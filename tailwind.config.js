@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
 
-const defaultTheme = require("tailwindcss/defaultTheme");
+import defaultTheme from "tailwindcss/defaultTheme";
 
-const plugin = require("tailwindcss/plugin");
+import plugin from "tailwindcss/plugin";
 
 const spacing = [...[...Array(1001).keys()]];
 
