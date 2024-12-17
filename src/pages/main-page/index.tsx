@@ -1,7 +1,10 @@
 import tw from "twin.macro";
+import { IconBack } from "../../components/Icons";
 
 const MainPage = () => {
-  return <StyledDiv>main</StyledDiv>;
+  return <StyledDiv>
+    <IconBack />
+  </StyledDiv>;
 };
 
 const StyledDiv = tw.div`
