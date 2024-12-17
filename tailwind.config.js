@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+ 
 
 import defaultTheme from "tailwindcss/defaultTheme";
 
@@ -38,20 +38,20 @@ module.exports = {
         gray: {
           100: "#E7E7E7",
           200: "#CFCFCF",
-
-          400: "#9A9A9A",
-          500: "#838383",
-
-          700: "#565656",
-          800: "#3F3F3F",
-          900: "#282828",
+        
+          400: "#A0A0A0",
+          500: "#888888",
+      
+          700: "#585858",
+          800: "#414141",
+          900: "#292929",
         },
 
         orange: "#FF5E00",
         green: "#59BC12",
         yellow: "#F3A216",
         red: "#FF5454",
-        closed: "#FF5454",
+        //closed: "#FF5454",
         // blue: "#FF5454",
         divider: "#EBEBED",
         border: "#F4F4F5",
