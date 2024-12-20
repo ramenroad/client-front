@@ -1,5 +1,3 @@
- 
-
 import defaultTheme from "tailwindcss/defaultTheme";
 
 import plugin from "tailwindcss/plugin";
@@ -38,10 +36,10 @@ module.exports = {
         gray: {
           100: "#E7E7E7",
           200: "#CFCFCF",
-        
+
           400: "#A0A0A0",
           500: "#888888",
-      
+
           700: "#585858",
           800: "#414141",
           900: "#292929",
@@ -51,8 +49,8 @@ module.exports = {
         green: "#59BC12",
         yellow: "#F3A216",
         red: "#FF5454",
-        //closed: "#FF5454",
-        // blue: "#FF5454",
+        closed: "#838383",
+        blue: "#3476E6",
         divider: "#EBEBED",
         border: "#F4F4F5",
       },
