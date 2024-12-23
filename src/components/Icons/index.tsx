@@ -30,20 +30,20 @@ export const IconFilter = ({ color, ...rest }: IconProps) => (
     <path
       d="M3 6H21"
       stroke={color ?? "#414141"}
-      stroke-width="1.5"
-      stroke-linecap="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
     <path
       d="M3 12H21"
       stroke={color ?? "#414141"}
-      stroke-width="1.5"
-      stroke-linecap="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
     <path
       d="M3 18H21"
       stroke={color ?? "#414141"}
-      stroke-width="1.5"
-      stroke-linecap="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
     <circle
       cx="8.5"
@@ -51,7 +51,7 @@ export const IconFilter = ({ color, ...rest }: IconProps) => (
       r="1.75"
       fill="white"
       stroke={color ?? "#414141"}
-      stroke-width="1.5"
+      strokeWidth="1.5"
     />
     <circle
       cx="15.5"
@@ -59,7 +59,7 @@ export const IconFilter = ({ color, ...rest }: IconProps) => (
       r="1.75"
       fill="white"
       stroke={color ?? "#414141"}
-      stroke-width="1.5"
+      strokeWidth="1.5"
     />
     <circle
       cx="10.5"
@@ -67,7 +67,7 @@ export const IconFilter = ({ color, ...rest }: IconProps) => (
       r="1.75"
       fill="white"
       stroke={color ?? "#414141"}
-      stroke-width="1.5"
+      strokeWidth="1.5"
     />
   </svg>
 );
@@ -123,7 +123,7 @@ export const IconTime = ({ color, ...rest }: IconProps) => (
     <path
       d="M8 5.5V8.29289C8 8.4255 8.05268 8.55268 8.14645 8.64645L9.5 10"
       stroke="white"
-      stroke-linecap="round"
+      strokeLinecap="round"
     />
   </svg>
 );
@@ -155,7 +155,7 @@ export const IconTag = ({ color, ...rest }: IconProps) => (
     preserveAspectRatio="none"
     {...rest}
   >
-    <g clip-path="url(#clip0_182_1434)">
+    <g clipPath="url(#clip0_182_1434)">
       <rect width="16" height="16" fill={"white"} />
       <path
         d="M7.66749 1.96825C7.92003 1.71571 8.28809 1.61703 8.6331 1.70935L12.5379 2.7543C12.8832 2.84671 13.153 3.11646 13.2454 3.4618L14.2904 7.3666C14.3827 7.71161 14.284 8.07967 14.0314 8.33222L7.79274 14.5709C7.40222 14.9614 6.76905 14.9614 6.37853 14.5709L1.42878 9.62117C1.03826 9.23065 1.03826 8.59749 1.42878 8.20696L7.66749 1.96825Z"
@@ -184,14 +184,14 @@ export const IconBack = ({ color, ...rest }: IconProps) => (
     <path
       d="M9.5 4.5L2.70711 11.2929C2.31658 11.6834 2.31658 12.3166 2.70711 12.7071L9.5 19.5"
       stroke={color ?? "#111111"}
-      stroke-width="1.5"
-      stroke-linecap="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
     <path
       d="M3.5 12H22"
       stroke={color ?? "#111111"}
-      stroke-width="1.5"
-      stroke-linecap="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
   </svg>
 );
@@ -209,8 +209,8 @@ export const IconDropDown = ({ color, ...rest }: IconProps) => (
     <path
       d="M3 6L7.29289 10.2929C7.68342 10.6834 8.31658 10.6834 8.70711 10.2929L13 6"
       stroke={color ?? "#565656"}
-      stroke-width="1.5"
-      stroke-linecap="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
   </svg>
 );
@@ -228,8 +228,8 @@ export const IconDropDownSelected = ({ color, ...rest }: IconProps) => (
     <path
       d="M3 10L7.29289 5.70711C7.68342 5.31658 8.31658 5.31658 8.70711 5.70711L13 10"
       stroke={color ?? "#565656"}
-      stroke-width="1.5"
-      stroke-linecap="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
   </svg>
 );

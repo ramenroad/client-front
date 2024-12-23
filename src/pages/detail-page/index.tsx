@@ -16,6 +16,7 @@ import styled from "@emotion/styled/macro";
 import { useState } from "react";
 import quoteStart from "../../assets/images/quotes-start.png";
 import quoteEnd from "../../assets/images/quotes-end.png";
+import KakaoMap from "./KaKaoMap";
 
 const dummyData = {
   id: "라멘야1",
@@ -34,7 +35,7 @@ const dummyData = {
     휴무일: "일요일",
   },
   phoneNumber: "010-1234-5678",
-  instagram: "https://www.instagram.com/example",
+  instagram: "https://www.instagram.com/example12312313123123123131231231",
   recommendMenu: [
     {
       name: "라멘",
@@ -59,6 +60,10 @@ const DAYS_MAP: { [key: string]: string } = {
   5: "금요일",
   6: "토요일",
 };
+
+const locationImage = "https://picsum.photos/200/300";
+
+//const realLocation = "서울특별시 마포구 동교로34길 21";
 
 // 영업 상태 확인 함수
 const checkIsOpen = (operatingHours: { [key: string]: string }): boolean => {
@@ -163,11 +168,12 @@ export const DetailPage = () => {
         </MarketDetailBoxContainer>
 
         <Divider />
+
         <ReviewTitle>리뷰</ReviewTitle>
         <RecommendMenuTitle>추천 메뉴</RecommendMenuTitle>
         <RecommendMenuContainer>
           {dummyData.recommendMenu.map((menu) => (
-            <RecommendMenuBox>
+            <RecommendMenuBox key={menu.name}>
               <RecommendMenuImage src={menu.image} alt={menu.name} />
               <RecommendMenuInfo>
                 <RecommendMenuName>{menu.name}</RecommendMenuName>
@@ -184,6 +190,14 @@ export const DetailPage = () => {
             <QuoteEndImage src={quoteEnd} />
           </QuateEndBox>
         </RecommendTextContainer>
+
+        <Divider />
+
+        <LocationTitle>위치</LocationTitle>
+        <LocationWrapper>
+          <KakaoMap />
+          <LocationImage src={locationImage} />
+        </LocationWrapper>
       </MarketDetailWrapper>
     </Wrapper>
   );
@@ -191,6 +205,7 @@ export const DetailPage = () => {
 
 const Wrapper = tw.div`
   flex flex-col items-center justify-center gap-16
+  pb-40
 `;
 
 const Header = tw.div`
@@ -231,7 +246,7 @@ const MarketDetailBoxContainer = tw.div`
 `;
 
 const MarketDetailBoxContent = tw.div`
-  font-14-r
+  font-14-r max-w-254 break-words
 `;
 
 const OperationgTimeTextContainer = tw.div`
@@ -264,7 +279,7 @@ const InstagramLink = tw.a`
 `;
 
 const Divider = tw.div`
-  w-full h-8 bg-divider
+  w-full h-8 bg-divider mt-16
 `;
 
 const ReviewTitle = tw.div`
@@ -276,7 +291,7 @@ const RecommendMenuTitle = tw.div`
 `;
 
 const RecommendMenuContainer = tw.div`
-  flex gap-16
+  flex gap-16 mb-16
 `;
 
 const RecommendMenuBox = tw.div`
@@ -322,6 +337,18 @@ const QuateEndBox = tw.div`
 
 const QuoteEndImage = tw.img`
   w-16 h-16
+`;
+
+const LocationTitle = tw.div`
+  font-18-sb pt-16
+`;
+
+const LocationWrapper = tw.div`
+  flex flex-col gap-16 w-350
+`;
+
+const LocationImage = tw.img`
+  w-full h-200
 `;
 
 export default DetailPage;

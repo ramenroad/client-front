@@ -3,7 +3,6 @@ import { LocationPathBox } from "./LocationPathBox";
 import mainImage from "../../assets/images/main-image.png";
 import mainLogo from "../../assets/images/logo.png";
 
-
 const locationPath = [
   {
     location: "연남동",
@@ -32,20 +31,18 @@ const locationPath = [
   {
     location: "관악구",
   },
-
 ];
-
 
 const MainPage = () => {
   return (
     <Wrapper>
       <MainLogoBox>
-        <MainLogo src={mainLogo}/>
+        <MainLogo src={mainLogo} />
       </MainLogoBox>
       <MainImageContainer>
-        <MainImage src={mainImage}/>
+        <MainImage src={mainImage} />
         <MainText>
-          다양한 라멘야 정보를 <br/> 
+          다양한 라멘야 정보를 <br />
           알려드려요
         </MainText>
       </MainImageContainer>
@@ -54,12 +51,12 @@ const MainPage = () => {
         <LocationViewingText>지역별 보기</LocationViewingText>
         <LocationPathContainer>
           {locationPath.map((location, index) => (
-            <LocationPathBox key={index} location={location.location}/>
+            <LocationPathBox key={index} location={location.location} />
           ))}
         </LocationPathContainer>
       </LocationViewingWrapper>
     </Wrapper>
-  )
+  );
 };
 
 const Wrapper = tw.div`
@@ -77,7 +74,7 @@ const MainLogo = tw.img`
 `;
 
 const MainImageContainer = tw.div`
-  flex relative
+  flex relative mb-20
 `;
 
 const MainImage = tw.img`
@@ -101,6 +98,5 @@ const LocationPathContainer = tw.div`
   grid grid-cols-3 gap-4
   w-350
 `;
-
 
 export default MainPage;
