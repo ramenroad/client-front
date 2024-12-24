@@ -22,7 +22,7 @@ const dummyData = {
   id: "라멘야1",
   name: "라멘야",
   genre: ["이에케", "이부라", "츠케멘"],
-  address: "서울특별시 강남구 테헤란로 14길 57 1층",
+  address: "성남대로43번길 10 하나EZ타워",
   operatingHours: {
     월요일: "10:00 ~ 20:00",
     화요일: "10:00 ~ 20:00",
@@ -48,6 +48,15 @@ const dummyData = {
       image: "https://picsum.photos/200/300",
     },
   ],
+  description: `라멘을 받자마자 느낀 점은 플레이팅에 굉장히 신경을 쓰셨구나 였습니다. 이게 플레이팅이 너무 예뻐서 약간 먹기 아까다 싶을 정도였습니다. 야채가 조금 들어가있는데 여러 색을 쓰셔서 그런지 보기가 정말 좋았습니다. 보기 좋은 떡이 먹기도 좋다라는 말이 괜히 있는 게 아니죠.
+
+국물부터 먹어봤습니다. 국물은 생각보다 기름기가 있는 편이였습니다. 느끼하다기보단 육향이 잘 느껴지는 느낌이였습니다. 면은 푹 익은 면이였습니다. 먹었던 시오 라멘 중엔 가장 푹 익은 면이였던 거 같아요. 거부감은 없는 정도였습니다.
+
+차슈랑 닭가슴살은 부드럽게 잘 익었지만 육향이 진하진 않았습니다. 평범하게 잘 조리된 고기였습니다.
+
+라멘 롱시즌 시오 라멘은 고기를 모두 먹고 면과 국물을 먹을 때 비로소 강점이 도드라지는 느낌이였습니다. 최근에 방문했고 자주 방문하는 멘야준, 희옥에 비해 염도가 낮은 느낌이였는데요. 염도가 낮은 게 '심심하다' '간이 더 됐으면 좋겠다' 가 아닌 '국믈이 육향을 즐기기 너무 좋다' 로 다가왔습니다. 평소에 라멘 염도를 높게 먹기도 하고 삼삼한 맛을 별로 선호하진 않음에도 불구하고 삼삼함이 정말 기분좋게 느껴졌습니다. 오히려 간이 더 됐다면 닭 육향만을 찐하게 즐기기 어려웠을 것 같습니다. 처음에 얘기했던 기름기가 이 부분에서 빛났습니다. 삼삼함과 적절한 기름기가 만나 국물을 즐기기 정말 좋았습니다.
+
+연남동에서 손에 꼽히는 시오 라멘 맛집이 아닐까..생각해봅니다.`
 };
 
 // 요일 매핑 객체 추가
@@ -60,10 +69,6 @@ const DAYS_MAP: { [key: string]: string } = {
   5: "금요일",
   6: "토요일",
 };
-
-const locationImage = "https://picsum.photos/200/300";
-
-//const realLocation = "서울특별시 마포구 동교로34길 21";
 
 // 영업 상태 확인 함수
 const checkIsOpen = (operatingHours: { [key: string]: string }): boolean => {
@@ -91,6 +96,7 @@ export const DetailPage = () => {
 
   return (
     <Wrapper>
+      <Container>
       <Header>
         <StyledIconBack onClick={() => navigate(-1)} />
       </Header>
@@ -170,11 +176,12 @@ export const DetailPage = () => {
         <Divider />
 
         <ReviewTitle>리뷰</ReviewTitle>
+        <RecommendBox>
         <RecommendMenuTitle>추천 메뉴</RecommendMenuTitle>
         <RecommendMenuContainer>
           {dummyData.recommendMenu.map((menu) => (
             <RecommendMenuBox key={menu.name}>
-              <RecommendMenuImage src={menu.image} alt={menu.name} />
+              {/* <RecommendMenuImage src={menu.image} alt={menu.name} /> */}
               <RecommendMenuInfo>
                 <RecommendMenuName>{menu.name}</RecommendMenuName>
                 <RecommendMenuPrice>{menu.price}</RecommendMenuPrice>
@@ -182,10 +189,11 @@ export const DetailPage = () => {
             </RecommendMenuBox>
           ))}
         </RecommendMenuContainer>
+        </RecommendBox>
         <RecommendTextContainer>
           <QuoteStartImage src={quoteStart} />
           <RecommendTitle>추천 메뉴를 소개합니다.</RecommendTitle>
-          <RecommendText>추천 메뉴를 소개합니다.</RecommendText>
+          <RecommendText>{dummyData.description}</RecommendText>
           <QuateEndBox>
             <QuoteEndImage src={quoteEnd} />
           </QuateEndBox>
@@ -195,22 +203,26 @@ export const DetailPage = () => {
 
         <LocationTitle>위치</LocationTitle>
         <LocationWrapper>
-          <KakaoMap />
-          <LocationImage src={locationImage} />
+          <KakaoMap location={dummyData.address} />
         </LocationWrapper>
       </MarketDetailWrapper>
+      </Container>
     </Wrapper>
   );
 };
 
 const Wrapper = tw.div`
-  flex flex-col items-center justify-center gap-16
+  flex flex-col items-center justify-center
   pb-40
+`;
+
+const Container = tw.div`
+  flex flex-col gap-16 w-390
 `;
 
 const Header = tw.div`
   flex items-center justify-start
-  px-20 py-10 w-350
+  px-20 py-10 w-full
 `;
 
 const StyledIconBack = tw(IconBack)`
@@ -286,6 +298,10 @@ const ReviewTitle = tw.div`
   font-18-sb pt-16
 `;
 
+const RecommendBox = tw.div`
+  flex flex-col gap-8
+`;
+
 const RecommendMenuTitle = tw.div`
   font-14-r text-gray-400
 `;
@@ -298,9 +314,9 @@ const RecommendMenuBox = tw.div`
   flex flex-col gap-12
 `;
 
-const RecommendMenuImage = tw.img`
-  w-100 h-100 rounded-8
-`;
+// const RecommendMenuImage = tw.img`
+//   w-100 h-100 rounded-8
+// `;
 
 const RecommendMenuInfo = tw.div`
   flex flex-col
@@ -324,7 +340,7 @@ const RecommendTitle = tw.div`
 `;
 
 const RecommendText = tw.div`
-  font-14-r
+  font-14-r whitespace-pre-line
 `;
 
 const QuoteStartImage = tw.img`
@@ -344,11 +360,7 @@ const LocationTitle = tw.div`
 `;
 
 const LocationWrapper = tw.div`
-  flex flex-col gap-16 w-350
-`;
-
-const LocationImage = tw.img`
-  w-full h-200
+  flex flex-col gap-16
 `;
 
 export default DetailPage;

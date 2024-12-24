@@ -1,13 +1,16 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import tw from "twin.macro";
 
-declare global {
-  interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    kakao: any;
-  }
+interface KakaoMapProps {
+  location: string;
 }
 
-const KakaoMap = () => {
+interface KakaoGeocoderResult {
+  y: string;
+  x: string;
+}
+
+const KakaoMap = ({ location }: KakaoMapProps) => {
   useEffect(() => {
     const loadKakaoMap = () => {
       // 이미 스크립트가 로드되어 있는지 확인
@@ -28,42 +31,31 @@ const KakaoMap = () => {
       }
 
       script.addEventListener("load", () => {
-        console.log("카카오맵 스크립트 로드됨");
-
-        // kakao.maps.load 함수를 사용하여 지도 API를 초기화
         window.kakao.maps.load(() => {
           const container = document.getElementById("map");
-          const realLocation = "서울특별시 마포구 동교로34길 21";
-
+          const realLocation = location;
           if (!container) {
-            console.error("지도를 표시할 div를 찾을 수 없습니다.");
             return;
           }
 
           try {
-            // 임시 중심 좌표로 지도 생성
             const map = new window.kakao.maps.Map(container, {
               center: new window.kakao.maps.LatLng(33.450701, 126.570667),
               level: 3,
             });
-
-            // 주소 검색
             const geocoder = new window.kakao.maps.services.Geocoder();
 
-            geocoder.addressSearch(realLocation, (result: any, status: any) => {
+            geocoder.addressSearch(realLocation, (result: KakaoGeocoderResult[], status: typeof window.kakao.maps.services.Status) => {
               if (status === window.kakao.maps.services.Status.OK) {
                 const coords = new window.kakao.maps.LatLng(
                   result[0].y,
                   result[0].x
                 );
-
-                // 마커 생성
-                const marker = new window.kakao.maps.Marker({
+                new window.kakao.maps.Marker({
                   map: map,
                   position: coords,
                 });
 
-                // 지도 중심 이동
                 map.setCenter(coords);
               } else {
                 console.error("주소 검색 실패");
@@ -74,11 +66,6 @@ const KakaoMap = () => {
           }
         });
       });
-
-      script.addEventListener("error", (error) => {
-        console.error("스크립트 로드 실패:", error);
-      });
-
       document.head.appendChild(script);
     };
 
@@ -92,17 +79,13 @@ const KakaoMap = () => {
         script.remove();
       }
     };
-  }, []);
+  }, [location]);
 
-  return (
-    <div
-      id="map"
-      style={{
-        width: "100%",
-        height: "400px",
-      }}
-    ></div>
-  );
+  return <Wrapper id="map"></Wrapper>;
 };
+
+const Wrapper = tw.div`
+  w-full h-210
+`;
 
 export default KakaoMap;
