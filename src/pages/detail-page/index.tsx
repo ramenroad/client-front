@@ -213,7 +213,7 @@ export const DetailPage = () => {
 
 const Wrapper = tw.div`
   flex flex-col items-center justify-center
-  pb-40
+  pb-40 px-20
 `;
 
 const Container = tw.div`
