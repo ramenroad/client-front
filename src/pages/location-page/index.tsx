@@ -4,12 +4,12 @@ import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
 import { useMemo, useState } from "react";
 import { IconBack, IconFilter } from "../../components/Icons";
 import styled from "@emotion/styled";
-import { ramenyaType } from "../../constants";
+import { RAMENYA_TYPES } from "../../constants";
 import RamenyaCard from "./RamenyaCard.tsx";
 
 export const LocationPage = () => {
   const { location } = useParams();
-  const ramenyaListQuery = useRamenyaListQuery("강남");
+  const ramenyaListQuery = useRamenyaListQuery(location);
 
   const [selectedFilterList, setSelectedFilterList] = useState<string[]>([]);
 
@@ -50,7 +50,7 @@ export const LocationPage = () => {
           <TagWrapper>
             <TagList>
               <OverflowBox>
-                {ramenyaType.map((type, index) => {
+                {RAMENYA_TYPES.map((type, index) => {
                   if (index > 5) return;
                   return (
                     <Tag
@@ -66,7 +66,7 @@ export const LocationPage = () => {
             </TagList>
             <TagList>
               <OverflowBox>
-                {ramenyaType.map((type, index) => {
+                {RAMENYA_TYPES.map((type, index) => {
                   if (index <= 5) return;
                   return (
                     <Tag
@@ -88,7 +88,7 @@ export const LocationPage = () => {
           <RamenyaListWrapper>
             {ramenyaList?.map((ramenya) => (
               <>
-                <RamenyaCard ramenya={ramenya} />
+                <RamenyaCard key={ramenya._id} ramenya={ramenya} />
                 <SubLine />
               </>
             ))}

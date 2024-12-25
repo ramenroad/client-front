@@ -1,20 +1,5 @@
-import { BusinessHour } from "../types";
-
-export enum OpenStatus {
-  OPEN = "영업 중",
-  CLOSED = "영업 종료",
-  BREAK = "쉬는 중",
-  BEFORE_OPEN = "영업 전",
-  DAY_OFF = "휴무일",
-}
-
-interface BusinessStatus {
-  status: OpenStatus;
-  todayHours: {
-    operatingTime: string | null;
-    breakTime: string | null;
-  } | null;
-}
+import { BusinessHour, BusinessStatus } from "../types";
+import { OpenStatus } from "../constants";
 
 export const checkBusinessStatus = (
   businessHours: BusinessHour[],
@@ -50,14 +35,6 @@ export const checkBusinessStatus = (
 
   const closing = new Date();
   closing.setHours(closeHour, closeMinute, 0, 0);
-
-  console.log(
-    "%cindex.ts:52 - %ccurrentTime, opening = ",
-    "color:yellow;",
-    "color:lightgreen; font-weight:bold",
-    currentTime,
-    opening,
-  );
 
   // Check if before opening
   if (currentTime < opening) {

@@ -1,3 +1,5 @@
+import { OpenStatus } from "../constants";
+
 export type BusinessHour = {
   day: string;
   operatingTime: string; // e.g., "09:00 – 18:00"
@@ -13,4 +15,12 @@ export interface Ramenya {
   businessHours: BusinessHour[];
   address: string;
   thumbnailUrl?: string;
+}
+
+export interface BusinessStatus {
+  status: OpenStatus;
+  todayHours: {
+    operatingTime: string | null;
+    breakTime: string | null;
+  } | null;
 }

@@ -1,4 +1,5 @@
 import { SVGProps } from "react";
+import tw from "twin.macro";
 
 interface IconProps extends Omit<SVGProps<SVGSVGElement>, "color"> {
   color?: string;
@@ -25,6 +26,7 @@ export const IconFilter = ({ color, ...rest }: IconProps) => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="none"
+    css={tw`cursor-pointer`}
     style={{
       cursor: "pointer",
     }}
