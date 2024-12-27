@@ -24,13 +24,13 @@ const dummyData = {
   genre: ["이에케", "이부라", "츠케멘"],
   address: "성남대로43번길 10 하나EZ타워",
   operatingHours: {
-    월요일: "10:00 ~ 20:00",
-    화요일: "10:00 ~ 20:00",
-    수요일: "10:00 ~ 20:00",
-    목요일: "10:00 ~ 20:00",
-    금요일: "10:00 ~ 20:00",
-    토요일: "10:00 ~ 20:00",
-    일요일: "10:00 ~ 20:00",
+    월요일: "10:00 - 20:00",
+    화요일: "10:00 - 20:00",
+    수요일: "10:00 - 20:00",
+    목요일: "10:00 - 20:00",
+    금요일: "10:00 - 20:00",
+    토요일: "10:00 - 20:00",
+    일요일: "10:00 - 20:00",
     브레이크타임: "10:00 ~ 20:00",
     휴무일: "일요일",
   },
@@ -79,7 +79,7 @@ const checkIsOpen = (operatingHours: { [key: string]: string }): boolean => {
   const todayHours = operatingHours[currentDay];
   if (!todayHours) return false;
 
-  const [start, end] = todayHours.split("~").map((time) => {
+  const [start, end] = todayHours.split("-").map((time) => {
     const [hours, minutes] = time.trim().split(":").map(Number);
     return hours * 100 + minutes;
   });
