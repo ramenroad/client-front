@@ -43,7 +43,7 @@ export const LocationPage = () => {
           <span>{location}</span>
         </Header>
         <FilterWrapper>
-          <IconFilter
+          <StyledIconFilter
             onClick={() => setSelectedFilterList([])}
             color={selectedFilterList.length >= 1 ? "#FF5E00" : "black"}
           />
@@ -124,6 +124,10 @@ const IconWrapper = tw.div`
 
 const FilterWrapper = tw.section`
   box-border pl-20 flex gap-8 w-full
+`;
+
+const StyledIconFilter = tw(IconFilter)`
+  cursor-pointer
 `;
 
 const TagWrapper = tw.div`

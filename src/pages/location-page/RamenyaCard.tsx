@@ -1,10 +1,10 @@
 import { Ramenya } from "../../types";
-import { checkBusinessStatus, OpenStatus } from "../../util";
+import { checkBusinessStatus } from "../../util";
 import tw from "twin.macro";
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import storeImage from "../../assets/images/store.png";
-
+import { OpenStatus } from "../../constants";
 interface RamenyaCardProps {
   ramenya: Ramenya;
 }
