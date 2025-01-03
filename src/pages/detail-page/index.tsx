@@ -11,6 +11,8 @@ import {
   IconTime,
 } from "../../components/Icons";
 import tw from "twin.macro";
+import { useParams } from "react-router-dom";
+import { useRamenyaDetailQuery } from "../../hooks/useRamenyaDetailQuery";
 import DetailIconTag from "./DetailIconTag";
 import styled from "@emotion/styled/macro";
 import { useState } from "react";
@@ -88,7 +90,8 @@ const checkIsOpen = (operatingHours: { [key: string]: string }): boolean => {
 };
 
 export const DetailPage = () => {
-  //const { id } = useParams();
+  const { id } = useParams();
+  const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
 
@@ -106,9 +109,9 @@ export const DetailPage = () => {
           <MarketDetailBox>
             <DetailIconTag icon={<IconTag />} text="장르" />
             <MarketDetailGenreBox>
-              {dummyData.genre.map((genre, index) => (
+              {ramenyaDetailQuery.data?.genre.map((genre, index) => (
                 <MarketDetailGenre key={genre}>
-                  {genre} {index !== dummyData.genre.length - 1 && <IconBar />}
+                  {genre} {index !== ramenyaDetailQuery.data?.genre.length - 1 && <IconBar />}
                 </MarketDetailGenre>
               ))}
             </MarketDetailGenreBox>
@@ -117,7 +120,7 @@ export const DetailPage = () => {
           <MarketDetailBox>
             <DetailIconTag icon={<IconLocate />} text="주소" />
             <MarketDetailBoxAddressText>
-              {dummyData.address}
+              {ramenyaDetailQuery.data?.address}
             </MarketDetailBoxAddressText>
           </MarketDetailBox>
 
@@ -155,7 +158,7 @@ export const DetailPage = () => {
           <MarketDetailBox>
             <DetailIconTag icon={<IconCall />} text="전화번호" />
             <MarketDetailBoxContent>
-              <PhoneNumberText>{dummyData.phoneNumber}</PhoneNumberText>
+              <PhoneNumberText>{ramenyaDetailQuery.data?.contactNumber}</PhoneNumberText>
             </MarketDetailBoxContent>
           </MarketDetailBox>
 
@@ -163,7 +166,7 @@ export const DetailPage = () => {
             <DetailIconTag icon={<IconInstagram />} text="인스타그램" />
             <MarketDetailBoxContent>
               <InstagramLink
-                href={dummyData.instagram}
+                href={ramenyaDetailQuery.data?.instagramProfile}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -179,7 +182,7 @@ export const DetailPage = () => {
         <RecommendBox>
         <RecommendMenuTitle>추천 메뉴</RecommendMenuTitle>
         <RecommendMenuContainer>
-          {dummyData.recommendMenu.map((menu) => (
+          {ramenyaDetailQuery.data?.recommendedMenu.map((menu) => (
             <RecommendMenuBox key={menu.name}>
               {/* <RecommendMenuImage src={menu.image} alt={menu.name} /> */}
               <RecommendMenuInfo>

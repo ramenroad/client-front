@@ -24,3 +24,21 @@ export interface BusinessStatus {
     breakTime: string | null;
   } | null;
 }
+
+export interface RemenyaDetail {
+  name: string;
+  thumbnailUrl: string;
+  genre: string[];
+  region: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  contactNumber: string;
+  instagramProfile: string;
+  businessHours: BusinessHour[];
+  recommendedMenu: {
+    name: string;
+    price: number;
+  }[];
+  isSelfmadeNoodle: boolean;
+}
