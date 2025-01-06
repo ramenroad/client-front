@@ -99,13 +99,9 @@ export const DetailPage = () => {
                     }
                   </OpenStatusText>
                   <TimeHeader>
-                    {
-                      dayMapping[
-                        ramenyaDetailQuery.data?.businessHours[0].day.toLowerCase() ??
-                          ""
-                      ]
-                    }
-                    : {ramenyaDetailQuery.data?.businessHours[0].operatingTime}
+                    {ramenyaDetailQuery.data?.businessHours[0].isOpen
+                      ? `${dayMapping[ramenyaDetailQuery.data?.businessHours[0].day.toLowerCase() ?? ""]}: ${ramenyaDetailQuery.data?.businessHours[0].operatingTime}`
+                      : `매주 ${dayMapping[ramenyaDetailQuery.data?.businessHours[0].day.toLowerCase() ?? ""]} 휴무`}
                     {isTimeExpanded ? (
                       <IconDropDownSelected
                         onClick={() => setIsTimeExpanded(false)}
@@ -115,15 +111,27 @@ export const DetailPage = () => {
                     )}
                   </TimeHeader>
                   {isTimeExpanded && (
-                    <TimeDetails>
-                      {ramenyaDetailQuery.data?.businessHours
-                        .slice(1)
-                        .map((businessHour) => (
-                          <div key={businessHour.day}>
-                            {`${dayMapping[businessHour.day.toLowerCase()]}: ${businessHour.operatingTime}`}
-                          </div>
-                        ))}
-                    </TimeDetails>
+                    <>
+                      <TimeDetails>
+                        {`${dayMapping[ramenyaDetailQuery.data?.businessHours[0].day.toLowerCase() ?? ""]} 브레이크타임 ${ramenyaDetailQuery.data?.businessHours[0].breakTime}`}
+                      </TimeDetails>
+                      <TimeDetails>
+                        {ramenyaDetailQuery.data?.businessHours
+                          .slice(1)
+                          .map((businessHour) => (
+                            <div key={businessHour.day}>
+                              {businessHour.isOpen ? (
+                                <TimeDetails>
+                                  <div>{`${dayMapping[businessHour.day.toLowerCase()]}: ${businessHour.operatingTime}`}</div>
+                                  <div>{`${dayMapping[businessHour.day.toLowerCase()]} 브레이크타임 ${businessHour.breakTime}`}</div>
+                                </TimeDetails>
+                              ) : (
+                                `매주 ${dayMapping[businessHour.day.toLowerCase()]} 휴무`
+                              )}
+                            </div>
+                          ))}
+                      </TimeDetails>
+                    </>
                   )}
                 </OperationgTimeTextContainer>
               </MarketDetailBoxContent>
