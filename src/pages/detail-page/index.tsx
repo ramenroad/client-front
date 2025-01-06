@@ -19,37 +19,12 @@ import { useState } from "react";
 import quoteStart from "../../assets/images/quotes-start.png";
 import quoteEnd from "../../assets/images/quotes-end.png";
 import KakaoMap from "./KaKaoMap";
+import { checkBusinessStatus } from "../../util";
+import { OpenStatus } from "../../constants";
+
 
 const dummyData = {
-  id: "라멘야1",
-  name: "라멘야",
-  genre: ["이에케", "이부라", "츠케멘"],
   address: "성남대로43번길 10 하나EZ타워",
-  operatingHours: {
-    월요일: "10:00 - 20:00",
-    화요일: "10:00 - 20:00",
-    수요일: "10:00 - 20:00",
-    목요일: "10:00 - 20:00",
-    금요일: "10:00 - 20:00",
-    토요일: "10:00 - 20:00",
-    일요일: "10:00 - 20:00",
-    브레이크타임: "10:00 ~ 20:00",
-    휴무일: "일요일",
-  },
-  phoneNumber: "010-1234-5678",
-  instagram: "https://www.instagram.com/example12312313123123123131231231",
-  recommendMenu: [
-    {
-      name: "라멘",
-      price: "10,000원",
-      image: "https://picsum.photos/200/300",
-    },
-    {
-      name: "라멘2",
-      price: "12,000원",
-      image: "https://picsum.photos/200/300",
-    },
-  ],
   description: `라멘을 받자마자 느낀 점은 플레이팅에 굉장히 신경을 쓰셨구나 였습니다. 이게 플레이팅이 너무 예뻐서 약간 먹기 아까다 싶을 정도였습니다. 야채가 조금 들어가있는데 여러 색을 쓰셔서 그런지 보기가 정말 좋았습니다. 보기 좋은 떡이 먹기도 좋다라는 말이 괜히 있는 게 아니죠.
 
 국물부터 먹어봤습니다. 국물은 생각보다 기름기가 있는 편이였습니다. 느끼하다기보단 육향이 잘 느껴지는 느낌이였습니다. 면은 푹 익은 면이였습니다. 먹었던 시오 라멘 중엔 가장 푹 익은 면이였던 거 같아요. 거부감은 없는 정도였습니다.
@@ -61,41 +36,12 @@ const dummyData = {
 연남동에서 손에 꼽히는 시오 라멘 맛집이 아닐까..생각해봅니다.`
 };
 
-// 요일 매핑 객체 추가
-const DAYS_MAP: { [key: string]: string } = {
-  0: "일요일",
-  1: "월요일",
-  2: "화요일",
-  3: "수요일",
-  4: "목요일",
-  5: "금요일",
-  6: "토요일",
-};
-
-// 영업 상태 확인 함수
-const checkIsOpen = (operatingHours: { [key: string]: string }): boolean => {
-  const now = new Date();
-  const currentDay = DAYS_MAP[now.getDay()];
-  const currentTime = now.getHours() * 100 + now.getMinutes();
-
-  const todayHours = operatingHours[currentDay];
-  if (!todayHours) return false;
-
-  const [start, end] = todayHours.split("-").map((time) => {
-    const [hours, minutes] = time.trim().split(":").map(Number);
-    return hours * 100 + minutes;
-  });
-
-  return currentTime >= start && currentTime <= end;
-};
 
 export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
-
-  const isOpen = checkIsOpen(dummyData.operatingHours);
 
   return (
     <Wrapper>
@@ -104,7 +50,7 @@ export const DetailPage = () => {
         <StyledIconBack onClick={() => navigate(-1)} />
       </Header>
       <MarketDetailWrapper>
-        <MarketDetailTitle>{dummyData.name}</MarketDetailTitle>
+        <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
         <MarketDetailBoxContainer>
           <MarketDetailBox>
             <DetailIconTag icon={<IconTag />} text="장르" />
@@ -128,12 +74,12 @@ export const DetailPage = () => {
             <DetailIconTag icon={<IconTime />} text="운영시간" />
             <MarketDetailBoxContent>
               <OperationgTimeTextContainer>
-                <OpenStatusText isOpen={isOpen}>
-                  {isOpen ? "영업중" : "영업종료"}
+                <OpenStatusText status={checkBusinessStatus(ramenyaDetailQuery.data?.businessHours ?? []).status}>
+                  {checkBusinessStatus(ramenyaDetailQuery.data?.businessHours ?? []).status}
                 </OpenStatusText>
                 <TimeHeader>
-                  {Object.entries(dummyData.operatingHours)[0][0]}:{" "}
-                  {Object.entries(dummyData.operatingHours)[0][1]}
+                  {ramenyaDetailQuery.data?.businessHours[0].day}:{" "}
+                  {ramenyaDetailQuery.data?.businessHours[0].operatingTime}
                   {isTimeExpanded ? (
                     <IconDropDownSelected
                       onClick={() => setIsTimeExpanded(false)}
@@ -144,11 +90,9 @@ export const DetailPage = () => {
                 </TimeHeader>
                 {isTimeExpanded && (
                   <TimeDetails>
-                    {Object.entries(dummyData.operatingHours)
-                      .slice(1)
-                      .map(([day, time]) => (
-                        <div key={day}>{`${day}: ${time}`}</div>
-                      ))}
+                    {ramenyaDetailQuery.data?.businessHours.slice(1).map((businessHour) => (
+                      <div key={businessHour.day}>{`${businessHour.day}: ${businessHour.operatingTime}`}</div>
+                    ))}
                   </TimeDetails>
                 )}
               </OperationgTimeTextContainer>
@@ -170,7 +114,7 @@ export const DetailPage = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {dummyData.instagram}
+                {ramenyaDetailQuery.data?.instagramProfile}
               </InstagramLink>
             </MarketDetailBoxContent>
           </MarketDetailBox>
@@ -269,12 +213,12 @@ const OperationgTimeTextContainer = tw.div`
 `;
 
 interface OpenStatusTextProps {
-  isOpen: boolean;
+  status: OpenStatus;
 }
 
-const OpenStatusText = styled.div<OpenStatusTextProps>(({ isOpen }) => [
+const OpenStatusText = styled.div<OpenStatusTextProps>(({ status }) => [
   tw`font-14-r`,
-  isOpen ? tw`text-green` : tw`text-red`,
+  status === OpenStatus.OPEN ? tw`text-green` : status === OpenStatus.BREAK ? tw`text-orange` : tw`text-red`
 ]);
 
 const TimeHeader = tw.div`
