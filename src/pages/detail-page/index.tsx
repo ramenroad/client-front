@@ -35,6 +35,16 @@ const dummyData = {
 연남동에서 손에 꼽히는 시오 라멘 맛집이 아닐까..생각해봅니다.`,
 };
 
+const dayMapping: { [key: string]: string } = {
+  mon: "월요일",
+  tue: "화요일",
+  wed: "수요일",
+  thu: "목요일",
+  fri: "금요일",
+  sat: "토요일",
+  sun: "일요일",
+};
+
 export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
@@ -89,8 +99,13 @@ export const DetailPage = () => {
                     }
                   </OpenStatusText>
                   <TimeHeader>
-                    {ramenyaDetailQuery.data?.businessHours[0].day}:{" "}
-                    {ramenyaDetailQuery.data?.businessHours[0].operatingTime}
+                    {
+                      dayMapping[
+                        ramenyaDetailQuery.data?.businessHours[0].day.toLowerCase() ??
+                          ""
+                      ]
+                    }
+                    : {ramenyaDetailQuery.data?.businessHours[0].operatingTime}
                     {isTimeExpanded ? (
                       <IconDropDownSelected
                         onClick={() => setIsTimeExpanded(false)}
@@ -104,9 +119,9 @@ export const DetailPage = () => {
                       {ramenyaDetailQuery.data?.businessHours
                         .slice(1)
                         .map((businessHour) => (
-                          <div
-                            key={businessHour.day}
-                          >{`${businessHour.day}: ${businessHour.operatingTime}`}</div>
+                          <div key={businessHour.day}>
+                            {`${dayMapping[businessHour.day.toLowerCase()]}: ${businessHour.operatingTime}`}
+                          </div>
                         ))}
                     </TimeDetails>
                   )}
