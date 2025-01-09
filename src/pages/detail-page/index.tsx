@@ -22,18 +22,7 @@ import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
 
-const dummyData = {
-  address: "성남대로43번길 10 하나EZ타워",
-  description: `라멘을 받자마자 느낀 점은 플레이팅에 굉장히 신경을 쓰셨구나 였습니다. 이게 플레이팅이 너무 예뻐서 약간 먹기 아까다 싶을 정도였습니다. 야채가 조금 들어가있는데 여러 색을 쓰셔서 그런지 보기가 정말 좋았습니다. 보기 좋은 떡이 먹기도 좋다라는 말이 괜히 있는 게 아니죠.
 
-국물부터 먹어봤습니다. 국물은 생각보다 기름기가 있는 편이였습니다. 느끼하다기보단 육향이 잘 느껴지는 느낌이였습니다. 면은 푹 익은 면이였습니다. 먹었던 시오 라멘 중엔 가장 푹 익은 면이였던 거 같아요. 거부감은 없는 정도였습니다.
-
-차슈랑 닭가슴살은 부드럽게 잘 익었지만 육향이 진하진 않았습니다. 평범하게 잘 조리된 고기였습니다.
-
-라멘 롱시즌 시오 라멘은 고기를 모두 먹고 면과 국물을 먹을 때 비로소 강점이 도드라지는 느낌이였습니다. 최근에 방문했고 자주 방문하는 멘야준, 희옥에 비해 염도가 낮은 느낌이였는데요. 염도가 낮은 게 '심심하다' '간이 더 됐으면 좋겠다' 가 아닌 '국믈이 육향을 즐기기 너무 좋다' 로 다가왔습니다. 평소에 라멘 염도를 높게 먹기도 하고 삼삼한 맛을 별로 선호하진 않음에도 불구하고 삼삼함이 정말 기분좋게 느껴졌습니다. 오히려 간이 더 됐다면 닭 육향만을 찐하게 즐기기 어려웠을 것 같습니다. 처음에 얘기했던 기름기가 이 부분에서 빛났습니다. 삼삼함과 적절한 기름기가 만나 국물을 즐기기 정말 좋았습니다.
-
-연남동에서 손에 꼽히는 시오 라멘 맛집이 아닐까..생각해봅니다.`,
-};
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -50,6 +39,22 @@ export const DetailPage = () => {
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
+
+  // 오늘 요일 구하기
+  const getCurrentDayIndex = () => {
+    const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    return days[new Date().getDay()];
+  };
+
+  // 오늘 영업 시간 찾기
+  const getTodayBusinessHour = () => {
+    const today = getCurrentDayIndex();
+    return ramenyaDetailQuery.data?.businessHours.find(
+      (hour) => hour.day.toLowerCase() === today
+    );
+  };
+
+  const todayBusinessHour = getTodayBusinessHour();
 
   return (
     <Wrapper>
@@ -99,25 +104,25 @@ export const DetailPage = () => {
                     }
                   </OpenStatusText>
                   <TimeHeader>
-                    {ramenyaDetailQuery.data?.businessHours[0].isOpen
-                      ? `${dayMapping[ramenyaDetailQuery.data?.businessHours[0].day.toLowerCase() ?? ""]}: ${ramenyaDetailQuery.data?.businessHours[0].operatingTime}`
-                      : `매주 ${dayMapping[ramenyaDetailQuery.data?.businessHours[0].day.toLowerCase() ?? ""]} 휴무`}
+                    {todayBusinessHour?.isOpen
+                      ? `${dayMapping[todayBusinessHour.day.toLowerCase()]}: ${todayBusinessHour.operatingTime}`
+                      : `매주 ${dayMapping[todayBusinessHour?.day.toLowerCase() ?? ""]} 휴무`}
                     {isTimeExpanded ? (
-                      <IconDropDownSelected
+                      <StyledIconDropDownSelected
                         onClick={() => setIsTimeExpanded(false)}
                       />
                     ) : (
-                      <IconDropDown onClick={() => setIsTimeExpanded(true)} />
+                      <StyledIconDropDown onClick={() => setIsTimeExpanded(true)} />
                     )}
                   </TimeHeader>
                   {isTimeExpanded && (
                     <>
                       <TimeDetails>
-                        {`${dayMapping[ramenyaDetailQuery.data?.businessHours[0].day.toLowerCase() ?? ""]} 브레이크타임 ${ramenyaDetailQuery.data?.businessHours[0].breakTime}`}
+                        {`${dayMapping[todayBusinessHour?.day.toLowerCase() ?? ""]} 브레이크타임 ${todayBusinessHour?.breakTime}`}
                       </TimeDetails>
                       <TimeDetails>
                         {ramenyaDetailQuery.data?.businessHours
-                          .slice(1)
+                          .filter(hour => hour.day.toLowerCase() !== getCurrentDayIndex())
                           .map((businessHour) => (
                             <div key={businessHour.day}>
                               {businessHour.isOpen ? (
@@ -180,7 +185,7 @@ export const DetailPage = () => {
           <RecommendTextContainer>
             <QuoteStartImage src={quoteStart} />
             <RecommendTitle>추천 메뉴를 소개합니다.</RecommendTitle>
-            <RecommendText>{dummyData.description}</RecommendText>
+            <RecommendText>{ramenyaDetailQuery.data?.description}</RecommendText>
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>
@@ -270,6 +275,14 @@ const OpenStatusText = styled.div<OpenStatusTextProps>(({ status }) => [
 
 const TimeHeader = tw.div`
   flex gap-4 items-center 
+`;
+
+const StyledIconDropDown = tw(IconDropDown)`
+  cursor-pointer
+`;
+
+const StyledIconDropDownSelected = tw(IconDropDownSelected)`
+  cursor-pointer
 `;
 
 const TimeDetails = tw.div`

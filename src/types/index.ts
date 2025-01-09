@@ -41,4 +41,5 @@ export interface RemenyaDetail {
     price: number;
   }[];
   isSelfmadeNoodle: boolean;
+  description: string;
 }
