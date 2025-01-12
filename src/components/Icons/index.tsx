@@ -1,4 +1,5 @@
 import { SVGProps } from "react";
+import tw from "twin.macro";
 
 interface IconProps extends Omit<SVGProps<SVGSVGElement>, "color"> {
   color?: string;
@@ -177,6 +178,7 @@ export const IconBack = ({ color, ...rest }: IconProps) => (
     height="24"
     viewBox="0 0 24 24"
     fill="none"
+    css={tw`cursor-pointer`}
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="none"
     {...rest}
