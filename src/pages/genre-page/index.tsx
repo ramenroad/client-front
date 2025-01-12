@@ -26,10 +26,10 @@ export const GenrePage = () => {
         <InformationWrapper>
           <InformationHeader>가게 정보</InformationHeader>
           <RamenyaListWrapper>
-            {ramenyaList?.map((ramenya) => (
+            {ramenyaList?.map((ramenya, index) => (
               <>
                 <RamenyaCard key={ramenya._id} ramenya={ramenya} />
-                <SubLine />
+                {index !== ramenyaList.length - 1 && <SubLine />}
               </>
             ))}
           </RamenyaListWrapper>
@@ -40,13 +40,14 @@ export const GenrePage = () => {
 };
 
 const Layout = tw.section`
-  flex justify-center
+  flex justify-center h-screen
 `;
 
 const Wrapper = tw.div`
-  flex flex-col items-center justify-center box-border
+  flex flex-col items-center box-border
   w-390
-  border-0 border-x border-border border-solid
+  border-y-0 border-border border-solid
+  h-full
 `;
 
 const Header = tw.section`
