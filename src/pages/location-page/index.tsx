@@ -2,15 +2,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
 import { useMemo, useState } from "react";
-import { IconBack, IconFilter } from "../../components/Icons";
+import { IconBack, IconFilter } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { RAMENYA_TYPES } from "../../constants";
-import RamenyaCard from "./RamenyaCard.tsx";
+import RamenyaCard from "../../components/common/RamenyaCard.tsx";
 
 export const LocationPage = () => {
   const { location } = useParams();
   const navigate = useNavigate();
-  const ramenyaListQuery = useRamenyaListQuery(location);
+  const ramenyaListQuery = useRamenyaListQuery({
+    type: "region",
+    value: location!,
+  });
 
   const [selectedFilterList, setSelectedFilterList] = useState<string[]>([]);
 
@@ -20,14 +23,14 @@ export const LocationPage = () => {
     }
 
     return ramenyaListQuery.data?.filter((ramenya) =>
-      ramenya.genre.some((genre) => selectedFilterList.includes(genre)),
+      ramenya.genre.some((genre) => selectedFilterList.includes(genre))
     );
   }, [selectedFilterList, ramenyaListQuery.data]);
 
   const handleFilterClick = (type: string) => {
     if (selectedFilterList.includes(type)) {
       setSelectedFilterList((prev) =>
-        prev.filter((prevType) => prevType !== type),
+        prev.filter((prevType) => prevType !== type)
       );
     } else {
       setSelectedFilterList((prev) => [...prev, type]);
