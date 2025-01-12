@@ -2,16 +2,12 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainPage from "./main-page";
 import LocationPage from "./location-page";
 import DetailPage from "./detail-page";
+import GenrePage from "./genre-page";
 
 const router = createBrowserRouter([
-
   {
     path: "*",
-    element: (
-  
-        <MainPage />
-    
-    ),
+    element: <MainPage />,
   },
   {
     path: "/location/:location",
@@ -20,6 +16,10 @@ const router = createBrowserRouter([
   {
     path: "/detail/:id",
     element: <DetailPage />,
+  },
+  {
+    path: "/genre/:genre",
+    element: <GenrePage />,
   },
 ]);
 
