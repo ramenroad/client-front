@@ -9,7 +9,7 @@ import {
   IconLocate,
   IconTag,
   IconTime,
-} from "../../components/Icons";
+} from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
 import { useRamenyaDetailQuery } from "../../hooks/useRamenyaDetailQuery";
@@ -21,8 +21,6 @@ import quoteEnd from "../../assets/images/quotes-end.png";
 import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
-
-
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -42,7 +40,7 @@ export const DetailPage = () => {
 
   // 오늘 요일 구하기
   const getCurrentDayIndex = () => {
-    const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
     return days[new Date().getDay()];
   };
 
@@ -112,7 +110,9 @@ export const DetailPage = () => {
                         onClick={() => setIsTimeExpanded(false)}
                       />
                     ) : (
-                      <StyledIconDropDown onClick={() => setIsTimeExpanded(true)} />
+                      <StyledIconDropDown
+                        onClick={() => setIsTimeExpanded(true)}
+                      />
                     )}
                   </TimeHeader>
                   {isTimeExpanded && (
@@ -122,7 +122,10 @@ export const DetailPage = () => {
                       </TimeDetails>
                       <TimeDetails>
                         {ramenyaDetailQuery.data?.businessHours
-                          .filter(hour => hour.day.toLowerCase() !== getCurrentDayIndex())
+                          .filter(
+                            (hour) =>
+                              hour.day.toLowerCase() !== getCurrentDayIndex()
+                          )
                           .map((businessHour) => (
                             <div key={businessHour.day}>
                               {businessHour.isOpen ? (
@@ -185,7 +188,9 @@ export const DetailPage = () => {
           <RecommendTextContainer>
             <QuoteStartImage src={quoteStart} />
             <RecommendTitle>추천 메뉴를 소개합니다.</RecommendTitle>
-            <RecommendText>{ramenyaDetailQuery.data?.description}</RecommendText>
+            <RecommendText>
+              {ramenyaDetailQuery.data?.description}
+            </RecommendText>
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>

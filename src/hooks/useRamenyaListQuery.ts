@@ -1,10 +1,26 @@
-import { getRamenyaList } from "../api/list-page";
+import {
+  getRamenyaListByRegion,
+  getRamenyaListByGenre,
+} from "../api/list-page";
 import { useQuery } from "@tanstack/react-query";
 
-export const useRamenyaListQuery = (location?: string) => {
+type QueryType = "region" | "genre";
+
+interface QueryParams {
+  type: QueryType;
+  value: string;
+}
+
+export const useRamenyaListQuery = ({ type, value }: QueryParams) => {
   return useQuery({
-    queryKey: ["ramenyaList", location],
-    queryFn: () => getRamenyaList(location!),
-    enabled: !!location,
+    queryKey: [
+      type === "region" ? "ramenyaListByRegion" : "ramenyaListByGenre",
+      value,
+    ],
+    queryFn: () =>
+      type === "region"
+        ? getRamenyaListByRegion(value)
+        : getRamenyaListByGenre(value),
+    enabled: !!value,
   });
 };
