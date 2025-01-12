@@ -2,15 +2,18 @@ import { useEffect } from "react";
 import tw from "twin.macro";
 
 interface KakaoMapProps {
-  location: string;
+  latitude: number | undefined;
+  longitude: number | undefined;
 }
 
-interface KakaoGeocoderResult {
-  y: string;
-  x: string;
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    kakao: any;
+  }
 }
 
-const KakaoMap = ({ location }: KakaoMapProps) => {
+const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
   useEffect(() => {
     const loadKakaoMap = () => {
       // 이미 스크립트가 로드되어 있는지 확인
@@ -33,34 +36,28 @@ const KakaoMap = ({ location }: KakaoMapProps) => {
       script.addEventListener("load", () => {
         window.kakao.maps.load(() => {
           const container = document.getElementById("map");
-          const realLocation = location;
           if (!container) {
             return;
           }
 
           try {
             const map = new window.kakao.maps.Map(container, {
-              center: new window.kakao.maps.LatLng(33.450701, 126.570667),
+              center: new window.kakao.maps.LatLng(
+                latitude || 33.450701,
+                longitude || 126.570667
+              ),
               level: 3,
             });
-            const geocoder = new window.kakao.maps.services.Geocoder();
 
-            geocoder.addressSearch(realLocation, (result: KakaoGeocoderResult[], status: typeof window.kakao.maps.services.Status) => {
-              if (status === window.kakao.maps.services.Status.OK) {
-                const coords = new window.kakao.maps.LatLng(
-                  result[0].y,
-                  result[0].x
-                );
-                new window.kakao.maps.Marker({
-                  map: map,
-                  position: coords,
-                });
-
-                map.setCenter(coords);
-              } else {
-                console.error("주소 검색 실패");
-              }
-            });
+            // 좌표가 있는 경우에만 마커 생성
+            if (latitude && longitude) {
+              const coords = new window.kakao.maps.LatLng(latitude, longitude);
+              new window.kakao.maps.Marker({
+                map: map,
+                position: coords,
+              });
+              map.setCenter(coords);
+            }
           } catch (error) {
             console.error("지도 생성 중 오류:", error);
           }
@@ -79,7 +76,7 @@ const KakaoMap = ({ location }: KakaoMapProps) => {
         script.remove();
       }
     };
-  }, [location]);
+  }, [latitude, longitude]);
 
   return <Wrapper id="map"></Wrapper>;
 };
