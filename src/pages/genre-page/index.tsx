@@ -1,13 +1,16 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
 
 import { IconBack } from "../../components/Icon/index.tsx";
 
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
+import NoStoreBox from "../../components/common/NoStoreBox.tsx";
+import styled from "@emotion/styled";
 
 export const GenrePage = () => {
   const { genre } = useParams();
+  const navigate = useNavigate();
   const ramenyaListQuery = useRamenyaListQuery({
     type: "genre",
     value: genre!,
@@ -19,19 +22,23 @@ export const GenrePage = () => {
       <Wrapper>
         <Header>
           <IconWrapper>
-            <IconBack />
+            <StyledIconBack onClick={() => navigate(-1)} />
           </IconWrapper>
           <span>{genre}</span>
         </Header>
         <InformationWrapper>
           <InformationHeader>가게 정보</InformationHeader>
-          <RamenyaListWrapper>
-            {ramenyaList?.map((ramenya, index) => (
-              <>
-                <RamenyaCard key={ramenya._id} ramenya={ramenya} />
-                {index !== ramenyaList.length - 1 && <SubLine />}
-              </>
-            ))}
+          <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
+            {ramenyaList?.length === 0 ? (
+              <NoStoreBox />
+            ) : (
+              ramenyaList?.map((ramenya, index) => (
+                <>
+                  <RamenyaCard key={ramenya._id} ramenya={ramenya} />
+                  {index !== ramenyaList.length - 1 && <SubLine />}
+                </>
+              ))
+            )}
           </RamenyaListWrapper>
         </InformationWrapper>
       </Wrapper>
@@ -62,6 +69,10 @@ const IconWrapper = tw.div`
   w-24 h-24
 `;
 
+const StyledIconBack = tw(IconBack)`
+  cursor-pointer
+`;
+
 const SubLine = tw.div`
   w-full h-1 bg-border box-border mx-20
 `;
@@ -74,9 +85,15 @@ const InformationHeader = tw.span`
   px-20 font-14-sb self-start
 `;
 
-const RamenyaListWrapper = tw.section`
-  flex flex-col items-center justify-center
-  w-full
-`;
+interface RamenyaListWrapperProps {
+  isEmpty?: boolean;
+}
+
+const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
+  ({ isEmpty }) => [
+    tw`flex flex-col items-center justify-center w-full`,
+    isEmpty && tw`h-full`,
+  ]
+);
 
 export default GenrePage;

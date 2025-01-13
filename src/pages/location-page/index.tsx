@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
-import { useEffect, useMemo, useState } from "react";
-import { IconBack, IconFilter } from "../../components/Icon";
+import { useMemo, useState } from "react";
+import { IconBack, IconFilter } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { RAMENYA_TYPES } from "../../constants";
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
+import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 
 export const LocationPage = () => {
   const { location } = useParams();
@@ -23,104 +24,106 @@ export const LocationPage = () => {
     }
 
     return ramenyaListQuery.data?.filter((ramenya) =>
-      ramenya.genre.some((genre) => selectedFilterList.includes(genre)),
+      ramenya.genre.some((genre) => selectedFilterList.includes(genre))
     );
   }, [selectedFilterList, ramenyaListQuery.data]);
 
   const handleFilterClick = (type: string) => {
     if (selectedFilterList.includes(type)) {
       setSelectedFilterList((prev) =>
-        prev.filter((prevType) => prevType !== type),
+        prev.filter((prevType) => prevType !== type)
       );
     } else {
       setSelectedFilterList((prev) => [...prev, type]);
     }
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   return (
-    <>
-      <FixedHeader>
+    <Layout>
+      <Wrapper>
         <Header>
-          <LocationInfoBar>
-            <IconWrapper>
-              <StyledIconBack onClick={() => navigate(-1)} />
-            </IconWrapper>
-            <span>{location}</span>
-          </LocationInfoBar>
-          <FilterWrapper>
-            <StyledIconFilter
-              onClick={() => setSelectedFilterList([])}
-              color={selectedFilterList.length >= 1 ? "#FF5E00" : "black"}
-            />
-            <TagWrapper>
-              <TagList>
-                <OverflowBox>
-                  {RAMENYA_TYPES.map((type, index) => {
-                    if (index > 5) return;
-                    return (
-                      <Tag
-                        key={index}
-                        onClick={() => handleFilterClick(type)}
-                        selected={selectedFilterList.includes(type)}
-                      >
-                        {type}
-                      </Tag>
-                    );
-                  })}
-                </OverflowBox>
-              </TagList>
-              <TagList>
-                <OverflowBox>
-                  {RAMENYA_TYPES.map((type, index) => {
-                    if (index <= 5) return;
-                    return (
-                      <Tag
-                        key={index}
-                        onClick={() => handleFilterClick(type)}
-                        selected={selectedFilterList.includes(type)}
-                      >
-                        {type}
-                      </Tag>
-                    );
-                  })}
-                </OverflowBox>
-              </TagList>
-            </TagWrapper>
-          </FilterWrapper>
-          <Line />
+          <IconWrapper>
+            <StyledIconBack onClick={() => navigate(-1)} />
+          </IconWrapper>
+          <span>{location}</span>
         </Header>
-      </FixedHeader>
-      <InformationWrapper>
-        <InformationHeader>가게 정보</InformationHeader>
-        <RamenyaListWrapper>
-          {ramenyaList?.map((ramenya) => (
-            <>
-              <RamenyaCard key={ramenya._id} ramenya={ramenya} />
-              <SubLine />
-            </>
-          ))}
-        </RamenyaListWrapper>
-      </InformationWrapper>
-    </>
+        <FilterWrapper>
+          <StyledIconFilter
+            onClick={() => setSelectedFilterList([])}
+            color={selectedFilterList.length >= 1 ? "#FF5E00" : "black"}
+          />
+          <TagWrapper>
+            <TagList>
+              <OverflowBox>
+                {RAMENYA_TYPES.map((type, index) => {
+                  if (index > 5) return;
+                  return (
+                    <Tag
+                      key={index}
+                      onClick={() => handleFilterClick(type)}
+                      selected={selectedFilterList.includes(type)}
+                    >
+                      {type}
+                    </Tag>
+                  );
+                })}
+              </OverflowBox>
+            </TagList>
+            <TagList>
+              <OverflowBox>
+                {RAMENYA_TYPES.map((type, index) => {
+                  if (index <= 5) return;
+                  return (
+                    <Tag
+                      key={index}
+                      onClick={() => handleFilterClick(type)}
+                      selected={selectedFilterList.includes(type)}
+                    >
+                      {type}
+                    </Tag>
+                  );
+                })}
+              </OverflowBox>
+            </TagList>
+          </TagWrapper>
+        </FilterWrapper>
+        <Line />
+        <InformationWrapper>
+          <InformationHeader>가게 정보</InformationHeader>
+          <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
+            {ramenyaList?.length === 0 ? (
+              <NoStoreBox />
+            ) : (
+              ramenyaList?.map((ramenya) => (
+                <>
+                  <RamenyaCard key={ramenya._id} ramenya={ramenya} />
+                  <SubLine />
+                </>
+              ))
+            )}
+          </RamenyaListWrapper>
+        </InformationWrapper>
+        {/*<div onClick={() => navigate("/detail/라멘야1")}>디테일페이지</div>*/}
+      </Wrapper>
+    </Layout>
   );
 };
 
-const FixedHeader = tw.section`
-  fixed w-390 bg-white z-10
+const Layout = tw.section`
+  flex justify-center h-screen overflow-hidden box-border
+`;
+
+const Wrapper = tw.div`
+  flex flex-col items-center box-border
+  w-390 h-full
+  border-0 border-x border-border border-solid
+  overflow-hidden
 `;
 
 const Header = tw.section`
-  absolute bg-white border-0 border-x border-border border-solid
-`;
-
-const LocationInfoBar = tw.section`
   flex items-center justify-center
   font-16-sb
-  w-full h-44 min-h-44
+  w-full h-44 min-h-44 relative
   px-20 mb-10 box-border
 `;
 
@@ -130,7 +133,7 @@ const IconWrapper = tw.div`
 `;
 
 const FilterWrapper = tw.section`
-  box-border pl-20 flex gap-8 w-full pr-10
+  box-border pl-20 flex gap-8 w-full
 `;
 
 const StyledIconFilter = tw(IconFilter)`
@@ -163,23 +166,28 @@ const Line = tw.div`
 `;
 
 const SubLine = tw.div`
-  w-[100%-40px] h-1 bg-border box-border mx-20
+  w-full h-1 bg-border box-border mx-20
 `;
 
 const InformationWrapper = tw.section`
-  flex flex-col w-full overflow-y-auto pt-136 h-full
+  flex flex-col w-full overflow-y-auto flex-1
 `;
 
 const InformationHeader = tw.span`
   px-20 mt-16 mb-[-8px] font-14-sb self-start text-gray-900
 `;
 
-const RamenyaListWrapper = tw.section`
-  flex flex-col w-full
-`;
+interface RamenyaListWrapperProps {
+  isEmpty?: boolean;
+}
+
+const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
+  ({ isEmpty }) => [
+    tw`flex flex-col items-center justify-center w-full`,
+    isEmpty && tw`h-full`,
+  ]
+);
 
 const StyledIconBack = tw(IconBack)`
   cursor-pointer
 `;
-
-export default LocationPage;
