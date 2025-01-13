@@ -96,11 +96,11 @@ const RamenyaOpenTime = tw.span`
 `;
 
 const RamenyaTagWrapper = tw.section`
-  flex gap-4
+  mt-4 flex gap-4
 `;
 
 const RamenyaTag = tw.span`
-  font-10-r text-gray-600 rounded-sm bg-gray-50 p-2
+  font-10-r text-gray-700 rounded-sm bg-border p-2
 `;
 
 export default RamenyaCard;
