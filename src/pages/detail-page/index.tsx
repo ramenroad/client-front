@@ -299,7 +299,7 @@ const PhoneNumberText = tw.div`
 `;
 
 const InstagramLink = tw.a`
-  font-14-r text-blue
+  font-14-r text-red
 `;
 
 const Divider = tw.div`
