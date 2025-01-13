@@ -21,6 +21,7 @@ const Wrapper = tw.div`
   w-110 h-50
   cursor-pointer
   hover:(bg-orange text-white)
+  active:(bg-orange text-white)
 `;
 
 const LocationPathText = tw.div`

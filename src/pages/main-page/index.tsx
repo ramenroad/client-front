@@ -173,7 +173,7 @@ const LocationViewingWrapper = tw.div`
 `;
 
 const LocationViewingText = tw.div`
-  flex font-18-sb font-black
+  flex font-18-sb text-black
 `;
 
 const Genre = tw.div`
