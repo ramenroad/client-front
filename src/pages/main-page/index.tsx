@@ -91,11 +91,11 @@ const LocationViewingWrapper = tw.div`
 `;
 
 const LocationViewingText = tw.div`
-  flex font-18-sb 
+  flex font-18-sb text-black
 `;
 
 const LocationPathContainer = tw.div`
-  grid grid-cols-3 gap-4
+  grid grid-cols-3 gap-10
   w-350
 `;
 

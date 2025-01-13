@@ -217,7 +217,7 @@ const Wrapper = tw.div`
 `;
 
 const Container = tw.div`
-  flex flex-col gap-16 w-390
+  flex flex-col gap-20 w-390
 `;
 
 const Header = tw.div`
@@ -299,7 +299,7 @@ const PhoneNumberText = tw.div`
 `;
 
 const InstagramLink = tw.a`
-  font-14-r text-blue
+  font-14-r text-red
 `;
 
 const Divider = tw.div`
@@ -356,7 +356,7 @@ const RecommendText = tw.div`
 `;
 
 const QuoteStartImage = tw.img`
-  w-16 h-16
+  w-30 h-22
 `;
 
 const QuateEndBox = tw.div`
@@ -364,7 +364,7 @@ const QuateEndBox = tw.div`
 `;
 
 const QuoteEndImage = tw.img`
-  w-16 h-16
+  w-30 h-22
 `;
 
 const LocationTitle = tw.div`
