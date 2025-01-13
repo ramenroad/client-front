@@ -39,7 +39,7 @@ export const LocationPage = () => {
       <Wrapper>
         <Header>
           <IconWrapper>
-            <IconBack onClick={() => navigate(-1)} />
+            <StyledIconBack onClick={() => navigate(-1)} />
           </IconWrapper>
           <span>{location}</span>
         </Header>
@@ -171,6 +171,10 @@ const InformationHeader = tw.span`
 
 const RamenyaListWrapper = tw.section`
   flex flex-col items-center justify-center w-full
+`;
+
+const StyledIconBack = tw(IconBack)`
+  cursor-pointer
 `;
 
 export default LocationPage;
