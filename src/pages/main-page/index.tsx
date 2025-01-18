@@ -56,11 +56,11 @@ const genrePath = [
     image: sio,
   },
   {
-    genre: "간장",
+    genre: "쇼유",
     image: soy,
   },
   {
-    genre: "이케이",
+    genre: "이에케",
     image: iekei,
   },
   {
@@ -92,7 +92,7 @@ const genrePath = [
     image: miso,
   },
   {
-    genre: "단단",
+    genre: "탄탄멘",
     image: dandan,
   },
 ];
