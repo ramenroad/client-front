@@ -56,11 +56,11 @@ const genrePath = [
     image: sio,
   },
   {
-    genre: "간장",
+    genre: "쇼유",
     image: soy,
   },
   {
-    genre: "이케이",
+    genre: "이에케",
     image: iekei,
   },
   {
@@ -92,7 +92,7 @@ const genrePath = [
     image: miso,
   },
   {
-    genre: "단단",
+    genre: "탄탄멘",
     image: dandan,
   },
 ];
@@ -113,7 +113,7 @@ const MainPage = () => {
         </MainText>
       </MainImageContainer>
 
-      <LocationViewingWrapper>
+      <GenreViewingWrapper>
         <LocationViewingText>장르별 보기</LocationViewingText>
         <GenrePathContainer>
           {genrePath.map((genre, index) => (
@@ -123,7 +123,7 @@ const MainPage = () => {
             </Genre>
           ))}
         </GenrePathContainer>
-      </LocationViewingWrapper>
+      </GenreViewingWrapper>
 
       <LocationViewingWrapper>
         <LocationViewingText>지역별 보기</LocationViewingText>
@@ -166,6 +166,10 @@ const GenreImage = tw.img`
 const MainText = tw.div`
   flex font-20-sb text-white
   absolute top-20 left-20
+`;
+
+const GenreViewingWrapper = tw.div`
+  flex flex-col gap-16 w-350 mb-20
 `;
 
 const LocationViewingWrapper = tw.div`
