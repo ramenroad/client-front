@@ -6,6 +6,7 @@ import { IconBack, IconFilter } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { RAMENYA_TYPES } from "../../constants";
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
+import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 
 export const LocationPage = () => {
   const { location } = useParams();
@@ -89,13 +90,17 @@ export const LocationPage = () => {
         <Line />
         <InformationWrapper>
           <InformationHeader>가게 정보</InformationHeader>
-          <RamenyaListWrapper>
-            {ramenyaList?.map((ramenya) => (
-              <>
-                <RamenyaCard key={ramenya._id} ramenya={ramenya} />
-                <SubLine />
-              </>
-            ))}
+          <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
+            {ramenyaList?.length === 0 ? (
+              <NoStoreBox />
+            ) : (
+              ramenyaList?.map((ramenya) => (
+                <>
+                  <RamenyaCard key={ramenya._id} ramenya={ramenya} />
+                  <SubLine />
+                </>
+              ))
+            )}
           </RamenyaListWrapper>
         </InformationWrapper>
         {/*<div onClick={() => navigate("/detail/라멘야1")}>디테일페이지</div>*/}
@@ -172,12 +177,17 @@ const InformationHeader = tw.span`
   px-20 mt-16 mb-[-8px] font-14-sb self-start text-gray-900
 `;
 
-const RamenyaListWrapper = tw.section`
-  flex flex-col items-center justify-center w-full
-`;
+interface RamenyaListWrapperProps {
+  isEmpty?: boolean;
+}
+
+const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
+  ({ isEmpty }) => [
+    tw`flex flex-col items-center justify-center w-full`,
+    isEmpty && tw`h-full`,
+  ]
+);
 
 const StyledIconBack = tw(IconBack)`
   cursor-pointer
 `;
-
-export default LocationPage;

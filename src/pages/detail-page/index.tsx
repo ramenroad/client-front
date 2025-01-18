@@ -21,6 +21,7 @@ import quoteEnd from "../../assets/images/quotes-end.png";
 import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
+import { formatNumber } from "../../util/number";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -53,6 +54,8 @@ export const DetailPage = () => {
   };
 
   const todayBusinessHour = getTodayBusinessHour();
+
+  console.log(ramenyaDetailQuery.data);
 
   return (
     <Wrapper>
@@ -118,7 +121,8 @@ export const DetailPage = () => {
                   {isTimeExpanded && (
                     <>
                       <TimeDetails>
-                        {`${dayMapping[todayBusinessHour?.day.toLowerCase() ?? ""]} 브레이크타임 ${todayBusinessHour?.breakTime}`}
+                        {todayBusinessHour?.isOpen &&
+                          `${dayMapping[todayBusinessHour?.day.toLowerCase() ?? ""]} 브레이크타임 ${todayBusinessHour?.breakTime}`}
                       </TimeDetails>
                       <TimeDetails>
                         {ramenyaDetailQuery.data?.businessHours
@@ -131,7 +135,9 @@ export const DetailPage = () => {
                               {businessHour.isOpen ? (
                                 <TimeDetails>
                                   <div>{`${dayMapping[businessHour.day.toLowerCase()]}: ${businessHour.operatingTime}`}</div>
-                                  <div>{`${dayMapping[businessHour.day.toLowerCase()]} 브레이크타임 ${businessHour.breakTime}`}</div>
+                                  {businessHour.breakTime && (
+                                    <div>{`${dayMapping[businessHour.day.toLowerCase()]} 브레이크타임 ${businessHour.breakTime}`}</div>
+                                  )}
                                 </TimeDetails>
                               ) : (
                                 `매주 ${dayMapping[businessHour.day.toLowerCase()]} 휴무`
@@ -179,7 +185,9 @@ export const DetailPage = () => {
                   {/* <RecommendMenuImage src={menu.image} alt={menu.name} /> */}
                   <RecommendMenuInfo>
                     <RecommendMenuName>{menu.name}</RecommendMenuName>
-                    <RecommendMenuPrice>{menu.price}</RecommendMenuPrice>
+                    <RecommendMenuPrice>
+                      {formatNumber(menu.price)}원
+                    </RecommendMenuPrice>
                   </RecommendMenuInfo>
                 </RecommendMenuBox>
               ))}
@@ -299,7 +307,7 @@ const PhoneNumberText = tw.div`
 `;
 
 const InstagramLink = tw.a`
-  font-14-r text-red
+  font-14-r text-blue
 `;
 
 const Divider = tw.div`
