@@ -21,7 +21,7 @@ export const checkBusinessStatus = (
   }
 
   // Parse operating and break times
-  const [openTime, closeTime] = todayHours.operatingTime.split(" - ");
+  const [openTime, closeTime] = todayHours.operatingTime.split(" ~ ");
   const [breakStart, breakEnd] = todayHours.breakTime
     ? todayHours.breakTime.split(" - ")
     : [null, null];
