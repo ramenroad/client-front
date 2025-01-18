@@ -20,8 +20,8 @@ const Screen = tw.section`
 `;
 
 const View = tw.main`
-  flex flex-col items-center box-border
-  w-390 h-full
+  relative flex flex-col items-center box-border
+  w-390 min-h-screen
   border-0 border-x border-border border-solid
 `;
 
