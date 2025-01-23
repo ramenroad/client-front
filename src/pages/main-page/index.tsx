@@ -1,9 +1,9 @@
 import tw from "twin.macro";
 import { LocationPathBox } from "./LocationPathBox";
-import mainImage from "../../assets/images/main-image.png";
 import mainLogo from "../../assets/images/logo.png";
 import { useNavigate } from "react-router-dom";
 import { genrePath } from "../../constants";
+import { Banner } from "../../components/common/Banner";
 
 const locationPath = [
   {
@@ -44,11 +44,7 @@ const MainPage = () => {
         <MainLogo src={mainLogo} />
       </MainLogoBox>
       <MainImageContainer>
-        <MainImage src={mainImage} />
-        <MainText>
-          다양한 라멘야 정보를 <br />
-          알려드려요
-        </MainText>
+        <Banner />
       </MainImageContainer>
 
       <GenreViewingWrapper>
@@ -93,17 +89,9 @@ const MainImageContainer = tw.div`
   flex relative mb-20
 `;
 
-const MainImage = tw.img`
-  flex w-350 h-200
-`;
 
 const GenreImage = tw.img`
   w-48 h-48
-`;
-
-const MainText = tw.div`
-  flex font-20-sb text-white
-  absolute top-20 left-20
 `;
 
 const GenreViewingWrapper = tw.div`

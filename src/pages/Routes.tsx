@@ -3,6 +3,7 @@ import MainPage from "./main-page";
 import LocationPage from "./location-page";
 import DetailPage from "./detail-page";
 import GenrePage from "./genre-page";
+import { BannerPage } from "./banner-page";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/genre/:genre",
     element: <GenrePage />,
+  },
+  {
+    path: "/banner",
+    element: <BannerPage />,
   },
 ]);
 
