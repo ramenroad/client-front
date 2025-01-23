@@ -1,33 +1,43 @@
 import tw from 'twin.macro'
-import { bannerImages } from '../../constants'
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useBannerQuery } from '../../hooks/useBannerQuery';
 
 export const Banner = () => {
   const navigate = useNavigate();
+  const { data: bannerData } = useBannerQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => 
-        prev === bannerImages.length - 1 ? 0 : prev + 1
+        prev === (bannerData?.length ?? 0) - 1 ? 0 : prev + 1
       );
     }, 3000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [bannerData?.length]);
+
+  if (!bannerData?.length) return null;
 
   return (
     <Wrapper>
       <BannerImage 
-        src={bannerImages[currentIndex].image} 
+        src={bannerData[currentIndex].bannerImageUrl} 
         alt="banner"
-        onClick={() => navigate(bannerImages[currentIndex].link)}
+        onClick={() => {
+          const url = bannerData[currentIndex].redirectUrl;
+          if (url.startsWith('http://') || url.startsWith('https://')) {
+            window.open(url, '_blank');
+          } else {
+            navigate(url);
+          }
+        }}
       />
       <BannerButtonWrapper onClick={() => navigate("/banner")}>
         <PresentNumber>{currentIndex + 1}</PresentNumber>
         <Divide>/</Divide>
-        <TotalNumber>{bannerImages.length} + </TotalNumber>
+        <TotalNumber>{bannerData.length} +</TotalNumber>
       </BannerButtonWrapper>
     </Wrapper>
   )
@@ -38,7 +48,7 @@ const Wrapper = tw.div`
 `
 
 const BannerImage = tw.img`
-  w-full h-full rounded-8 cursor-pointer
+  w-350 h-200 rounded-8 cursor-pointer
   relative
   transition-transform duration-500 ease-in-out
   transform translate-x-0

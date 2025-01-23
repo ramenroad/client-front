@@ -46,3 +46,15 @@ export interface RemenyaDetail {
     description: string;
   };
 }
+
+export interface Banner {
+  _id: string;
+  name: string;
+  description: string;
+  priority: number;
+  redirectUrl: string;
+  isShown: boolean;
+  bannerImageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
