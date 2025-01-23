@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
 import { useMemo, useState } from "react";
-import { IconBack, IconFilter } from "../../components/Icon/index.tsx";
+import { IconBack, IconFilter } from "../../components/Icon";
 import styled from "@emotion/styled";
 import { RAMENYA_TYPES } from "../../constants";
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";

@@ -1,13 +1,12 @@
-import tw from 'twin.macro'
+// import tw from "twin.macro";
 
 export const Footer = () => {
-  return (
-    <Wrapper>Footer</Wrapper>
-  )
-}
+  return null;
+  // return <Wrapper>Footer</Wrapper>;
+};
 
-const Wrapper = tw.div`
-  w-full h-full 
-  bg-orange text-white
-  text-center
-`
+// const Wrapper = tw.div`
+//   w-full h-20
+//   bg-orange text-white
+//   text-center
+// `;
