@@ -3,6 +3,7 @@ import { Routes } from "./pages/Routes.tsx";
 import { queryClient } from "./core/queryClient";
 import tw from "twin.macro";
 import { Footer } from "./components/common/Footer.tsx";
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -12,7 +13,6 @@ function App() {
           <Footer />
         </View>
       </Screen>
-
     </QueryClientProvider>
   );
 }
