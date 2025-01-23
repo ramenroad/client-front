@@ -1,10 +1,12 @@
 import { IconClose } from "../../components/Icon";
-import { bannerImages } from "../../constants";
 import tw from "twin.macro";
 import { useNavigate } from "react-router-dom";
+import { useBannerQuery } from "../../hooks/useBannerQuery";
 export const BannerPage = () => {
   
   const navigate = useNavigate();
+
+  const { data: bannerData } = useBannerQuery();
   return (
     <Wrapper>
         <Header>
@@ -12,8 +14,20 @@ export const BannerPage = () => {
             <StyledIconClose onClick={() => navigate("/")} />
         </Header>
         <BannerListContainer>
-            {bannerImages.map((banner) => (
-                <BannerImage key={banner.id} src={banner.image} alt="banner" />
+            {bannerData?.map((banner) => (
+                <BannerImage 
+                    key={banner.id} 
+                    src={banner.bannerImageUrl} 
+                    alt="banner" 
+                    onClick={() => {
+                        const url = banner.redirectUrl;
+                        if (url.startsWith('http://') || url.startsWith('https://')) {
+                            window.open(url, '_blank');
+                        } else {
+                            navigate(url);
+                        }
+                    }}
+                />
             ))}
         </BannerListContainer>
     </Wrapper>
@@ -41,6 +55,6 @@ const BannerListContainer = tw.div`
   px-20 gap-20
 `
 const BannerImage = tw.img`
-  w-full h-full rounded-8
+  w-350 h-200 rounded-8 cursor-pointer
 `
 
