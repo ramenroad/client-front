@@ -47,7 +47,7 @@ export const GenrePage = () => {
 };
 
 const Layout = tw.section`
-  flex justify-center h-screen
+  flex justify-center h-full
 `;
 
 const Wrapper = tw.div`
