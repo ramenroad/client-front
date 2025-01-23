@@ -56,7 +56,7 @@ const Wrapper = tw.section`
 `;
 
 const Layout = tw.section`
-  w-full flex gap-16
+  w-full flex gap-16 items-center
 `;
 
 const RamenyaThumbnail = styled.img(
@@ -68,19 +68,19 @@ const RamenyaThumbnail = styled.img(
 );
 
 const RamenyaDescription = tw.section`
-  w-full flex flex-col flex-1
+  w-full h-full flex flex-col flex-1
 `;
 
 const RamenyaTitle = tw.span`
-  font-16-sb mb-6
+  font-16-sb mb-6 h-19
 `;
 
 const RamenyaAddress = tw.span`
-  font-14-r text-gray-700 mb-12
+  font-14-r text-gray-700 mb-12 h-17
 `;
 
 const RamenyaOpenStatusWrapper = tw.span`
-  flex gap-2 items-center font-12-r
+  flex gap-2 items-center font-12-r h-14
 `;
 
 const RamenyaOpenStatus = styled.span(({ status }: { status: OpenStatus }) => [

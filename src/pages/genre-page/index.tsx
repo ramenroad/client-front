@@ -1,16 +1,19 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
-
-import { IconBack } from "../../components/Icon/index.tsx";
 
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
 import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 import styled from "@emotion/styled";
+import TopBar from "../../components/common/TopBar.tsx";
+import { Line } from "../../components/common/Line.tsx";
+import { useScrollToTop } from "../../hooks/useScrollToTop.tsx";
 
 export const GenrePage = () => {
+  useScrollToTop();
+
   const { genre } = useParams();
-  const navigate = useNavigate();
+
   const ramenyaListQuery = useRamenyaListQuery({
     type: "genre",
     value: genre!,
@@ -20,13 +23,12 @@ export const GenrePage = () => {
   return (
     <Layout>
       <Wrapper>
-        <Header>
-          <IconWrapper>
-            <StyledIconBack onClick={() => navigate(-1)} />
-          </IconWrapper>
-          <span>{genre}</span>
-        </Header>
-        <Line />
+        <HeaderSectionWrapper>
+          <HeaderSection>
+            <TopBar title={genre || ""} />
+            <Line />
+          </HeaderSection>
+        </HeaderSectionWrapper>
         <InformationWrapper>
           {ramenyaList?.length === 0 ? (
             <NoStoreBox />
@@ -50,7 +52,7 @@ export const GenrePage = () => {
 };
 
 const Layout = tw.section`
-  flex justify-center h-screen
+  flex justify-center h-full box-border
 `;
 
 const Wrapper = tw.div`
@@ -60,33 +62,25 @@ const Wrapper = tw.div`
   h-full
 `;
 
-const Header = tw.section`
-  flex items-center justify-center
+export const HeaderSectionWrapper = tw.section`
+  absolute left-0
+`;
+
+export const HeaderSection = tw.section`
+  fixed 
+  flex flex-col items-center
   font-16-sb
-  w-full h-44 relative
-  px-20 box-border
-`;
-
-const IconWrapper = tw.div`
-  absolute left-20
-  w-24 h-24
-`;
-
-const StyledIconBack = tw(IconBack)`
-  cursor-pointer
+  w-390
+  bg-white box-border border-0 border-x border-border border-solid
 `;
 
 const SubLine = tw.div`
   w-full h-1 bg-border box-border mx-20
 `;
 
-const Line = tw.div`
-  w-full h-1 bg-divider
-`;
-
 const InformationWrapper = tw.section`
-  flex flex-col w-full overflow-y-auto flex-1
-  pt-16
+  flex flex-col w-full h-full overflow-y-auto
+  pt-60
 `;
 
 const InformationHeader = tw.span`

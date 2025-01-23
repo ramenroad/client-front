@@ -1,16 +1,21 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
-import { useEffect, useMemo, useState } from "react";
-import { IconBack, IconFilter } from "../../components/Icon";
+import { useMemo, useState } from "react";
+import { IconFilter } from "../../components/Icon";
 import styled from "@emotion/styled";
 import { RAMENYA_TYPES } from "../../constants";
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
 import NoStoreBox from "../../components/common/NoStoreBox.tsx";
+import TopBar from "../../components/common/TopBar.tsx";
+import { Line } from "../../components/common/Line.tsx";
+import { useScrollToTop } from "../../hooks/useScrollToTop.tsx";
 
 export const LocationPage = () => {
+  useScrollToTop();
+
   const { location } = useParams();
-  const navigate = useNavigate();
+
   const ramenyaListQuery = useRamenyaListQuery({
     type: "region",
     value: location!,
@@ -38,21 +43,12 @@ export const LocationPage = () => {
     }
   };
 
-  useEffect(() => {
-    window.scroll(0, 0);
-  }, []);
-
   return (
     <Layout>
       <Wrapper>
         <HeaderSectionWrapper>
           <HeaderSection>
-            <LocationTopBar>
-              <IconWrapper>
-                <StyledIconBack onClick={() => navigate(-1)} />
-              </IconWrapper>
-              <span>{location}</span>
-            </LocationTopBar>
+            <TopBar title={location || ""} />
             <FilterWrapper>
               <StyledIconFilter
                 onClick={() => setSelectedFilterList([])}
@@ -126,31 +122,21 @@ const Layout = tw.section`
 `;
 
 const Wrapper = tw.div`
-  flex flex-col items-center box-border
+  flex flex-col  box-border
   w-390 h-full
   border-0 border-x border-border border-solid
 `;
 
-const HeaderSectionWrapper = tw.section`
+export const HeaderSectionWrapper = tw.section`
   absolute left-0
 `;
 
-const HeaderSection = tw.section`
+export const HeaderSection = tw.section`
   fixed 
   flex flex-col items-center
   font-16-sb
-  w-390 h-144
+  w-390
   bg-white box-border border-0 border-x border-border border-solid
-`;
-
-const LocationTopBar = tw.section`
-  flex items-center justify-between
-  h-44
-`;
-
-const IconWrapper = tw.div`
-  absolute left-20
-  w-24 h-24
 `;
 
 const FilterWrapper = tw.section`
@@ -183,12 +169,8 @@ const Tag = styled.div(({ selected }: { selected?: boolean }) => [
   selected && tw`border-orange text-orange`,
 ]);
 
-const Line = tw.div`
-  w-full h-1 bg-divider
-`;
-
 const SubLine = tw.div`
-  w-full h-1 bg-border box-border mx-20
+  w-full h-1 bg-border box-border
 `;
 
 const InformationWrapper = tw.section`
@@ -204,14 +186,7 @@ interface RamenyaListWrapperProps {
 }
 
 const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
-  ({ isEmpty }) => [
-    tw`flex flex-col items-center justify-center w-full`,
-    isEmpty && tw`h-full`,
-  ],
+  ({ isEmpty }) => [tw`flex flex-col w-full`, isEmpty && tw`h-full`],
 );
-
-const StyledIconBack = tw(IconBack)`
-  cursor-pointer
-`;
 
 export default LocationPage;
