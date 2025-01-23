@@ -247,3 +247,19 @@ export const IconBar = ({ color, ...rest }: IconProps) => (
     <rect y="0.5" width="1" height="10" fill={color ?? "#E7E7E7"} />
   </svg>
 );
+
+export const IconClose = ({ color, ...rest }: IconProps) => (
+  <svg 
+    width="16" 
+    height="16" 
+    viewBox="0 0 16 16" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+    {...rest}
+  >
+    <path d="M1.43896 1L14.9999 15" stroke={color ?? "#111111"} strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M14.561 1L1.00014 15" stroke={color ?? "#111111"} strokeWidth="1.5" strokeLinecap="round"/>
+  </svg>
+);
+

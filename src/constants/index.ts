@@ -1,3 +1,19 @@
+import mainImage from "../assets/images/main-image.png";
+
+export const bannerImages = [
+    {
+      id: 1,
+      image: mainImage,
+      link: "https://www.google.com",
+    },
+    {
+      id: 2,
+      image: "https://picsum.photos/350/200",
+      link: "https://www.naver.com",
+    },
+
+  ];
+
 export const RAMENYA_TYPES = [
   "이에케",
   "돈코츠",
