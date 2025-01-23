@@ -26,6 +26,7 @@ export const GenrePage = () => {
           </IconWrapper>
           <span>{genre}</span>
         </Header>
+        <Line />
         <InformationWrapper>
           <InformationHeader>가게 정보</InformationHeader>
           <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
@@ -47,7 +48,7 @@ export const GenrePage = () => {
 };
 
 const Layout = tw.section`
-  flex justify-center h-full
+  flex justify-center h-screen
 `;
 
 const Wrapper = tw.div`
@@ -61,7 +62,7 @@ const Header = tw.section`
   flex items-center justify-center
   font-16-sb
   w-full h-44 relative
-  px-20 mb-20 box-border
+  px-20 box-border
 `;
 
 const IconWrapper = tw.div`
@@ -77,8 +78,13 @@ const SubLine = tw.div`
   w-full h-1 bg-border box-border mx-20
 `;
 
+const Line = tw.div`
+  w-full h-1 bg-divider
+`;
+
 const InformationWrapper = tw.section`
-  flex flex-col items-center justify-center w-full
+  flex flex-col w-full overflow-y-auto flex-1
+  pt-16
 `;
 
 const InformationHeader = tw.span`
