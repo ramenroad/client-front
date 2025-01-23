@@ -7,3 +7,11 @@ export const instance = axios.create({
     Accept: "application/json",
   },
 });
+
+export const instanceWithNoVersioning = axios.create({
+  baseURL: "https://ramenroad.com/api/",
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+});
