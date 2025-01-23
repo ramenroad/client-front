@@ -12,7 +12,7 @@ const NoStoreBox = () => {
 };
 
 const Wrapper = tw.div`
-  flex flex-col items-center justify-center
+  flex flex-col items-center justify-center h-full
 `;
 
 const NoStoreImage = tw.img`

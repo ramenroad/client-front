@@ -89,20 +89,23 @@ export const LocationPage = () => {
         </FilterWrapper>
         <Line />
         <InformationWrapper>
-          <InformationHeader>가게 정보</InformationHeader>
-          <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
-            {ramenyaList?.length === 0 ? (
-              <NoStoreBox />
-            ) : (
-              ramenyaList?.map((ramenya) => (
-                <>
-                  <RamenyaCard key={ramenya._id} ramenya={ramenya} />
-                  <SubLine />
-                </>
-              ))
-            )}
-          </RamenyaListWrapper>
+          {ramenyaList?.length === 0 ? (
+            <NoStoreBox />
+          ) : (
+            <>
+              <InformationHeader>가게 정보</InformationHeader>
+              <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
+                {ramenyaList?.map((ramenya) => (
+                  <>
+                    <RamenyaCard key={ramenya._id} ramenya={ramenya} />
+                    <SubLine />
+                  </>
+                ))}
+              </RamenyaListWrapper>
+            </>
+          )}
         </InformationWrapper>
+
         {/*<div onClick={() => navigate("/detail/라멘야1")}>디테일페이지</div>*/}
       </Wrapper>
     </Layout>

@@ -28,19 +28,21 @@ export const GenrePage = () => {
         </Header>
         <Line />
         <InformationWrapper>
-          <InformationHeader>가게 정보</InformationHeader>
-          <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
-            {ramenyaList?.length === 0 ? (
-              <NoStoreBox />
-            ) : (
-              ramenyaList?.map((ramenya, index) => (
-                <>
-                  <RamenyaCard key={ramenya._id} ramenya={ramenya} />
-                  {index !== ramenyaList.length - 1 && <SubLine />}
-                </>
-              ))
-            )}
-          </RamenyaListWrapper>
+          {ramenyaList?.length === 0 ? (
+            <NoStoreBox />
+          ) : (
+            <>
+              <InformationHeader>가게 정보</InformationHeader>
+              <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
+                {ramenyaList?.map((ramenya, index) => (
+                  <>
+                    <RamenyaCard key={ramenya._id} ramenya={ramenya} />
+                    {index !== ramenyaList.length - 1 && <SubLine />}
+                  </>
+                ))}
+              </RamenyaListWrapper>
+            </>
+          )}
         </InformationWrapper>
       </Wrapper>
     </Layout>
@@ -99,7 +101,7 @@ const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
   ({ isEmpty }) => [
     tw`flex flex-col items-center justify-center w-full`,
     isEmpty && tw`h-full`,
-  ]
+  ],
 );
 
 export default GenrePage;
