@@ -221,15 +221,15 @@ export const DetailPage = () => {
 
 const Wrapper = tw.div`
   flex flex-col items-center justify-center
-  pb-40 px-20
+  pb-40 px-20 w-full
 `;
 
 const Container = tw.div`
-  flex flex-col gap-20 w-390
+  flex flex-col gap-20 w-full
+  max-w-390
 `;
 
-const Header = tw.div`
-  flex items-center justify-start
+const Header = tw.div`  flex items-center justify-start
   px-20 py-10 w-full
 `;
 
@@ -384,3 +384,4 @@ const LocationWrapper = tw.div`
 `;
 
 export default DetailPage;
+
