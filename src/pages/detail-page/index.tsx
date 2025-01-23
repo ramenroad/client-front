@@ -195,9 +195,11 @@ export const DetailPage = () => {
           </RecommendBox>
           <RecommendTextContainer>
             <QuoteStartImage src={quoteStart} />
-            <RecommendTitle>추천 메뉴를 소개합니다.</RecommendTitle>
+            <RecommendTitle>
+              {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
+            </RecommendTitle>
             <RecommendText>
-              {ramenyaDetailQuery.data?.description}
+              {ramenyaDetailQuery.data?.ramenroadReview.description}
             </RecommendText>
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
