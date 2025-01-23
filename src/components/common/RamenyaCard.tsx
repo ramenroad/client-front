@@ -61,14 +61,14 @@ const Layout = tw.section`
 
 const RamenyaThumbnail = styled.img(
   ({ isImageExist }: { isImageExist: boolean }) => [
-    tw`w-100 h-100 object-cover rounded-lg
-  border border-solid border-border`,
+    tw`w-100 h-100 object-cover rounded-lg flex-shrink-0
+    border border-solid border-border`,
     !isImageExist ? tw`object-contain` : tw`object-cover`,
   ],
 );
 
 const RamenyaDescription = tw.section`
-  w-full h-full flex flex-col flex-1
+  flex flex-col h-full min-w-0 justify-center
 `;
 
 const RamenyaTitle = tw.span`
@@ -76,7 +76,7 @@ const RamenyaTitle = tw.span`
 `;
 
 const RamenyaAddress = tw.span`
-  font-14-r text-gray-700 mb-12 h-17
+  font-14-r text-gray-700 mb-12 h-17 truncate
 `;
 
 const RamenyaOpenStatusWrapper = tw.span`
