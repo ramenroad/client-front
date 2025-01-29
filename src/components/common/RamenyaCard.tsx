@@ -56,31 +56,31 @@ const Wrapper = tw.section`
 `;
 
 const Layout = tw.section`
-  w-full flex gap-16
+  w-full flex gap-16 items-center
 `;
 
 const RamenyaThumbnail = styled.img(
   ({ isImageExist }: { isImageExist: boolean }) => [
-    tw`w-100 h-100 object-cover rounded-lg
-  border border-solid border-border`,
+    tw`w-100 h-100 object-cover rounded-lg flex-shrink-0
+    border border-solid border-border`,
     !isImageExist ? tw`object-contain` : tw`object-cover`,
   ],
 );
 
 const RamenyaDescription = tw.section`
-  w-full flex flex-col flex-1
+  flex flex-col h-full min-w-0 justify-center
 `;
 
 const RamenyaTitle = tw.span`
-  font-16-sb mb-6
+  font-16-sb mb-6 h-19
 `;
 
 const RamenyaAddress = tw.span`
-  font-14-r text-gray-700 mb-12
+  font-14-r text-gray-700 mb-12 h-17 truncate
 `;
 
 const RamenyaOpenStatusWrapper = tw.span`
-  flex gap-2 items-center font-12-r
+  flex gap-2 items-center font-12-r h-14
 `;
 
 const RamenyaOpenStatus = styled.span(({ status }: { status: OpenStatus }) => [

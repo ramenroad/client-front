@@ -53,6 +53,7 @@ module.exports = {
         blue: "#3476E6",
         divider: "#EBEBED",
         border: "#F4F4F5",
+        footer: "#FAFAFA",
       },
 
       fontFamily: {

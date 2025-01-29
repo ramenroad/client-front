@@ -83,3 +83,5 @@ export const genrePath = [
     image: dandan,
   },
 ];
+
+export const ramenroadEmail = "ramenroad99@gmail.com";
