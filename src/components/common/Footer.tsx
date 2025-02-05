@@ -2,7 +2,6 @@ import tw from "twin.macro";
 import { ramenroadEmail } from "../../constants";
 
 export const Footer = () => {
-  // return null;
   return (
     <Wrapper>
       <Title>팀 라멘로드</Title>
@@ -16,12 +15,12 @@ export const Footer = () => {
 };
 
 const Wrapper = tw.div`
-  w-full min-h-134 p-20 box-border
+  w-full h-134 p-20 box-border
   bg-footer text-gray-500 font-14-r
 `;
 
 const Title = tw.div`
-  font-14-sb
+  flex items-center h-27 font-14-sb mb-4
 `;
 
 const Email = tw.a`
