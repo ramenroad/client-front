@@ -122,19 +122,21 @@ const Layout = tw.section`
 `;
 
 const Wrapper = tw.div`
-  flex flex-col
-  w-390 h-full 
+  flex flex-col  box-border
+  w-390 h-full
+  border-0 border-x border-border border-solid
 `;
 
 export const HeaderSectionWrapper = tw.section`
+  absolute left-0
 `;
 
 export const HeaderSection = tw.section`
-  fixed w-390
+  fixed 
   flex flex-col items-center
   font-16-sb
-  bg-white
-  border-0 border-x border-border border-solid box-border
+  w-390
+  bg-white box-border border-0 border-x border-border border-solid
 `;
 
 const FilterWrapper = tw.section`

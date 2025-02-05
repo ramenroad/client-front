@@ -35,7 +35,7 @@ export const BannerPage = () => {
 }
 
 const Wrapper = tw.div`
-  flex flex-col items-center h-full
+  flex flex-col items-center justify-center
 `
 const Header = tw.div`
   flex h-44 items-center justify-center w-full

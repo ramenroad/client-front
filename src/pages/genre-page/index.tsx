@@ -56,22 +56,23 @@ const Layout = tw.section`
 `;
 
 const Wrapper = tw.div`
-  flex flex-col
-  w-390 h-full 
+  flex flex-col items-center box-border
+  w-390
+  border-y-0 border-border border-solid
+  h-full
 `;
 
 export const HeaderSectionWrapper = tw.section`
+  absolute left-0
 `;
 
 export const HeaderSection = tw.section`
-  fixed w-390
+  fixed 
   flex flex-col items-center
   font-16-sb
-  bg-white
-  border-0 border-x border-border border-solid box-border
+  w-390
+  bg-white box-border border-0 border-x border-border border-solid
 `;
-
-
 
 const SubLine = tw.div`
   w-full h-1 bg-border box-border mx-20
