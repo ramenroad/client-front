@@ -263,3 +263,21 @@ export const IconClose = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
+export const IconArrowRight = ({ color, ...rest }: IconProps) => (
+<svg 
+    width="12" 
+    height="12" 
+    viewBox="0 0 12 12" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+    {...rest}
+  >
+    <path
+      d="M5 10L8.29289 6.70711C8.68342 6.31658 8.68342 5.68342 8.29289 5.29289L5 2"
+      stroke={color ?? "#888888"}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+  </svg>
+);

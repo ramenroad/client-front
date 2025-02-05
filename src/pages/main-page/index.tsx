@@ -3,7 +3,10 @@ import { LocationPathBox } from "./LocationPathBox";
 import mainLogo from "../../assets/images/logo.png";
 import { useNavigate } from "react-router-dom";
 import { genrePath } from "../../constants";
+import { IconArrowRight } from "../../components/Icon";
 import { Banner } from "../../components/common/Banner";
+import { GroupListBox } from "../../components/main-page/GroupListBox";
+import { useRamenyaGroupQuery } from "../../hooks/useRamenyaGroupQuery";
 
 const locationPath = [
   {
@@ -38,6 +41,8 @@ const locationPath = [
 const MainPage = () => {
   const navigate = useNavigate();
 
+  const { data: ramenyaGroup } = useRamenyaGroupQuery();
+
   return (
     <Wrapper>
       <MainLogoBox>
@@ -67,6 +72,26 @@ const MainPage = () => {
           ))}
         </LocationPathContainer>
       </LocationViewingWrapper>
+
+      <GroupViewingWrapper>
+        <GroupInfoBox>
+        <GroupTitleBox>
+          <GroupTitleText>그룹 제목</GroupTitleText>
+          <GroupTitleButtonBox>
+            <GroupTitleButtonText>더 보기</GroupTitleButtonText>
+            <IconArrowRight color="#888888" />
+          </GroupTitleButtonBox>
+        </GroupTitleBox>
+        <GroupSubTitle>
+          그룹 소제목
+        </GroupSubTitle>
+        </GroupInfoBox>
+        <GroupListWrapper>
+          {ramenyaGroup?.map((data, index) => (
+            <GroupListBox key={index} title={data.name} subTitle={data.description} image={data.descriptionImageUrl} />
+          ))}
+        </GroupListWrapper>
+      </GroupViewingWrapper>
     </Wrapper>
   );
 };
@@ -99,7 +124,7 @@ const GenreViewingWrapper = tw.div`
 `;
 
 const LocationViewingWrapper = tw.div`
-  flex flex-col gap-16 w-350
+  flex flex-col gap-16 w-350 mb-20
 `;
 
 const LocationViewingText = tw.div`
@@ -122,6 +147,38 @@ const GenreInfo = tw.span`
 const LocationPathContainer = tw.div`
   grid grid-cols-3 gap-10
   w-350
+`;
+
+const GroupViewingWrapper = tw.div`
+  flex flex-col w-350 mb-20 gap-16
+`;
+
+const GroupInfoBox = tw.div`
+  flex flex-col
+`;
+
+const GroupTitleBox = tw.div`
+  flex justify-between items-center
+`;
+
+const GroupTitleText = tw.span`
+  flex font-18-sb text-black
+`;
+
+const GroupTitleButtonBox = tw.div`
+  flex items-center gap-2 cursor-pointer
+`;
+
+const GroupTitleButtonText = tw.div`
+  flex font-12-r text-gray-700
+`;
+
+const GroupSubTitle = tw.span`
+  flex font-14-r text-gray-800
+`;
+
+const GroupListWrapper = tw.div`
+  flex gap-10 w-full overflow-x-scroll
 `;
 
 export default MainPage;
