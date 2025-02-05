@@ -1,39 +1,50 @@
 import tw from 'twin.macro'
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useBannerQuery } from '../../hooks/useBannerQuery';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/autoplay';
 
 export const Banner = () => {
   const navigate = useNavigate();
   const { data: bannerData } = useBannerQuery();
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prev) => 
-        prev === (bannerData?.length ?? 0) - 1 ? 0 : prev + 1
-      );
-    }, 3000);
-
-    return () => clearInterval(timer);
-  }, [bannerData?.length]);
-
+  
   if (!bannerData?.length) return null;
 
   return (
     <Wrapper>
-      <BannerImage 
-        src={bannerData[currentIndex].bannerImageUrl} 
-        alt="banner"
-        onClick={() => {
-          const url = bannerData[currentIndex].redirectUrl;
-          if (url.startsWith('http://') || url.startsWith('https://')) {
-            window.open(url, '_blank');
-          } else {
-            navigate(url);
-          }
-        }}
-      />
+      <SwiperContainer>
+        <Swiper
+          modules={[Autoplay]}
+          spaceBetween={30}
+          slidesPerView={1}
+          autoplay={{
+            delay: 3000,
+            disableOnInteraction: false
+          }}
+          onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
+        >
+          {bannerData.map((banner, index) => (
+            <SwiperSlide key={index}>
+              <BannerImage 
+                src={banner.bannerImageUrl} 
+                alt="banner"
+                onClick={() => {
+                  const url = banner.redirectUrl;
+                  if (url.startsWith('http://') || url.startsWith('https://')) {
+                    window.open(url, '_blank');
+                  } else {
+                    navigate(url);
+                  }
+                }}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </SwiperContainer>
       <BannerButtonWrapper onClick={() => navigate("/banner")}>
         <PresentNumber>{currentIndex + 1}</PresentNumber>
         <Divide>/</Divide>
@@ -44,21 +55,22 @@ export const Banner = () => {
 }
 
 const Wrapper = tw.div`
-  flex w-full overflow-hidden
+  flex flex-col w-full overflow-hidden
+`
+
+const SwiperContainer = tw.div`
+  w-350 h-200 relative
 `
 
 const BannerImage = tw.img`
-  w-350 h-200 rounded-8 cursor-pointer
-  relative
-  transition-transform duration-500 ease-in-out
-  transform translate-x-0
+  w-full h-full object-cover rounded-8 cursor-pointer
 `
 
 const BannerButtonWrapper = tw.div`
   flex items-center justify-center
-  absolute bottom-20 right-20
+  absolute bottom-12 right-12
   bg-black/50 rounded-full
-  pl-6 pr-4
+  pl-6 pr-4 z-10
   cursor-pointer
 `
 
