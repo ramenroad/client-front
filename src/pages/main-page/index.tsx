@@ -43,6 +43,8 @@ const MainPage = () => {
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
 
+  console.log(ramenyaGroup);
+
   return (
     <Wrapper>
       <MainLogoBox>
@@ -73,25 +75,34 @@ const MainPage = () => {
         </LocationPathContainer>
       </LocationViewingWrapper>
 
+      {ramenyaGroup?.[0] && (
       <GroupViewingWrapper>
         <GroupInfoBox>
         <GroupTitleBox>
-          <GroupTitleText>그룹 제목</GroupTitleText>
-          <GroupTitleButtonBox>
+          <GroupTitleText>{ramenyaGroup?.[0].name}</GroupTitleText>
+          <GroupTitleButtonBox onClick={() => navigate(`/group`)}>
             <GroupTitleButtonText>더 보기</GroupTitleButtonText>
             <IconArrowRight color="#888888" />
           </GroupTitleButtonBox>
         </GroupTitleBox>
         <GroupSubTitle>
-          그룹 소제목
+          {ramenyaGroup?.[0].description}
         </GroupSubTitle>
         </GroupInfoBox>
         <GroupListWrapper>
-          {ramenyaGroup?.map((data, index) => (
-            <GroupListBox key={index} title={data.name} subTitle={data.description} image={data.descriptionImageUrl} />
-          ))}
-        </GroupListWrapper>
-      </GroupViewingWrapper>
+          {ramenyaGroup?.[0].ramenyas
+            .map((data) => (
+              <GroupListBox
+                key={data._id}
+                title={data.name}
+                subTitle={data.genre[0]}
+                image={data.thumbnailUrl ?? ""}
+                onClick={() => navigate(`/detail/${data._id}`)}
+              />
+            ))}
+          </GroupListWrapper>
+        </GroupViewingWrapper>
+      )}
     </Wrapper>
   );
 };
@@ -178,7 +189,7 @@ const GroupSubTitle = tw.span`
 `;
 
 const GroupListWrapper = tw.div`
-  flex gap-10 w-full overflow-x-scroll
+  flex gap-10 w-full overflow-x-scroll scrollbar-hide
 `;
 
 export default MainPage;

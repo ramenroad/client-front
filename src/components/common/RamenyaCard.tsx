@@ -12,7 +12,6 @@ interface RamenyaCardProps {
 const RamenyaCard = (props: RamenyaCardProps) => {
   const { ramenya } = props;
   const navigate = useNavigate();
-
   return (
     <Wrapper
       key={ramenya._id}

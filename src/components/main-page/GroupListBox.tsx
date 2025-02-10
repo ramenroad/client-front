@@ -4,11 +4,12 @@ interface GroupListBoxProps {
  title: string
  subTitle: string
  image: string
+ onClick: () => void
 }
 
-export const GroupListBox = ({ title, subTitle, image }: GroupListBoxProps) => {
+export const GroupListBox = ({ title, subTitle, image, onClick }: GroupListBoxProps) => {
   return (
-    <Wrapper>
+    <Wrapper onClick={onClick}>
         <GroupListImage src={image} />
         <TextBox>
             <GroupListTitle>{title}</GroupListTitle>
@@ -19,7 +20,7 @@ export const GroupListBox = ({ title, subTitle, image }: GroupListBoxProps) => {
 }
 
 const Wrapper = tw.div`
-  flex flex-col
+  flex flex-col cursor-pointer
   gap-10
 `;
 

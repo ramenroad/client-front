@@ -1,30 +1,24 @@
-import { useParams } from "react-router-dom";
 import tw from "twin.macro";
-import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
 
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
 import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 import styled from "@emotion/styled";
 import TopBar from "../../components/common/TopBar.tsx";
 import { useScrollToTop } from "../../hooks/useScrollToTop.tsx";
+import { useRamenyaGroupQuery } from "../../hooks/useRamenyaGroupQuery.ts";
 
-export const GenrePage = () => {
+export const GroupPage = () => {
   useScrollToTop();
 
-  const { genre } = useParams();
-
-  const ramenyaListQuery = useRamenyaListQuery({
-    type: "genre",
-    value: genre!,
-  });
-  const ramenyaList = ramenyaListQuery.data;
+  const { data: ramenyaGroup } = useRamenyaGroupQuery();
+  const ramenyaList = ramenyaGroup?.[0]?.ramenyas;
 
   return (
     <Layout>
       <Wrapper>
         <HeaderSectionWrapper>
           <HeaderSection>
-            <TopBar title={genre || ""} /> 
+            <TopBar title={ramenyaGroup?.[0]?.name|| ""} />
           </HeaderSection>
         </HeaderSectionWrapper>
         <InformationWrapper>
@@ -93,4 +87,4 @@ const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
   ],
 );
 
-export default GenrePage;
+export default GroupPage;
