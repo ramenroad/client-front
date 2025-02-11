@@ -4,6 +4,7 @@ import LocationPage from "./location-page";
 import DetailPage from "./detail-page";
 import GenrePage from "./genre-page";
 import { BannerPage } from "./banner-page";
+import GroupPage from "./group-page";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/banner",
     element: <BannerPage />,
+  },
+  {
+    path: "/group",
+    element: <GroupPage />,
   },
 ]);
 

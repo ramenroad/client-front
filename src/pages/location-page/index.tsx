@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import tw from "twin.macro";
-import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
+import { useRamenyaListQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { useMemo, useState } from "react";
 import { IconFilter } from "../../components/Icon";
 import styled from "@emotion/styled";
@@ -9,7 +9,7 @@ import RamenyaCard from "../../components/common/RamenyaCard.tsx";
 import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 import TopBar from "../../components/common/TopBar.tsx";
 import { Line } from "../../components/common/Line.tsx";
-import { useScrollToTop } from "../../hooks/useScrollToTop.tsx";
+import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 
 export const LocationPage = () => {
   useScrollToTop();
@@ -122,21 +122,19 @@ const Layout = tw.section`
 `;
 
 const Wrapper = tw.div`
-  flex flex-col  box-border
-  w-390 h-full
-  border-0 border-x border-border border-solid
+  flex flex-col
+  w-390 h-full 
 `;
 
 export const HeaderSectionWrapper = tw.section`
-  absolute left-0
 `;
 
 export const HeaderSection = tw.section`
-  fixed 
+  fixed w-390
   flex flex-col items-center
   font-16-sb
-  w-390
-  bg-white box-border border-0 border-x border-border border-solid
+  bg-white
+  border-0 border-x border-border border-solid box-border
 `;
 
 const FilterWrapper = tw.section`

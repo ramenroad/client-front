@@ -1,7 +1,7 @@
 import { IconClose } from "../../components/Icon";
 import tw from "twin.macro";
 import { useNavigate } from "react-router-dom";
-import { useBannerQuery } from "../../hooks/useBannerQuery";
+import { useBannerQuery } from "../../hooks/queries/useBannerQuery";
 export const BannerPage = () => {
   
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export const BannerPage = () => {
 }
 
 const Wrapper = tw.div`
-  flex flex-col items-center justify-center
+  flex flex-col items-center h-full
 `
 const Header = tw.div`
   flex h-44 items-center justify-center w-full

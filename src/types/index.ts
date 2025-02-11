@@ -58,3 +58,13 @@ export interface Banner {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface RamenyaGroup {
+  _id: string;
+  name: string;
+  description: string;
+  priority: number;
+  isShown: boolean;
+  ramenyas: Ramenya[];
+  descriptionImageUrl: string;
+}

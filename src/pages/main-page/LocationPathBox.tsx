@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import tw from "twin.macro";
-import { useMobileState } from "../../hooks/useMobileState.ts";
+import { useMobileState } from "../../hooks/common/useMobileState.ts";
 import styled from "@emotion/styled/macro";
 
 interface LocationPathBoxProps {

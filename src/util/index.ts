@@ -21,9 +21,12 @@ export const checkBusinessStatus = (
   }
 
   // Parse operating and break times
-  const [openTime, closeTime] = todayHours.operatingTime.split(" ~ ");
+  const normalizeTimeString = (timeStr: string) => 
+    timeStr.replace(/\s*[~-]\s*/g, " - "); // 공백을 포함한 ~ 또는 - 를 " - "로 정규화
+
+  const [openTime, closeTime] = normalizeTimeString(todayHours.operatingTime).split(" - ");
   const [breakStart, breakEnd] = todayHours.breakTime
-    ? todayHours.breakTime.split(" - ")
+    ? normalizeTimeString(todayHours.breakTime).split(" - ")
     : [null, null];
 
   // Convert string times into Date objects (same day as current day)

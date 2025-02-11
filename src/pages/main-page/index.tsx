@@ -3,7 +3,10 @@ import { LocationPathBox } from "./LocationPathBox";
 import mainLogo from "../../assets/images/logo.png";
 import { useNavigate } from "react-router-dom";
 import { genrePath } from "../../constants";
+import { IconArrowRight } from "../../components/Icon";
 import { Banner } from "../../components/common/Banner";
+import { GroupListBox } from "../../components/main-page/GroupListBox";
+import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 
 const locationPath = [
   {
@@ -38,6 +41,8 @@ const locationPath = [
 const MainPage = () => {
   const navigate = useNavigate();
 
+  const { data: ramenyaGroup } = useRamenyaGroupQuery();
+
   return (
     <Wrapper>
       <MainLogoBox>
@@ -67,6 +72,35 @@ const MainPage = () => {
           ))}
         </LocationPathContainer>
       </LocationViewingWrapper>
+
+      {ramenyaGroup?.[0] && (
+      <GroupViewingWrapper>
+        <GroupInfoBox>
+        <GroupTitleBox>
+          <GroupTitleText>{ramenyaGroup?.[0].name}</GroupTitleText>
+          <GroupTitleButtonBox onClick={() => navigate(`/group`)}>
+            <GroupTitleButtonText>더 보기</GroupTitleButtonText>
+            <IconArrowRight color="#888888" />
+          </GroupTitleButtonBox>
+        </GroupTitleBox>
+        <GroupSubTitle>
+          {ramenyaGroup?.[0].description}
+        </GroupSubTitle>
+        </GroupInfoBox>
+        <GroupListWrapper>
+          {ramenyaGroup?.[0].ramenyas
+            .map((data) => (
+              <GroupListBox
+                key={data._id}
+                title={data.name}
+                subTitle={data.genre[0]}
+                image={data.thumbnailUrl ?? ""}
+                onClick={() => navigate(`/detail/${data._id}`)}
+              />
+            ))}
+          </GroupListWrapper>
+        </GroupViewingWrapper>
+      )}
     </Wrapper>
   );
 };
@@ -99,7 +133,7 @@ const GenreViewingWrapper = tw.div`
 `;
 
 const LocationViewingWrapper = tw.div`
-  flex flex-col gap-16 w-350
+  flex flex-col gap-16 w-350 mb-20
 `;
 
 const LocationViewingText = tw.div`
@@ -122,6 +156,38 @@ const GenreInfo = tw.span`
 const LocationPathContainer = tw.div`
   grid grid-cols-3 gap-10
   w-350
+`;
+
+const GroupViewingWrapper = tw.div`
+  flex flex-col w-350 mb-20 gap-16
+`;
+
+const GroupInfoBox = tw.div`
+  flex flex-col
+`;
+
+const GroupTitleBox = tw.div`
+  flex justify-between items-center
+`;
+
+const GroupTitleText = tw.span`
+  flex font-18-sb text-black
+`;
+
+const GroupTitleButtonBox = tw.div`
+  flex items-center gap-2 cursor-pointer
+`;
+
+const GroupTitleButtonText = tw.div`
+  flex font-12-r text-gray-700
+`;
+
+const GroupSubTitle = tw.span`
+  flex font-14-r text-gray-800
+`;
+
+const GroupListWrapper = tw.div`
+  flex gap-10 w-full overflow-x-scroll scrollbar-hide
 `;
 
 export default MainPage;
