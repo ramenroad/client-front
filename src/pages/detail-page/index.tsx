@@ -55,8 +55,6 @@ export const DetailPage = () => {
 
   const todayBusinessHour = getTodayBusinessHour();
 
-  console.log(ramenyaDetailQuery.data);
-
   return (
     <Wrapper>
       <Container>

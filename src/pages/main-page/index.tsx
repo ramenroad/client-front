@@ -43,8 +43,6 @@ const MainPage = () => {
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
 
-  console.log(ramenyaGroup);
-
   return (
     <Wrapper>
       <MainLogoBox>
