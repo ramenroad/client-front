@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import tw from "twin.macro";
-import { useRamenyaListQuery } from "../../hooks/useRamenyaListQuery.ts";
+import { useRamenyaListQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { useMemo, useState } from "react";
 import { IconFilter } from "../../components/Icon";
 import styled from "@emotion/styled";
@@ -9,7 +9,7 @@ import RamenyaCard from "../../components/common/RamenyaCard.tsx";
 import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 import TopBar from "../../components/common/TopBar.tsx";
 import { Line } from "../../components/common/Line.tsx";
-import { useScrollToTop } from "../../hooks/useScrollToTop.tsx";
+import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 
 export const LocationPage = () => {
   useScrollToTop();

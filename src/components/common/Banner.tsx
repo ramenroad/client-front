@@ -1,7 +1,7 @@
 import tw from 'twin.macro'
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useBannerQuery } from '../../hooks/useBannerQuery';
+import { useBannerQuery } from '../../hooks/queries/useBannerQuery';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import 'swiper/css';

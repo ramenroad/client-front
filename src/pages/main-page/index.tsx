@@ -6,7 +6,7 @@ import { genrePath } from "../../constants";
 import { IconArrowRight } from "../../components/Icon";
 import { Banner } from "../../components/common/Banner";
 import { GroupListBox } from "../../components/main-page/GroupListBox";
-import { useRamenyaGroupQuery } from "../../hooks/useRamenyaGroupQuery";
+import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 
 const locationPath = [
   {

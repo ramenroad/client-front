@@ -1,12 +1,12 @@
 import {
     getRamenyaGroup,
-  } from "../api/group";
+  } from "../../api/group";
   import { useQuery } from "@tanstack/react-query";
-  
+  import { queryKeys } from "./queryKeys";
   
   export const useRamenyaGroupQuery = () => {
     return useQuery({
-      queryKey: ["ramenyaGroup"],
+      ...queryKeys.ramenya.group,
       queryFn: () => getRamenyaGroup(),
     });
   };

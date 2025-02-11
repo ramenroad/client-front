@@ -12,7 +12,7 @@ import {
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
-import { useRamenyaDetailQuery } from "../../hooks/useRamenyaDetailQuery";
+import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery";
 import DetailIconTag from "./DetailIconTag";
 import styled from "@emotion/styled/macro";
 import { useState } from "react";

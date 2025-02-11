@@ -4,8 +4,8 @@ import RamenyaCard from "../../components/common/RamenyaCard.tsx";
 import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 import styled from "@emotion/styled";
 import TopBar from "../../components/common/TopBar.tsx";
-import { useScrollToTop } from "../../hooks/useScrollToTop.tsx";
-import { useRamenyaGroupQuery } from "../../hooks/useRamenyaGroupQuery.ts";
+import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
+import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 
 export const GroupPage = () => {
   useScrollToTop();
