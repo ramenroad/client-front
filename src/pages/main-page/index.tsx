@@ -74,22 +74,19 @@ const MainPage = () => {
       </LocationViewingWrapper>
 
       {ramenyaGroup?.[0] && (
-      <GroupViewingWrapper>
-        <GroupInfoBox>
-        <GroupTitleBox>
-          <GroupTitleText>{ramenyaGroup?.[0].name}</GroupTitleText>
-          <GroupTitleButtonBox onClick={() => navigate(`/group`)}>
-            <GroupTitleButtonText>더 보기</GroupTitleButtonText>
-            <IconArrowRight color="#888888" />
-          </GroupTitleButtonBox>
-        </GroupTitleBox>
-        <GroupSubTitle>
-          {ramenyaGroup?.[0].description}
-        </GroupSubTitle>
-        </GroupInfoBox>
-        <GroupListWrapper>
-          {ramenyaGroup?.[0].ramenyas
-            .map((data) => (
+        <GroupViewingWrapper>
+          <GroupInfoBox>
+            <GroupTitleBox>
+              <GroupTitleText>{ramenyaGroup?.[0].name}</GroupTitleText>
+              <GroupTitleButtonBox onClick={() => navigate(`/group`)}>
+                <GroupTitleButtonText>더보기</GroupTitleButtonText>
+                <IconArrowRight color="#888888" />
+              </GroupTitleButtonBox>
+            </GroupTitleBox>
+            <GroupSubTitle>{ramenyaGroup?.[0].description}</GroupSubTitle>
+          </GroupInfoBox>
+          <GroupListWrapper>
+            {ramenyaGroup?.[0].ramenyas.map((data) => (
               <GroupListBox
                 key={data._id}
                 title={data.name}
@@ -122,7 +119,6 @@ const MainLogo = tw.img`
 const MainImageContainer = tw.div`
   flex relative mb-20
 `;
-
 
 const GenreImage = tw.img`
   w-48 h-48
