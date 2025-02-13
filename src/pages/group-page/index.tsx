@@ -18,7 +18,8 @@ export const GroupPage = () => {
       <Wrapper>
         <HeaderSectionWrapper>
           <HeaderSection>
-            <TopBar title={ramenyaGroup?.[0]?.name|| ""} />
+            <TopBar title={ramenyaGroup?.[0]?.name || ""} />
+            <HeaderImage src={ramenyaGroup?.[0]?.descriptionImageUrl || ""} />
           </HeaderSection>
         </HeaderSectionWrapper>
         <InformationWrapper>
@@ -63,13 +64,17 @@ export const HeaderSection = tw.section`
   border-0 border-x border-border border-solid box-border
 `;
 
+const HeaderImage = tw.img`
+  w-full h-78
+`;
+
 const SubLine = tw.div`
   w-full h-1 bg-border box-border mx-20
 `;
 
 const InformationWrapper = tw.section`
   flex flex-col w-full h-full overflow-y-auto
-  pt-60
+  pt-132
 `;
 
 const InformationHeader = tw.span`
@@ -84,7 +89,7 @@ const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
   ({ isEmpty }) => [
     tw`flex flex-col items-center justify-center w-full`,
     isEmpty && tw`h-full`,
-  ],
+  ]
 );
 
 export default GroupPage;

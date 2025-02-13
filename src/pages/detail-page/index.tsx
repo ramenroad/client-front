@@ -15,7 +15,7 @@ import { useParams } from "react-router-dom";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery";
 import DetailIconTag from "./DetailIconTag";
 import styled from "@emotion/styled/macro";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import quoteStart from "../../assets/images/quotes-start.png";
 import quoteEnd from "../../assets/images/quotes-end.png";
 import KakaoMap from "./KaKaoMap";
@@ -38,6 +38,11 @@ export const DetailPage = () => {
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
+
+  // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // 오늘 요일 구하기
   const getCurrentDayIndex = () => {
@@ -384,4 +389,3 @@ const LocationWrapper = tw.div`
 `;
 
 export default DetailPage;
-
