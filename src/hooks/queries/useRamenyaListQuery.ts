@@ -1,6 +1,7 @@
 import {
   getRamenyaListByRegion,
   getRamenyaListByGenre,
+  getRegions,
 } from "../../api/list-page";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "./queryKeys";
@@ -19,5 +20,12 @@ export const useRamenyaListQuery = ({ type, value }: QueryParams) => {
         ? getRamenyaListByRegion(value)
         : getRamenyaListByGenre(value),
     enabled: !!value,
+  });
+};
+
+export const useRegionsQuery = () => {
+  return useQuery({
+    ...queryKeys.ramenya.regions,
+    queryFn: getRegions,
   });
 };

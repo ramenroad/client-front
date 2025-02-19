@@ -1,5 +1,5 @@
 import { instance } from "../index";
-import { Ramenya } from "../../types";
+import { Ramenya, Region } from "../../types";
 
 export const getRamenyaListByRegion = async (location: string) => {
   const response = await instance.get<Ramenya[]>(`/ramenya/all`, {
@@ -15,5 +15,10 @@ export const getRamenyaListByGenre = async (genre: string) => {
       encode: (param: string) => encodeURIComponent(param),
     },
   });
+  return response.data;
+};
+
+export const getRegions = async () => {
+  const response = await instance.get<Region>("/ramenya/regions");
   return response.data;
 };

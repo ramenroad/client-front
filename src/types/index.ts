@@ -68,3 +68,5 @@ export interface RamenyaGroup {
   ramenyas: Ramenya[];
   descriptionImageUrl: string;
 }
+
+export type Region = string[];
