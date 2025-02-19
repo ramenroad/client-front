@@ -39,7 +39,7 @@ const MainPage = () => {
       </GenreViewingWrapper>
 
       <LocationViewingWrapper>
-        <LocationViewingText>지역별 보기</LocationViewingText>
+        <LocationViewingText>어디로 가시나요?</LocationViewingText>
         <LocationPathContainer>
           {locationPath?.map((region, index) => (
             <LocationPathBox key={index} location={region.location} />
