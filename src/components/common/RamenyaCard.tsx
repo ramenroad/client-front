@@ -5,6 +5,15 @@ import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import storeImage from "../../assets/images/store.png";
 import { OpenStatus } from "../../constants";
+import CountUp from "react-countup";
+import { useEffect, useMemo, useState } from "react";
+import {
+  setCurrentLocation,
+  useLocationStore,
+} from "../../store/location/useLocationStore.ts";
+import { calculateDistance } from "../../util/number.ts";
+import { IconTalk } from "../Icon";
+
 interface RamenyaCardProps {
   ramenya: Ramenya;
 }
@@ -12,6 +21,43 @@ interface RamenyaCardProps {
 const RamenyaCard = (props: RamenyaCardProps) => {
   const { ramenya } = props;
   const navigate = useNavigate();
+  const { current } = useLocationStore();
+
+  const [memorialDistance, setMemorialDistance] = useState<string>("0");
+
+  const currentDistance = useMemo(() => {
+    const distance = calculateDistance(current, {
+      latitude: ramenya.latitude,
+      longitude: ramenya.longitude,
+    });
+    setTimeout(() => setMemorialDistance(distance), 1000);
+    console.log(
+      "%cRamenyaCard.tsx:34 - %cdistance = ",
+      "color:yellow;",
+      "color:lightgreen; font-weight:bold",
+      distance,
+    );
+    return distance;
+  }, [ramenya, current]);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        setCurrentLocation({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        });
+      });
+
+      navigator.geolocation.watchPosition((pos) => {
+        setCurrentLocation({
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+        });
+      });
+    }
+  }, []);
+
   return (
     <Wrapper
       key={ramenya._id}
@@ -25,18 +71,40 @@ const RamenyaCard = (props: RamenyaCardProps) => {
         />
         <RamenyaDescription>
           <RamenyaTitle>{ramenya.name}</RamenyaTitle>
-          <RamenyaAddress>{ramenya.address}</RamenyaAddress>
+          <RamenyaLocation>
+            {current.latitude !== 0 && (
+              <>
+                <RamenyaDistance>
+                  <StyledCountUp
+                    start={parseFloat(memorialDistance.replace(/[^0-9.]/g, ""))}
+                    end={parseFloat(currentDistance.replace(/[^0-9.]/g, ""))}
+                    duration={1}
+                    decimals={2}
+                  />
+                  {currentDistance.replace(/[\d.]+/g, "")}
+                </RamenyaDistance>
+                <VerticalLine />
+              </>
+            )}
+
+            <RamenyaAddress>{ramenya.address}</RamenyaAddress>
+          </RamenyaLocation>
           <RamenyaOpenStatusWrapper>
             <RamenyaOpenStatus
               status={checkBusinessStatus(ramenya.businessHours).status}
             >
               {checkBusinessStatus(ramenya.businessHours).status}
             </RamenyaOpenStatus>
-            <span>·</span>
-            <RamenyaOpenTime>
-              {checkBusinessStatus(ramenya.businessHours).todayHours
-                ?.operatingTime || ""}
-            </RamenyaOpenTime>
+            {checkBusinessStatus(ramenya.businessHours).todayHours
+              ?.operatingTime && (
+              <>
+                <span>·</span>
+                <RamenyaOpenTime>
+                  {checkBusinessStatus(ramenya.businessHours).todayHours
+                    ?.operatingTime || ""}
+                </RamenyaOpenTime>
+              </>
+            )}
           </RamenyaOpenStatusWrapper>
           <RamenyaTagWrapper>
             {ramenya.genre.map((genre, index) => (
@@ -45,13 +113,23 @@ const RamenyaCard = (props: RamenyaCardProps) => {
           </RamenyaTagWrapper>
         </RamenyaDescription>
       </Layout>
+      <RamenyaOneLineReview>
+        <IconTalk />
+        <OneLineReviewText>
+          {ramenya.ramenroadReview.oneLineReview}
+        </OneLineReviewText>
+      </RamenyaOneLineReview>
     </Wrapper>
   );
 };
 
+const StyledCountUp = tw(CountUp)`
+  text-gray-700
+`;
+
 const Wrapper = tw.section`
   w-full gap-10 cursor-pointer
-  box-border px-20 py-20
+  box-border px-20 pt-20
 `;
 
 const Layout = tw.section`
@@ -74,8 +152,16 @@ const RamenyaTitle = tw.span`
   font-16-sb mb-6 h-19
 `;
 
-const RamenyaAddress = tw.span`
-  font-14-r text-gray-700 mb-12 h-17 truncate
+const RamenyaLocation = tw.section`
+  flex gap-4 items-center mb-12
+`;
+
+const VerticalLine = tw.span`
+  w-1 h-10 bg-gray-100
+`;
+
+const RamenyaAddress = tw.div`
+  font-14-r text-gray-700 truncate whitespace-nowrap overflow-hidden text-ellipsis flex-1
 `;
 
 const RamenyaOpenStatusWrapper = tw.span`
@@ -100,6 +186,19 @@ const RamenyaTagWrapper = tw.section`
 
 const RamenyaTag = tw.span`
   font-10-r text-gray-700 rounded-sm bg-border p-2
+`;
+
+const RamenyaDistance = tw.section`
+  font-12-m text-gray-900 flex items-center
+`;
+
+const RamenyaOneLineReview = tw.section`
+  bg-border rounded-md my-20 h-34 flex items-center gap-8 text-gray-700 font-12-r px-10
+  overflow-hidden
+`;
+
+const OneLineReviewText = tw.span`
+  truncate min-w-0 flex-1
 `;
 
 export default RamenyaCard;
