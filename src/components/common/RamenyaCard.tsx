@@ -31,12 +31,6 @@ const RamenyaCard = (props: RamenyaCardProps) => {
       longitude: ramenya.longitude,
     });
     setTimeout(() => setMemorialDistance(distance), 1000);
-    console.log(
-      "%cRamenyaCard.tsx:34 - %cdistance = ",
-      "color:yellow;",
-      "color:lightgreen; font-weight:bold",
-      distance,
-    );
     return distance;
   }, [ramenya, current]);
 
