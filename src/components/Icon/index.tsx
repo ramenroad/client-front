@@ -249,26 +249,36 @@ export const IconBar = ({ color, ...rest }: IconProps) => (
 );
 
 export const IconClose = ({ color, ...rest }: IconProps) => (
-  <svg 
-    width="16" 
-    height="16" 
-    viewBox="0 0 16 16" 
-    fill="none" 
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="none"
     {...rest}
   >
-    <path d="M1.43896 1L14.9999 15" stroke={color ?? "#111111"} strokeWidth="1.5" strokeLinecap="round"/>
-    <path d="M14.561 1L1.00014 15" stroke={color ?? "#111111"} strokeWidth="1.5" strokeLinecap="round"/>
+    <path
+      d="M1.43896 1L14.9999 15"
+      stroke={color ?? "#111111"}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M14.561 1L1.00014 15"
+      stroke={color ?? "#111111"}
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
   </svg>
 );
 
 export const IconArrowRight = ({ color, ...rest }: IconProps) => (
-<svg 
-    width="12" 
-    height="12" 
-    viewBox="0 0 12 12" 
-    fill="none" 
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 12 12"
+    fill="none"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="none"
     {...rest}
@@ -279,5 +289,23 @@ export const IconArrowRight = ({ color, ...rest }: IconProps) => (
       strokeWidth="1.5"
       strokeLinecap="round"
     />
+  </svg>
+);
+
+export const IconTalk = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect x="1" y="2" width="14" height="10" rx="1" fill="#CFCFCF" />
+    <path
+      d="M4 14.5172V11.2C4 11.0895 4.08954 11 4.2 11H7.51716C7.69534 11 7.78457 11.2154 7.65858 11.3414L4.34142 14.6586C4.21543 14.7846 4 14.6953 4 14.5172Z"
+      fill="#CFCFCF"
+    />
+    <rect x="5" y="5" width="6" height="1" rx="0.5" fill="#F5F5F5" />
+    <rect x="5" y="8" width="6" height="1" rx="0.5" fill="#F5F5F5" />
   </svg>
 );

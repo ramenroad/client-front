@@ -13,8 +13,14 @@ export interface Ramenya {
   region: string;
   genre: string[];
   businessHours: BusinessHour[];
+  ramenroadReview: {
+    description: string;
+    oneLineReview: string;
+  };
   address: string;
   thumbnailUrl?: string;
+  latitude: number;
+  longitude: number;
 }
 
 export interface BusinessStatus {
@@ -67,6 +73,11 @@ export interface RamenyaGroup {
   isShown: boolean;
   ramenyas: Ramenya[];
   descriptionImageUrl: string;
+}
+
+export interface Coordinate {
+  latitude: number;
+  longitude: number;
 }
 
 export type Region = string[];
