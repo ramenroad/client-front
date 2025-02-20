@@ -8,8 +8,8 @@ export const queryKeys = createQueryKeyStore({
     all: null,
     detail: (id: string) => [id],
     group: null,
+    regions: null,
     list: (params: { type: "region" | "genre"; value: string }) =>
       [params.type, params.value] as const,
   },
-
 });

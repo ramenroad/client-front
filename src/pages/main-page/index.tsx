@@ -7,42 +7,16 @@ import { IconArrowRight } from "../../components/Icon";
 import { Banner } from "../../components/common/Banner";
 import { GroupListBox } from "../../components/main-page/GroupListBox";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
-
-const locationPath = [
-  {
-    location: "연남동",
-  },
-  {
-    location: "서교동",
-  },
-  {
-    location: "망원동",
-  },
-  {
-    location: "합정동",
-  },
-  {
-    location: "강남역",
-  },
-  {
-    location: "종로",
-  },
-  {
-    location: "잠실",
-  },
-  {
-    location: "강서구",
-  },
-  {
-    location: "관악구",
-  },
-];
+import { useRegionsQuery } from "../../hooks/queries/useRamenyaListQuery";
 
 const MainPage = () => {
   const navigate = useNavigate();
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
-
+  const { data: regions } = useRegionsQuery();
+  const locationPath = regions?.map((region) => ({
+    location: region,
+  }));
   return (
     <Wrapper>
       <MainLogoBox>
@@ -65,10 +39,10 @@ const MainPage = () => {
       </GenreViewingWrapper>
 
       <LocationViewingWrapper>
-        <LocationViewingText>지역별 보기</LocationViewingText>
+        <LocationViewingText>어디로 가시나요?</LocationViewingText>
         <LocationPathContainer>
-          {locationPath.map((location, index) => (
-            <LocationPathBox key={index} location={location.location} />
+          {locationPath?.map((region, index) => (
+            <LocationPathBox key={index} location={region.location} />
           ))}
         </LocationPathContainer>
       </LocationViewingWrapper>
