@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import storeImage from "../../assets/images/store.png";
 import { OpenStatus } from "../../constants";
 import CountUp from "react-countup";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import {
   setCurrentLocation,
   useLocationStore,
@@ -23,15 +23,11 @@ const RamenyaCard = (props: RamenyaCardProps) => {
   const navigate = useNavigate();
   const { current } = useLocationStore();
 
-  const [memorialDistance, setMemorialDistance] = useState<string>("0");
-
   const currentDistance = useMemo(() => {
-    const distance = calculateDistance(current, {
+    return calculateDistance(current, {
       latitude: ramenya.latitude,
       longitude: ramenya.longitude,
     });
-    setTimeout(() => setMemorialDistance(distance), 1000);
-    return distance;
   }, [ramenya, current]);
 
   useEffect(() => {
@@ -70,7 +66,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
               <>
                 <RamenyaDistance>
                   <StyledCountUp
-                    start={parseFloat(memorialDistance.replace(/[^0-9.]/g, ""))}
+                    start={0}
                     end={parseFloat(currentDistance.replace(/[^0-9.]/g, ""))}
                     duration={1}
                     decimals={2}
