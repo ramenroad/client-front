@@ -9,10 +9,9 @@ import { GroupListBox } from "../../components/main-page/GroupListBox";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 import { useRegionsQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { useNavigationTracking } from "../../hooks/ga/usePageNavigation";
-import { usePageAnalytics } from "../../hooks/ga/usePagePerformance";
 
 const MainPage = () => {
-  usePageAnalytics();
+
   const navigate = useNavigate();
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
