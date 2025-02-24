@@ -3,8 +3,15 @@ import { Routes } from "./pages/Routes.tsx";
 import { queryClient } from "./core/queryClient";
 import tw from "twin.macro";
 import { Footer } from "./components/common/Footer.tsx";
+import { useEffect } from "react";
+import { initializeGA } from "./util/initializeGa.tsx";
 
 function App() {
+
+  useEffect(() => {
+    initializeGA('G-XXXXXXXXXX'); // 실제 GA4 측정 ID로 교체
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Screen>
