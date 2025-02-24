@@ -29,7 +29,17 @@ export const useInteractionTracking = () => {
     });
   }, [trackEvent]);
 
+  const trackMapInteraction = useCallback((action: 'click' | 'zoom', params: TrackingParams = {}) => {
+    trackEvent('map_interaction', {
+      ...params,
+      event_category: 'interaction',
+      event_action: action,
+      event_label: 'map_view',
+    });
+  }, [trackEvent]);
+
   return {
     trackImageClick,
+    trackMapInteraction,
   };
 };

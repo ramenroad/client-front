@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import tw from "twin.macro";
 
 interface KakaoMapProps {
-  latitude: number | undefined;
-  longitude: number | undefined;
+  latitude?: number;
+  longitude?: number;
+  onClick?: () => void;
+  onZoomChanged?: () => void;
 }
 
 declare global {
@@ -13,7 +15,7 @@ declare global {
   }
 }
 
-const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
+const KakaoMap = ({ latitude, longitude, onClick, onZoomChanged }: KakaoMapProps) => {
   useEffect(() => {
     const loadKakaoMap = () => {
       // 이미 스크립트가 로드되어 있는지 확인
@@ -57,6 +59,14 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
                 position: coords,
               });
               map.setCenter(coords);
+            }
+
+            // 이벤트 리스너 추가
+            if (onClick) {
+              window.kakao.maps.event.addListener(map, 'click', onClick);
+            }
+            if (onZoomChanged) {
+              window.kakao.maps.event.addListener(map, 'zoom_changed', onZoomChanged);
             }
           } catch (error) {
             console.error("지도 생성 중 오류:", error);

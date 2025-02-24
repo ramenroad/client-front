@@ -22,6 +22,7 @@ import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
 import { formatNumber } from "../../util/number";
+import { useInteractionTracking } from "../../hooks/ga/usePageInteraction";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -38,6 +39,7 @@ export const DetailPage = () => {
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
+  const { trackMapInteraction } = useInteractionTracking();
 
   // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
   useEffect(() => {
@@ -216,6 +218,8 @@ export const DetailPage = () => {
             <KakaoMap
               latitude={ramenyaDetailQuery.data?.latitude}
               longitude={ramenyaDetailQuery.data?.longitude}
+              onClick={() => trackMapInteraction('click')}
+              onZoomChanged={() => trackMapInteraction('zoom')}
             />
           </LocationWrapper>
         </MarketDetailWrapper>
