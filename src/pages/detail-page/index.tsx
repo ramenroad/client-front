@@ -63,9 +63,12 @@ export const DetailPage = () => {
   return (
     <Wrapper>
       <Container>
-        <Header>
-          <StyledIconBack onClick={() => navigate(-1)} />
-        </Header>
+        <HeaderBox>
+          <Header>
+            <StyledIconBack onClick={() => navigate(-1)} />
+          </Header>
+        <MarketThumbnail src={ramenyaDetailQuery.data?.thumbnailUrl} />        
+        </HeaderBox>
         <MarketDetailWrapper>
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
@@ -234,7 +237,12 @@ const Container = tw.div`
   max-w-390
 `;
 
-const Header = tw.div`  flex items-center justify-start
+const HeaderBox = tw.div`
+  flex flex-col
+`;
+
+const Header = tw.div`  
+  flex items-center justify-start
   px-20 py-10 w-full
 `;
 
@@ -244,6 +252,10 @@ const StyledIconBack = tw(IconBack)`
 
 const MarketDetailWrapper = tw.div`
   flex flex-col px-20 gap-16
+`;
+
+const MarketThumbnail = tw.img`
+  w-full h-190
 `;
 
 const MarketDetailTitle = tw.div`
