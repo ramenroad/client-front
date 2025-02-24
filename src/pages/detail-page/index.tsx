@@ -18,6 +18,7 @@ import styled from "@emotion/styled/macro";
 import { useState, useEffect } from "react";
 import quoteStart from "../../assets/images/quotes-start.png";
 import quoteEnd from "../../assets/images/quotes-end.png";
+import emptyThumbnail from "../../assets/images/store.png";
 import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
@@ -67,7 +68,13 @@ export const DetailPage = () => {
           <Header>
             <StyledIconBack onClick={() => navigate(-1)} />
           </Header>
-        <MarketThumbnail src={ramenyaDetailQuery.data?.thumbnailUrl} />        
+          <ThumbnailContainer>
+            {ramenyaDetailQuery.data?.thumbnailUrl ? (
+              <MarketThumbnail src={ramenyaDetailQuery.data?.thumbnailUrl} />
+            ) : (
+              <EmptyThumbnail src={emptyThumbnail} />
+            )}
+          </ThumbnailContainer>
         </HeaderBox>
         <MarketDetailWrapper>
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
@@ -244,6 +251,15 @@ const Header = tw.div`
   flex items-center justify-start
   px-20 py-10 w-full
 `;
+
+const ThumbnailContainer = tw.div`
+  w-full flex items-center justify-center
+`;
+
+const EmptyThumbnail = tw.img`
+  w-190
+`;
+
 
 const StyledIconBack = tw(IconBack)`
   cursor-pointer
