@@ -5,6 +5,7 @@ import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import storeImage from "../../assets/images/store.png";
 import { OpenStatus } from "../../constants";
+import { useInteractionTracking } from "../../hooks/ga/usePageInteraction";
 interface RamenyaCardProps {
   ramenya: Ramenya;
 }
@@ -12,10 +13,17 @@ interface RamenyaCardProps {
 const RamenyaCard = (props: RamenyaCardProps) => {
   const { ramenya } = props;
   const navigate = useNavigate();
+  const { trackImageClick } = useInteractionTracking();
+
+  const handleCardClick = () => {
+    trackImageClick(ramenya._id, ramenya.name);
+    navigate(`/detail/${ramenya._id}`);
+  };
+
   return (
     <Wrapper
       key={ramenya._id}
-      onClick={() => navigate(`/detail/${ramenya._id}`)}
+      onClick={handleCardClick}
     >
       <Layout>
         <RamenyaThumbnail
