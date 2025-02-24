@@ -39,12 +39,14 @@ const RamenyaCard = (props: RamenyaCardProps) => {
         });
       });
 
-      navigator.geolocation.watchPosition((pos) => {
+      const watchId = navigator.geolocation.watchPosition((pos) => {
         setCurrentLocation({
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
         });
       });
+
+      return () => navigator.geolocation.clearWatch(watchId);
     }
   }, []);
 
