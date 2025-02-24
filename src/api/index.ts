@@ -1,8 +1,11 @@
 import axios from "axios";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const instance = axios.create({
-  baseURL: "https://ramenroad.com/api/v1",
-  // baseURL: "http://localhost:3000/v1",
+  baseURL: isProduction
+    ? "https://ramenroad.com/api/v1"
+    : "http://localhost:3000/v1",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -10,7 +13,9 @@ export const instance = axios.create({
 });
 
 export const instanceWithNoVersioning = axios.create({
-  baseURL: "https://ramenroad.com/api/",
+  baseURL: isProduction
+    ? "https://ramenroad.com/api/"
+    : "http://localhost:3000/",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
