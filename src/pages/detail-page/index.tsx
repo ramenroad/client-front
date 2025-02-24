@@ -204,9 +204,6 @@ export const DetailPage = () => {
             <RecommendTitle>
               {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
             </RecommendTitle>
-            <RecommendText>
-              {ramenyaDetailQuery.data?.ramenroadReview.description}
-            </RecommendText>
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>
@@ -256,6 +253,8 @@ const MarketDetailWrapper = tw.div`
 
 const MarketThumbnail = tw.img`
   w-full h-190
+  object-center
+  object-cover
 `;
 
 const MarketDetailTitle = tw.div`
@@ -368,17 +367,14 @@ const RecommendMenuPrice = tw.div`
 `;
 
 const RecommendTextContainer = tw.div`
-  flex flex-col p-20 gap-20
+  flex flex-col p-20
   bg-orange/[0.02] border-solid border-1 border-orange/30 rounded-8
 `;
 
 const RecommendTitle = tw.div`
-  font-16-sb
+  font-16-sb text-center
 `;
 
-const RecommendText = tw.div`
-  font-14-r whitespace-pre-line
-`;
 
 const QuoteStartImage = tw.img`
   w-30 h-22
