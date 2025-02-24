@@ -201,9 +201,11 @@ export const DetailPage = () => {
           </RecommendBox>
           <RecommendTextContainer>
             <QuoteStartImage src={quoteStart} />
+            <RecommendText>
             <RecommendTitle>
               {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
             </RecommendTitle>
+            </RecommendText>
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>
@@ -367,8 +369,12 @@ const RecommendMenuPrice = tw.div`
 `;
 
 const RecommendTextContainer = tw.div`
-  flex flex-col p-20
+  flex flex-col p-20 gap-4
   bg-orange/[0.02] border-solid border-1 border-orange/30 rounded-8
+`;
+
+const RecommendText = tw.div`
+  flex items-center justify-center
 `;
 
 const RecommendTitle = tw.div`
