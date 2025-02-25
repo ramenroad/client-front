@@ -8,12 +8,35 @@ import { Banner } from "../../components/common/Banner";
 import { GroupListBox } from "../../components/main-page/GroupListBox";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 import { useRegionsQuery } from "../../hooks/queries/useRamenyaListQuery";
+import { useNavigationTracking } from "../../hooks/ga/usePageNavigation";
 
 const MainPage = () => {
+
   const navigate = useNavigate();
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
   const { data: regions } = useRegionsQuery();
+
+  const { trackPageNavigation } = useNavigationTracking();
+
+  const handleGenreClick = (genre: string) => {
+    trackPageNavigation(`/genre/${genre}`, {
+      category: 'genre',
+      action: 'click',
+      label: genre
+    });
+    navigate(`/genre/${genre}`);
+  }
+
+  const handleLocationClick = (location: string) => {
+    trackPageNavigation(`/location/${location}`, {
+      category: 'location',
+      action: 'click',
+      label: location
+    });
+    navigate(`/location/${location}`);
+  }
+
   const locationPath = regions?.map((region) => ({
     location: region,
   }));
@@ -30,7 +53,7 @@ const MainPage = () => {
         <LocationViewingText>장르별 보기</LocationViewingText>
         <GenrePathContainer>
           {genrePath.map((genre, index) => (
-            <Genre onClick={() => navigate(`/genre/${genre.genre}`)}>
+            <Genre onClick={() => handleGenreClick(genre.genre)}>
               <GenreImage key={index} src={genre.image} alt={genre.genre} />
               <GenreInfo>{genre.genre}</GenreInfo>
             </Genre>
@@ -42,7 +65,7 @@ const MainPage = () => {
         <LocationViewingText>어디로 가시나요?</LocationViewingText>
         <LocationPathContainer>
           {locationPath?.map((region, index) => (
-            <LocationPathBox key={index} location={region.location} />
+            <LocationPathBox key={index} location={region.location} onClick={() => handleLocationClick(region.location)} />
           ))}
         </LocationPathContainer>
       </LocationViewingWrapper>

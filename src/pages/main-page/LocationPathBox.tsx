@@ -1,20 +1,19 @@
-import { useNavigate } from "react-router-dom";
 import tw from "twin.macro";
 import { useMobileState } from "../../hooks/common/useMobileState.ts";
 import styled from "@emotion/styled/macro";
 
-interface LocationPathBoxProps {
+interface LocationPathBoxProps  {
   location: string;
+  onClick: () => void;
 }
 
-export const LocationPathBox = ({ location }: LocationPathBoxProps) => {
-  const navigate = useNavigate();
+export const LocationPathBox = ({ location, onClick }: LocationPathBoxProps) => {
   const { isMobile } = useMobileState();
 
   return (
     <Wrapper
       isMobile={isMobile}
-      onClick={() => navigate(`/location/${location}`)}
+      onClick={onClick}
     >
       <LocationPathText>{location}</LocationPathText>
     </Wrapper>
