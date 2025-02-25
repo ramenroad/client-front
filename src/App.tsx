@@ -10,7 +10,7 @@ import { usePageAnalytics } from "./hooks/ga/usePagePerformance";
 function App() {
 
   useEffect(() => {
-    initializeGA('G-XXXXXXXXXX'); // 실제 GA4 측정 ID로 교체
+    initializeGA(import.meta.env.VITE_GOOGLE_MAP_API_KEY); // 실제 GA4 측정 ID로 교체
   }, []);
   
   usePageAnalytics();
