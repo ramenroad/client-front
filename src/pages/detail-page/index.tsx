@@ -18,6 +18,7 @@ import styled from "@emotion/styled/macro";
 import { useState, useEffect } from "react";
 import quoteStart from "../../assets/images/quotes-start.png";
 import quoteEnd from "../../assets/images/quotes-end.png";
+import emptyThumbnail from "../../assets/images/store.png";
 import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
@@ -63,9 +64,18 @@ export const DetailPage = () => {
   return (
     <Wrapper>
       <Container>
-        <Header>
-          <StyledIconBack onClick={() => navigate(-1)} />
-        </Header>
+        <HeaderBox>
+          <Header>
+            <StyledIconBack onClick={() => navigate(-1)} />
+          </Header>
+          <ThumbnailContainer>
+            {ramenyaDetailQuery.data?.thumbnailUrl ? (
+              <MarketThumbnail src={ramenyaDetailQuery.data?.thumbnailUrl} />
+            ) : (
+              <EmptyThumbnail src={emptyThumbnail} />
+            )}
+          </ThumbnailContainer>
+        </HeaderBox>
         <MarketDetailWrapper>
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
@@ -198,11 +208,10 @@ export const DetailPage = () => {
           </RecommendBox>
           <RecommendTextContainer>
             <QuoteStartImage src={quoteStart} />
+            <RecommendText>
             <RecommendTitle>
               {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
             </RecommendTitle>
-            <RecommendText>
-              {ramenyaDetailQuery.data?.ramenroadReview.description}
             </RecommendText>
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
@@ -234,9 +243,23 @@ const Container = tw.div`
   max-w-390
 `;
 
-const Header = tw.div`  flex items-center justify-start
+const HeaderBox = tw.div`
+  flex flex-col
+`;
+
+const Header = tw.div`  
+  flex items-center justify-start
   px-20 py-10 w-full
 `;
+
+const ThumbnailContainer = tw.div`
+  w-full flex items-center justify-center
+`;
+
+const EmptyThumbnail = tw.img`
+  w-190
+`;
+
 
 const StyledIconBack = tw(IconBack)`
   cursor-pointer
@@ -244,6 +267,12 @@ const StyledIconBack = tw(IconBack)`
 
 const MarketDetailWrapper = tw.div`
   flex flex-col px-20 gap-16
+`;
+
+const MarketThumbnail = tw.img`
+  w-full h-190
+  object-center
+  object-cover
 `;
 
 const MarketDetailTitle = tw.div`
@@ -356,17 +385,18 @@ const RecommendMenuPrice = tw.div`
 `;
 
 const RecommendTextContainer = tw.div`
-  flex flex-col p-20 gap-20
+  flex flex-col p-20 gap-4
   bg-orange/[0.02] border-solid border-1 border-orange/30 rounded-8
 `;
 
-const RecommendTitle = tw.div`
-  font-16-sb
+const RecommendText = tw.div`
+  flex items-center justify-center
 `;
 
-const RecommendText = tw.div`
-  font-14-r whitespace-pre-line
+const RecommendTitle = tw.div`
+  font-16-sb text-center
 `;
+
 
 const QuoteStartImage = tw.img`
   w-30 h-22

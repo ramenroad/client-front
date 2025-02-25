@@ -10,6 +10,7 @@ import aburasoba from "../assets/images/aburasoba.png";
 import tsukemen from "../assets/images/tsukemen.png";
 import miso from "../assets/images/miso.png";
 import dandan from "../assets/images/dandan.png";
+import mazemen from "../assets/images/mazemen.png";
 
 export const RAMENYA_TYPES = [
   "이에케",
@@ -82,6 +83,10 @@ export const genrePath = [
     genre: "탄탄멘",
     image: dandan,
   },
+  {
+    genre: "마제소바",
+    image: mazemen,
+  }
 ];
 
 export const ramenroadEmail = "ramenroad99@gmail.com";
