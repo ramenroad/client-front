@@ -16,6 +16,8 @@ export const useAuthMutation = () => {
     onSuccess: (data) => {
       sessionStorage.setItem("isAuthenticated", "true");
       useSignInStore.getState().setTokens(data);
+      console.log(data);
+      console.log(useSignInStore.getState());
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       navigate("/register");
     },

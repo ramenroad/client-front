@@ -25,6 +25,8 @@ const RegisterPage = () => {
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             onClick={handleClick}
+            minLength={2}
+            maxLength={10}
           />
         </InputWrapper>
         <Button disabled={nickname.length < 2 || nickname.length > 10}>

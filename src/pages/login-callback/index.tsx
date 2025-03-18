@@ -11,7 +11,7 @@ const LoginCallbackPage = () => {
     const code = new URLSearchParams(window.location.search).get("code");
     console.log(code);
     console.log(id);
-    if (code) {
+    if (code && !login.isPending) {
       login.mutate({ id: id!, code: code });
     }
   }, [id, login]);
