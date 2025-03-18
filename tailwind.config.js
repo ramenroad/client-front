@@ -54,6 +54,9 @@ module.exports = {
         divider: "#EBEBED",
         border: "#F4F4F5",
         footer: "#FAFAFA",
+
+        kakao: "#FEE500",
+        naver: "#03C75A",
       },
 
       fontFamily: {
