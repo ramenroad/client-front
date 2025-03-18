@@ -2,11 +2,22 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { oAuthLogin } from "../../api/auth";
+import { useSignInStore } from "../../states/sign-in";
+import { queryClient } from "../../core/queryClient";
+import { useNavigate } from "react-router-dom";
 
 export const useAuthMutation = () => {
+  const navigate = useNavigate();
+
   const login = useMutation({
     mutationFn: async ({ id, code }: { id: string; code: string }) => {
       return await oAuthLogin(id, code);
+    },
+    onSuccess: (data) => {
+      sessionStorage.setItem("isAuthenticated", "true");
+      useSignInStore.getState().setTokens(data);
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      navigate("/register");
     },
   });
 
