@@ -1,13 +1,18 @@
 import axios from "axios";
 import { QueryClient } from "@tanstack/react-query";
+import { useSignInStore } from "../states/sign-in";
+import { refreshToken } from "./auth";
 
 const isProduction = process.env.NODE_ENV === "production";
 
-export const createAxiosInstance = (queryClient: QueryClient) => {
+export const createAxiosInstance = (
+  queryClient: QueryClient,
+  versioning: boolean = true
+) => {
   const instance = axios.create({
     baseURL: isProduction
-      ? "https://ramenroad.com/api/v1"
-      : "http://localhost:3000/v1",
+      ? `https://ramenroad.com/api${versioning ? "/v1" : "/"}`
+      : `http://localhost:3000${versioning ? "/v1" : "/"}`,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -16,7 +21,7 @@ export const createAxiosInstance = (queryClient: QueryClient) => {
 
   // Request 인터셉터 추가
   instance.interceptors.request.use((config) => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = useSignInStore.getState().accessToken;
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -43,23 +48,17 @@ export const createAxiosInstance = (queryClient: QueryClient) => {
         console.log("401 에러 발생");
 
         try {
-          const refreshToken = localStorage.getItem("refreshToken");
-          if (!refreshToken) throw new Error("No refresh token");
+          const tokens = await refreshToken(
+            useSignInStore.getState().refreshToken as string
+          );
 
-          const response = await instance.post("/auth/refresh", {
-            refreshToken,
-          });
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", newRefreshToken);
+          useSignInStore.getState().setTokens(tokens);
           queryClient.invalidateQueries({ queryKey: ["auth"] });
 
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
           return instance(originalRequest);
         } catch (refreshError) {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
+          useSignInStore.getState().clearTokens();
           queryClient.invalidateQueries({ queryKey: ["auth"] });
           window.location.href = "/login";
           return Promise.reject(refreshError);
@@ -72,14 +71,6 @@ export const createAxiosInstance = (queryClient: QueryClient) => {
   return instance;
 };
 
-export const instance = createAxiosInstance(new QueryClient());
-
-export const instanceWithNoVersioning = axios.create({
-  baseURL: isProduction
-    ? "https://ramenroad.com/api/"
-    : "http://localhost:3000/",
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
-});
+const queryClient = new QueryClient();
+export const instance = createAxiosInstance(queryClient);
+export const instanceWithNoVersioning = createAxiosInstance(queryClient, false);
