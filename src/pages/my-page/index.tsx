@@ -1,19 +1,45 @@
 import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
 import styled from "@emotion/styled";
-import { CameraIcon } from "../../components/Icon";
+import { CameraIcon, IconArrowRight } from "../../components/Icon";
+import { useNavigate } from "react-router-dom";
 
 const MyPage = () => {
+  const navigate = useNavigate();
+
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    console.log(
+      "%cindex.tsx:14 - %cfile = ",
+      "color:yellow;",
+      "color:lightgreen; font-weight:bold",
+      file
+    );
+  };
+
   return (
-    <>
+    <Layout>
       <TopBar title="내 정보" />
       <Wrapper>
         <ProfileWrapper>
-          <ProfileImageWrapper>
+          <ProfileImageWrapper
+            onClick={() =>
+              document.getElementById("profileImageInput")?.click()
+            }
+          >
             <ProfileImage />
             <ProfileImageEditButton>
               <CameraIcon />
             </ProfileImageEditButton>
+            <ProfileImageInput
+              id="profileImageInput"
+              type="file"
+              accept="image/*"
+              onChange={handleProfileImageChange}
+              style={{ display: "none" }}
+            />
           </ProfileImageWrapper>
           <ProfileInfoWrapper>
             <ProfileInfo>라멘로드</ProfileInfo>
@@ -22,7 +48,10 @@ const MyPage = () => {
         <ProfileDescriptionWrapper>
           <ProfileDescription>
             <Label>닉네임</Label>
-            <LabelDescription>라멘로드</LabelDescription>
+            <NicknameEditWrapper onClick={() => navigate("/register")}>
+              <LabelDescription>라멘로드</LabelDescription>
+              <IconArrowRight />
+            </NicknameEditWrapper>
           </ProfileDescription>
           <ProfileDescription>
             <Label>이름</Label>
@@ -35,13 +64,18 @@ const MyPage = () => {
         </ProfileDescriptionWrapper>
         <LogoutText>로그아웃</LogoutText>
       </Wrapper>
-    </>
+    </Layout>
   );
 };
 
+const Layout = tw.div`
+  box-border w-full h-full flex flex-col
+`;
+
 const Wrapper = tw.div`
   flex flex-col
-  w-full h-full
+  w-full flex-1
+  box-border
 `;
 
 const ProfileWrapper = tw.div`
@@ -50,7 +84,7 @@ const ProfileWrapper = tw.div`
 `;
 
 const ProfileImageWrapper = tw.div`
-  relative mt-20 mb-22
+  relative mt-20 mb-22 cursor-pointer
 `;
 
 const ProfileImage = tw.div`
@@ -65,6 +99,10 @@ const ProfileImageEditButton = tw.div`
   flex justify-center items-center
 `;
 
+const ProfileImageInput = tw.input`
+  hidden
+`;
+
 const ProfileInfoWrapper = tw.div`
   flex
   w-full
@@ -77,7 +115,11 @@ const ProfileInfo = tw.div`
 `;
 
 const ProfileDescriptionWrapper = tw.div`
-  border border-solid border-1 border-border mx-20 rounded-8 mt-32 mb-233
+  border border-solid border-1 border-border mx-20 rounded-8 mt-32
+`;
+
+const NicknameEditWrapper = tw.div`
+  flex gap-4 items-center cursor-pointer
 `;
 
 const ProfileDescription = styled.div<{ isLast?: boolean }>(({ isLast }) => [
@@ -97,11 +139,12 @@ const LabelDescription = tw.span`
   text-gray-500
 `;
 
+// Start of Selection
 const LogoutText = tw.span`
   text-gray-500
   font-14-m
-  text-center
-  cursor-pointer
+  text-center justify-self-end
+  cursor-pointer mb-40 mt-auto
 `;
 
 export default MyPage;
