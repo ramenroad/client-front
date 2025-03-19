@@ -12,7 +12,7 @@ import {
   useLocationStore,
 } from "../../store/location/useLocationStore.ts";
 import { calculateDistance } from "../../util/number.ts";
-import { IconTalk } from "../Icon";
+import { IconTalk, IconStar } from "../Icon";
 
 interface RamenyaCardProps {
   ramenya: Ramenya;
@@ -62,47 +62,56 @@ const RamenyaCard = (props: RamenyaCardProps) => {
           alt={"Thumbnail"}
         />
         <RamenyaDescription>
-          <RamenyaTitle>{ramenya.name}</RamenyaTitle>
-          <RamenyaLocation>
-            {current.latitude !== 0 && (
-              <>
-                <RamenyaDistance>
-                  <StyledCountUp
-                    start={0}
-                    end={parseFloat(currentDistance.replace(/[^0-9.]/g, ""))}
-                    duration={1}
-                    decimals={2}
-                  />
-                  {currentDistance.replace(/[\d.]+/g, "")}
-                </RamenyaDistance>
-                <VerticalLine />
-              </>
-            )}
+          <RamenyaInfoWrapper>
+            <RamenyaTitle>{ramenya.name}</RamenyaTitle>
+            <RamenyaRatingWrapper>
+              <IconStar inactive={ramenya.rating === 0} />
+              <RamenyaRating>{ramenya.rating.toFixed(1)}</RamenyaRating>
+              <RamenyaReviewCount>({ramenya.reviewCount})</RamenyaReviewCount>
+            </RamenyaRatingWrapper>
+            <RamenyaLocation>
+              {current.latitude !== 0 && (
+                <>
+                  <RamenyaDistance>
+                    <StyledCountUp
+                      start={0}
+                      end={parseFloat(currentDistance.replace(/[^0-9.]/g, ""))}
+                      duration={1}
+                      decimals={2}
+                    />
+                    {currentDistance.replace(/[\d.]+/g, "")}
+                  </RamenyaDistance>
+                  <VerticalLine />
+                </>
+              )}
 
-            <RamenyaAddress>{ramenya.address}</RamenyaAddress>
-          </RamenyaLocation>
-          <RamenyaOpenStatusWrapper>
-            <RamenyaOpenStatus
-              status={checkBusinessStatus(ramenya.businessHours).status}
-            >
-              {checkBusinessStatus(ramenya.businessHours).status}
-            </RamenyaOpenStatus>
-            {checkBusinessStatus(ramenya.businessHours).todayHours
-              ?.operatingTime && (
-              <>
-                <span>·</span>
-                <RamenyaOpenTime>
-                  {checkBusinessStatus(ramenya.businessHours).todayHours
-                    ?.operatingTime || ""}
-                </RamenyaOpenTime>
-              </>
-            )}
-          </RamenyaOpenStatusWrapper>
-          <RamenyaTagWrapper>
-            {ramenya.genre.map((genre, index) => (
-              <RamenyaTag key={index}>{genre}</RamenyaTag>
-            ))}
-          </RamenyaTagWrapper>
+              <RamenyaAddress>{ramenya.address}</RamenyaAddress>
+            </RamenyaLocation>
+          </RamenyaInfoWrapper>
+          <RamenyaCardBottomSection>
+            <RamenyaOpenStatusWrapper>
+              <RamenyaOpenStatus
+                status={checkBusinessStatus(ramenya.businessHours).status}
+              >
+                {checkBusinessStatus(ramenya.businessHours).status}
+              </RamenyaOpenStatus>
+              {checkBusinessStatus(ramenya.businessHours).todayHours
+                ?.operatingTime && (
+                <>
+                  <span>·</span>
+                  <RamenyaOpenTime>
+                    {checkBusinessStatus(ramenya.businessHours).todayHours
+                      ?.operatingTime || ""}
+                  </RamenyaOpenTime>
+                </>
+              )}
+            </RamenyaOpenStatusWrapper>
+            <RamenyaTagWrapper>
+              {ramenya.genre.map((genre, index) => (
+                <RamenyaTag key={index}>{genre}</RamenyaTag>
+              ))}
+            </RamenyaTagWrapper>
+          </RamenyaCardBottomSection>
         </RamenyaDescription>
       </Layout>
       <RamenyaOneLineReview>
@@ -120,7 +129,7 @@ const StyledCountUp = tw(CountUp)`
 `;
 
 const Wrapper = tw.section`
-  w-full gap-10 cursor-pointer
+  w-full cursor-pointer
   box-border px-20 pt-20
 `;
 
@@ -133,27 +142,43 @@ const RamenyaThumbnail = styled.img(
     tw`w-100 h-100 object-cover rounded-lg flex-shrink-0
     border border-solid border-border`,
     !isImageExist ? tw`object-contain` : tw`object-cover`,
-  ],
+  ]
 );
 
 const RamenyaDescription = tw.section`
-  flex flex-col h-full min-w-0 justify-center
+  flex flex-col h-full min-w-0 w-full justify-center gap-12
+`;
+
+const RamenyaInfoWrapper = tw.section`
+  flex flex-col gap-2
 `;
 
 const RamenyaTitle = tw.span`
-  font-16-sb mb-6 h-19
+  font-16-sb h-19
+`;
+
+const RamenyaRatingWrapper = tw.section`
+  flex gap-2 items-center
+`;
+
+const RamenyaRating = tw.span`
+  font-12-r text-black
+`;
+
+const RamenyaReviewCount = tw.span`
+  font-12-r text-gray-700
 `;
 
 const RamenyaLocation = tw.section`
-  flex gap-4 items-center mb-12
+  flex gap-4 items-center
 `;
 
 const VerticalLine = tw.span`
   w-1 h-10 bg-gray-100
 `;
 
-const RamenyaAddress = tw.div`
-  font-14-r text-gray-700 truncate whitespace-nowrap overflow-hidden text-ellipsis flex-1
+const RamenyaAddress = tw.span`
+  font-14-r text-gray-700 truncate whitespace-nowrap overflow-hidden text-ellipsis flex-1 h-17 leading-17
 `;
 
 const RamenyaOpenStatusWrapper = tw.span`
@@ -173,15 +198,19 @@ const RamenyaOpenTime = tw.span`
 `;
 
 const RamenyaTagWrapper = tw.section`
-  mt-4 flex gap-4
+  flex gap-4
 `;
 
 const RamenyaTag = tw.span`
-  font-10-r text-gray-700 rounded-sm bg-border p-2
+  font-10-r text-gray-700 rounded-sm bg-border p-3 leading-10
 `;
 
 const RamenyaDistance = tw.section`
-  font-12-m text-gray-900 flex items-center
+  font-14-m text-gray-900 flex items-center h-17
+`;
+
+const RamenyaCardBottomSection = tw.section`
+  flex flex-col gap-4
 `;
 
 const RamenyaOneLineReview = tw.section`
