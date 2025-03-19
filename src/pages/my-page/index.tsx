@@ -10,13 +10,6 @@ const MyPage = () => {
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    console.log(
-      "%cindex.tsx:14 - %cfile = ",
-      "color:yellow;",
-      "color:lightgreen; font-weight:bold",
-      file
-    );
   };
 
   return (
