@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
+import { Tokens } from "../types";
 
 interface SignInState {
   isSignIn: boolean;
   accessToken: string | null;
   refreshToken: string | null;
   setIsSignIn: (isSignIn: boolean) => void;
-  setTokens: (tokens: { accessToken: string; refreshToken: string }) => void;
+  setTokens: (tokens: Tokens) => void;
   clearTokens: () => void;
 }
 

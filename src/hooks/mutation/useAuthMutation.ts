@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 export const useAuthMutation = () => {
   const navigate = useNavigate();
+  const { setTokens } = useSignInStore();
 
   const login = useMutation({
     mutationFn: async ({ id, code }: { id: string; code: string }) => {
@@ -15,9 +16,7 @@ export const useAuthMutation = () => {
     },
     onSuccess: (data) => {
       sessionStorage.setItem("isAuthenticated", "true");
-      useSignInStore.getState().setTokens(data);
-      console.log(data);
-      console.log(useSignInStore.getState());
+      setTokens(data);
       queryClient.invalidateQueries({ queryKey: ["auth"] });
       navigate("/register");
     },

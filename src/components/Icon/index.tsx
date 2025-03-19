@@ -311,7 +311,7 @@ export const IconTalk = () => (
   </svg>
 );
 
-export const KakaoIcon = () => (
+export const IconKakao = () => (
   <svg
     width="19"
     height="18"
@@ -328,7 +328,7 @@ export const KakaoIcon = () => (
   </svg>
 );
 
-export const NaverIcon = () => (
+export const IconNaver = () => (
   <svg
     width="14"
     height="14"

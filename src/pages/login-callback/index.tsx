@@ -9,12 +9,11 @@ const LoginCallbackPage = () => {
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("code");
-    console.log(code);
-    console.log(id);
+
     if (code && !login.isPending) {
       login.mutate({ id: id!, code: code });
     }
-  }, [id, login]);
+  }, [id]);
 
   return <Wrapper>로그인 작업 진행 중</Wrapper>;
 };
