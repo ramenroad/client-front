@@ -3,6 +3,7 @@ import { SVGProps } from "react";
 interface IconProps extends Omit<SVGProps<SVGSVGElement>, "color"> {
   color?: string;
 }
+
 export const IconSample = ({ color, ...rest }: IconProps) => (
   <svg
     width="20"
@@ -307,5 +308,37 @@ export const IconTalk = () => (
     />
     <rect x="5" y="5" width="6" height="1" rx="0.5" fill="#F5F5F5" />
     <rect x="5" y="8" width="6" height="1" rx="0.5" fill="#F5F5F5" />
+  </svg>
+);
+
+export const IconKakao = () => (
+  <svg
+    width="19"
+    height="18"
+    viewBox="0 0 19 18"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M9.5 15C14.7467 15 19 11.6421 19 7.5C19 3.35786 14.7467 0 9.5 0C4.25329 0 0 3.35786 0 7.5C0 9.96708 1.50885 12.156 3.83776 13.5228L3.79287 17.7491C3.79108 17.9181 3.98674 18.013 4.11835 17.9069L7.86348 14.8891C8.39513 14.962 8.94195 15 9.5 15Z"
+      fill="black"
+    />
+  </svg>
+);
+
+export const IconNaver = () => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 14 14"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M9.49917 7.49L4.30413 0H0V14H4.5124V6.51L9.69587 14H14V0H9.49917V7.49Z"
+      fill="white"
+    />
   </svg>
 );

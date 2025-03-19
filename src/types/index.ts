@@ -81,3 +81,8 @@ export interface Coordinate {
 }
 
 export type Region = string[];
+
+export interface Tokens {
+  accessToken: string;
+  refreshToken: string;
+}
