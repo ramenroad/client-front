@@ -21,6 +21,8 @@ export interface Ramenya {
   thumbnailUrl?: string;
   latitude: number;
   longitude: number;
+  rating: number;
+  reviewCount: number;
 }
 
 export interface BusinessStatus {
