@@ -5,11 +5,16 @@ import DetailPage from "./detail-page";
 import GenrePage from "./genre-page";
 import { BannerPage } from "./banner-page";
 import GroupPage from "./group-page";
+import MyPage from "./my-page";
 
 const router = createBrowserRouter([
   {
     path: "*",
     element: <MainPage />,
+  },
+  {
+    path: "/mypage",
+    element: <MyPage />,
   },
   {
     path: "/location/:location",
