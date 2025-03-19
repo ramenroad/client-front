@@ -1,7 +1,7 @@
 import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
 import styled from "@emotion/styled";
-import { CameraIcon, IconArrowRight } from "../../components/Icon";
+import { IconCamera, IconArrowRight } from "../../components/Icon";
 import { useNavigate } from "react-router-dom";
 
 const MyPage = () => {
@@ -24,7 +24,7 @@ const MyPage = () => {
           >
             <ProfileImage />
             <ProfileImageEditButton>
-              <CameraIcon />
+              <IconCamera />
             </ProfileImageEditButton>
             <ProfileImageInput
               id="profileImageInput"

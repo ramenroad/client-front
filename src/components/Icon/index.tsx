@@ -310,7 +310,7 @@ export const IconTalk = () => (
   </svg>
 );
 
-export const CameraIcon = ({ color, ...rest }: IconProps) => (
+export const IconCamera = ({ color, ...rest }: IconProps) => (
   <svg
     width="12"
     height="12"
