@@ -5,12 +5,27 @@ import DetailPage from "./detail-page";
 import GenrePage from "./genre-page";
 import { BannerPage } from "./banner-page";
 import GroupPage from "./group-page";
+import LoginPage from "./login-page";
+import LoginCallbackPage from "./login-callback";
+import RegisterPage from "./register-page";
 import MyPage from "./my-page";
 
 const router = createBrowserRouter([
   {
     path: "*",
     element: <MainPage />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+  {
+    path: "/oauth/:id",
+    element: <LoginCallbackPage />,
   },
   {
     path: "/mypage",
