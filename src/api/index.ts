@@ -60,7 +60,7 @@ export const createAxiosInstance = (
         } catch (refreshError) {
           useSignInStore.getState().clearTokens();
           queryClient.invalidateQueries({ queryKey: ["auth"] });
-          window.location.href = "/login";
+          window.location.href = "/";
           return Promise.reject(refreshError);
         }
       }
