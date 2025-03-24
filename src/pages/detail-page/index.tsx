@@ -7,8 +7,10 @@ import {
   IconDropDownSelected,
   IconInstagram,
   IconLocate,
+  IconStarLarge,
   IconTag,
   IconTime,
+  IconArrowRight,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -209,14 +211,50 @@ export const DetailPage = () => {
           <RecommendTextContainer>
             <QuoteStartImage src={quoteStart} />
             <RecommendText>
-            <RecommendTitle>
-              {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
-            </RecommendTitle>
+              <RecommendTitle>
+                {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
+              </RecommendTitle>
             </RecommendText>
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>
           </RecommendTextContainer>
+
+          <Divider />
+
+
+          <ImageTitle>사진</ImageTitle>
+          <ImageContainer>
+            <Image src={ramenyaDetailQuery.data?.thumbnailUrl} />
+          </ImageContainer>
+
+          <Divider />
+
+          <ReviewWrapper>
+
+            <ReviewHeader>
+              <ReviewHeaderTitle>님 리뷰를 남겨주세요</ReviewHeaderTitle>
+              <StarContainer onClick={() => navigate(`/review/create/${id}`)}>
+                <IconStarLarge color="#E1E1E1" />
+                <IconStarLarge color="#E1E1E1" />
+                <IconStarLarge color="#E1E1E1" />
+                <IconStarLarge color="#E1E1E1" />
+                <IconStarLarge color="#E1E1E1" />
+              </StarContainer>
+            </ReviewHeader>
+
+            <ReviewDivider />
+
+            <ReviewContent>
+              <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
+
+              <AllReviewButton>
+                <span>모든 리뷰 보기</span>
+                <IconArrowRight />
+              </AllReviewButton>
+            </ReviewContent>
+
+          </ReviewWrapper>
 
           <Divider />
 
@@ -409,6 +447,60 @@ const QuateEndBox = tw.div`
 const QuoteEndImage = tw.img`
   w-30 h-22
 `;
+
+const ImageTitle = tw.div`
+  font-18-sb pt-16
+`;
+
+const ImageContainer = tw.div`
+  flex gap-16 mb-16
+`;
+
+const Image = tw.img`
+  w-100 h-100 rounded-8
+`;
+
+const ReviewWrapper = tw.div`
+  flex flex-col
+`;
+
+const ReviewHeader = tw.div`
+  flex flex-col gap-10 items-center
+`;
+
+const ReviewHeaderTitle = tw.div`
+  font-18-r text-black
+`;
+
+const StarContainer = tw.div`
+  flex gap-4 items-center
+  cursor-pointer
+`;
+
+const ReviewDivider = tw.div`
+  w-full h-1 bg-divider mt-32
+`;
+
+const ReviewContent = tw.div`
+  flex flex-col
+  items-center
+  gap-16
+`;
+
+const ReviewContentTitle = tw.div`
+  font-18-sb text-black mt-20
+`;
+
+const AllReviewButton = tw.div`
+  flex w-350 justify-center items-center
+  h-21 p-10 font-14-m text-black
+  bg-border rounded-8 gap-2
+`;
+
+
+
+
+
 
 const LocationTitle = tw.div`
   font-18-sb pt-16

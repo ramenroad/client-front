@@ -19,7 +19,7 @@ const TopBar = (props: TopBarProps) => {
           }
         />
       </IconWrapper>
-      <span>{props.title}</span>
+      <HeaderTitle>{props.title}</HeaderTitle>
     </TopBarWrapper>
   );
 };
@@ -36,6 +36,10 @@ const IconWrapper = tw.div`
 
 const StyledIconBack = tw(IconBack)`
   cursor-pointer
+  `;
+
+const HeaderTitle = tw.span`
+  font-16-sb text-black
 `;
 
 export default TopBar;
