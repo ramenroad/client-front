@@ -342,3 +342,18 @@ export const IconNaver = () => (
     />
   </svg>
 );
+
+export const IconStar = ({ inactive = false }: { inactive?: boolean }) => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 14 14"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M7 1L8.76336 4.57295L12.7063 5.1459L9.85317 7.92705L10.5267 11.8541L7 10L3.47329 11.8541L4.14683 7.92705L1.29366 5.1459L5.23664 4.57295L7 1Z"
+      fill={inactive ? "#CFCFCF" : "#FFCC00"}
+    />
+  </svg>
+);
