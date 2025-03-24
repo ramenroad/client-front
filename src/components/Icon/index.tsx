@@ -499,3 +499,27 @@ export const IconStarLarge = ({ color, ...rest }: IconProps) => (
     <path d="M18 0L23.2901 10.7188L35.119 12.4377L26.5595 20.7812L28.5801 32.5623L18 27L7.41987 32.5623L9.44049 20.7812L0.880983 12.4377L12.7099 10.7188L18 0Z" fill={color ?? "#FFCC00"} />
   </svg>
 );
+
+export const IconAdd = ({ color, ...rest }: IconProps) => (
+  <svg
+    width="36"
+    height="36"
+    viewBox="0 0 36 36"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+    {...rest}
+  >
+    <rect x="17" y="7" width="2" height="22" rx="1" fill={color ?? "#CFCFCF"} />
+    <rect x="29" y="17" width="2" height="22" rx="1" transform="rotate(90 29 17)" fill={color ?? "#CFCFCF"} />
+  </svg>
+);
+
+export const IconDelete = ({ color, ...rest }: IconProps) => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" {...rest}>
+    <path d="M1.6959 10.302C1.4347 10.038 1.4347 9.61 1.6959 9.34601L9.26298 1.69799C9.52418 1.434 9.94766 1.434 10.2089 1.69799C10.4701 1.96199 10.4701 2.39 10.2089 2.654L2.64178 10.302C2.38058 10.566 1.9571 10.566 1.6959 10.302Z"
+      fill={color ?? "#585858"} />
+    <path d="M10.3041 10.302C10.5653 10.038 10.5653 9.61 10.3041 9.34601L2.73702 1.69799C2.47582 1.434 2.05234 1.434 1.79114 1.69799C1.52994 1.96199 1.52994 2.39 1.79114 2.654L9.35822 10.302C9.61941 10.566 10.0429 10.566 10.3041 10.302Z"
+      fill={color ?? "#585858"} />
+  </svg>
+);
