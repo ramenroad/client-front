@@ -8,6 +8,7 @@ import GroupPage from "./group-page";
 import LoginPage from "./login-page";
 import LoginCallbackPage from "./login-callback";
 import RegisterPage from "./register-page";
+import MyPage from "./my-page";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/oauth/:id",
     element: <LoginCallbackPage />,
+  },
+  {
+    path: "/mypage",
+    element: <MyPage />,
   },
   {
     path: "/location/:location",

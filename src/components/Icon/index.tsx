@@ -357,3 +357,35 @@ export const IconStar = ({ inactive = false }: { inactive?: boolean }) => (
     />
   </svg>
 );
+
+export const IconCamera = ({ color, ...rest }: IconProps) => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 12 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+    {...rest}
+  >
+    <rect
+      x="11"
+      y="3"
+      width="7"
+      height="10"
+      rx="0.5"
+      transform="rotate(90 11 3)"
+      fill={color ?? "white"}
+    />
+    <rect
+      x="8"
+      y="1"
+      width="6"
+      height="4"
+      rx="0.5"
+      transform="rotate(90 8 1)"
+      fill={color ?? "white"}
+    />
+    <circle cx="6" cy="6.5" r="2" fill={color ?? "#CFCFCF"} />
+  </svg>
+);

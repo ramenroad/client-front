@@ -20,7 +20,7 @@ const TopBar = (props: TopBarProps) => {
 };
 
 const TopBarWrapper = tw.section`
-  flex items-center justify-between
+  flex items-center justify-center
   h-44
 `;
 
