@@ -92,15 +92,6 @@ const InputWrapper = styled.div`
   }
 `;
 
-// const Input = tw.input`
-//   w-350 h-44
-//   box-border
-//   bg-border rounded-8 border-none outline-none
-//   focus:outline-none
-//   px-20 py-10
-//   text-black font-16-m
-// `;
-
 const Input = tw.input`
     w-350 h-44
     box-border
