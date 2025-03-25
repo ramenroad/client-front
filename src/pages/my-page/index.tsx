@@ -3,14 +3,23 @@ import TopBar from "../../components/common/TopBar";
 import styled from "@emotion/styled";
 import { IconCamera, IconArrowRight } from "../../components/Icon";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useSignInStore } from "../../states/sign-in";
 
 const MyPage = () => {
   const navigate = useNavigate();
+  const { isSignIn } = useSignInStore();
 
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
   };
+
+  useEffect(() => {
+    if (!isSignIn) {
+      navigate("/login");
+    }
+  }, [isSignIn, navigate]);
 
   return (
     <Layout>

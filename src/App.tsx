@@ -10,7 +10,6 @@ function App() {
       <Screen>
         <View>
           <Routes />
-          <Footer />
         </View>
       </Screen>
     </QueryClientProvider>
