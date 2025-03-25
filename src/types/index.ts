@@ -10,6 +10,8 @@ export type BusinessHour = {
 export interface Ramenya {
   _id: string;
   name: string;
+  rating: number;
+  reviewCount: number;
   region: string;
   genre: string[];
   businessHours: BusinessHour[];
@@ -53,6 +55,8 @@ export interface RemenyaDetail {
     oneLineReview: string;
     description: string;
   };
+  reviewCount?: number;
+  rating?: number;
 }
 
 export interface Banner {
