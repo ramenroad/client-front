@@ -6,7 +6,7 @@ import { UserReview } from '../../types'
 
 export const ReviewCard = ({ review }: { review: UserReview }) => {
     const [isExpanded, setIsExpanded] = React.useState(false)
-    const MAX_TEXT_LENGTH = 100
+    const MAX_TEXT_LENGTH = 97
     const isTextLong = review.review.length > MAX_TEXT_LENGTH
 
     const toggleExpand = () => {
