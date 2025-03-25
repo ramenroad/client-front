@@ -67,12 +67,6 @@ const MyPage = () => {
               <IconArrowRight />
             </NicknameEditWrapper>
           </ProfileDescription>
-          <ProfileDescription>
-            <Label>이름</Label>
-            <LabelDescription>
-              {userInformationQuery.data?.email}
-            </LabelDescription>
-          </ProfileDescription>
           <ProfileDescription isLast>
             <Label>이메일</Label>
             <LabelDescription>

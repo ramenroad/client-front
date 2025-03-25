@@ -1,6 +1,6 @@
 import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
 import styled from "@emotion/styled";
 
@@ -10,8 +10,6 @@ const RegisterPage = () => {
 
   const [nickname, setNickname] = useState("");
   const { updateNicknameMutation } = useUserInfoMutation();
-
-  const disabled = useMemo(() => nickname.length > 10, [nickname]);
 
   const handleClick = () => {
     updateNicknameMutation.mutate(nickname);
@@ -40,12 +38,13 @@ const RegisterPage = () => {
               </div>
             </>
           ) : (
-            <span>새로운 닉네임을 입력해주세요</span>
+            <UpdateNicknameText>
+              새로운 닉네임을 입력해주세요
+            </UpdateNicknameText>
           )}
         </DescriptionWrapper>
         <InputWrapper>
           <Input
-            warning={disabled}
             placeholder="최소 2-10자로 설정해주세요"
             value={nickname}
             onChange={handleChange}
@@ -81,8 +80,16 @@ const HighlightText = tw.span`
   text-orange
 `;
 
-const InputWrapper = tw.div`
-  mb-394
+const UpdateNicknameText = tw.span`
+  font-16-m
+`;
+
+const InputWrapper = styled.div`
+  ${tw`mb-394`}
+
+  @media (min-width: 768px) {
+    ${tw`mb-40`}
+  }
 `;
 
 // const Input = tw.input`
@@ -94,20 +101,14 @@ const InputWrapper = tw.div`
 //   text-black font-16-m
 // `;
 
-const Input = styled.input(({ warning }: { warning: boolean }) => [
-  tw`
+const Input = tw.input`
     w-350 h-44
     box-border
     bg-border rounded-8 border-none outline-none
     focus:outline-none
     px-20 py-10
     text-black font-16-m
-  `,
-  warning &&
-    tw`
-    border border-solid border-red
-  `,
-]);
+`;
 
 const Button = tw.button`
   w-350 h-44
