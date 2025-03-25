@@ -6,8 +6,6 @@ import { UserReview } from '../../types'
 
 export const ReviewCard = ({ review }: { review: UserReview }) => {
     const [isExpanded, setIsExpanded] = React.useState(false)
-    console.log(review)
-    // 더보기 표시 기준 글자 수
     const MAX_TEXT_LENGTH = 100
     const isTextLong = review.review.length > MAX_TEXT_LENGTH
 
@@ -15,10 +13,10 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
         setIsExpanded(!isExpanded)
     }
 
-    // 더보기 버튼 표시 여부에 따라 표시할 텍스트 결정
     const displayText = isTextLong && !isExpanded
         ? `${review.review.slice(0, MAX_TEXT_LENGTH)}...`
         : review.review
+
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -149,8 +147,12 @@ const MoreButton = tw.button`
 const ReviewImages = tw.div`
     flex gap-1 items-center
     rounded-8
+    mt-12
 `
 
 const ReviewImage = tw.img`
     w-96 h-96
+    first:rounded-l-8
+    last:rounded-r-8
+    [&:only-child]:rounded-8
 `

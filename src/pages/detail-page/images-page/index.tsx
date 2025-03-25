@@ -1,4 +1,3 @@
-import React from 'react'
 import TopBar from '../../../components/common/TopBar'
 import tw from 'twin.macro'
 

@@ -27,6 +27,7 @@ import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
 import { formatNumber } from "../../util/number";
 import { ReviewCard } from "./ReviewCard";
+import React from "react";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -278,12 +279,16 @@ export const DetailPage = () => {
               <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
 
               <ReviewCardContainer>
-                {ramenyaDetailQuery.data?.reviews?.map((review) => (
-                  <>
-                    <ReviewCard key={review._id} review={review} />
-                    <ReviewDivider />
-                  </>
-                ))}
+                {ramenyaDetailQuery.data?.reviews
+                  ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                  .slice(0, 3)
+                  .map((review) => (
+                    <React.Fragment key={review._id}>
+                      <ReviewCard review={review} />
+                      <ReviewDivider />
+                    </React.Fragment>
+                  ))
+                }
               </ReviewCardContainer>
 
 
