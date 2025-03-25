@@ -92,3 +92,11 @@ export interface Tokens {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface Review {
+  ramenyaId: string;
+  rating: number;
+  review: string;
+  menus: string[];
+  reviewImageUrl?: string[];
+}
