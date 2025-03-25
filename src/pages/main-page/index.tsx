@@ -47,20 +47,20 @@ const MainPage = () => {
         </LocationPathContainer>
       </LocationViewingWrapper>
 
-      {ramenyaGroup?.[0] && (
-        <GroupViewingWrapper>
+      {ramenyaGroup?.map((group) => (
+        <GroupViewingWrapper key={group._id}>
           <GroupInfoBox>
             <GroupTitleBox>
-              <GroupTitleText>{ramenyaGroup?.[0].name}</GroupTitleText>
+              <GroupTitleText>{group.name}</GroupTitleText>
               <GroupTitleButtonBox onClick={() => navigate(`/group`)}>
                 <GroupTitleButtonText>더보기</GroupTitleButtonText>
                 <IconArrowRight color="#888888" />
               </GroupTitleButtonBox>
             </GroupTitleBox>
-            <GroupSubTitle>{ramenyaGroup?.[0].description}</GroupSubTitle>
+            <GroupSubTitle>{group.description}</GroupSubTitle>
           </GroupInfoBox>
           <GroupListWrapper>
-            {ramenyaGroup?.[0].ramenyas.map((data) => (
+            {group.ramenyas.map((data) => (
               <GroupListBox
                 key={data._id}
                 title={data.name}
@@ -71,7 +71,7 @@ const MainPage = () => {
             ))}
           </GroupListWrapper>
         </GroupViewingWrapper>
-      )}
+      ))}
     </Wrapper>
   );
 };
