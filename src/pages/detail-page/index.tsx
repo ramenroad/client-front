@@ -26,6 +26,7 @@ import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
 import { formatNumber } from "../../util/number";
+import { ReviewCard } from "./ReviewCard";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -256,14 +257,19 @@ export const DetailPage = () => {
           <ReviewWrapper>
 
             <ReviewHeader>
-              <ReviewHeaderTitle>님 리뷰를 남겨주세요</ReviewHeaderTitle>
-              <StarContainer onClick={() => navigate(`/review/create/${id}`)}>
+              <ReviewHeaderTitle>
+                <ReviewerName>
+                  라멘로드
+                </ReviewerName>
+                님 리뷰를 남겨주세요
+              </ReviewHeaderTitle>
+              <LargeStarContainer onClick={() => navigate(`/review/create/${id}`)}>
                 <IconStarLarge color="#E1E1E1" />
                 <IconStarLarge color="#E1E1E1" />
                 <IconStarLarge color="#E1E1E1" />
                 <IconStarLarge color="#E1E1E1" />
                 <IconStarLarge color="#E1E1E1" />
-              </StarContainer>
+              </LargeStarContainer>
             </ReviewHeader>
 
             <ReviewDivider />
@@ -271,7 +277,17 @@ export const DetailPage = () => {
             <ReviewContent>
               <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
 
-              <AllReviewButton>
+              <ReviewCardContainer>
+                <ReviewCard />
+                <ReviewDivider />
+                <ReviewCard />
+                <ReviewDivider />
+                <ReviewCard />
+                <ReviewDivider />
+              </ReviewCardContainer>
+
+
+              <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
                 <span>모든 리뷰 보기</span>
                 <IconArrowRight />
               </AllReviewButton>
@@ -500,7 +516,11 @@ const ReviewHeader = tw.div`
 `;
 
 const ReviewHeaderTitle = tw.div`
-  font-18-r text-black
+  flex font-18-r text-black
+`;
+
+const ReviewerName = tw.div`
+  text-orange
 `;
 
 const StarContainer = tw.div`
@@ -508,13 +528,17 @@ const StarContainer = tw.div`
   cursor-pointer
 `;
 
+const LargeStarContainer = tw.div`
+  flex gap-2 items-center
+  cursor-pointer mb-32
+`;
+
 const ReviewDivider = tw.div`
-  w-full h-1 bg-divider mt-32
+  w-full h-1 bg-divider
 `;
 
 const ReviewContent = tw.div`
   flex flex-col
-  items-center
   gap-16
 `;
 
@@ -522,16 +546,18 @@ const ReviewContentTitle = tw.div`
   font-18-sb text-black mt-20
 `;
 
-const AllReviewButton = tw.div`
-  flex w-350 justify-center items-center
-  h-21 p-10 font-14-m text-black
-  bg-border rounded-8 gap-2
+const ReviewCardContainer = tw.div`
+  flex flex-col gap-20
 `;
 
-
-
-
-
+const AllReviewButton = tw.div`
+  flex w-full py-10
+  box-border
+  justify-center items-center
+  font-14-m text-black
+  bg-border rounded-8 gap-2
+  cursor-pointer
+`;
 
 const LocationTitle = tw.div`
   font-18-sb pt-16
