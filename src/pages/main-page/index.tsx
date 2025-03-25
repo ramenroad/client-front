@@ -13,7 +13,6 @@ const MainPage = () => {
   const navigate = useNavigate();
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
-  console.log(ramenyaGroup);
   const { data: regions } = useRegionsQuery();
   const locationPath = regions?.map((region) => ({
     location: region,
