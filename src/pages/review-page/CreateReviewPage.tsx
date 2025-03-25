@@ -4,33 +4,31 @@ import { IconStarLarge, IconAdd, IconClose } from '../../components/Icon/index.t
 import styled from '@emotion/styled'
 import { createRef, useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
-
-// 폼 데이터 타입 정의
-interface ReviewFormData {
-    rating: number;
-    menus: string[];
-    description: string;
-    images: string[];
-}
+import { Review } from '../../types'
+import { useRamenyaReviewMutation } from '../../hooks/queries/useRamenyaReviewQuery.ts'
+import { useNavigate } from 'react-router-dom';
 
 export const CreateReviewPage = () => {
-    // 페이지 로드 시 맨 위로 스크롤
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    const { mutate: createReview } = useRamenyaReviewMutation();
+    const navigate = useNavigate();
 
-    // React Hook Form 설정
-    const { control, handleSubmit, formState: { isValid, errors }, watch, setValue, register } = useForm<ReviewFormData>({
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+        watch,
+        setValue,
+    } = useForm<Review>({
         defaultValues: {
+            ramenyaId: '',
             rating: 0,
-            menus: [],
-            description: '',
-            images: []
+            review: '',
+            reviewImageUrl: [],
+            menus: []
         },
-        mode: 'onChange' // 입력값이 변경될 때마다 유효성 검사
+        mode: 'onChange'
     });
 
-    // 현재 폼 값들 관찰
     const formValues = watch();
 
     const [customMenuInput, setCustomMenuInput] = useState('');
@@ -44,27 +42,27 @@ export const CreateReviewPage = () => {
         '라멘7',
     ]);
 
-    // 파일 입력 참조 생성
     const fileInputRef = createRef<HTMLInputElement>();
 
+    // handle Rating 
     const handleStarClick = (index: number) => {
         setValue('rating', index, { shouldValidate: true });
     };
 
+    // handle Menu
     const handleMenuClick = (menu: string) => {
         const currentMenus = formValues.menus;
 
         if (currentMenus.includes(menu)) {
-            // 이미 선택된 메뉴라면 선택 해제
             setValue('menus', currentMenus.filter(item => item !== menu), { shouldValidate: true });
         } else {
-            // 아직 선택되지 않은 메뉴라면 선택 (최대 2개까지)
             if (currentMenus.length < 2) {
                 setValue('menus', [...currentMenus, menu], { shouldValidate: true });
             }
         }
     };
 
+    // handle Add Custom Menu
     const handleAddCustomMenu = () => {
         if (customMenuInput.trim() !== '' && !menuList.includes(customMenuInput)) {
             setMenuList([...menuList, customMenuInput]);
@@ -78,19 +76,18 @@ export const CreateReviewPage = () => {
         }
     };
 
+    // handle Image Upload
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
 
-        const currentImages = formValues.images;
+        const currentImages = formValues.reviewImageUrl || [];
 
-        // 최대 5개까지만 허용
         if (currentImages.length + files.length > 5) {
             alert('이미지는 최대 5개까지 업로드 가능합니다.');
             return;
         }
 
-        // 파일을 미리보기 URL로 변환
         const newImages: string[] = [];
         for (let i = 0; i < files.length; i++) {
             if (currentImages.length + newImages.length >= 5) break;
@@ -101,34 +98,34 @@ export const CreateReviewPage = () => {
             }
         }
 
-        setValue('images', [...currentImages, ...newImages], { shouldValidate: true });
+        setValue('reviewImageUrl', [...currentImages, ...newImages], { shouldValidate: true });
     };
 
     const handleImageClick = () => {
-        // 이미지 개수가 5개 미만일 때만 파일 선택 대화상자 열기
-        if (formValues.images.length < 5) {
+        if ((formValues.reviewImageUrl?.length ?? 0) < 5) {
             fileInputRef.current?.click();
         }
     };
 
     const handleRemoveImage = (index: number) => {
-        const newImages = [...formValues.images];
-        // 해당 URL 객체 해제
+        const newImages = [...formValues.reviewImageUrl || []];
         URL.revokeObjectURL(newImages[index]);
         newImages.splice(index, 1);
-        setValue('images', newImages, { shouldValidate: true });
+        setValue('reviewImageUrl', newImages, { shouldValidate: true });
     };
 
-    const onSubmit = (data: ReviewFormData) => {
-        // 폼 제출 처리
-        console.log('제출된 리뷰 데이터:', data);
-        // 여기서 API 호출 등을 통해 데이터를 서버로 전송할 수 있습니다
+    const onSubmit = (data: Review) => {
+        createReview(data);
+        navigate(-1);
     };
 
-    // 폼의 유효성 여부 확인
     const isFormValid = formValues.rating > 0 &&
         formValues.menus.length > 0 &&
-        formValues.description.trim() !== '';
+        formValues.review.trim().length >= 10;
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <Wrapper>
@@ -189,7 +186,7 @@ export const CreateReviewPage = () => {
                     <ReviewDescriptionWrapper>
                         <ReviewDescriptionTitle>어떤 점이 좋았나요?</ReviewDescriptionTitle>
                         <Controller
-                            name="description"
+                            name="review"
                             control={control}
                             rules={{ required: true, minLength: 10 }}
                             render={({ field }) => (
@@ -204,10 +201,10 @@ export const CreateReviewPage = () => {
                                 </ReviewTextAreaContainer>
                             )}
                         />
-                        {errors.description && errors.description.type === 'required' &&
+                        {/* {errors.review && errors.review.type === 'required' &&
                             <ErrorMessage>리뷰 내용을 입력해주세요</ErrorMessage>}
-                        {errors.description && errors.description.type === 'minLength' &&
-                            <ErrorMessage>최소 10자 이상 입력해주세요</ErrorMessage>}
+                        {errors.review && errors.review.type === 'minLength' &&
+                            <ErrorMessage>최소 10자 이상 입력해주세요</ErrorMessage>} */}
                     </ReviewDescriptionWrapper>
 
                     <ImageUploadWrapper>
@@ -215,7 +212,7 @@ export const CreateReviewPage = () => {
                             <ImageUploadTitleBox>
                                 <ImageUploadTitle>사진 첨부</ImageUploadTitle>
                                 <ImageCountBox>
-                                    <ImageAdded>{formValues.images.length}</ImageAdded>
+                                    <ImageAdded>{formValues.reviewImageUrl?.length}</ImageAdded>
                                     <ImageAddedText>/</ImageAddedText>
                                     <ImageMax>5</ImageMax>
                                 </ImageCountBox>
@@ -226,7 +223,7 @@ export const CreateReviewPage = () => {
                         <ImageUploadContent>
                             <ImageUploadContentImage>
                                 {/* 이미지 미리보기 */}
-                                {formValues.images.map((image, index) => (
+                                {formValues.reviewImageUrl?.map((image, index) => (
                                     <ImagePreviewContainer key={index}>
                                         <ImagePreview src={image} alt={`업로드 이미지 ${index + 1}`} />
                                         <ImageRemoveButton onClick={() => handleRemoveImage(index)} type="button">
@@ -236,7 +233,7 @@ export const CreateReviewPage = () => {
                                 ))}
 
                                 {/* 이미지 추가 버튼 (5개 미만일 때만 표시) */}
-                                {formValues.images.length < 5 && (
+                                {(formValues.reviewImageUrl?.length ?? 0) < 5 && (
                                     <ImageAddButton onClick={handleImageClick} type="button">
                                         <IconAdd />
                                     </ImageAddButton>
