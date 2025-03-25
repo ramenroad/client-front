@@ -7,7 +7,6 @@ import styled from "@emotion/styled";
 
 const LoginPage = () => {
   const handleLogin = (loginType: "kakao" | "naver") => {
-    console.log(loginType);
     switch (loginType) {
       case "kakao":
         window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/kakao&response_type=code`;
