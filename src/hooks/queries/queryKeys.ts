@@ -12,4 +12,7 @@ export const queryKeys = createQueryKeyStore({
     list: (params: { type: "region" | "genre"; value: string }) =>
       [params.type, params.value] as const,
   },
+  user: {
+    information: null,
+  },
 });

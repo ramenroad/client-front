@@ -5,14 +5,24 @@ import { IconCamera, IconArrowRight } from "../../components/Icon";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useSignInStore } from "../../states/sign-in";
+import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
+import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
+import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 
 const MyPage = () => {
   const navigate = useNavigate();
   const { isSignIn } = useSignInStore();
 
+  const { userInformationQuery } = useUserInformationQuery();
+  const { userInfoMutation } = useUserInfoMutation();
+  const { logout } = useAuthMutation();
+
   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const formData = new FormData();
+    formData.append("profileImageFile", file);
+    userInfoMutation.mutate(formData);
   };
 
   useEffect(() => {
@@ -23,7 +33,7 @@ const MyPage = () => {
 
   return (
     <Layout>
-      <TopBar title="내 정보" />
+      <TopBar title="내 정보" navigate="/main" />
       <Wrapper>
         <ProfileWrapper>
           <ProfileImageWrapper
@@ -31,7 +41,10 @@ const MyPage = () => {
               document.getElementById("profileImageInput")?.click()
             }
           >
-            <ProfileImage />
+            <ProfileImage
+              src={userInformationQuery.data?.profileImageUrl}
+              alt="profile"
+            />
             <ProfileImageEditButton>
               <IconCamera />
             </ProfileImageEditButton>
@@ -44,27 +57,33 @@ const MyPage = () => {
             />
           </ProfileImageWrapper>
           <ProfileInfoWrapper>
-            <ProfileInfo>라멘로드</ProfileInfo>
+            <ProfileInfo>{userInformationQuery.data?.nickname}</ProfileInfo>
           </ProfileInfoWrapper>
         </ProfileWrapper>
         <ProfileDescriptionWrapper>
           <ProfileDescription>
             <Label>닉네임</Label>
-            <NicknameEditWrapper onClick={() => navigate("/register")}>
-              <LabelDescription>라멘로드</LabelDescription>
+            <NicknameEditWrapper
+              onClick={() =>
+                navigate(
+                  `/register?nickname=${userInformationQuery.data?.nickname}`
+                )
+              }
+            >
+              <LabelDescription>
+                {userInformationQuery.data?.nickname}
+              </LabelDescription>
               <IconArrowRight />
             </NicknameEditWrapper>
           </ProfileDescription>
-          <ProfileDescription>
-            <Label>이름</Label>
-            <LabelDescription>김종운</LabelDescription>
-          </ProfileDescription>
           <ProfileDescription isLast>
             <Label>이메일</Label>
-            <LabelDescription>kangkang@gmail.com</LabelDescription>
+            <LabelDescription>
+              {userInformationQuery.data?.email}
+            </LabelDescription>
           </ProfileDescription>
         </ProfileDescriptionWrapper>
-        <LogoutText>로그아웃</LogoutText>
+        <LogoutText onClick={() => logout.mutate()}>로그아웃</LogoutText>
       </Wrapper>
     </Layout>
   );
@@ -89,7 +108,7 @@ const ProfileImageWrapper = tw.div`
   relative mt-20 mb-22 cursor-pointer
 `;
 
-const ProfileImage = tw.div`
+const ProfileImage = tw.img`
   w-64 h-64
   bg-gray-100 rounded-full
 `;

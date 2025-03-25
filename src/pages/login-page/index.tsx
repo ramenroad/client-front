@@ -19,7 +19,7 @@ const LoginPage = () => {
   };
 
   return (
-    <>
+    <Layout>
       <TopBar title="" />
       <LogoWrapper>
         <LogoImage src={RamenroadMainLogo} alt="ramenroad-main-logo" />
@@ -46,9 +46,14 @@ const LoginPage = () => {
           </LoginButton>
         </LoginButtonWrapper>
       </LoginActionWrapper>
-    </>
+    </Layout>
   );
 };
+
+const Layout = tw.div`
+  flex flex-col items-center
+  w-full h-full
+`;
 
 const LogoWrapper = tw.div`
   flex flex-col items-center justify-center gap-8
@@ -67,7 +72,7 @@ const LoginText = tw.span`
 
 const LoginActionWrapper = tw.div`
   flex flex-col items-center justify-center
-  w-full mt-124 mb-80 px-40
+  w-full mt-auto mb-80 px-40
   box-border
 `;
 
