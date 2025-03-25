@@ -278,12 +278,12 @@ export const DetailPage = () => {
               <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
 
               <ReviewCardContainer>
-                <ReviewCard />
-                <ReviewDivider />
-                <ReviewCard />
-                <ReviewDivider />
-                <ReviewCard />
-                <ReviewDivider />
+                {ramenyaDetailQuery.data?.reviews?.map((review) => (
+                  <>
+                    <ReviewCard key={review._id} review={review} />
+                    <ReviewDivider />
+                  </>
+                ))}
               </ReviewCardContainer>
 
 

@@ -2,23 +2,14 @@ import React from 'react'
 import tw from 'twin.macro'
 import defaultProfile from '../../assets/images/profile-default.png'
 import { IconStarMedium } from '../../components/Icon'
+import { UserReview } from '../../types'
 
-
-export const ReviewCard = () => {
-    const scoredMenudummy = ['라멘1', '라멘2']
-    const dummyImages = [
-        "https://placehold.co/960x960",
-        "https://placehold.co/960x960",
-        "https://placehold.co/960x960",
-    ]
+export const ReviewCard = ({ review }: { review: UserReview }) => {
     const [isExpanded, setIsExpanded] = React.useState(false)
-
+    console.log(review)
     // 더보기 표시 기준 글자 수
     const MAX_TEXT_LENGTH = 100
-
-    const reviewText = "육수의 감칠맛과 염도가 좋은 라멘입니다. 고명도 풍부하고 차슈에서 불향이 나서 좋았어요! 사장님도 친절하시고 매장도 깔끔합니다. 조금 기다렸지만 만족합니다! 다음에는 다른 메뉴 먹어보 육수의 감칠맛과 염도가 좋은 라멘입니다. 고명도 풍부하고 차슈에서 불향이 나서 좋았어요! 사장님도 친절하시고 매장도 깔끔합니다. 조금 기다렸지만 만족합니다! 다음에는 다른 메뉴 먹어보"
-
-    const isTextLong = reviewText.length > MAX_TEXT_LENGTH
+    const isTextLong = review.review.length > MAX_TEXT_LENGTH
 
     const toggleExpand = () => {
         setIsExpanded(!isExpanded)
@@ -26,15 +17,24 @@ export const ReviewCard = () => {
 
     // 더보기 버튼 표시 여부에 따라 표시할 텍스트 결정
     const displayText = isTextLong && !isExpanded
-        ? `${reviewText.slice(0, MAX_TEXT_LENGTH)}...`
-        : reviewText
+        ? `${review.review.slice(0, MAX_TEXT_LENGTH)}...`
+        : review.review
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear().toString().slice(2);
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+
+        return `${year}.${month}.${day}`;
+    }
 
     return (
         <Wrapper>
             <ReviewHeader>
                 <ReviewerProfileImage src={defaultProfile} />
                 <ReviewerName>
-                    라멘로드
+                    {review.userId}
                 </ReviewerName>
             </ReviewHeader>
 
@@ -42,22 +42,25 @@ export const ReviewCard = () => {
                 <ScoreBox>
                     <StarContainer>
                         {[1, 2, 3, 4, 5].map((star) => (
-                            <IconStarMedium key={star} color="#FFCC00" />
+                            <IconStarMedium
+                                key={star}
+                                color={star <= review.rating ? "#FFCC00" : "#E1E1E1"}
+                            />
                         ))}
                     </StarContainer>
                     <ScoredMenuContainer>
-                        {scoredMenudummy.map((menu, index) => (
+                        {review.menus?.map((menu, index) => (
                             <React.Fragment key={menu}>
                                 <ScoredMenu>
                                     {menu}
                                 </ScoredMenu>
-                                {index < scoredMenudummy.length - 1 && <MenuDivider />}
+                                {index < review.menus.length - 1 && <MenuDivider />}
                             </React.Fragment>
                         ))}
                     </ScoredMenuContainer>
                 </ScoreBox>
                 <ReviewDate>
-                    2025.03.24
+                    {formatDate(review.createdAt.toString())}
                 </ReviewDate>
             </ReviewScore>
 
@@ -73,8 +76,8 @@ export const ReviewCard = () => {
             </ReviewDetail>
 
             <ReviewImages>
-                {dummyImages.map((image) => (
-                    <ReviewImage src={image} />
+                {review.reviewImageUrls?.map((image, index) => (
+                    <ReviewImage key={index} src={image} />
                 ))}
             </ReviewImages>
         </Wrapper>

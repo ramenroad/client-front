@@ -23,7 +23,7 @@ export const CreateReviewPage = () => {
             ramenyaId: '',
             rating: 0,
             review: '',
-            reviewImageUrl: [],
+            reviewImageUrls: [],
             menus: []
         },
         mode: 'onChange'
@@ -81,7 +81,7 @@ export const CreateReviewPage = () => {
         const files = e.target.files;
         if (!files) return;
 
-        const currentImages = formValues.reviewImageUrl || [];
+        const currentImages = formValues.reviewImageUrls || [];
 
         if (currentImages.length + files.length > 5) {
             alert('이미지는 최대 5개까지 업로드 가능합니다.');
@@ -98,20 +98,20 @@ export const CreateReviewPage = () => {
             }
         }
 
-        setValue('reviewImageUrl', [...currentImages, ...newImages], { shouldValidate: true });
+        setValue('reviewImageUrls', [...currentImages, ...newImages], { shouldValidate: true });
     };
 
     const handleImageClick = () => {
-        if ((formValues.reviewImageUrl?.length ?? 0) < 5) {
+        if ((formValues.reviewImageUrls?.length ?? 0) < 5) {
             fileInputRef.current?.click();
         }
     };
 
     const handleRemoveImage = (index: number) => {
-        const newImages = [...formValues.reviewImageUrl || []];
+        const newImages = [...formValues.reviewImageUrls || []];
         URL.revokeObjectURL(newImages[index]);
         newImages.splice(index, 1);
-        setValue('reviewImageUrl', newImages, { shouldValidate: true });
+        setValue('reviewImageUrls', newImages, { shouldValidate: true });
     };
 
     const onSubmit = (data: Review) => {
@@ -212,7 +212,7 @@ export const CreateReviewPage = () => {
                             <ImageUploadTitleBox>
                                 <ImageUploadTitle>사진 첨부</ImageUploadTitle>
                                 <ImageCountBox>
-                                    <ImageAdded>{formValues.reviewImageUrl?.length}</ImageAdded>
+                                    <ImageAdded>{formValues.reviewImageUrls?.length}</ImageAdded>
                                     <ImageAddedText>/</ImageAddedText>
                                     <ImageMax>5</ImageMax>
                                 </ImageCountBox>
@@ -223,7 +223,7 @@ export const CreateReviewPage = () => {
                         <ImageUploadContent>
                             <ImageUploadContentImage>
                                 {/* 이미지 미리보기 */}
-                                {formValues.reviewImageUrl?.map((image, index) => (
+                                {formValues.reviewImageUrls?.map((image, index) => (
                                     <ImagePreviewContainer key={index}>
                                         <ImagePreview src={image} alt={`업로드 이미지 ${index + 1}`} />
                                         <ImageRemoveButton onClick={() => handleRemoveImage(index)} type="button">
@@ -233,7 +233,7 @@ export const CreateReviewPage = () => {
                                 ))}
 
                                 {/* 이미지 추가 버튼 (5개 미만일 때만 표시) */}
-                                {(formValues.reviewImageUrl?.length ?? 0) < 5 && (
+                                {(formValues.reviewImageUrls?.length ?? 0) < 5 && (
                                     <ImageAddButton onClick={handleImageClick} type="button">
                                         <IconAdd />
                                     </ImageAddButton>
