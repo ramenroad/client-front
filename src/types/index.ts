@@ -57,6 +57,7 @@ export interface RemenyaDetail {
   };
   reviewCount?: number;
   rating?: number;
+  reviews?: UserReview[];
 }
 
 export interface Banner {
@@ -98,5 +99,12 @@ export interface Review {
   rating: number;
   review: string;
   menus: string[];
-  reviewImageUrl?: string[];
+  reviewImageUrls?: string[];
+}
+
+export interface UserReview extends Review {
+  _id: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
