@@ -373,26 +373,9 @@ export const IconStarSmall = ({ color, ...rest }: IconProps) => (
     preserveAspectRatio="none"
     {...rest}
   >
-    <rect
-      x="11"
-      y="3"
-      width="7"
-      height="10"
-      rx="0.5"
-      transform="rotate(90 11 3)"
-      fill={color ?? "white"}
-    />
-    <rect
-      x="8"
-      y="1"
-      width="6"
-      height="4"
-      rx="0.5"
-      transform="rotate(90 8 1)"
-      fill={color ?? "white"}
-    />
-    <circle cx="6" cy="6.5" r="2" fill={color ?? "#CFCFCF"} />
+    <path d="M6 0L7.76336 3.57295L11.7063 4.1459L8.85317 6.92705L9.52671 10.8541L6 9L2.47329 10.8541L3.14683 6.92705L0.293661 4.1459L4.23664 3.57295L6 0Z" fill={color ?? "#FFCC00"} />
   </svg>
+
 );
 
 export const IconHome = ({ selected }: { selected: boolean }) => {
@@ -521,5 +504,37 @@ export const IconDelete = ({ color, ...rest }: IconProps) => (
       fill={color ?? "#585858"} />
     <path d="M10.3041 10.302C10.5653 10.038 10.5653 9.61 10.3041 9.34601L2.73702 1.69799C2.47582 1.434 2.05234 1.434 1.79114 1.69799C1.52994 1.96199 1.52994 2.39 1.79114 2.654L9.35822 10.302C9.61941 10.566 10.0429 10.566 10.3041 10.302Z"
       fill={color ?? "#585858"} />
+  </svg>
+);
+
+export const IconCamera = ({ color, ...rest }: IconProps) => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 12 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+    {...rest}
+  >
+    <rect
+      x="11"
+      y="3"
+      width="7"
+      height="10"
+      rx="0.5"
+      transform="rotate(90 11 3)"
+      fill={color ?? "white"}
+    />
+    <rect
+      x="8"
+      y="1"
+      width="6"
+      height="4"
+      rx="0.5"
+      transform="rotate(90 8 1)"
+      fill={color ?? "white"}
+    />
+    <circle cx="6" cy="6.5" r="2" fill={color ?? "#CFCFCF"} />
   </svg>
 );

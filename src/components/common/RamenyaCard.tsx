@@ -93,32 +93,34 @@ const RamenyaCard = (props: RamenyaCardProps) => {
                   <VerticalLine />
                 </>
               )}
+
               <RamenyaAddress>{ramenya.address}</RamenyaAddress>
             </RamenyaLocation>
           </RamenyaDescriptionHeader>
-
-          <RamenyaOpenStatusWrapper>
-            <RamenyaOpenStatus
-              status={checkBusinessStatus(ramenya.businessHours).status}
-            >
-              {checkBusinessStatus(ramenya.businessHours).status}
-            </RamenyaOpenStatus>
-            {checkBusinessStatus(ramenya.businessHours).todayHours
-              ?.operatingTime && (
-                <>
-                  <span>·</span>
-                  <RamenyaOpenTime>
-                    {checkBusinessStatus(ramenya.businessHours).todayHours
-                      ?.operatingTime || ""}
-                  </RamenyaOpenTime>
-                </>
-              )}
-          </RamenyaOpenStatusWrapper>
-          <RamenyaTagWrapper>
-            {ramenya.genre.map((genre, index) => (
-              <RamenyaTag key={index}>{genre}</RamenyaTag>
-            ))}
-          </RamenyaTagWrapper>
+          <RamenyaCardBottomSection>
+            <RamenyaOpenStatusWrapper>
+              <RamenyaOpenStatus
+                status={checkBusinessStatus(ramenya.businessHours).status}
+              >
+                {checkBusinessStatus(ramenya.businessHours).status}
+              </RamenyaOpenStatus>
+              {checkBusinessStatus(ramenya.businessHours).todayHours
+                ?.operatingTime && (
+                  <>
+                    <span>·</span>
+                    <RamenyaOpenTime>
+                      {checkBusinessStatus(ramenya.businessHours).todayHours
+                        ?.operatingTime || ""}
+                    </RamenyaOpenTime>
+                  </>
+                )}
+            </RamenyaOpenStatusWrapper>
+            <RamenyaTagWrapper>
+              {ramenya.genre.map((genre, index) => (
+                <RamenyaTag key={index}>{genre}</RamenyaTag>
+              ))}
+            </RamenyaTagWrapper>
+          </RamenyaCardBottomSection>
         </RamenyaDescription>
       </Layout>
       <RamenyaOneLineReview>
@@ -156,9 +158,6 @@ const RamenyaDescription = tw.section`
   flex flex-col h-full min-w-0 w-full justify-center gap-12
 `;
 
-const RamenyaInfoWrapper = tw.section`
-  flex flex-col gap-2
-`;
 
 const RamenyaDescriptionHeader = tw.section`
   flex flex-col h-full justify-center
@@ -173,21 +172,11 @@ const RamenyaScore = tw.span`
   font-12-m text-black
 `;
 
-const RamenyaReviewCount = tw.span`
-  font-12-r text-gray-700
-`;
 
 const RamenyaTitle = tw.span`
   font-16-sb h-19
 `;
 
-const RamenyaRatingWrapper = tw.section`
-  flex gap-2 items-center
-`;
-
-const RamenyaRating = tw.span`
-  font-12-r text-black
-`;
 
 const RamenyaReviewCount = tw.span`
   font-12-r text-gray-700
