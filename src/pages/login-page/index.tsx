@@ -20,7 +20,7 @@ const LoginPage = () => {
 
   return (
     <Layout>
-      <TopBar title="" />
+      <TopBar title="" navigate="/" />
       <LogoWrapper>
         <LogoImage src={RamenroadMainLogo} alt="ramenroad-main-logo" />
         <LogoText>라멘 맛집 찾는다면, 라멘로드</LogoText>

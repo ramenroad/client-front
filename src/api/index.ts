@@ -48,6 +48,8 @@ export const createAxiosInstance = (
         console.log("401 에러 발생");
 
         try {
+          if (!useSignInStore.getState().isSignIn) return;
+
           const tokens = await refreshToken(
             useSignInStore.getState().refreshToken as string
           );
@@ -60,7 +62,7 @@ export const createAxiosInstance = (
         } catch (refreshError) {
           useSignInStore.getState().clearTokens();
           queryClient.invalidateQueries({ queryKey: ["auth"] });
-          window.location.href = "/";
+          window.location.href = "/login";
           return Promise.reject(refreshError);
         }
       }

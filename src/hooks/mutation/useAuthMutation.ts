@@ -34,7 +34,7 @@ export const useAuthMutation = () => {
       sessionStorage.removeItem("isAuthenticated");
       queryClient.invalidateQueries({ ...queryKeys.user.information });
       clearTokens();
-      navigate("/main");
+      navigate("/");
     },
   });
 

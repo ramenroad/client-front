@@ -30,7 +30,10 @@ const MainPage = () => {
         <LocationViewingText>장르별 보기</LocationViewingText>
         <GenrePathContainer>
           {genrePath.map((genre, index) => (
-            <Genre onClick={() => navigate(`/genre/${genre.genre}`)}>
+            <Genre
+              key={index}
+              onClick={() => navigate(`/genre/${genre.genre}`)}
+            >
               <GenreImage key={index} src={genre.image} alt={genre.genre} />
               <GenreInfo>{genre.genre}</GenreInfo>
             </Genre>

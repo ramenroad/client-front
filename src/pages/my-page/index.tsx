@@ -12,7 +12,6 @@ import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 const MyPage = () => {
   const navigate = useNavigate();
   const { isSignIn } = useSignInStore();
-
   const { userInformationQuery } = useUserInformationQuery();
   const { userInfoMutation } = useUserInfoMutation();
   const { logout } = useAuthMutation();
@@ -33,7 +32,7 @@ const MyPage = () => {
 
   return (
     <Layout>
-      <TopBar title="내 정보" navigate="/main" />
+      <TopBar title="내 정보" />
       <Wrapper>
         <ProfileWrapper>
           <ProfileImageWrapper
