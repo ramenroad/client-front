@@ -3,12 +3,15 @@ import TopBar from "../../components/common/TopBar";
 import styled from "@emotion/styled";
 import { IconCamera, IconArrowRight } from "../../components/Icon";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useSignInStore } from "../../states/sign-in";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
 import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 
 const MyPage = () => {
   const navigate = useNavigate();
+  const { isSignIn } = useSignInStore();
 
   const { userInformationQuery } = useUserInformationQuery();
   const { userInfoMutation } = useUserInfoMutation();
@@ -21,6 +24,12 @@ const MyPage = () => {
     formData.append("profileImageFile", file);
     userInfoMutation.mutate(formData);
   };
+
+  useEffect(() => {
+    if (!isSignIn) {
+      navigate("/login");
+    }
+  }, [isSignIn, navigate]);
 
   return (
     <Layout>

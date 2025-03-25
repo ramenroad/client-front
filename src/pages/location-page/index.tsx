@@ -29,14 +29,14 @@ export const LocationPage = () => {
     }
 
     return ramenyaListQuery.data?.filter((ramenya) =>
-      ramenya.genre.some((genre) => selectedFilterList.includes(genre)),
+      ramenya.genre.some((genre) => selectedFilterList.includes(genre))
     );
   }, [selectedFilterList, ramenyaListQuery.data]);
 
   const handleFilterClick = (type: string) => {
     if (selectedFilterList.includes(type)) {
       setSelectedFilterList((prev) =>
-        prev.filter((prevType) => prevType !== type),
+        prev.filter((prevType) => prevType !== type)
       );
     } else {
       setSelectedFilterList((prev) => [...prev, type]);
@@ -184,7 +184,7 @@ interface RamenyaListWrapperProps {
 }
 
 const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
-  ({ isEmpty }) => [tw`flex flex-col w-full`, isEmpty && tw`h-full`],
+  ({ isEmpty }) => [tw`flex flex-col w-full`, isEmpty && tw`h-full`]
 );
 
 export default LocationPage;

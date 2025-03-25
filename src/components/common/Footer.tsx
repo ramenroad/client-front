@@ -17,6 +17,7 @@ export const Footer = () => {
 const Wrapper = tw.div`
   w-full h-134 p-20 box-border
   bg-footer text-gray-500 font-14-r
+  mt-auto
 `;
 
 const Title = tw.div`
