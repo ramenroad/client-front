@@ -222,7 +222,6 @@ export const CreateReviewPage = () => {
 
                         <ImageUploadContent>
                             <ImageUploadContentImage>
-                                {/* 이미지 미리보기 */}
                                 {formValues.reviewImageUrls?.map((image, index) => (
                                     <ImagePreviewContainer key={index}>
                                         <ImagePreview src={image} alt={`업로드 이미지 ${index + 1}`} />
@@ -231,15 +230,11 @@ export const CreateReviewPage = () => {
                                         </ImageRemoveButton>
                                     </ImagePreviewContainer>
                                 ))}
-
-                                {/* 이미지 추가 버튼 (5개 미만일 때만 표시) */}
                                 {(formValues.reviewImageUrls?.length ?? 0) < 5 && (
                                     <ImageAddButton onClick={handleImageClick} type="button">
                                         <IconAdd />
                                     </ImageAddButton>
                                 )}
-
-                                {/* 숨겨진 파일 입력 */}
                                 <input
                                     type="file"
                                     ref={fileInputRef}
