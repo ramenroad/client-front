@@ -25,9 +25,14 @@ const MyPage = () => {
   };
 
   useEffect(() => {
-    if (!isSignIn) {
-      navigate("/login");
-    }
+    const checkAuth = () => {
+      if (!isSignIn && !sessionStorage.getItem("isAuthenticated")) {
+        console.log("변경");
+        navigate("/login", { replace: true });
+      }
+    };
+
+    checkAuth();
   }, [isSignIn, navigate]);
 
   return (

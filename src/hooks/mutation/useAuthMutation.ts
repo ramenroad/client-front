@@ -9,8 +9,7 @@ import { queryKeys } from "../queries/queryKeys";
 
 export const useAuthMutation = () => {
   const navigate = useNavigate();
-  const { setTokens } = useSignInStore();
-  const { clearTokens } = useSignInStore();
+  const { setTokens, clearTokens } = useSignInStore();
 
   const login = useMutation({
     mutationFn: async ({ id, code }: { id: string; code: string }) => {
@@ -31,10 +30,10 @@ export const useAuthMutation = () => {
   const logout = useMutation({
     mutationFn: () => signOut(),
     onSuccess: () => {
+      clearTokens();
       sessionStorage.removeItem("isAuthenticated");
       queryClient.invalidateQueries({ ...queryKeys.user.information });
-      clearTokens();
-      navigate("/");
+      window.location.href = "/";
     },
   });
 
