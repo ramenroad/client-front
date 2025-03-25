@@ -2,7 +2,7 @@ import TopBar from '../../components/common/TopBar.tsx'
 import tw from 'twin.macro'
 import { IconStarLarge, IconAdd, IconClose } from '../../components/Icon/index.tsx'
 import styled from '@emotion/styled'
-import { createRef, useState } from 'react'
+import { createRef, useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 
 // 폼 데이터 타입 정의
@@ -14,6 +14,11 @@ interface ReviewFormData {
 }
 
 export const CreateReviewPage = () => {
+    // 페이지 로드 시 맨 위로 스크롤
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     // React Hook Form 설정
     const { control, handleSubmit, formState: { isValid, errors }, watch, setValue, register } = useForm<ReviewFormData>({
         defaultValues: {
@@ -29,7 +34,15 @@ export const CreateReviewPage = () => {
     const formValues = watch();
 
     const [customMenuInput, setCustomMenuInput] = useState('');
-    const [menuList, setMenuList] = useState(['라멘러ㅏ멘레ㅏ멘', '라멘', '라멘리ㅏㅔㅁㄴ라멘', '라멘', '라멘', '라멘리ㅏㅔㅁㄴ라멘', '라멘', '라멘']);
+    const [menuList, setMenuList] = useState([
+        '라멘1',
+        '라멘2',
+        '라멘3',
+        '라멘4',
+        '라멘5',
+        '라멘6',
+        '라멘7',
+    ]);
 
     // 파일 입력 참조 생성
     const fileInputRef = createRef<HTMLInputElement>();
@@ -167,7 +180,7 @@ export const CreateReviewPage = () => {
                                 value={customMenuInput}
                                 onChange={(e) => setCustomMenuInput(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                placeholder="메뉴 이름 입력"
+                                placeholder="메뉴명을 입력해주세요"
                             />
                             <MenuAddButton onClick={handleAddCustomMenu} type="button">추가</MenuAddButton>
                         </MenuInputContainer>
@@ -178,15 +191,23 @@ export const CreateReviewPage = () => {
                         <Controller
                             name="description"
                             control={control}
-                            rules={{ required: true }}
+                            rules={{ required: true, minLength: 10 }}
                             render={({ field }) => (
-                                <ReviewDescriptionTextarea
-                                    {...field}
-                                    placeholder="라멘의 맛, 분위기 등 자세한 리뷰를 남겨주세요."
-                                />
+                                <ReviewTextAreaContainer>
+                                    <ReviewDescriptionTextarea
+                                        {...field}
+                                        placeholder="최소 10자 이상 입력해주세요"
+                                    />
+                                    <CharacterCount>
+                                        <TypedCount>{field.value.length}</TypedCount>/300
+                                    </CharacterCount>
+                                </ReviewTextAreaContainer>
                             )}
                         />
-                        {errors.description && <ErrorMessage>리뷰 내용을 입력해주세요</ErrorMessage>}
+                        {errors.description && errors.description.type === 'required' &&
+                            <ErrorMessage>리뷰 내용을 입력해주세요</ErrorMessage>}
+                        {errors.description && errors.description.type === 'minLength' &&
+                            <ErrorMessage>최소 10자 이상 입력해주세요</ErrorMessage>}
                     </ReviewDescriptionWrapper>
 
                     <ImageUploadWrapper>
@@ -316,9 +337,8 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
     cursor-pointer
     `,
     selected && tw`
-        bg-orange
         border-orange
-        text-white
+        text-orange
     `
 ])
 
@@ -336,8 +356,10 @@ const MenuInputContainer = tw.div`
 
 const MenuInput = tw.input`
     flex-1 h-44 rounded-8 
-    bg-border
+    bg-border box-border
     border-none
+    px-12 py-10
+    font-16-r
 `
 
 const MenuAddButton = tw.button`
@@ -348,18 +370,55 @@ const MenuAddButton = tw.button`
 
 const ReviewDescriptionWrapper = tw.div`
     flex flex-col mt-32 gap-12
+    relative
 `
 
 const ReviewDescriptionTitle = tw.div`
     font-16-m text-black
 `
 
-const ReviewDescriptionTextarea = tw.textarea`
-    flex h-260 
-    px-12 py-10
-    rounded-8 bg-border
-    border-none
+const ReviewTextAreaContainer = tw.div`
+    flex flex-col gap-4 relative
+    bg-border
+    rounded-8
+    px-12 pt-10
+    pb-36
 `
+
+const ReviewDescriptionTextarea = styled.textarea`
+    ${tw`
+        flex h-214 w-full 
+        bg-transparent
+        border-none
+        font-16-r
+    `}
+    
+    /* 스크롤바 스타일링 */
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+        background: #D9D9D9;
+        border-radius: 3px;
+    }
+
+`
+
+// 글자 수 표시 스타일
+const CharacterCount = tw.div`
+    absolute bottom-14 right-12
+    font-14-r text-gray-400
+`
+
+const TypedCount = tw.span`
+    font-14-r text-black
+`
+
 
 const ImageUploadWrapper = tw.div`
     flex flex-col mt-32 gap-12
@@ -463,6 +522,7 @@ const ErrorMessage = tw.div`
     font-12-r text-red
     mt-4
 `
+
 
 
 
