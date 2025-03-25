@@ -12,7 +12,7 @@ import {
   useLocationStore,
 } from "../../store/location/useLocationStore.ts";
 import { calculateDistance } from "../../util/number.ts";
-import { IconTalk, IconStar } from "../Icon";
+import { IconStarSmall, IconTalk } from "../Icon";
 
 interface RamenyaCardProps {
   ramenya: Ramenya;
@@ -62,13 +62,22 @@ const RamenyaCard = (props: RamenyaCardProps) => {
           alt={"Thumbnail"}
         />
         <RamenyaDescription>
-          <RamenyaInfoWrapper>
+          <RamenyaDescriptionHeader>
             <RamenyaTitle>{ramenya.name}</RamenyaTitle>
-            <RamenyaRatingWrapper>
-              <IconStar inactive={ramenya.rating === 0} />
-              <RamenyaRating>{ramenya.rating.toFixed(1)}</RamenyaRating>
+            <RamenyaReviewBox>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <IconStarSmall
+                  key={star}
+                  color={
+                    ramenya.reviewCount > 0 && Math.round(ramenya.rating) >= star
+                      ? "#FFCC00"
+                      : "#E1E1E1"
+                  }
+                />
+              ))}
+              <RamenyaScore>{ramenya.rating.toFixed(1)}</RamenyaScore>
               <RamenyaReviewCount>({ramenya.reviewCount})</RamenyaReviewCount>
-            </RamenyaRatingWrapper>
+            </RamenyaReviewBox>
             <RamenyaLocation>
               {current.latitude !== 0 && (
                 <>
@@ -84,19 +93,18 @@ const RamenyaCard = (props: RamenyaCardProps) => {
                   <VerticalLine />
                 </>
               )}
-
               <RamenyaAddress>{ramenya.address}</RamenyaAddress>
             </RamenyaLocation>
-          </RamenyaInfoWrapper>
-          <RamenyaCardBottomSection>
-            <RamenyaOpenStatusWrapper>
-              <RamenyaOpenStatus
-                status={checkBusinessStatus(ramenya.businessHours).status}
-              >
-                {checkBusinessStatus(ramenya.businessHours).status}
-              </RamenyaOpenStatus>
-              {checkBusinessStatus(ramenya.businessHours).todayHours
-                ?.operatingTime && (
+          </RamenyaDescriptionHeader>
+
+          <RamenyaOpenStatusWrapper>
+            <RamenyaOpenStatus
+              status={checkBusinessStatus(ramenya.businessHours).status}
+            >
+              {checkBusinessStatus(ramenya.businessHours).status}
+            </RamenyaOpenStatus>
+            {checkBusinessStatus(ramenya.businessHours).todayHours
+              ?.operatingTime && (
                 <>
                   <span>·</span>
                   <RamenyaOpenTime>
@@ -105,13 +113,12 @@ const RamenyaCard = (props: RamenyaCardProps) => {
                   </RamenyaOpenTime>
                 </>
               )}
-            </RamenyaOpenStatusWrapper>
-            <RamenyaTagWrapper>
-              {ramenya.genre.map((genre, index) => (
-                <RamenyaTag key={index}>{genre}</RamenyaTag>
-              ))}
-            </RamenyaTagWrapper>
-          </RamenyaCardBottomSection>
+          </RamenyaOpenStatusWrapper>
+          <RamenyaTagWrapper>
+            {ramenya.genre.map((genre, index) => (
+              <RamenyaTag key={index}>{genre}</RamenyaTag>
+            ))}
+          </RamenyaTagWrapper>
         </RamenyaDescription>
       </Layout>
       <RamenyaOneLineReview>
@@ -151,6 +158,23 @@ const RamenyaDescription = tw.section`
 
 const RamenyaInfoWrapper = tw.section`
   flex flex-col gap-2
+`;
+
+const RamenyaDescriptionHeader = tw.section`
+  flex flex-col h-full justify-center
+  gap-2
+`;
+
+const RamenyaReviewBox = tw.section`
+  flex items-center gap-2
+`;
+
+const RamenyaScore = tw.span`
+  font-12-m text-black
+`;
+
+const RamenyaReviewCount = tw.span`
+  font-12-r text-gray-700
 `;
 
 const RamenyaTitle = tw.span`

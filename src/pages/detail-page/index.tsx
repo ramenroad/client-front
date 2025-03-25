@@ -11,6 +11,7 @@ import {
   IconTag,
   IconTime,
   IconArrowRight,
+  IconStarMedium,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -81,6 +82,28 @@ export const DetailPage = () => {
         <MarketDetailWrapper>
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
+
+            <MarketDetailBox>
+              <DetailIconTag icon={<IconStarMedium color="#CFCFCF" />} text="평점" />
+              <MarketDetailReviewBox>
+                <StarContainer>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <IconStarMedium
+                      key={star}
+                      color={
+                        (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
+                          Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
+                          ? "#FFCC00"
+                          : "#E1E1E1"
+                      }
+                    />
+                  ))}
+                </StarContainer>
+                <MarketDetailReviewScore>{ramenyaDetailQuery.data?.rating?.toFixed(1) || "0.0"}</MarketDetailReviewScore>
+              </MarketDetailReviewBox>
+            </MarketDetailBox>
+
+
             <MarketDetailBox>
               <DetailIconTag icon={<IconTag />} text="장르" />
               <MarketDetailGenreBox>
@@ -321,6 +344,14 @@ const MarketDetailBox = tw.div`
   flex gap-16 items-start
 `;
 
+const MarketDetailReviewBox = tw.div`
+  flex gap-4 items-center
+`;
+
+const MarketDetailReviewScore = tw.div`
+  font-14-r text-black
+`;
+
 const MarketDetailGenreBox = tw.div`
   flex gap-8 items-center font-14-r
 `;
@@ -473,7 +504,7 @@ const ReviewHeaderTitle = tw.div`
 `;
 
 const StarContainer = tw.div`
-  flex gap-4 items-center
+  flex gap-2 items-center
   cursor-pointer
 `;
 
