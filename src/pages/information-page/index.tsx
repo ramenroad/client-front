@@ -11,7 +11,6 @@ import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 
 const InformationPage = () => {
   const navigate = useNavigate();
-  const { isSignIn } = useSignInStore();
 
   const { userInformationQuery } = useUserInformationQuery();
   const { userInfoMutation } = useUserInfoMutation();
@@ -24,12 +23,6 @@ const InformationPage = () => {
     formData.append("profileImageFile", file);
     userInfoMutation.mutate(formData);
   };
-
-  useEffect(() => {
-    if (!isSignIn) {
-      navigate("/login");
-    }
-  }, [isSignIn, navigate]);
 
   return (
     <Layout>
