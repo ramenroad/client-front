@@ -1,13 +1,27 @@
+# 빌드 단계
 FROM node:18-alpine AS builder
 
 WORKDIR /app
+
+# 환경 변수 전달
+ARG VITE_KAKAO_APP_KEY
+ARG VITE_KAKAO_CLIENT_ID
+
+# 환경 변수를 설정
+ENV VITE_KAKAO_APP_KEY=$VITE_KAKAO_APP_KEY
+ENV VITE_KAKAO_CLIENT_ID=$VITE_KAKAO_CLIENT_ID
 
 COPY package.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build
 
+# 환경 변수를 빌드에 반영
+RUN VITE_KAKAO_APP_KEY=$VITE_KAKAO_APP_KEY \
+    VITE_KAKAO_CLIENT_ID=$VITE_KAKAO_CLIENT_ID \
+    npm run build
+
+# 실행 단계
 FROM node:18-alpine AS runner
 
 WORKDIR /app
@@ -20,4 +34,4 @@ COPY package.json .
 EXPOSE 3000
 
 # 애플리케이션 실행
-CMD [ "serve", "-s", "dist" ]
+CMD ["serve", "-s", "dist"]
