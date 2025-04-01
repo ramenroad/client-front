@@ -4,8 +4,10 @@ import styled from '@emotion/styled'
 import defaultProfile from '../../assets/images/profile-default.png'
 import { IconStarMedium } from '../../components/Icon'
 import { UserReview } from '../../types'
-
+import { useModal } from '../../hooks/common/useModal'
+import { Modal } from '../../components/common/Modal'
 export const ReviewCard = ({ review }: { review: UserReview }) => {
+    const { isOpen, open, close } = useModal()
     const [isExpanded, setIsExpanded] = React.useState(false)
     // const dummyImages = [
     //     'https://placehold.co/600x400',
@@ -35,68 +37,74 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
         return `${year}.${month}.${day}`;
     }
 
+    const handleDeleteReview = () => {
+        console.log('삭제')
+        open()
+    }
+
     return (
-        <Wrapper>
-            <ReviewHeader>
-                <ReviewNameBox>
-                    <ReviewerProfileImage src={defaultProfile} />
-                    <ReviewerName>
-                        {review.userId.nickname}
-                    </ReviewerName>
-                </ReviewNameBox>
+        <>
+            <Wrapper>
+                <ReviewHeader>
+                    <ReviewNameBox>
+                        <ReviewerProfileImage src={defaultProfile} />
+                        <ReviewerName>
+                            {review.userId.nickname}
+                        </ReviewerName>
+                    </ReviewNameBox>
 
-                <ReviewDeleteButton>
-                    삭제
-                </ReviewDeleteButton>
-            </ReviewHeader>
+                    <ReviewDeleteButton onClick={handleDeleteReview}>
+                        삭제
+                    </ReviewDeleteButton>
+                </ReviewHeader>
 
-            <ReviewScore>
-                <ScoreBox>
-                    <StarContainer>
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <IconStarMedium
-                                key={star}
-                                color={star <= review.rating ? "#FFCC00" : "#E1E1E1"}
-                            />
-                        ))}
-                    </StarContainer>
-                    <ScoredMenuContainer>
-                        {review.menus?.map((menu, index) => (
-                            <React.Fragment key={menu}>
-                                <ScoredMenu>
-                                    {menu}
-                                </ScoredMenu>
-                                {index < review.menus.length - 1 && <MenuDivider />}
-                            </React.Fragment>
-                        ))}
-                    </ScoredMenuContainer>
-                </ScoreBox>
-                <ReviewDate>
-                    {formatDate(review.createdAt.toString())}
-                </ReviewDate>
-            </ReviewScore>
+                <ReviewScore>
+                    <ScoreBox>
+                        <StarContainer>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <IconStarMedium
+                                    key={star}
+                                    color={star <= review.rating ? "#FFCC00" : "#E1E1E1"}
+                                />
+                            ))}
+                        </StarContainer>
+                        <ScoredMenuContainer>
+                            {review.menus?.map((menu, index) => (
+                                <React.Fragment key={menu}>
+                                    <ScoredMenu>
+                                        {menu}
+                                    </ScoredMenu>
+                                    {index < review.menus.length - 1 && <MenuDivider />}
+                                </React.Fragment>
+                            ))}
+                        </ScoredMenuContainer>
+                    </ScoreBox>
+                    <ReviewDate>
+                        {formatDate(review.createdAt.toString())}
+                    </ReviewDate>
+                </ReviewScore>
 
-            <ReviewDetail>
-                <ReviewTextContainer>
-                    <span>{displayText}</span>
-                    {isTextLong && (
-                        <MoreButton onClick={toggleExpand}>
-                            {isExpanded ? '접기' : '더보기'}
-                        </MoreButton>
-                    )}
-                </ReviewTextContainer>
-            </ReviewDetail>
+                <ReviewDetail>
+                    <ReviewTextContainer>
+                        <span>{displayText}</span>
+                        {isTextLong && (
+                            <MoreButton onClick={toggleExpand}>
+                                {isExpanded ? '접기' : '더보기'}
+                            </MoreButton>
+                        )}
+                    </ReviewTextContainer>
+                </ReviewDetail>
 
-            <ReviewImages>
-                {review.reviewImageUrls?.map((image, index) => (
-                    <ReviewImage
-                        key={index}
-                        src={image}
-                        index={index}
-                        totalImages={review.reviewImageUrls?.length || 0}
-                    />
-                ))}
-                {/* {dummyImages.map((image, index) => (
+                <ReviewImages>
+                    {review.reviewImageUrls?.map((image, index) => (
+                        <ReviewImage
+                            key={index}
+                            src={image}
+                            index={index}
+                            totalImages={review.reviewImageUrls?.length || 0}
+                        />
+                    ))}
+                    {/* {dummyImages.map((image, index) => (
                     <ReviewImage
                         key={index}
                         src={image}
@@ -104,8 +112,14 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                         totalImages={dummyImages.length}
                     />
                 ))} */}
-            </ReviewImages>
-        </Wrapper>
+                </ReviewImages>
+            </Wrapper>
+            {isOpen &&
+                <Modal isOpen={isOpen} onClose={close} >
+                    삭제
+                </Modal>
+            }
+        </>
     )
 }
 
