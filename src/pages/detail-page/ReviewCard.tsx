@@ -116,7 +116,13 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
             </Wrapper>
             {isOpen &&
                 <Modal isOpen={isOpen} onClose={close} >
-                    삭제
+                    <ModalContent>
+                        <ModalTitle>리뷰 작성을 멈추고 뒤로 갈까요?</ModalTitle>
+                        <ModalButtonBox>
+                            <ModalCancelButton onClick={close}>취소</ModalCancelButton>
+                            <ModalConfirmButton>확인</ModalConfirmButton>
+                        </ModalButtonBox>
+                    </ModalContent>
                 </Modal>
             }
         </>
@@ -215,3 +221,34 @@ const ReviewImage = styled.img<{ index: number; totalImages: number }>(({ totalI
         ? tw`w-116 h-116`
         : tw`w-96 h-96`
 ])
+
+const ModalContent = tw.div`
+    flex flex-col gap-16 w-290
+    items-center
+    justify-center
+    bg-white
+    rounded-12
+`
+
+const ModalTitle = tw.div`
+    font-16-r text-gray-900
+`
+
+const ModalButtonBox = tw.div`
+    flex h-60 w-full
+`
+
+const ModalCancelButton = tw.button`
+    w-full
+    font-16-r text-black
+    cursor-pointer
+    border-none
+    bg-transparent
+`
+
+const ModalConfirmButton = tw.button`
+    w-full
+    font-16-r text-orange
+    cursor-pointer
+    border-none
+    bg-transparent`
