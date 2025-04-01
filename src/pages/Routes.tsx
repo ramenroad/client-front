@@ -8,9 +8,10 @@ import GroupPage from "./group-page";
 import LoginPage from "./login-page";
 import LoginCallbackPage from "./login-callback";
 import RegisterPage from "./register-page";
-import MyPage from "./my-page";
+import InformationPage from "./information-page";
 import AppBarLayout from "../components/layout/AppBarLayout";
 import WithoutAppBarLayout from "../components/layout/WithoutAppBarLayout";
+import MyPage from "./my-page";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
       {
         path: "mypage",
         element: <MyPage />,
+      },
+      {
+        path: "information",
+        element: <InformationPage />,
       },
     ],
   },

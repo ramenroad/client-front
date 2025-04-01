@@ -32,9 +32,9 @@ export const useAuthMutation = () => {
     mutationFn: () => signOut(),
     onSuccess: () => {
       sessionStorage.removeItem("isAuthenticated");
-      queryClient.invalidateQueries({ ...queryKeys.user.information });
       clearTokens();
-      navigate("/main");
+      queryClient.setQueryData(["user", "information"], null);
+      navigate("/");
     },
   });
 

@@ -60,7 +60,9 @@ export const createAxiosInstance = (
         } catch (refreshError) {
           useSignInStore.getState().clearTokens();
           queryClient.invalidateQueries({ queryKey: ["auth"] });
-          window.location.href = "/";
+          console.log("로그인 페이지로 이동");
+          debugger;
+          window.location.href = "/login";
           return Promise.reject(refreshError);
         }
       }
