@@ -38,10 +38,16 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
     return (
         <Wrapper>
             <ReviewHeader>
-                <ReviewerProfileImage src={defaultProfile} />
-                <ReviewerName>
-                    {review.userId.nickname}
-                </ReviewerName>
+                <ReviewNameBox>
+                    <ReviewerProfileImage src={defaultProfile} />
+                    <ReviewerName>
+                        {review.userId.nickname}
+                    </ReviewerName>
+                </ReviewNameBox>
+
+                <ReviewDeleteButton>
+                    삭제
+                </ReviewDeleteButton>
             </ReviewHeader>
 
             <ReviewScore>
@@ -108,9 +114,22 @@ const Wrapper = tw.div`
 `
 
 const ReviewHeader = tw.div`
+    flex gap-8 items-center justify-between
+`
+
+const ReviewNameBox = tw.div`
     flex gap-8 items-center
 `
 
+const ReviewDeleteButton = tw.button`
+    font-12-r text-black
+    cursor-pointer
+    border-none
+    bg-border
+    rounded-12
+    px-10 py-4
+    box-border
+`
 const ReviewerProfileImage = tw.img`
     w-24 h-24 rounded-full
 `
