@@ -1,11 +1,19 @@
 import React from 'react'
 import tw from 'twin.macro'
+import styled from '@emotion/styled'
 import defaultProfile from '../../assets/images/profile-default.png'
 import { IconStarMedium } from '../../components/Icon'
 import { UserReview } from '../../types'
 
 export const ReviewCard = ({ review }: { review: UserReview }) => {
     const [isExpanded, setIsExpanded] = React.useState(false)
+    // const dummyImages = [
+    //     'https://placehold.co/600x400',
+    //     'https://placehold.co/600x400',
+    //     'https://placehold.co/600x400',
+    //     'https://placehold.co/600x400',
+    //     'https://placehold.co/600x400',
+    // ]
     const MAX_TEXT_LENGTH = 97
     const isTextLong = review.review.length > MAX_TEXT_LENGTH
 
@@ -75,8 +83,21 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
 
             <ReviewImages>
                 {review.reviewImageUrls?.map((image, index) => (
-                    <ReviewImage key={index} src={image} />
+                    <ReviewImage
+                        key={index}
+                        src={image}
+                        index={index}
+                        totalImages={review.reviewImageUrls?.length || 0}
+                    />
                 ))}
+                {/* {dummyImages.map((image, index) => (
+                    <ReviewImage
+                        key={index}
+                        src={image}
+                        index={index}
+                        totalImages={dummyImages.length}
+                    />
+                ))} */}
             </ReviewImages>
         </Wrapper>
     )
@@ -146,13 +167,18 @@ const MoreButton = tw.button`
 
 const ReviewImages = tw.div`
     flex gap-1 items-center
-    rounded-8
+    overflow-x-auto
     mt-12
+    scrollbar-hide
 `
 
-const ReviewImage = tw.img`
-    w-96 h-96
+const ReviewImage = styled.img<{ index: number; totalImages: number }>(({ totalImages }) => [
+    tw`    
     first:rounded-l-8
     last:rounded-r-8
-    [&:only-child]:rounded-8
-`
+    [&:only-child]:rounded-8 
+    object-cover flex-shrink-0`,
+    totalImages <= 3
+        ? tw`w-116 h-116`
+        : tw`w-96 h-96`
+])

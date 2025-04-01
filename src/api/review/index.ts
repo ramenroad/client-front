@@ -1,5 +1,5 @@
 import { Review } from "../../types";
-import { instance, instanceWithNoVersioning } from "../index";
+import { instanceWithNoVersioning } from "../index";
 
 
 export const postReview = async (data: Review) => {
