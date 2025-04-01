@@ -3,8 +3,6 @@ import TopBar from "../../components/common/TopBar";
 import styled from "@emotion/styled";
 import { IconCamera, IconArrowRight } from "../../components/Icon";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useSignInStore } from "../../states/sign-in";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
 import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";

@@ -47,7 +47,11 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: ${{ env.DOCKER_IMAGE }}:latest
-          build-args: BUILD_ENV=prod
+          build-args: |
+            BUILD_ENV=prod
+            VITE_KAKAO_APP_KEY=${{ secrets.VITE_KAKAO_APP_KEY }}
+            VITE_KAKAO_CLIENT_ID=${{ secrets.VITE_KAKAO_CLIENT_ID }}
+
   # 배포 Job
   deploy:
     needs: build
