@@ -32,7 +32,7 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
             <ReviewHeader>
                 <ReviewerProfileImage src={defaultProfile} />
                 <ReviewerName>
-                    {review.userId}
+                    {review.userId.nickname}
                 </ReviewerName>
             </ReviewHeader>
 

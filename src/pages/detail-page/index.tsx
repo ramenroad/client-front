@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import {
-  IconBack,
   IconBar,
   IconCall,
   IconDropDown,
@@ -27,6 +26,7 @@ import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
 import { formatNumber } from "../../util/number";
 import { ReviewCard } from "./ReviewCard";
+import TopBar from "../../components/common/TopBar";
 import React from "react";
 
 const dayMapping: { [key: string]: string } = {
@@ -70,9 +70,7 @@ export const DetailPage = () => {
     <Wrapper>
       <Container>
         <HeaderBox>
-          <Header>
-            <StyledIconBack onClick={() => navigate(-1)} />
-          </Header>
+          <TopBar title={ramenyaDetailQuery.data?.name ?? ""} />
           <ThumbnailContainer>
             {ramenyaDetailQuery.data?.thumbnailUrl ? (
               <MarketThumbnail src={ramenyaDetailQuery.data?.thumbnailUrl} />
@@ -329,11 +327,6 @@ const HeaderBox = tw.div`
   flex flex-col
 `;
 
-const Header = tw.div`  
-  flex items-center justify-start
-  px-20 py-10 w-full
-`;
-
 const ThumbnailContainer = tw.div`
   w-full flex items-center justify-center
 `;
@@ -343,9 +336,6 @@ const EmptyThumbnail = tw.img`
 `;
 
 
-const StyledIconBack = tw(IconBack)`
-  cursor-pointer
-`;
 
 const MarketDetailWrapper = tw.div`
   flex flex-col px-20 gap-16

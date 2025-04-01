@@ -102,7 +102,11 @@ export interface Review {
 
 export interface UserReview extends Review {
   _id: string;
-  userId: string;
+  userId: {
+    _id: string;
+    nickname: string;
+    profileImageUrl: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }

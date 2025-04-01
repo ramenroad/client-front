@@ -6,7 +6,7 @@ import { createRef, useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { Review } from '../../types'
 import { useRamenyaReviewMutation } from '../../hooks/queries/useRamenyaReviewQuery.ts'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export const CreateReviewPage = () => {
     const { mutate: createReview } = useRamenyaReviewMutation();
@@ -20,7 +20,7 @@ export const CreateReviewPage = () => {
         setValue,
     } = useForm<Review>({
         defaultValues: {
-            ramenyaId: '',
+            ramenyaId: useParams().id,
             rating: 0,
             review: '',
             reviewImageUrls: [],

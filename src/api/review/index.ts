@@ -1,8 +1,8 @@
 import { Review } from "../../types";
-import { instance } from "../index";
+import { instance, instanceWithNoVersioning } from "../index";
 
 
 export const postReview = async (data: Review) => {
-  const response = await instance.post("/review", data);
+  const response = await instanceWithNoVersioning.post("/review", data);
   return response.data;
 };
