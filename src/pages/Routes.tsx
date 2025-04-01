@@ -13,6 +13,8 @@ import AppBarLayout from "../components/layout/AppBarLayout";
 import WithoutAppBarLayout from "../components/layout/WithoutAppBarLayout";
 import MyPage from "./my-page";
 
+import { CreateReviewPage } from "./review-page/CreateReviewPage";
+import { ReviewListPage } from "./review-page/ReviewListPage";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -69,6 +71,14 @@ const router = createBrowserRouter([
         element: <LoginCallbackPage />,
       },
     ],
+  },
+  {
+    path: "/review/create/:id",
+    element: <CreateReviewPage />,
+  },
+  {
+    path: "/review/list/:id",
+    element: <ReviewListPage />,
   },
 ]);
 

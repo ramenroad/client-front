@@ -1,14 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import {
-  IconBack,
   IconBar,
   IconCall,
   IconDropDown,
   IconDropDownSelected,
   IconInstagram,
   IconLocate,
+  IconStarLarge,
   IconTag,
   IconTime,
+  IconArrowRight,
+  IconStarMedium,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -23,6 +25,9 @@ import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
 import { formatNumber } from "../../util/number";
+import { ReviewCard } from "./ReviewCard";
+import TopBar from "../../components/common/TopBar";
+import React from "react";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -61,13 +66,22 @@ export const DetailPage = () => {
 
   const todayBusinessHour = getTodayBusinessHour();
 
+  const dummyImages = [
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+  ];
+
   return (
     <Wrapper>
       <Container>
         <HeaderBox>
-          <Header>
-            <StyledIconBack onClick={() => navigate(-1)} />
-          </Header>
+          <TopBar title={ramenyaDetailQuery.data?.name ?? ""} />
           <ThumbnailContainer>
             {ramenyaDetailQuery.data?.thumbnailUrl ? (
               <MarketThumbnail src={ramenyaDetailQuery.data?.thumbnailUrl} />
@@ -79,6 +93,28 @@ export const DetailPage = () => {
         <MarketDetailWrapper>
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
+
+            <MarketDetailBox>
+              <DetailIconTag icon={<IconStarMedium color="#CFCFCF" />} text="평점" />
+              <MarketDetailReviewBox>
+                <StarContainer>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <IconStarMedium
+                      key={star}
+                      color={
+                        (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
+                          Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
+                          ? "#FFCC00"
+                          : "#E1E1E1"
+                      }
+                    />
+                  ))}
+                </StarContainer>
+                <MarketDetailReviewScore>{ramenyaDetailQuery.data?.rating?.toFixed(1) || "0.0"}</MarketDetailReviewScore>
+              </MarketDetailReviewBox>
+            </MarketDetailBox>
+
+
             <MarketDetailBox>
               <DetailIconTag icon={<IconTag />} text="장르" />
               <MarketDetailGenreBox>
@@ -209,14 +245,80 @@ export const DetailPage = () => {
           <RecommendTextContainer>
             <QuoteStartImage src={quoteStart} />
             <RecommendText>
-            <RecommendTitle>
-              {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
-            </RecommendTitle>
+              <RecommendTitle>
+                {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
+              </RecommendTitle>
             </RecommendText>
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>
           </RecommendTextContainer>
+
+          <Divider />
+
+
+          <ImageTitle>사진</ImageTitle>
+          <ImageContainer>
+            {dummyImages.slice(0, 5).map((image, index) => (
+              <Image key={index} src={image} />
+            ))}
+            {dummyImages.length > 5 && (
+              <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
+                <Image src={dummyImages[5]} />
+                <MoreOverlay>
+                  <MoreText>더보기</MoreText>
+                  <IconArrowRight color="#FFFFFF" />
+                </MoreOverlay>
+              </MoreImageWrapper>
+            )}
+          </ImageContainer>
+
+          <Divider />
+
+          <ReviewWrapper>
+
+            <ReviewHeader>
+              <ReviewHeaderTitle>
+                <ReviewerName>
+                  라멘로드
+                </ReviewerName>
+                님 리뷰를 남겨주세요
+              </ReviewHeaderTitle>
+              <LargeStarContainer onClick={() => navigate(`/review/create/${id}`)}>
+                <IconStarLarge color="#E1E1E1" />
+                <IconStarLarge color="#E1E1E1" />
+                <IconStarLarge color="#E1E1E1" />
+                <IconStarLarge color="#E1E1E1" />
+                <IconStarLarge color="#E1E1E1" />
+              </LargeStarContainer>
+            </ReviewHeader>
+
+            <ReviewDivider />
+
+            <ReviewContent>
+              <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
+
+              <ReviewCardContainer>
+                {ramenyaDetailQuery.data?.reviews
+                  ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                  .slice(0, 3)
+                  .map((review) => (
+                    <React.Fragment key={review._id}>
+                      <ReviewCard review={review} />
+                      <ReviewDivider />
+                    </React.Fragment>
+                  ))
+                }
+              </ReviewCardContainer>
+
+
+              <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
+                <span>모든 리뷰 보기</span>
+                <IconArrowRight />
+              </AllReviewButton>
+            </ReviewContent>
+
+          </ReviewWrapper>
 
           <Divider />
 
@@ -247,11 +349,6 @@ const HeaderBox = tw.div`
   flex flex-col
 `;
 
-const Header = tw.div`  
-  flex items-center justify-start
-  px-20 py-10 w-full
-`;
-
 const ThumbnailContainer = tw.div`
   w-full flex items-center justify-center
 `;
@@ -261,9 +358,6 @@ const EmptyThumbnail = tw.img`
 `;
 
 
-const StyledIconBack = tw(IconBack)`
-  cursor-pointer
-`;
 
 const MarketDetailWrapper = tw.div`
   flex flex-col px-20 gap-16
@@ -281,6 +375,14 @@ const MarketDetailTitle = tw.div`
 
 const MarketDetailBox = tw.div`
   flex gap-16 items-start
+`;
+
+const MarketDetailReviewBox = tw.div`
+  flex gap-4 items-center
+`;
+
+const MarketDetailReviewScore = tw.div`
+  font-14-r text-black
 `;
 
 const MarketDetailGenreBox = tw.div`
@@ -410,12 +512,95 @@ const QuoteEndImage = tw.img`
   w-30 h-22
 `;
 
+const ImageTitle = tw.div`
+  font-18-sb pt-16
+`;
+
+const ImageContainer = tw.div`
+  flex flex-wrap gap-1 mb-16
+  w-350
+  rounded-8 overflow-hidden
+`;
+
+const Image = tw.img`
+  w-116 h-116 object-cover
+
+`;
+
+const ReviewWrapper = tw.div`
+  flex flex-col
+`;
+
+const ReviewHeader = tw.div`
+  flex flex-col gap-10 items-center
+`;
+
+const ReviewHeaderTitle = tw.div`
+  flex font-18-r text-black
+`;
+
+const ReviewerName = tw.div`
+  text-orange
+`;
+
+const StarContainer = tw.div`
+  flex gap-2 items-center
+  cursor-pointer
+`;
+
+const LargeStarContainer = tw.div`
+  flex gap-2 items-center
+  cursor-pointer mb-32
+`;
+
+const ReviewDivider = tw.div`
+  w-full h-1 bg-divider
+`;
+
+const ReviewContent = tw.div`
+  flex flex-col
+  gap-16
+`;
+
+const ReviewContentTitle = tw.div`
+  font-18-sb text-black mt-20
+`;
+
+const ReviewCardContainer = tw.div`
+  flex flex-col gap-20
+`;
+
+const AllReviewButton = tw.div`
+  flex w-full py-10
+  box-border
+  justify-center items-center
+  font-14-m text-black
+  bg-border rounded-8 gap-2
+  cursor-pointer
+`;
+
 const LocationTitle = tw.div`
   font-18-sb pt-16
 `;
 
 const LocationWrapper = tw.div`
   flex flex-col gap-16
+`;
+
+const MoreImageWrapper = tw.div`
+  relative cursor-pointer
+  w-116 h-116
+`;
+
+const MoreOverlay = tw.div`
+  absolute top-0 left-0 w-116 h-116
+  bg-black/50 
+  flex items-center justify-center gap-4
+  rounded-br-8
+`;
+
+const MoreText = tw.span`
+  font-16-m text-white
 `;
 
 export default DetailPage;

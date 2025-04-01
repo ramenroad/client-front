@@ -53,6 +53,9 @@ export interface RemenyaDetail {
     oneLineReview: string;
     description: string;
   };
+  reviewCount?: number;
+  rating?: number;
+  reviews?: UserReview[];
 }
 
 export interface Banner {
@@ -87,4 +90,23 @@ export type Region = string[];
 export interface Tokens {
   accessToken: string;
   refreshToken: string;
+}
+
+export interface Review {
+  ramenyaId: string;
+  rating: number;
+  review: string;
+  menus: string[];
+  reviewImageUrls?: string[];
+}
+
+export interface UserReview extends Review {
+  _id: string;
+  userId: {
+    _id: string;
+    nickname: string;
+    profileImageUrl: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
 }

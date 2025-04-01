@@ -5,21 +5,30 @@ import { useNavigate } from "react-router-dom";
 interface TopBarProps {
   title: string;
   navigate?: string;
+  onBackClick?: () => void;
 }
 
 const TopBar = (props: TopBarProps) => {
   const navigate = useNavigate();
 
+  const handleBackClick = () => {
+    if (props.onBackClick) {
+      props.onBackClick();
+    } else {
+      if (props.navigate) {
+        navigate(props.navigate);
+      } else {
+        navigate(-1);
+      }
+    }
+  };
+
   return (
     <TopBarWrapper>
       <IconWrapper>
-        <StyledIconBack
-          onClick={() =>
-            props.navigate ? navigate(props.navigate) : navigate(-1)
-          }
-        />
+        <StyledIconBack onClick={handleBackClick} />
       </IconWrapper>
-      <span>{props.title}</span>
+      <HeaderTitle>{props.title}</HeaderTitle>
     </TopBarWrapper>
   );
 };
@@ -36,6 +45,10 @@ const IconWrapper = tw.div`
 
 const StyledIconBack = tw(IconBack)`
   cursor-pointer
+  `;
+
+const HeaderTitle = tw.span`
+  font-16-sb text-black
 `;
 
 export default TopBar;
