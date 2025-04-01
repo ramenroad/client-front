@@ -7,15 +7,18 @@ import { useForm, Controller } from 'react-hook-form'
 import { Review } from '../../types'
 import { useRamenyaReviewMutation } from '../../hooks/queries/useRamenyaReviewQuery.ts'
 import { useNavigate, useParams } from 'react-router-dom';
+import { Modal } from '../../components/common/Modal';
 
 export const CreateReviewPage = () => {
     const { mutate: createReview } = useRamenyaReviewMutation();
     const navigate = useNavigate();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isFormDirty, setIsFormDirty] = useState(false);
 
     const {
         control,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isDirty },
         watch,
         setValue,
     } = useForm<Review>({
@@ -43,6 +46,17 @@ export const CreateReviewPage = () => {
     ]);
 
     const fileInputRef = createRef<HTMLInputElement>();
+
+    useEffect(() => {
+        const hasChanges =
+            isDirty ||
+            (formValues.reviewImageUrls?.length ?? 0) > 0 ||
+            formValues.rating > 0 ||
+            formValues.menus.length > 0 ||
+            formValues.review.trim().length > 0;
+
+        setIsFormDirty(hasChanges);
+    }, [isDirty, formValues.reviewImageUrls, formValues.rating, formValues.menus, formValues.review]);
 
     // handle Rating 
     const handleStarClick = (index: number) => {
@@ -127,10 +141,27 @@ export const CreateReviewPage = () => {
         window.scrollTo(0, 0);
     }, []);
 
+    const handleBackClick = () => {
+        if (isFormDirty) {
+            setIsModalOpen(true);
+        } else {
+            navigate(-1);
+        }
+    };
+
+    const handleConfirmBack = () => {
+        setIsModalOpen(false);
+        navigate(-1);
+    };
+
+    const handleCancelBack = () => {
+        setIsModalOpen(false);
+    };
+
     return (
         <Wrapper>
             <Header>
-                <TopBar title="리뷰 작성하기" />
+                <TopBar title="리뷰 작성하기" onBackClick={handleBackClick} />
             </Header>
             <form onSubmit={handleSubmit(onSubmit)}>
                 <ContentsWrapper>
@@ -257,6 +288,18 @@ export const CreateReviewPage = () => {
                     </AddReviewButton>
                 </ContentsWrapper>
             </form>
+
+            <Modal isOpen={isModalOpen} onClose={handleCancelBack}>
+                <ModalContent>
+                    <ModalTitle>
+                        리뷰 작성을 멈추고 뒤로 갈까요?
+                    </ModalTitle>
+                    <ModalButtonBox>
+                        <ModalCancelButton onClick={handleCancelBack}>취소</ModalCancelButton>
+                        <ModalConfirmButton onClick={handleConfirmBack}>확인</ModalConfirmButton>
+                    </ModalButtonBox>
+                </ModalContent>
+            </Modal>
         </Wrapper>
     )
 }
@@ -513,6 +556,39 @@ const StarButton = tw.button`
 const ErrorMessage = tw.div`
     font-12-r text-red
     mt-4
+`
+
+const ModalContent = tw.div`
+    flex flex-col gap-16 w-290
+    items-center
+    justify-center
+    bg-white
+    rounded-12
+`
+
+const ModalTitle = tw.div`
+    font-16-r text-gray-900
+    text-center
+`
+
+const ModalButtonBox = tw.div`
+    flex h-60 w-full
+`
+
+const ModalCancelButton = tw.button`
+    w-full
+    font-16-r text-black
+    cursor-pointer
+    border-none
+    bg-transparent
+`
+
+const ModalConfirmButton = tw.button`
+    w-full
+    font-16-r text-orange
+    cursor-pointer
+    border-none
+    bg-transparent
 `
 
 

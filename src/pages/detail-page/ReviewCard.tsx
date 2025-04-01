@@ -117,10 +117,14 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
             {isOpen &&
                 <Modal isOpen={isOpen} onClose={close} >
                     <ModalContent>
-                        <ModalTitle>리뷰 작성을 멈추고 뒤로 갈까요?</ModalTitle>
+                        <ModalTitle>
+                            작성한 리뷰를 삭제할까요?
+                            <br />
+                            내 리뷰 목록에서도 삭제됩니다.
+                        </ModalTitle>
                         <ModalButtonBox>
                             <ModalCancelButton onClick={close}>취소</ModalCancelButton>
-                            <ModalConfirmButton>확인</ModalConfirmButton>
+                            <ModalConfirmButton>삭제</ModalConfirmButton>
                         </ModalButtonBox>
                     </ModalContent>
                 </Modal>
@@ -232,6 +236,7 @@ const ModalContent = tw.div`
 
 const ModalTitle = tw.div`
     font-16-r text-gray-900
+    text-center
 `
 
 const ModalButtonBox = tw.div`
