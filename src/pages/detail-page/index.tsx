@@ -66,6 +66,17 @@ export const DetailPage = () => {
 
   const todayBusinessHour = getTodayBusinessHour();
 
+  const dummyImages = [
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+  ];
+
   return (
     <Wrapper>
       <Container>
@@ -248,7 +259,18 @@ export const DetailPage = () => {
 
           <ImageTitle>사진</ImageTitle>
           <ImageContainer>
-            <Image src={ramenyaDetailQuery.data?.thumbnailUrl} />
+            {dummyImages.slice(0, 5).map((image, index) => (
+              <Image key={index} src={image} />
+            ))}
+            {dummyImages.length > 5 && (
+              <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
+                <Image src={dummyImages[5]} />
+                <MoreOverlay>
+                  <MoreText>더보기</MoreText>
+                  <IconArrowRight color="#FFFFFF" />
+                </MoreOverlay>
+              </MoreImageWrapper>
+            )}
           </ImageContainer>
 
           <Divider />
@@ -495,11 +517,14 @@ const ImageTitle = tw.div`
 `;
 
 const ImageContainer = tw.div`
-  flex gap-16 mb-16
+  flex flex-wrap gap-1 mb-16
+  w-350
+  rounded-8 overflow-hidden
 `;
 
 const Image = tw.img`
-  w-100 h-100 rounded-8
+  w-116 h-116 object-cover
+
 `;
 
 const ReviewWrapper = tw.div`
@@ -560,6 +585,22 @@ const LocationTitle = tw.div`
 
 const LocationWrapper = tw.div`
   flex flex-col gap-16
+`;
+
+const MoreImageWrapper = tw.div`
+  relative cursor-pointer
+  w-116 h-116
+`;
+
+const MoreOverlay = tw.div`
+  absolute top-0 left-0 w-116 h-116
+  bg-black/50 
+  flex items-center justify-center gap-4
+  rounded-br-8
+`;
+
+const MoreText = tw.span`
+  font-16-m text-white
 `;
 
 export default DetailPage;
