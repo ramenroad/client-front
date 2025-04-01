@@ -4,7 +4,6 @@ import { IconArrowRight } from "../../components/Icon";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 const MyPage = () => {
   const { userInformationQuery } = useUserInformationQuery();
