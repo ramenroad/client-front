@@ -8,9 +8,12 @@ import { Review } from '../../types'
 import { useRamenyaReviewMutation } from '../../hooks/queries/useRamenyaReviewQuery.ts'
 import { useNavigate, useParams } from 'react-router-dom';
 import { Modal } from '../../components/common/Modal';
+import { useRamenyaDetailQuery } from '../../hooks/queries/useRamenyaDetailQuery.ts'
 
 export const CreateReviewPage = () => {
+    const { id } = useParams();
     const { mutate: createReview } = useRamenyaReviewMutation();
+    const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
     const navigate = useNavigate();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isFormDirty, setIsFormDirty] = useState(false);
@@ -35,15 +38,7 @@ export const CreateReviewPage = () => {
     const formValues = watch();
 
     const [customMenuInput, setCustomMenuInput] = useState('');
-    const [menuList, setMenuList] = useState([
-        '라멘1',
-        '라멘2',
-        '라멘3',
-        '라멘4',
-        '라멘5',
-        '라멘6',
-        '라멘7',
-    ]);
+    const [menuList, setMenuList] = useState(ramenyaDetailQuery.data?.menus?.map((menu) => menu) || []);
 
     const fileInputRef = createRef<HTMLInputElement>();
 

@@ -56,6 +56,7 @@ export interface RemenyaDetail {
   reviewCount?: number;
   rating?: number;
   reviews?: UserReview[];
+  menus?: string[];
 }
 
 export interface Banner {
