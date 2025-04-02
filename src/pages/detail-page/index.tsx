@@ -43,7 +43,6 @@ export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
-  console.log(ramenyaReviewImagesQuery.data);
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
 
