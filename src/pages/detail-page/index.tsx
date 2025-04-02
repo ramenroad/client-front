@@ -39,6 +39,7 @@ const dayMapping: { [key: string]: string } = {
   sun: "일요일",
 };
 
+
 export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);

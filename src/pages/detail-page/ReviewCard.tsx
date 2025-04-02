@@ -69,7 +69,7 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                             ))}
                         </StarContainer>
                         <ScoredMenuContainer>
-                            {review.menus?.map((menu, index) => (
+                            {Array.isArray(review.menus) && review.menus.map((menu: string, index: number) => (
                                 <React.Fragment key={menu}>
                                     <ScoredMenu>
                                         {menu}
@@ -105,13 +105,13 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                         />
                     ))}
                     {/* {dummyImages.map((image, index) => (
-                    <ReviewImage
-                        key={index}
-                        src={image}
-                        index={index}
-                        totalImages={dummyImages.length}
-                    />
-                ))} */}
+                        <ReviewImage
+                            key={index}
+                            src={image}
+                            index={index}
+                            totalImages={dummyImages.length}
+                        />
+                    ))} */}
                 </ReviewImages>
             </Wrapper>
             {isOpen &&
@@ -213,6 +213,8 @@ const ReviewImages = tw.div`
     overflow-x-auto
     mt-12
     scrollbar-hide
+    relative
+    -mr-20
 `
 
 const ReviewImage = styled.img<{ index: number; totalImages: number }>(({ totalImages }) => [
