@@ -28,7 +28,7 @@ import { formatNumber } from "../../util/number";
 import { ReviewCard } from "./ReviewCard";
 import TopBar from "../../components/common/TopBar";
 import React from "react";
-
+import { useRamenyaReviewImagesQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
   tue: "화요일",
@@ -42,6 +42,8 @@ const dayMapping: { [key: string]: string } = {
 export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
+  const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
+  console.log(ramenyaReviewImagesQuery.data);
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
 
@@ -65,17 +67,6 @@ export const DetailPage = () => {
   };
 
   const todayBusinessHour = getTodayBusinessHour();
-
-  const dummyImages = [
-    'https://placehold.co/600x400',
-    'https://placehold.co/600x400',
-    'https://placehold.co/600x400',
-    'https://placehold.co/600x400',
-    'https://placehold.co/600x400',
-    'https://placehold.co/600x400',
-    'https://placehold.co/600x400',
-    'https://placehold.co/600x400',
-  ];
 
   return (
     <Wrapper>
@@ -259,12 +250,12 @@ export const DetailPage = () => {
 
           <ImageTitle>사진</ImageTitle>
           <ImageContainer>
-            {dummyImages.slice(0, 5).map((image, index) => (
+            {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.slice(0, 5).map((image: string, index: number) => (
               <Image key={index} src={image} />
             ))}
-            {dummyImages.length > 5 && (
+            {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
               <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
-                <Image src={dummyImages[5]} />
+                <Image src={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
                 <MoreOverlay>
                   <MoreText>더보기</MoreText>
                   <IconArrowRight color="#FFFFFF" />
