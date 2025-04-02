@@ -96,7 +96,7 @@ export interface Review {
   ramenyaId: string;
   rating: number;
   review: string;
-  menus: string[];
+  menus: string[] | string;
   reviewImageUrls?: string[];
 }
 

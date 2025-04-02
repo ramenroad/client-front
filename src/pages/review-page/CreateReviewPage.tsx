@@ -52,20 +52,18 @@ export const CreateReviewPage = () => {
             isDirty ||
             (formValues.reviewImageUrls?.length ?? 0) > 0 ||
             formValues.rating > 0 ||
-            formValues.menus.length > 0 ||
+            (Array.isArray(formValues.menus) ? formValues.menus.length > 0 : false) ||
             formValues.review.trim().length > 0;
 
         setIsFormDirty(hasChanges);
     }, [isDirty, formValues.reviewImageUrls, formValues.rating, formValues.menus, formValues.review]);
 
-    // handle Rating 
     const handleStarClick = (index: number) => {
         setValue('rating', index, { shouldValidate: true });
     };
 
-    // handle Menu
     const handleMenuClick = (menu: string) => {
-        const currentMenus = formValues.menus;
+        const currentMenus = Array.isArray(formValues.menus) ? formValues.menus : [];
 
         if (currentMenus.includes(menu)) {
             setValue('menus', currentMenus.filter(item => item !== menu), { shouldValidate: true });
@@ -76,7 +74,6 @@ export const CreateReviewPage = () => {
         }
     };
 
-    // handle Add Custom Menu
     const handleAddCustomMenu = () => {
         if (customMenuInput.trim() !== '' && !menuList.includes(customMenuInput)) {
             setMenuList([...menuList, customMenuInput]);
@@ -90,7 +87,6 @@ export const CreateReviewPage = () => {
         }
     };
 
-    // handle Image Upload
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
@@ -129,12 +125,16 @@ export const CreateReviewPage = () => {
     };
 
     const onSubmit = (data: Review) => {
-        createReview(data);
-        navigate(-1);
+        const reviewData = {
+            ...data,
+            menus: Array.isArray(data.menus) ? data.menus.join(',') : data.menus
+        };
+        createReview(reviewData);
+        //navigate(-1);
     };
 
     const isFormValid = formValues.rating > 0 &&
-        formValues.menus.length > 0 &&
+        (Array.isArray(formValues.menus) ? formValues.menus.length > 0 : false) &&
         formValues.review.trim().length >= 10;
 
     useEffect(() => {
