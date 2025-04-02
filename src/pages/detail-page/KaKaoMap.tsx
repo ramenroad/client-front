@@ -1,4 +1,7 @@
-import { useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import styled from "@emotion/styled";
+import { useEffect, useState } from "react";
 import tw from "twin.macro";
 
 interface KakaoMapProps {
@@ -8,18 +11,21 @@ interface KakaoMapProps {
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     kakao: any;
   }
 }
 
 const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
+  const [map, setMap] = useState<any>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+
   useEffect(() => {
+    let isMounted = true;
+
     const loadKakaoMap = () => {
       // 이미 스크립트가 로드되어 있는지 확인
-      if (
-        document.querySelector('script[src*="dapi.kakao.com/v2/maps/sdk.js"]')
-      ) {
+      if (document.querySelector('script[src*="dapi.kakao.com/v2/maps/sdk.js"]')) {
+        initializeMap();
         return;
       }
 
@@ -34,41 +40,67 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
       }
 
       script.addEventListener("load", () => {
+        if (isMounted) {
+          initializeMap();
+        }
+      });
+
+      script.addEventListener("error", () => {
+        if (isMounted) {
+          console.error("지도 로딩에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        }
+      });
+
+      document.head.appendChild(script);
+    };
+
+    const initializeMap = () => {
+      try {
         window.kakao.maps.load(() => {
           const container = document.getElementById("map");
           if (!container) {
+            console.error("지도를 표시할 컨테이너를 찾을 수 없습니다.");
             return;
           }
 
-          try {
-            const map = new window.kakao.maps.Map(container, {
-              center: new window.kakao.maps.LatLng(
-                latitude || 33.450701,
-                longitude || 126.570667
-              ),
-              level: 3,
-            });
+          const mapInstance = new window.kakao.maps.Map(container, {
+            center: new window.kakao.maps.LatLng(
+              latitude || 33.450701,
+              longitude || 126.570667
+            ),
+            level: 3,
+          });
 
-            // 좌표가 있는 경우에만 마커 생성
-            if (latitude && longitude) {
-              const coords = new window.kakao.maps.LatLng(latitude, longitude);
-              new window.kakao.maps.Marker({
-                map: map,
-                position: coords,
-              });
-              map.setCenter(coords);
-            }
-          } catch (error) {
-            console.error("지도 생성 중 오류:", error);
+          // 좌표가 있는 경우에만 마커 생성
+          if (latitude && longitude) {
+            const coords = new window.kakao.maps.LatLng(latitude, longitude);
+            new window.kakao.maps.Marker({
+              map: mapInstance,
+              position: coords,
+            });
+            mapInstance.setCenter(coords);
+          }
+
+          if (isMounted) {
+            setMap(mapInstance);
+            setIsMapLoaded(true);
           }
         });
-      });
-      document.head.appendChild(script);
+      } catch (error) {
+        console.error("지도 생성 중 오류:", error);
+        if (isMounted) {
+          console.error("지도 생성 중 오류가 발생했습니다.");
+        }
+      }
     };
 
     loadKakaoMap();
 
     return () => {
+      isMounted = false;
+      if (map) {
+        map.setMap(null);
+      }
       const script = document.querySelector(
         'script[src*="dapi.kakao.com/v2/maps/sdk.js"]'
       );
@@ -78,11 +110,17 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
     };
   }, [latitude, longitude]);
 
-  return <Wrapper id="map"></Wrapper>;
+  return (
+    <Wrapper id="map" isMapLoaded={isMapLoaded}></Wrapper>
+  );
 };
 
-const Wrapper = tw.div`
-  w-full h-210
-`;
+interface WrapperProps {
+  isMapLoaded: boolean;
+}
+const Wrapper = styled.div<WrapperProps>(({ isMapLoaded }) => [
+  tw`w-full h-210 relative`,
+  !isMapLoaded && tw`hidden`,
+]);
 
 export default KakaoMap;
