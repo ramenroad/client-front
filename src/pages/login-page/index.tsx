@@ -2,7 +2,7 @@ import TopBar from "../../components/common/TopBar";
 import RamenroadMainLogo from "../../assets/images/ramenroad-main-logo.svg";
 import tw from "twin.macro";
 import { Line } from "../../components/common/Line";
-import { IconKakao, IconNaver } from "../../components/Icon";
+import { IconKakao } from "../../components/Icon";
 import styled from "@emotion/styled";
 
 const LoginPage = () => {
@@ -38,12 +38,12 @@ const LoginPage = () => {
               카카오로 계속하기
             </LoginButtonText>
           </LoginButton>
-          <LoginButton loginType="naver" onClick={() => handleLogin("naver")}>
+          {/* <LoginButton loginType="naver" onClick={() => handleLogin("naver")}>
             <IconNaver />
             <LoginButtonText loginType="naver">
               네이버로 계속하기
             </LoginButtonText>
-          </LoginButton>
+          </LoginButton> */}
         </LoginButtonWrapper>
       </LoginActionWrapper>
     </Layout>

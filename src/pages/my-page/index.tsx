@@ -1,9 +1,10 @@
 import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
-import { IconArrowRight } from "../../components/Icon";
+import { IconArrowRight, IconUnSignInUser } from "../../components/Icon";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../../components/common/Button";
 
 const MyPage = () => {
   const { userInformationQuery } = useUserInformationQuery();
@@ -13,32 +14,38 @@ const MyPage = () => {
   return (
     <Layout>
       <TopBar title="마이페이지" navigate="/" />
-      <CardLayout
-        onClick={() => {
-          if (userInformationQuery.data) {
-            navigate("/information");
-          } else {
-            navigate("/login");
-          }
-        }}
-      >
-        <CardLeftSection>
-          {userInformationQuery.data ? (
-            <>
-              <WelcomeText>반가워요!</WelcomeText>
-              <UserInfoWrapper>
-                <span>{userInformationQuery.data?.nickname}님</span>
-                <IconArrowRight />
-              </UserInfoWrapper>
-            </>
-          ) : (
-            <WelcomeText>로그인 후 이용해주세요.</WelcomeText>
-          )}
-        </CardLeftSection>
-        <CardRightSection>
-          <UserProfileImage src={userInformationQuery.data?.profileImageUrl} />
-        </CardRightSection>
-      </CardLayout>
+      {userInformationQuery.data ? (
+        <CardLayout
+          onClick={() => {
+            if (userInformationQuery.data) {
+              navigate("/information");
+            }
+          }}
+        >
+          <CardLeftSection>
+            <WelcomeText>반가워요!</WelcomeText>
+            <UserInfoWrapper>
+              <span>{userInformationQuery.data?.nickname}님</span>
+              <IconArrowRight />
+            </UserInfoWrapper>
+          </CardLeftSection>
+
+          <CardRightSection>
+            <UserProfileImage
+              src={userInformationQuery.data?.profileImageUrl}
+            />
+          </CardRightSection>
+        </CardLayout>
+      ) : (
+        <SignInWrapper>
+          <IconUnSignInUser />
+          <SignInDescription>
+            <LoginText>로그인 후 이용해주세요.</LoginText>
+            <LoginDescription>간편 로그인으로 쉽게 가능해요.</LoginDescription>
+          </SignInDescription>
+          <Button onClick={() => navigate("/login")}>로그인/회원가입</Button>
+        </SignInWrapper>
+      )}
       {userInformationQuery.data && (
         <LogoutText onClick={() => logout.mutate()}>로그아웃</LogoutText>
       )}
@@ -48,7 +55,8 @@ const MyPage = () => {
 
 const Layout = tw.section`
   flex flex-col items-center gap-20
-  h-full
+  w-full h-full
+  px-20 box-border
 `;
 
 const CardLayout = tw.section`
@@ -86,6 +94,27 @@ const LogoutText = tw.span`
   font-14-m
   text-center justify-self-end
   cursor-pointer mb-40 mt-auto
+`;
+
+const SignInWrapper = tw.section`
+  flex flex-col items-center
+  w-full h-full
+  mt-20
+`;
+
+const SignInDescription = tw.section`
+  flex flex-col gap-4
+  items-center
+  text-gray-800
+  mt-24 mb-40
+`;
+
+const LoginText = tw.span`
+  font-20-m
+`;
+
+const LoginDescription = tw.span`
+  font-18-r
 `;
 
 export default MyPage;

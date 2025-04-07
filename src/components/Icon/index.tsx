@@ -373,9 +373,11 @@ export const IconStarSmall = ({ color, ...rest }: IconProps) => (
     preserveAspectRatio="none"
     {...rest}
   >
-    <path d="M6 0L7.76336 3.57295L11.7063 4.1459L8.85317 6.92705L9.52671 10.8541L6 9L2.47329 10.8541L3.14683 6.92705L0.293661 4.1459L4.23664 3.57295L6 0Z" fill={color ?? "#FFCC00"} />
+    <path
+      d="M6 0L7.76336 3.57295L11.7063 4.1459L8.85317 6.92705L9.52671 10.8541L6 9L2.47329 10.8541L3.14683 6.92705L0.293661 4.1459L4.23664 3.57295L6 0Z"
+      fill={color ?? "#FFCC00"}
+    />
   </svg>
-
 );
 
 export const IconHome = ({ selected }: { selected: boolean }) => {
@@ -465,7 +467,10 @@ export const IconStarMedium = ({ color, ...rest }: IconProps) => (
     preserveAspectRatio="none"
     {...rest}
   >
-    <path d="M7 0L9.05725 4.16844L13.6574 4.83688L10.3287 8.08156L11.1145 12.6631L7 10.5L2.8855 12.6631L3.6713 8.08156L0.342604 4.83688L4.94275 4.16844L7 0Z" fill={color ?? "#FFCC00"} />
+    <path
+      d="M7 0L9.05725 4.16844L13.6574 4.83688L10.3287 8.08156L11.1145 12.6631L7 10.5L2.8855 12.6631L3.6713 8.08156L0.342604 4.83688L4.94275 4.16844L7 0Z"
+      fill={color ?? "#FFCC00"}
+    />
   </svg>
 );
 
@@ -479,7 +484,10 @@ export const IconStarLarge = ({ color, ...rest }: IconProps) => (
     preserveAspectRatio="none"
     {...rest}
   >
-    <path d="M18 0L23.2901 10.7188L35.119 12.4377L26.5595 20.7812L28.5801 32.5623L18 27L7.41987 32.5623L9.44049 20.7812L0.880983 12.4377L12.7099 10.7188L18 0Z" fill={color ?? "#FFCC00"} />
+    <path
+      d="M18 0L23.2901 10.7188L35.119 12.4377L26.5595 20.7812L28.5801 32.5623L18 27L7.41987 32.5623L9.44049 20.7812L0.880983 12.4377L12.7099 10.7188L18 0Z"
+      fill={color ?? "#FFCC00"}
+    />
   </svg>
 );
 
@@ -494,16 +502,36 @@ export const IconAdd = ({ color, ...rest }: IconProps) => (
     {...rest}
   >
     <rect x="17" y="7" width="2" height="22" rx="1" fill={color ?? "#CFCFCF"} />
-    <rect x="29" y="17" width="2" height="22" rx="1" transform="rotate(90 29 17)" fill={color ?? "#CFCFCF"} />
+    <rect
+      x="29"
+      y="17"
+      width="2"
+      height="22"
+      rx="1"
+      transform="rotate(90 29 17)"
+      fill={color ?? "#CFCFCF"}
+    />
   </svg>
 );
 
 export const IconDelete = ({ color, ...rest }: IconProps) => (
-  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" {...rest}>
-    <path d="M1.6959 10.302C1.4347 10.038 1.4347 9.61 1.6959 9.34601L9.26298 1.69799C9.52418 1.434 9.94766 1.434 10.2089 1.69799C10.4701 1.96199 10.4701 2.39 10.2089 2.654L2.64178 10.302C2.38058 10.566 1.9571 10.566 1.6959 10.302Z"
-      fill={color ?? "#585858"} />
-    <path d="M10.3041 10.302C10.5653 10.038 10.5653 9.61 10.3041 9.34601L2.73702 1.69799C2.47582 1.434 2.05234 1.434 1.79114 1.69799C1.52994 1.96199 1.52994 2.39 1.79114 2.654L9.35822 10.302C9.61941 10.566 10.0429 10.566 10.3041 10.302Z"
-      fill={color ?? "#585858"} />
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 12 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+    {...rest}
+  >
+    <path
+      d="M1.6959 10.302C1.4347 10.038 1.4347 9.61 1.6959 9.34601L9.26298 1.69799C9.52418 1.434 9.94766 1.434 10.2089 1.69799C10.4701 1.96199 10.4701 2.39 10.2089 2.654L2.64178 10.302C2.38058 10.566 1.9571 10.566 1.6959 10.302Z"
+      fill={color ?? "#585858"}
+    />
+    <path
+      d="M10.3041 10.302C10.5653 10.038 10.5653 9.61 10.3041 9.34601L2.73702 1.69799C2.47582 1.434 2.05234 1.434 1.79114 1.69799C1.52994 1.96199 1.52994 2.39 1.79114 2.654L9.35822 10.302C9.61941 10.566 10.0429 10.566 10.3041 10.302Z"
+      fill={color ?? "#585858"}
+    />
   </svg>
 );
 
@@ -536,5 +564,24 @@ export const IconCamera = ({ color, ...rest }: IconProps) => (
       fill={color ?? "white"}
     />
     <circle cx="6" cy="6.5" r="2" fill={color ?? "#CFCFCF"} />
+  </svg>
+);
+
+export const IconUnSignInUser = () => (
+  <svg
+    width="64"
+    height="64"
+    viewBox="0 0 64 64"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="32" cy="32" r="32" fill="#FFEFE5" />
+    <circle cx="32" cy="22" r="6" fill="#FFDFCB" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M32.4738 62.6548H31.5252C31.6827 62.66 31.8408 62.6626 31.9995 62.6626C32.1582 62.6626 32.3163 62.66 32.4738 62.6548ZM46.8833 44.6616C47.0116 45.7588 46.1038 46.6587 44.999 46.6587H18.9999C17.8952 46.6587 16.9873 45.7589 17.1156 44.6616C18.0387 36.7695 24.3505 30.6626 31.9995 30.6626C39.6484 30.6626 45.9602 36.7695 46.8833 44.6616Z"
+      fill="#FFDFCB"
+    />
   </svg>
 );
