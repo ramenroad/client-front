@@ -12,7 +12,7 @@ const MyPage = () => {
 
   return (
     <Layout>
-      <TopBar title="마이페이지" navigate="/main" />
+      <TopBar title="마이페이지" navigate="/" />
       <CardLayout
         onClick={() => {
           if (userInformationQuery.data) {
