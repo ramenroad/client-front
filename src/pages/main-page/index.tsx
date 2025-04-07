@@ -67,6 +67,8 @@ const MainPage = () => {
                 subTitle={data.genre[0]}
                 image={data.thumbnailUrl ?? ""}
                 onClick={() => navigate(`/detail/${data._id}`)}
+                type={group.type}
+                region={data.region}
               />
             ))}
           </GroupListWrapper>

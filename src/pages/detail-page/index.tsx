@@ -39,7 +39,6 @@ const dayMapping: { [key: string]: string } = {
   sun: "일요일",
 };
 
-
 export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
@@ -84,9 +83,11 @@ export const DetailPage = () => {
         <MarketDetailWrapper>
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
-
             <MarketDetailBox>
-              <DetailIconTag icon={<IconStarMedium color="#CFCFCF" />} text="평점" />
+              <DetailIconTag
+                icon={<IconStarMedium color="#CFCFCF" />}
+                text="평점"
+              />
               <MarketDetailReviewBox>
                 <StarContainer>
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -94,17 +95,18 @@ export const DetailPage = () => {
                       key={star}
                       color={
                         (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
-                          Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
+                        Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
                           ? "#FFCC00"
                           : "#E1E1E1"
                       }
                     />
                   ))}
                 </StarContainer>
-                <MarketDetailReviewScore>{ramenyaDetailQuery.data?.rating?.toFixed(1) || "0.0"}</MarketDetailReviewScore>
+                <MarketDetailReviewScore>
+                  {ramenyaDetailQuery.data?.rating?.toFixed(1) || "0.0"}
+                </MarketDetailReviewScore>
               </MarketDetailReviewBox>
             </MarketDetailBox>
-
 
             <MarketDetailBox>
               <DetailIconTag icon={<IconTag />} text="장르" />
@@ -247,15 +249,21 @@ export const DetailPage = () => {
 
           <Divider />
 
-
           <ImageTitle>사진</ImageTitle>
           <ImageContainer>
-            {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.slice(0, 5).map((image: string, index: number) => (
-              <Image key={index} src={image} />
-            ))}
-            {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
+            {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls
+              ?.slice(0, 5)
+              .map((image: string, index: number) => (
+                <Image key={index} src={image} />
+              ))}
+            {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length >
+              5 && (
               <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
-                <Image src={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
+                <Image
+                  src={
+                    ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]
+                  }
+                />
                 <MoreOverlay>
                   <MoreText>더보기</MoreText>
                   <IconArrowRight color="#FFFFFF" />
@@ -267,15 +275,13 @@ export const DetailPage = () => {
           <Divider />
 
           <ReviewWrapper>
-
             <ReviewHeader>
               <ReviewHeaderTitle>
-                <ReviewerName>
-                  라멘로드
-                </ReviewerName>
-                님 리뷰를 남겨주세요
+                <ReviewerName>라멘로드</ReviewerName>님 리뷰를 남겨주세요
               </ReviewHeaderTitle>
-              <LargeStarContainer onClick={() => navigate(`/review/create/${id}`)}>
+              <LargeStarContainer
+                onClick={() => navigate(`/review/create/${id}`)}
+              >
                 <IconStarLarge color="#E1E1E1" />
                 <IconStarLarge color="#E1E1E1" />
                 <IconStarLarge color="#E1E1E1" />
@@ -291,35 +297,41 @@ export const DetailPage = () => {
 
               <ReviewCardContainer>
                 {ramenyaDetailQuery.data?.reviews
-                  ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                  ?.sort(
+                    (a, b) =>
+                      new Date(b.createdAt).getTime() -
+                      new Date(a.createdAt).getTime()
+                  )
                   .slice(0, 3)
                   .map((review) => (
                     <React.Fragment key={review._id}>
                       <ReviewCard review={review} />
                       <ReviewDivider />
                     </React.Fragment>
-                  ))
-                }
+                  ))}
               </ReviewCardContainer>
-
 
               <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
                 <span>모든 리뷰 보기</span>
                 <IconArrowRight />
               </AllReviewButton>
             </ReviewContent>
-
           </ReviewWrapper>
 
           <Divider />
 
-          <LocationTitle>위치</LocationTitle>
-          <LocationWrapper>
-            <KakaoMap
-              latitude={ramenyaDetailQuery.data?.latitude}
-              longitude={ramenyaDetailQuery.data?.longitude}
-            />
-          </LocationWrapper>
+          {ramenyaDetailQuery.data?.latitude &&
+            ramenyaDetailQuery.data?.longitude && (
+              <>
+                <LocationTitle>위치</LocationTitle>
+                <LocationWrapper>
+                  <KakaoMap
+                    latitude={ramenyaDetailQuery.data?.latitude}
+                    longitude={ramenyaDetailQuery.data?.longitude}
+                  />
+                </LocationWrapper>
+              </>
+            )}
         </MarketDetailWrapper>
       </Container>
     </Wrapper>
@@ -347,8 +359,6 @@ const ThumbnailContainer = tw.div`
 const EmptyThumbnail = tw.img`
   w-190
 `;
-
-
 
 const MarketDetailWrapper = tw.div`
   flex flex-col px-20 gap-16
@@ -489,7 +499,6 @@ const RecommendText = tw.div`
 const RecommendTitle = tw.div`
   font-16-sb text-center
 `;
-
 
 const QuoteStartImage = tw.img`
   w-30 h-22

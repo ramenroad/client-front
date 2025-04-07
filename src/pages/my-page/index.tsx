@@ -1,6 +1,10 @@
 import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
-import { IconArrowRight, IconUnSignInUser } from "../../components/Icon";
+import {
+  IconArrowRight,
+  IconUnSignInUser,
+  IconUnSignInUserProfile,
+} from "../../components/Icon";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 import { useNavigate } from "react-router-dom";
@@ -31,9 +35,13 @@ const MyPage = () => {
           </CardLeftSection>
 
           <CardRightSection>
-            <UserProfileImage
-              src={userInformationQuery.data?.profileImageUrl}
-            />
+            {userInformationQuery.data?.profileImageUrl ? (
+              <UserProfileImage
+                src={userInformationQuery.data?.profileImageUrl}
+              />
+            ) : (
+              <IconUnSignInUserProfile />
+            )}
           </CardRightSection>
         </CardLayout>
       ) : (
