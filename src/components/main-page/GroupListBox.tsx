@@ -18,7 +18,7 @@ export const GroupListBox = ({
   region,
 }: GroupListBoxProps) => {
   switch (type) {
-    case 2:
+    case 1:
       return (
         <Wrapper onClick={onClick}>
           <GroupListImage src={image} />
@@ -28,7 +28,7 @@ export const GroupListBox = ({
           </TextBox>
         </Wrapper>
       );
-    case 1:
+    case 2:
       return (
         <GroupListRoundedWrapper onClick={onClick}>
           <GroupListImageWrapper>
