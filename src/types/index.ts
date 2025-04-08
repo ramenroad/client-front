@@ -79,6 +79,7 @@ export interface RamenyaGroup {
   isShown: boolean;
   ramenyas: Ramenya[];
   descriptionImageUrl: string;
+  type: number;
 }
 
 export interface Coordinate {

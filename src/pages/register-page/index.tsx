@@ -3,6 +3,7 @@ import TopBar from "../../components/common/TopBar";
 import { useEffect, useState } from "react";
 import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
 import styled from "@emotion/styled";
+import { Button } from "../../components/common/Button";
 
 const RegisterPage = () => {
   const query = new URLSearchParams(window.location.search);
@@ -26,7 +27,7 @@ const RegisterPage = () => {
   }, [params]);
 
   return (
-    <>
+    <Layout>
       <TopBar title="" navigate={params ? "/mypage" : undefined} />
       <Wrapper>
         <DescriptionWrapper>
@@ -59,9 +60,14 @@ const RegisterPage = () => {
           {params ? "변경 완료" : "완료"}
         </Button>
       </Wrapper>
-    </>
+    </Layout>
   );
 };
+
+const Layout = tw.div`
+  flex flex-col
+  w-full h-full
+`;
 
 const Wrapper = tw.div`
   flex flex-col
@@ -99,14 +105,6 @@ const Input = tw.input`
     focus:outline-none
     px-20 py-10
     text-black font-16-m
-`;
-
-const Button = tw.button`
-  w-350 h-44
-  bg-orange rounded-8 border-none
-  text-white
-  mb-40
-  disabled:bg-gray-200 disabled:cursor-not-allowed cursor-pointer
 `;
 
 export default RegisterPage;

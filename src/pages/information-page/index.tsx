@@ -1,7 +1,11 @@
 import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
 import styled from "@emotion/styled";
-import { IconCamera, IconArrowRight } from "../../components/Icon";
+import {
+  IconCamera,
+  IconArrowRight,
+  IconUnSignInUserProfile,
+} from "../../components/Icon";
 import { useNavigate } from "react-router-dom";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
@@ -32,10 +36,14 @@ const InformationPage = () => {
               document.getElementById("profileImageInput")?.click()
             }
           >
-            <ProfileImage
-              src={userInformationQuery.data?.profileImageUrl}
-              alt="profile"
-            />
+            {userInformationQuery.data?.profileImageUrl ? (
+              <ProfileImage
+                src={userInformationQuery.data?.profileImageUrl}
+                alt="profile"
+              />
+            ) : (
+              <IconUnSignInUserProfile />
+            )}
             <ProfileImageEditButton>
               <IconCamera />
             </ProfileImageEditButton>

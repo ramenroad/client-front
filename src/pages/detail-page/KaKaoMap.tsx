@@ -42,10 +42,7 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
 
           try {
             const map = new window.kakao.maps.Map(container, {
-              center: new window.kakao.maps.LatLng(
-                latitude || 33.450701,
-                longitude || 126.570667
-              ),
+              center: new window.kakao.maps.LatLng(latitude, longitude),
               level: 3,
             });
 
@@ -66,7 +63,9 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
       document.head.appendChild(script);
     };
 
-    loadKakaoMap();
+    if (latitude && longitude) {
+      loadKakaoMap();
+    }
 
     return () => {
       const script = document.querySelector(

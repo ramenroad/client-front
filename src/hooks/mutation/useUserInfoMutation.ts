@@ -3,14 +3,16 @@ import { updateUserImage, updateUserNickname } from "../../api/auth";
 import { queryClient } from "../../core/queryClient";
 import { queryKeys } from "../queries/queryKeys";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../../components/ToastProvider";
 
 export const useUserInfoMutation = () => {
   const navigate = useNavigate();
+  const { openToast } = useToast();
 
   const userInfoMutation = useMutation({
     mutationFn: (formData: FormData) => updateUserImage(formData),
     onSuccess: () => {
-      alert("프로필 이미지 업데이트 성공");
+      openToast("프로필 이미지 업데이트 성공");
       queryClient.invalidateQueries({
         ...queryKeys.user.information,
       });
@@ -20,7 +22,7 @@ export const useUserInfoMutation = () => {
   const updateNicknameMutation = useMutation({
     mutationFn: (nickname: string) => updateUserNickname(nickname),
     onSuccess: () => {
-      alert("닉네임 업데이트 성공");
+      openToast("닉네임 업데이트 성공");
       queryClient.invalidateQueries({
         ...queryKeys.user.information,
       });
