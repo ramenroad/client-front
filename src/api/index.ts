@@ -10,7 +10,7 @@ export const createAxiosInstance = (
   versioning: boolean = true
 ) => {
   const instance = axios.create({
-    baseURL: !isProduction
+    baseURL: isProduction
       ? `https://ramenroad.com/api${versioning ? "/v1" : "/"}`
       : `http://localhost:3000${versioning ? "/v1" : "/"}`,
     headers: {
