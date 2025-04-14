@@ -12,4 +12,7 @@ export const getReviewImages = async (reviewId: string) => {
   return response.data;
 };
 
-
+export const deleteReview = async (reviewId: string) => {
+  const response = await instanceWithNoVersioning.delete(`/review/${reviewId}`);
+  return response.data;
+};

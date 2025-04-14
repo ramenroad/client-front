@@ -7,8 +7,11 @@ import { UserReview } from '../../types'
 import { useModal } from '../../hooks/common/useModal'
 import { Modal } from '../../components/common/Modal'
 import { useUserInformationQuery } from '../../hooks/queries/useUserInformationQuery'
+import { useRamenyaReviewDeleteMutation } from '../../hooks/queries/useRamenyaReviewQuery'
+
 export const ReviewCard = ({ review }: { review: UserReview }) => {
     const { userInformationQuery } = useUserInformationQuery();
+    const { mutate: deleteReview } = useRamenyaReviewDeleteMutation();
     const { isOpen, open, close } = useModal()
     const [isExpanded, setIsExpanded] = React.useState(false)
     const MAX_TEXT_LENGTH = 97
@@ -32,9 +35,13 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
         return `${year}.${month}.${day}`;
     }
 
-    const handleDeleteReview = () => {
-        console.log('삭제')
+    const handleOpenDeleteModal = () => {
         open()
+    }
+
+    const handleDeleteReview = () => {
+        deleteReview(review._id)
+        close()
     }
 
     return (
@@ -48,7 +55,7 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                         </ReviewerName>
                     </ReviewNameBox>
 
-                    {review.userId._id === userInformationQuery.data?._id && <ReviewDeleteButton onClick={handleDeleteReview}>
+                    {review.userId._id === userInformationQuery.data?._id && <ReviewDeleteButton onClick={handleOpenDeleteModal}>
                         삭제
                     </ReviewDeleteButton>}
                 </ReviewHeader>
@@ -119,7 +126,7 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                         </ModalTitle>
                         <ModalButtonBox>
                             <ModalCancelButton onClick={close}>취소</ModalCancelButton>
-                            <ModalConfirmButton>삭제</ModalConfirmButton>
+                            <ModalConfirmButton onClick={handleDeleteReview}>삭제</ModalConfirmButton>
                         </ModalButtonBox>
                     </ModalContent>
                 </Modal>
