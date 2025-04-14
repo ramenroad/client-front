@@ -6,16 +6,11 @@ import { IconStarMedium } from '../../components/Icon'
 import { UserReview } from '../../types'
 import { useModal } from '../../hooks/common/useModal'
 import { Modal } from '../../components/common/Modal'
+import { useUserInformationQuery } from '../../hooks/queries/useUserInformationQuery'
 export const ReviewCard = ({ review }: { review: UserReview }) => {
+    const { userInformationQuery } = useUserInformationQuery();
     const { isOpen, open, close } = useModal()
     const [isExpanded, setIsExpanded] = React.useState(false)
-    // const dummyImages = [
-    //     'https://placehold.co/600x400',
-    //     'https://placehold.co/600x400',
-    //     'https://placehold.co/600x400',
-    //     'https://placehold.co/600x400',
-    //     'https://placehold.co/600x400',
-    // ]
     const MAX_TEXT_LENGTH = 97
     const isTextLong = review.review.length > MAX_TEXT_LENGTH
 
@@ -53,9 +48,9 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                         </ReviewerName>
                     </ReviewNameBox>
 
-                    <ReviewDeleteButton onClick={handleDeleteReview}>
+                    {review.userId._id === userInformationQuery.data?._id && <ReviewDeleteButton onClick={handleDeleteReview}>
                         삭제
-                    </ReviewDeleteButton>
+                    </ReviewDeleteButton>}
                 </ReviewHeader>
 
                 <ReviewScore>

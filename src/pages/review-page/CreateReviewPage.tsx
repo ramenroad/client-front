@@ -124,6 +124,7 @@ export const CreateReviewPage = () => {
             ...data,
             menus: Array.isArray(data.menus) ? data.menus.join(',') : data.menus
         };
+        console.log(reviewData);
         createReview(reviewData);
         //navigate(-1);
     };
