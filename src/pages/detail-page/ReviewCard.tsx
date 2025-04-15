@@ -8,10 +8,12 @@ import { useModal } from '../../hooks/common/useModal'
 import { Modal } from '../../components/common/Modal'
 import { useUserInformationQuery } from '../../hooks/queries/useUserInformationQuery'
 import { useRamenyaReviewDeleteMutation } from '../../hooks/queries/useRamenyaReviewQuery'
+import { useRamenyaDetailQuery } from '../../hooks/queries/useRamenyaDetailQuery'
 
 export const ReviewCard = ({ review }: { review: UserReview }) => {
     const { userInformationQuery } = useUserInformationQuery();
     const { mutate: deleteReview } = useRamenyaReviewDeleteMutation();
+    const { refetch: refetchRamenyaDetail } = useRamenyaDetailQuery(review.ramenyaId);
     const { isOpen, open, close } = useModal()
     const [isExpanded, setIsExpanded] = React.useState(false)
     const MAX_TEXT_LENGTH = 97
@@ -40,8 +42,12 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
     }
 
     const handleDeleteReview = () => {
-        deleteReview(review._id)
-        close()
+        deleteReview(review._id, {
+            onSuccess: () => {
+                refetchRamenyaDetail();
+                close();
+            }
+        });
     }
 
     return (
@@ -106,14 +112,6 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                             totalImages={review.reviewImageUrls?.length || 0}
                         />
                     ))}
-                    {/* {dummyImages.map((image, index) => (
-                        <ReviewImage
-                            key={index}
-                            src={image}
-                            index={index}
-                            totalImages={dummyImages.length}
-                        />
-                    ))} */}
                 </ReviewImages>
             </Wrapper>
             {isOpen &&
