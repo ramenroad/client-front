@@ -47,6 +47,8 @@ export const CreateReviewPage = () => {
 
   const fileInputRef = createRef<HTMLInputElement>();
 
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+
   useEffect(() => {
     const hasChanges =
       isDirty ||
@@ -63,6 +65,23 @@ export const CreateReviewPage = () => {
     formValues.menus,
     formValues.review,
   ]);
+
+  useEffect(() => {
+    // 이미지 URL 생성
+    const urls = formValues.reviewImages?.map(image =>
+      image instanceof File ? URL.createObjectURL(image) : image
+    ) || [];
+    setImageUrls(urls);
+
+    // cleanup 함수
+    return () => {
+      urls.forEach(url => {
+        if (url.startsWith('blob:')) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [formValues.reviewImages]);
 
   const handleStarClick = (index: number) => {
     setValue("rating", index, { shouldValidate: true });
@@ -302,11 +321,7 @@ export const CreateReviewPage = () => {
                 {formValues.reviewImages?.map((image, index) => (
                   <ImagePreviewContainer key={index}>
                     <ImagePreview
-                      src={
-                        image instanceof File
-                          ? URL.createObjectURL(image)
-                          : image
-                      }
+                      src={imageUrls[index]}
                       alt={`업로드 이미지 ${index + 1}`}
                     />
                     <ImageRemoveButton
