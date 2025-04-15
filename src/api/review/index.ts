@@ -1,4 +1,3 @@
-import { Review } from "../../types";
 import { instanceWithNoVersioning } from "../index";
 
 export const postReview = async (data: FormData) => {

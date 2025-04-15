@@ -15,7 +15,8 @@ import { Modal } from "../../components/common/Modal";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 export const CreateReviewPage = () => {
   const { id } = useParams();
-  const { mutate: createReview, isPending: isSubmitting } = useRamenyaReviewMutation();
+  const { mutate: createReview, isPending: isSubmitting } =
+    useRamenyaReviewMutation();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,15 +69,16 @@ export const CreateReviewPage = () => {
 
   useEffect(() => {
     // 이미지 URL 생성
-    const urls = formValues.reviewImages?.map(image =>
-      image instanceof File ? URL.createObjectURL(image) : image
-    ) || [];
+    const urls =
+      formValues.reviewImages?.map((image) =>
+        image instanceof File ? URL.createObjectURL(image) : image
+      ) || [];
     setImageUrls(urls);
 
     // cleanup 함수
     return () => {
-      urls.forEach(url => {
-        if (url.startsWith('blob:')) {
+      urls.forEach((url) => {
+        if (url.startsWith("blob:")) {
           URL.revokeObjectURL(url);
         }
       });
@@ -177,7 +179,7 @@ export const CreateReviewPage = () => {
         onError: (error) => {
           console.error("리뷰 업로드 중 에러 발생:", error);
           alert("리뷰 업로드에 실패했습니다.");
-        }
+        },
       });
     } catch (error) {
       console.error("리뷰 업로드 중 에러 발생:", error);
@@ -318,7 +320,7 @@ export const CreateReviewPage = () => {
 
             <ImageUploadContent>
               <ImageUploadContentImage>
-                {formValues.reviewImages?.map((image, index) => (
+                {formValues.reviewImages?.map((_, index) => (
                   <ImagePreviewContainer key={index}>
                     <ImagePreview
                       src={imageUrls[index]}
@@ -353,7 +355,7 @@ export const CreateReviewPage = () => {
             active={isFormValid}
             disabled={!isFormValid || isSubmitting}
           >
-            {isSubmitting ? '등록중...' : '등록하기'}
+            {isSubmitting ? "등록중..." : "등록하기"}
           </AddReviewButton>
         </ContentsWrapper>
       </form>
@@ -443,7 +445,7 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
     cursor-pointer
     `,
   selected &&
-  tw`
+    tw`
         border-orange
         text-orange
     `,
@@ -607,17 +609,19 @@ interface AddReviewButtonProps {
   disabled?: boolean;
 }
 
-const AddReviewButton = styled.button<AddReviewButtonProps>(({ active, disabled }) => [
-  tw`
+const AddReviewButton = styled.button<AddReviewButtonProps>(
+  ({ active, disabled }) => [
+    tw`
     flex items-center justify-center
     mt-32
     w-full h-48 rounded-8 text-white
     px-10 py-10 bg-gray-200
     border-none box-border
     `,
-  active && !disabled && tw`bg-orange cursor-pointer`,
-  (!active || disabled) && tw`cursor-not-allowed`,
-]);
+    active && !disabled && tw`bg-orange cursor-pointer`,
+    (!active || disabled) && tw`cursor-not-allowed`,
+  ]
+);
 
 const StarButton = tw.button`
     bg-transparent border-none cursor-pointer p-0 m-0
