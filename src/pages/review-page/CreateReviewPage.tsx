@@ -15,7 +15,7 @@ import { Modal } from "../../components/common/Modal";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 export const CreateReviewPage = () => {
   const { id } = useParams();
-  const { mutate: createReview } = useRamenyaReviewMutation();
+  const { mutate: createReview, isPending: isSubmitting } = useRamenyaReviewMutation();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -151,8 +151,15 @@ export const CreateReviewPage = () => {
         });
       }
 
-      await createReview(formData);
-      navigate(-1);
+      await createReview(formData, {
+        onSuccess: () => {
+          navigate(-1);
+        },
+        onError: (error) => {
+          console.error("리뷰 업로드 중 에러 발생:", error);
+          alert("리뷰 업로드에 실패했습니다.");
+        }
+      });
     } catch (error) {
       console.error("리뷰 업로드 중 에러 발생:", error);
       alert("리뷰 업로드에 실패했습니다.");
@@ -329,10 +336,9 @@ export const CreateReviewPage = () => {
 
           <AddReviewButton
             active={isFormValid}
-            type="submit"
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSubmitting}
           >
-            등록하기
+            {isSubmitting ? '등록중...' : '등록하기'}
           </AddReviewButton>
         </ContentsWrapper>
       </form>
@@ -422,7 +428,7 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
     cursor-pointer
     `,
   selected &&
-    tw`
+  tw`
         border-orange
         text-orange
     `,
@@ -586,7 +592,7 @@ interface AddReviewButtonProps {
   disabled?: boolean;
 }
 
-const AddReviewButton = styled.button<AddReviewButtonProps>(({ active }) => [
+const AddReviewButton = styled.button<AddReviewButtonProps>(({ active, disabled }) => [
   tw`
     flex items-center justify-center
     mt-32
@@ -594,8 +600,8 @@ const AddReviewButton = styled.button<AddReviewButtonProps>(({ active }) => [
     px-10 py-10 bg-gray-200
     border-none box-border
     `,
-  active && tw`bg-orange cursor-pointer`,
-  !active && tw`cursor-not-allowed`,
+  active && !disabled && tw`bg-orange cursor-pointer`,
+  (!active || disabled) && tw`cursor-not-allowed`,
 ]);
 
 const StarButton = tw.button`
