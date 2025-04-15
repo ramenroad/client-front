@@ -111,4 +111,5 @@ export interface UserReview extends Review {
   };
   createdAt: Date;
   updatedAt: Date;
+  reviewImageUrls?: string[];
 }
