@@ -1,4 +1,4 @@
-import { getReviewImages, postReview } from "../../api/review";
+import { deleteReview, getReviewImages, postReview } from "../../api/review";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useRamenyaReviewMutation = () => {
@@ -7,9 +7,17 @@ export const useRamenyaReviewMutation = () => {
   });
 };
 
+
+
 export const useRamenyaReviewImagesQuery = (reviewId: string) => {
   return useQuery({
     queryKey: ["ramenyaReviewImages", reviewId],
     queryFn: () => getReviewImages(reviewId),
+  });
+};
+
+export const useRamenyaReviewDeleteMutation = () => {
+  return useMutation({
+    mutationFn: deleteReview,
   });
 };

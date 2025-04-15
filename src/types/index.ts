@@ -98,8 +98,8 @@ export interface Review {
   ramenyaId: string;
   rating: number;
   review: string;
-  menus: string[] | string;
-  reviewImageUrls?: string[];
+  menus: string;
+  reviewImages?: File[];
 }
 
 export interface UserReview extends Review {
@@ -111,4 +111,5 @@ export interface UserReview extends Review {
   };
   createdAt: Date;
   updatedAt: Date;
+  reviewImageUrls?: string[];
 }

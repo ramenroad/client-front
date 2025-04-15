@@ -6,16 +6,16 @@ import { IconStarMedium } from '../../components/Icon'
 import { UserReview } from '../../types'
 import { useModal } from '../../hooks/common/useModal'
 import { Modal } from '../../components/common/Modal'
+import { useUserInformationQuery } from '../../hooks/queries/useUserInformationQuery'
+import { useRamenyaReviewDeleteMutation } from '../../hooks/queries/useRamenyaReviewQuery'
+import { useRamenyaDetailQuery } from '../../hooks/queries/useRamenyaDetailQuery'
+
 export const ReviewCard = ({ review }: { review: UserReview }) => {
+    const { userInformationQuery } = useUserInformationQuery();
+    const { mutate: deleteReview } = useRamenyaReviewDeleteMutation();
+    const { refetch: refetchRamenyaDetail } = useRamenyaDetailQuery(review.ramenyaId);
     const { isOpen, open, close } = useModal()
     const [isExpanded, setIsExpanded] = React.useState(false)
-    // const dummyImages = [
-    //     'https://placehold.co/600x400',
-    //     'https://placehold.co/600x400',
-    //     'https://placehold.co/600x400',
-    //     'https://placehold.co/600x400',
-    //     'https://placehold.co/600x400',
-    // ]
     const MAX_TEXT_LENGTH = 97
     const isTextLong = review.review.length > MAX_TEXT_LENGTH
 
@@ -37,9 +37,17 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
         return `${year}.${month}.${day}`;
     }
 
-    const handleDeleteReview = () => {
-        console.log('삭제')
+    const handleOpenDeleteModal = () => {
         open()
+    }
+
+    const handleDeleteReview = () => {
+        deleteReview(review._id, {
+            onSuccess: () => {
+                refetchRamenyaDetail();
+                close();
+            }
+        });
     }
 
     return (
@@ -53,9 +61,9 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                         </ReviewerName>
                     </ReviewNameBox>
 
-                    <ReviewDeleteButton onClick={handleDeleteReview}>
+                    {review.userId._id === userInformationQuery.data?._id && <ReviewDeleteButton onClick={handleOpenDeleteModal}>
                         삭제
-                    </ReviewDeleteButton>
+                    </ReviewDeleteButton>}
                 </ReviewHeader>
 
                 <ReviewScore>
@@ -104,14 +112,6 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                             totalImages={review.reviewImageUrls?.length || 0}
                         />
                     ))}
-                    {/* {dummyImages.map((image, index) => (
-                        <ReviewImage
-                            key={index}
-                            src={image}
-                            index={index}
-                            totalImages={dummyImages.length}
-                        />
-                    ))} */}
                 </ReviewImages>
             </Wrapper>
             {isOpen &&
@@ -124,7 +124,7 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                         </ModalTitle>
                         <ModalButtonBox>
                             <ModalCancelButton onClick={close}>취소</ModalCancelButton>
-                            <ModalConfirmButton>삭제</ModalConfirmButton>
+                            <ModalConfirmButton onClick={handleDeleteReview}>삭제</ModalConfirmButton>
                         </ModalButtonBox>
                     </ModalContent>
                 </Modal>
