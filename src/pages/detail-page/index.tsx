@@ -29,6 +29,7 @@ import { ReviewCard } from "./ReviewCard";
 import TopBar from "../../components/common/TopBar";
 import React from "react";
 import { useRamenyaReviewImagesQuery } from "../../hooks/queries/useRamenyaReviewQuery";
+import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
   tue: "화요일",
@@ -43,6 +44,7 @@ export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
+  const userInformationQuery = useUserInformationQuery();
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
 
@@ -281,7 +283,7 @@ export const DetailPage = () => {
         <ReviewWrapper>
           <ReviewHeader>
             <ReviewHeaderTitle>
-              <ReviewerName>라멘로드</ReviewerName>님 리뷰를 남겨주세요
+              <ReviewerName>{userInformationQuery.data?.nickname}</ReviewerName>님 리뷰를 남겨주세요
             </ReviewHeaderTitle>
             <LargeStarContainer
               onClick={() => navigate(`/review/create/${id}`)}

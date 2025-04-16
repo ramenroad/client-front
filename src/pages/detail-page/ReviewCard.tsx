@@ -11,7 +11,7 @@ import { useRamenyaReviewDeleteMutation } from '../../hooks/queries/useRamenyaRe
 import { useRamenyaDetailQuery } from '../../hooks/queries/useRamenyaDetailQuery'
 
 export const ReviewCard = ({ review }: { review: UserReview }) => {
-    const { userInformationQuery } = useUserInformationQuery();
+    const userInformationQuery = useUserInformationQuery();
     const { mutate: deleteReview } = useRamenyaReviewDeleteMutation();
     const { refetch: refetchRamenyaDetail } = useRamenyaDetailQuery(review.ramenyaId);
     const { isOpen, open, close } = useModal()
