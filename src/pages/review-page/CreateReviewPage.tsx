@@ -68,14 +68,14 @@ export const CreateReviewPage = () => {
   ]);
 
   useEffect(() => {
-    // 이미지 URL 생성
     const urls =
-      formValues.reviewImages?.map((image) =>
-        image instanceof File ? URL.createObjectURL(image) : image
-      ) || [];
+      formValues.reviewImages?.map((image) => {
+        if (image instanceof File) {
+          return URL.createObjectURL(image);
+        }
+        return image;
+      }) || [];
     setImageUrls(urls);
-
-    // cleanup 함수
     return () => {
       urls.forEach((url) => {
         if (url.startsWith("blob:")) {
@@ -144,6 +144,11 @@ export const CreateReviewPage = () => {
     setValue("reviewImages", [...currentImages, ...newImages], {
       shouldValidate: true,
     });
+
+    // 파일 입력 필드 리셋
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleImageClick = () => {
@@ -445,7 +450,7 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
     cursor-pointer
     `,
   selected &&
-    tw`
+  tw`
         border-orange
         text-orange
     `,
@@ -582,6 +587,7 @@ const ImagePreviewContainer = tw.div`
 const ImagePreview = tw.img`
     w-full h-full
     object-cover
+    rounded-8
 `;
 
 const ImageRemoveButton = tw.button`
