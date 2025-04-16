@@ -496,6 +496,7 @@ const RecommendMenuPrice = tw.div`
 
 const RecommendTextContainer = tw.div`
   flex flex-col p-20 gap-4
+  w-350 box-border
   bg-orange/[0.02] border-solid border-1 border-orange/30 rounded-8
 `;
 
