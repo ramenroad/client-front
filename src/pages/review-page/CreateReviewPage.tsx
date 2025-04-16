@@ -13,6 +13,7 @@ import { useRamenyaReviewMutation } from "../../hooks/queries/useRamenyaReviewQu
 import { useNavigate, useParams } from "react-router-dom";
 import { Modal } from "../../components/common/Modal";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
+import { css } from "@emotion/react";
 export const CreateReviewPage = () => {
   const { id } = useParams();
   const { mutate: createReview, isPending: isSubmitting } =
@@ -383,14 +384,18 @@ export const CreateReviewPage = () => {
 };
 
 const Wrapper = tw.div`
-    flex flex-col pb-40
+    flex 
+    flex-col 
+    w-full
+    pb-40
 `;
 
 const Header = tw.div`
 `;
 
 const ContentsWrapper = tw.div`
-    flex flex-col
+    flex 
+    flex-col
     px-20
 `;
 
@@ -466,14 +471,17 @@ const MenuAddTitle = tw.div`
 
 const MenuInputContainer = tw.div`
     flex items-center gap-4
+    
 `;
 
 const MenuInput = tw.input`
     flex-1 h-44 rounded-8 
     bg-border box-border
-    border-none
     px-12 py-10
     font-16-r
+    border-none
+    outline-none
+    focus-within:(border-orange border-solid border-1)
 `;
 
 const MenuAddButton = tw.button`
@@ -497,20 +505,24 @@ const ReviewTextAreaContainer = tw.div`
     rounded-8
     px-12 pt-10
     pb-36
+    border-none
+    outline-none
+    focus-within:(border-orange border-solid border-1)
 `;
 
-const ReviewDescriptionTextarea = styled.textarea`
-  ${tw`
-        flex h-214 w-full 
-        bg-transparent
-        border-none
-        font-16-r
-    `}
-
-  /* 스크롤바 스타일링 */
+const ReviewDescriptionTextarea = styled.textarea(() => [
+  tw`
+    flex h-214 w-350
+    bg-transparent
+    border-none
+    font-16-r
+    resize-none
+    outline-none
+    `,
+  css`
     &::-webkit-scrollbar {
-    width: 4px;
-  }
+      width: 4px;
+    }
 
   &::-webkit-scrollbar-track {
     background: transparent;
@@ -520,7 +532,8 @@ const ReviewDescriptionTextarea = styled.textarea`
     background: #d9d9d9;
     border-radius: 3px;
   }
-`;
+  `,
+]);
 
 // 글자 수 표시 스타일
 const CharacterCount = tw.div`
