@@ -111,6 +111,7 @@ export const CreateReviewPage = () => {
   const handleAddCustomMenu = () => {
     if (customMenuInput.trim() !== "" && !menuList.includes(customMenuInput)) {
       setMenuList([...menuList, customMenuInput]);
+      handleMenuClick(customMenuInput);
       setCustomMenuInput("");
     }
   };
@@ -276,7 +277,7 @@ export const CreateReviewPage = () => {
               <MenuInput
                 value={customMenuInput}
                 onChange={(e) => setCustomMenuInput(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 placeholder="메뉴명을 입력해주세요"
               />
               <MenuAddButton onClick={handleAddCustomMenu} type="button">
