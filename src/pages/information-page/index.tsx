@@ -14,7 +14,7 @@ import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 const InformationPage = () => {
   const navigate = useNavigate();
 
-  const { userInformationQuery } = useUserInformationQuery();
+  const userInformationQuery = useUserInformationQuery();
   const { userInfoMutation } = useUserInfoMutation();
   const { logout } = useAuthMutation();
 

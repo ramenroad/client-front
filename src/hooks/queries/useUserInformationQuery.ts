@@ -6,11 +6,9 @@ import { useSignInStore } from "../../states/sign-in";
 export const useUserInformationQuery = () => {
   const { accessToken } = useSignInStore();
 
-  const userInformationQuery = useQuery({
+  return useQuery({
     ...queryKeys.user.information,
     queryFn: getUserInformation,
     enabled: !!accessToken,
   });
-
-  return { userInformationQuery };
 };

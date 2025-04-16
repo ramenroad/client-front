@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/common/Button";
 
 const MyPage = () => {
-  const { userInformationQuery } = useUserInformationQuery();
+  const userInformationQuery = useUserInformationQuery();
   const { logout } = useAuthMutation();
   const navigate = useNavigate();
 
