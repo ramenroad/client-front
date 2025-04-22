@@ -1,16 +1,16 @@
-import pig from "../assets/images/pig.png";
-import sio from "../assets/images/sio.png";
-import soy from "../assets/images/soy.png";
-import iekei from "../assets/images/iekei.png";
-import jiro from "../assets/images/jiro.png";
-import toripaitan from "../assets/images/toripaitan.png";
-import niboshi from "../assets/images/niboshi.png";
-import asari from "../assets/images/asari.png";
-import aburasoba from "../assets/images/aburasoba.png";
-import tsukemen from "../assets/images/tsukemen.png";
-import miso from "../assets/images/miso.png";
-import dandan from "../assets/images/dandan.png";
-import mazemen from "../assets/images/mazemen.png";
+import pig from "../assets/images/ramen/pig.png";
+import sio from "../assets/images/ramen/sio.png";
+import soy from "../assets/images/ramen/soy.png";
+import iekei from "../assets/images/ramen/iekei.png";
+import jiro from "../assets/images/ramen/jiro.png";
+import toripaitan from "../assets/images/ramen/toripaitan.png";
+import niboshi from "../assets/images/ramen/niboshi.png";
+import asari from "../assets/images/ramen/asari.png";
+import aburasoba from "../assets/images/ramen/aburasoba.png";
+import tsukemen from "../assets/images/ramen/tsukemen.png";
+import miso from "../assets/images/ramen/miso.png";
+import dandan from "../assets/images/ramen/dandan.png";
+import mazemen from "../assets/images/ramen/mazemen.png";
 
 export const RAMENYA_TYPES = [
   "이에케",

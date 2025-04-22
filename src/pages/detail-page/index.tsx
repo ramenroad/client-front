@@ -21,6 +21,8 @@ import { useState, useEffect } from "react";
 import quoteStart from "../../assets/images/quotes-start.png";
 import quoteEnd from "../../assets/images/quotes-end.png";
 import emptyThumbnail from "../../assets/images/store.png";
+import emptyImage from "../../assets/images/empty-images.png";
+import emptyReview from "../../assets/images/empty-review.png";
 import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
@@ -255,19 +257,23 @@ export const DetailPage = () => {
 
         <ImageWrapper>
           <ImageTitle>사진</ImageTitle>
-          <ImageContainer>
-            {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls
-              ?.slice(0, 5)
-              .map((image: string, index: number) => (
-                <Image key={index} src={image} />
-              ))}
-            {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length >
-              5 && (
+          {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length === 0 ? (
+            <EmptyImageContainer>
+              <EmptyImageImage src={emptyImage} />
+              <EmptyImageTitle>등록된 사진이 없습니다.</EmptyImageTitle>
+              <EmptyImageText>리뷰를 작성하고 사진을 등록해주세요!</EmptyImageText>
+            </EmptyImageContainer>
+          ) : (
+            <ImageContainer>
+              {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls
+                ?.slice(0, 5)
+                .map((image: string, index: number) => (
+                  <Image key={index} src={image} />
+                ))}
+              {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
                 <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
                   <Image
-                    src={
-                      ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]
-                    }
+                    src={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]}
                   />
                   <MoreOverlay>
                     <MoreText>더보기</MoreText>
@@ -275,7 +281,8 @@ export const DetailPage = () => {
                   </MoreOverlay>
                 </MoreImageWrapper>
               )}
-          </ImageContainer>
+            </ImageContainer>
+          )}
         </ImageWrapper>
 
         <Divider />
@@ -301,28 +308,44 @@ export const DetailPage = () => {
           <ReviewContent>
             <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
 
-            <ReviewCardContainer>
-              {ramenyaDetailQuery.data?.reviews
-                ?.sort(
-                  (a, b) =>
-                    new Date(b.createdAt).getTime() -
-                    new Date(a.createdAt).getTime()
-                )
-                .slice(0, 3)
-                .map((review) => (
-                  <React.Fragment key={review._id}>
-                    <ReviewCardBox>
-                      <ReviewCard review={review} />
-                    </ReviewCardBox>
-                    <ReviewDivider />
-                  </React.Fragment>
-                ))}
-            </ReviewCardContainer>
+            {ramenyaDetailQuery.data?.reviews?.length === 0 ? (
+              <EmptyReviewContainer>
+                <EmptyReviewImage src={emptyReview} />
+                <EmptyReviewTitle>등록된 리뷰가 없습니다.</EmptyReviewTitle>
+                <EmptyReviewText>리뷰를 작성해주세요!</EmptyReviewText>
+                <CreateReviewButton
+                  onClick={() => navigate(`/review/create/${id}`)}
+                >
+                  리뷰 작성하기
+                </CreateReviewButton>
+              </EmptyReviewContainer>
+            ) : (
+              <>
+                <ReviewCardContainer>
+                  {ramenyaDetailQuery.data?.reviews
+                    ?.sort(
+                      (a, b) =>
+                        new Date(b.createdAt).getTime() -
+                        new Date(a.createdAt).getTime()
+                    )
+                    .slice(0, 3)
+                    .map((review) => (
+                      <React.Fragment key={review._id}>
+                        <ReviewCardBox>
+                          <ReviewCard review={review} />
+                        </ReviewCardBox>
+                        <ReviewDivider />
+                      </React.Fragment>
+                    ))}
+                </ReviewCardContainer>
+                <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
+                  <span>모든 리뷰 보기</span>
+                  <IconArrowRight />
+                </AllReviewButton>
+              </>
+            )}
 
-            <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
-              <span>모든 리뷰 보기</span>
-              <IconArrowRight />
-            </AllReviewButton>
+
           </ReviewContent>
         </ReviewWrapper>
 
@@ -584,6 +607,33 @@ const ReviewContentTitle = tw.div`
   font-18-sb text-black pl-20 pt-20
 `;
 
+const EmptyReviewContainer = tw.div`
+  flex flex-col items-center justify-center
+`;
+
+const EmptyReviewImage = tw.img`
+  w-80
+  pb-8
+`;
+
+const EmptyReviewTitle = tw.div`
+  font-16-r text-black pb-4
+`;
+
+const EmptyReviewText = tw.div`
+  font-14-r text-gray-700 pb-24
+`;
+
+const CreateReviewButton = tw.div`
+  flex w-fit py-10 px-32
+  box-border
+  justify-center items-center
+  font-16-m
+  bg-brightOrange rounded-100 gap-2
+  cursor-pointer
+  text-orange
+`;
+
 const ReviewCardContainer = tw.div`
   flex flex-col gap-20
 `;
@@ -623,6 +673,23 @@ const MoreOverlay = tw.div`
 
 const MoreText = tw.span`
   font-16-m text-white
+`;
+
+const EmptyImageContainer = tw.div`
+  flex flex-col items-center justify-center
+`;
+
+const EmptyImageImage = tw.img`
+  w-80
+  pb-8
+`;
+
+const EmptyImageTitle = tw.div`
+  font-16-r text-black pb-4
+`;
+
+const EmptyImageText = tw.div`
+  font-14-r text-gray-700
 `;
 
 export default DetailPage;

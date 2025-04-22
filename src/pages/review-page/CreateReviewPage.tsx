@@ -14,14 +14,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Modal } from "../../components/common/Modal";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 import { css } from "@emotion/react";
+import { useSignInStore } from "../../states/sign-in";
+import { useModal } from "../../hooks/common/useModal";
+
 export const CreateReviewPage = () => {
   const { id } = useParams();
   const { mutate: createReview, isPending: isSubmitting } =
     useRamenyaReviewMutation();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
+  const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
   const [isFormDirty, setIsFormDirty] = useState(false);
+  const { isSignIn } = useSignInStore();
 
   const {
     control,
@@ -166,6 +171,11 @@ export const CreateReviewPage = () => {
   };
 
   const onSubmit = async (values: Review) => {
+    if (!isSignIn) {
+      openLoginModal();
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("ramenyaId", values.ramenyaId);
@@ -207,19 +217,24 @@ export const CreateReviewPage = () => {
 
   const handleBackClick = () => {
     if (isFormDirty) {
-      setIsModalOpen(true);
+      openBackModal();
     } else {
       navigate(-1);
     }
   };
 
   const handleConfirmBack = () => {
-    setIsModalOpen(false);
+    closeBackModal();
     navigate(-1);
   };
 
   const handleCancelBack = () => {
-    setIsModalOpen(false);
+    closeBackModal();
+  };
+
+  const handleLoginConfirm = () => {
+    closeLoginModal();
+    navigate("/login");
   };
 
   return (
@@ -367,7 +382,7 @@ export const CreateReviewPage = () => {
         </ContentsWrapper>
       </form>
 
-      <Modal isOpen={isModalOpen} onClose={handleCancelBack}>
+      <Modal isOpen={isBackModalOpen} onClose={handleCancelBack}>
         <ModalContent>
           <ModalTitle>리뷰 작성을 멈추고 뒤로 갈까요?</ModalTitle>
           <ModalButtonBox>
@@ -377,6 +392,23 @@ export const CreateReviewPage = () => {
             <ModalConfirmButton onClick={handleConfirmBack}>
               확인
             </ModalConfirmButton>
+          </ModalButtonBox>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isLoginModalOpen} onClose={closeLoginModal}>
+        <ModalContent>
+          <ModalTextBox>
+            <ModalTitle>
+              로그인이 필요해요
+            </ModalTitle>
+            <ModalText>
+              로그인 하시겠습니까?
+            </ModalText>
+          </ModalTextBox>
+          <ModalButtonBox>
+            <ModalCancelButton onClick={closeLoginModal}>취소</ModalCancelButton>
+            <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
           </ModalButtonBox>
         </ModalContent>
       </Modal>
@@ -660,7 +692,16 @@ const ModalContent = tw.div`
     rounded-12
 `;
 
+const ModalTextBox = tw.div`
+    flex flex-col
+`;
+
 const ModalTitle = tw.div`
+    font-16-sb text-gray-900
+    text-center
+`;
+
+const ModalText = tw.div`
     font-16-r text-gray-900
     text-center
 `;
