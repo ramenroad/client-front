@@ -13,6 +13,7 @@ import { useRamenyaReviewMutation } from "../../hooks/queries/useRamenyaReviewQu
 import { useNavigate, useParams } from "react-router-dom";
 import { Modal } from "../../components/common/Modal";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
+import { css } from "@emotion/react";
 export const CreateReviewPage = () => {
   const { id } = useParams();
   const { mutate: createReview, isPending: isSubmitting } =
@@ -68,14 +69,14 @@ export const CreateReviewPage = () => {
   ]);
 
   useEffect(() => {
-    // 이미지 URL 생성
     const urls =
-      formValues.reviewImages?.map((image) =>
-        image instanceof File ? URL.createObjectURL(image) : image
-      ) || [];
+      formValues.reviewImages?.map((image) => {
+        if (image instanceof File) {
+          return URL.createObjectURL(image);
+        }
+        return image;
+      }) || [];
     setImageUrls(urls);
-
-    // cleanup 함수
     return () => {
       urls.forEach((url) => {
         if (url.startsWith("blob:")) {
@@ -110,6 +111,7 @@ export const CreateReviewPage = () => {
   const handleAddCustomMenu = () => {
     if (customMenuInput.trim() !== "" && !menuList.includes(customMenuInput)) {
       setMenuList([...menuList, customMenuInput]);
+      handleMenuClick(customMenuInput);
       setCustomMenuInput("");
     }
   };
@@ -144,6 +146,11 @@ export const CreateReviewPage = () => {
     setValue("reviewImages", [...currentImages, ...newImages], {
       shouldValidate: true,
     });
+
+    // 파일 입력 필드 리셋
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleImageClick = () => {
@@ -270,7 +277,7 @@ export const CreateReviewPage = () => {
               <MenuInput
                 value={customMenuInput}
                 onChange={(e) => setCustomMenuInput(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 placeholder="메뉴명을 입력해주세요"
               />
               <MenuAddButton onClick={handleAddCustomMenu} type="button">
@@ -378,14 +385,18 @@ export const CreateReviewPage = () => {
 };
 
 const Wrapper = tw.div`
-    flex flex-col pb-40
+    flex 
+    flex-col 
+    w-full
+    pb-40
 `;
 
 const Header = tw.div`
 `;
 
 const ContentsWrapper = tw.div`
-    flex flex-col
+    flex 
+    flex-col
     px-20
 `;
 
@@ -445,7 +456,7 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
     cursor-pointer
     `,
   selected &&
-    tw`
+  tw`
         border-orange
         text-orange
     `,
@@ -461,14 +472,17 @@ const MenuAddTitle = tw.div`
 
 const MenuInputContainer = tw.div`
     flex items-center gap-4
+    
 `;
 
 const MenuInput = tw.input`
     flex-1 h-44 rounded-8 
     bg-border box-border
-    border-none
     px-12 py-10
     font-16-r
+    border-none
+    outline-none
+    focus-within:(border-orange border-solid border-1)
 `;
 
 const MenuAddButton = tw.button`
@@ -492,20 +506,24 @@ const ReviewTextAreaContainer = tw.div`
     rounded-8
     px-12 pt-10
     pb-36
+    border-none
+    outline-none
+    focus-within:(border-orange border-solid border-1)
 `;
 
-const ReviewDescriptionTextarea = styled.textarea`
-  ${tw`
-        flex h-214 w-full 
-        bg-transparent
-        border-none
-        font-16-r
-    `}
-
-  /* 스크롤바 스타일링 */
+const ReviewDescriptionTextarea = styled.textarea(() => [
+  tw`
+    flex h-214 w-350
+    bg-transparent
+    border-none
+    font-16-r
+    resize-none
+    outline-none
+    `,
+  css`
     &::-webkit-scrollbar {
-    width: 4px;
-  }
+      width: 4px;
+    }
 
   &::-webkit-scrollbar-track {
     background: transparent;
@@ -515,7 +533,8 @@ const ReviewDescriptionTextarea = styled.textarea`
     background: #d9d9d9;
     border-radius: 3px;
   }
-`;
+  `,
+]);
 
 // 글자 수 표시 스타일
 const CharacterCount = tw.div`
@@ -582,6 +601,7 @@ const ImagePreviewContainer = tw.div`
 const ImagePreview = tw.img`
     w-full h-full
     object-cover
+    rounded-8
 `;
 
 const ImageRemoveButton = tw.button`

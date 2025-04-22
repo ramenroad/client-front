@@ -29,6 +29,7 @@ import { ReviewCard } from "./ReviewCard";
 import TopBar from "../../components/common/TopBar";
 import React from "react";
 import { useRamenyaReviewImagesQuery } from "../../hooks/queries/useRamenyaReviewQuery";
+import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
   tue: "화요일",
@@ -43,6 +44,7 @@ export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
+  const userInformationQuery = useUserInformationQuery();
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
 
@@ -95,7 +97,7 @@ export const DetailPage = () => {
                       key={star}
                       color={
                         (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
-                        Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
+                          Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
                           ? "#FFCC00"
                           : "#E1E1E1"
                       }
@@ -215,9 +217,11 @@ export const DetailPage = () => {
               </MarketDetailBoxContent>
             </MarketDetailBox>
           </MarketDetailBoxContainer>
+        </MarketDetailWrapper>
 
-          <Divider />
+        <Divider />
 
+        <RecommendWrapper>
           <ReviewTitle>리뷰</ReviewTitle>
           <RecommendBox>
             <RecommendMenuTitle>추천 메뉴</RecommendMenuTitle>
@@ -246,9 +250,10 @@ export const DetailPage = () => {
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>
           </RecommendTextContainer>
+        </RecommendWrapper>
+        <Divider />
 
-          <Divider />
-
+        <ImageWrapper>
           <ImageTitle>사진</ImageTitle>
           <ImageContainer>
             {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls
@@ -258,81 +263,81 @@ export const DetailPage = () => {
               ))}
             {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length >
               5 && (
-              <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
-                <Image
-                  src={
-                    ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]
-                  }
-                />
-                <MoreOverlay>
-                  <MoreText>더보기</MoreText>
-                  <IconArrowRight color="#FFFFFF" />
-                </MoreOverlay>
-              </MoreImageWrapper>
-            )}
-          </ImageContainer>
-
-          <Divider />
-
-          <ReviewWrapper>
-            <ReviewHeader>
-              <ReviewHeaderTitle>
-                <ReviewerName>라멘로드</ReviewerName>님 리뷰를 남겨주세요
-              </ReviewHeaderTitle>
-              <LargeStarContainer
-                onClick={() => navigate(`/review/create/${id}`)}
-              >
-                <IconStarLarge color="#E1E1E1" />
-                <IconStarLarge color="#E1E1E1" />
-                <IconStarLarge color="#E1E1E1" />
-                <IconStarLarge color="#E1E1E1" />
-                <IconStarLarge color="#E1E1E1" />
-              </LargeStarContainer>
-            </ReviewHeader>
-
-            <ReviewDivider />
-
-            <ReviewContent>
-              <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
-
-              <ReviewCardContainer>
-                {ramenyaDetailQuery.data?.reviews
-                  ?.sort(
-                    (a, b) =>
-                      new Date(b.createdAt).getTime() -
-                      new Date(a.createdAt).getTime()
-                  )
-                  .slice(0, 3)
-                  .map((review) => (
-                    <React.Fragment key={review._id}>
-                      <ReviewCard review={review} />
-                      <ReviewDivider />
-                    </React.Fragment>
-                  ))}
-              </ReviewCardContainer>
-
-              <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
-                <span>모든 리뷰 보기</span>
-                <IconArrowRight />
-              </AllReviewButton>
-            </ReviewContent>
-          </ReviewWrapper>
-
-          <Divider />
-
-          {ramenyaDetailQuery.data?.latitude &&
-            ramenyaDetailQuery.data?.longitude && (
-              <>
-                <LocationTitle>위치</LocationTitle>
-                <LocationWrapper>
-                  <KakaoMap
-                    latitude={ramenyaDetailQuery.data?.latitude}
-                    longitude={ramenyaDetailQuery.data?.longitude}
+                <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
+                  <Image
+                    src={
+                      ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]
+                    }
                   />
-                </LocationWrapper>
-              </>
-            )}
-        </MarketDetailWrapper>
+                  <MoreOverlay>
+                    <MoreText>더보기</MoreText>
+                    <IconArrowRight color="#FFFFFF" />
+                  </MoreOverlay>
+                </MoreImageWrapper>
+              )}
+          </ImageContainer>
+        </ImageWrapper>
+
+        <Divider />
+
+        <ReviewWrapper>
+          <ReviewHeader>
+            <ReviewHeaderTitle>
+              <ReviewerName>{userInformationQuery.data?.nickname}</ReviewerName>님 리뷰를 남겨주세요
+            </ReviewHeaderTitle>
+            <LargeStarContainer
+              onClick={() => navigate(`/review/create/${id}`)}
+            >
+              <IconStarLarge color="#E1E1E1" />
+              <IconStarLarge color="#E1E1E1" />
+              <IconStarLarge color="#E1E1E1" />
+              <IconStarLarge color="#E1E1E1" />
+              <IconStarLarge color="#E1E1E1" />
+            </LargeStarContainer>
+          </ReviewHeader>
+
+          <ReviewDivider />
+
+          <ReviewContent>
+            <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
+
+            <ReviewCardContainer>
+              {ramenyaDetailQuery.data?.reviews
+                ?.sort(
+                  (a, b) =>
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime()
+                )
+                .slice(0, 3)
+                .map((review) => (
+                  <React.Fragment key={review._id}>
+                    <ReviewCardBox>
+                      <ReviewCard review={review} />
+                    </ReviewCardBox>
+                    <ReviewDivider />
+                  </React.Fragment>
+                ))}
+            </ReviewCardContainer>
+
+            <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
+              <span>모든 리뷰 보기</span>
+              <IconArrowRight />
+            </AllReviewButton>
+          </ReviewContent>
+        </ReviewWrapper>
+
+        <Divider />
+
+        {ramenyaDetailQuery.data?.latitude &&
+          ramenyaDetailQuery.data?.longitude && (
+            <LocationWrapper>
+              <LocationTitle>위치</LocationTitle>
+              <KakaoMap
+                latitude={ramenyaDetailQuery.data?.latitude}
+                longitude={ramenyaDetailQuery.data?.longitude}
+              />
+            </LocationWrapper>
+          )}
       </Container>
     </Wrapper>
   );
@@ -340,11 +345,11 @@ export const DetailPage = () => {
 
 const Wrapper = tw.div`
   flex flex-col items-center justify-center
-  pb-40 px-20 w-full
+  pb-40 w-full
 `;
 
 const Container = tw.div`
-  flex flex-col gap-20 w-full
+  flex flex-col w-full
   max-w-390
 `;
 
@@ -361,7 +366,9 @@ const EmptyThumbnail = tw.img`
 `;
 
 const MarketDetailWrapper = tw.div`
-  flex flex-col px-20 gap-16
+  flex flex-col gap-16 px-20
+  pt-20
+  pb-32
 `;
 
 const MarketThumbnail = tw.img`
@@ -448,11 +455,11 @@ const InstagramLink = tw.a`
 `;
 
 const Divider = tw.div`
-  w-full h-8 bg-divider mt-16
+  w-full h-8 bg-divider
 `;
 
 const ReviewTitle = tw.div`
-  font-18-sb pt-16
+  font-18-sb
 `;
 
 const RecommendBox = tw.div`
@@ -489,7 +496,13 @@ const RecommendMenuPrice = tw.div`
 
 const RecommendTextContainer = tw.div`
   flex flex-col p-20 gap-4
+  w-350 box-border
   bg-orange/[0.02] border-solid border-1 border-orange/30 rounded-8
+`;
+
+const RecommendWrapper = tw.div`
+  flex flex-col gap-16 
+  px-20 py-32
 `;
 
 const RecommendText = tw.div`
@@ -504,8 +517,7 @@ const QuoteStartImage = tw.img`
   w-30 h-22
 `;
 
-const QuateEndBox = tw.div`
-  flex justify-end
+const QuateEndBox = tw.div`  flex justify-end
 `;
 
 const QuoteEndImage = tw.img`
@@ -513,7 +525,12 @@ const QuoteEndImage = tw.img`
 `;
 
 const ImageTitle = tw.div`
-  font-18-sb pt-16
+  font-18-sb
+`;
+
+const ImageWrapper = tw.div`
+  flex flex-col gap-16 
+  px-20 py-32
 `;
 
 const ImageContainer = tw.div`
@@ -524,15 +541,16 @@ const ImageContainer = tw.div`
 
 const Image = tw.img`
   w-116 h-116 object-cover
-
 `;
 
 const ReviewWrapper = tw.div`
-  flex flex-col
+  flex flex-col 
+  py-32
 `;
 
 const ReviewHeader = tw.div`
   flex flex-col gap-10 items-center
+  px-20
 `;
 
 const ReviewHeaderTitle = tw.div`
@@ -563,11 +581,15 @@ const ReviewContent = tw.div`
 `;
 
 const ReviewContentTitle = tw.div`
-  font-18-sb text-black mt-20
+  font-18-sb text-black pl-20 pt-20
 `;
 
 const ReviewCardContainer = tw.div`
   flex flex-col gap-20
+`;
+
+const ReviewCardBox = tw.div`
+  flex flex-col gap-16 px-20
 `;
 
 const AllReviewButton = tw.div`
@@ -584,7 +606,7 @@ const LocationTitle = tw.div`
 `;
 
 const LocationWrapper = tw.div`
-  flex flex-col gap-16
+  flex flex-col gap-16 px-20
 `;
 
 const MoreImageWrapper = tw.div`
@@ -604,3 +626,4 @@ const MoreText = tw.span`
 `;
 
 export default DetailPage;
+
