@@ -313,9 +313,9 @@ export const DetailPage = () => {
           <ReviewHeader>
             <ReviewHeaderTitle>
               <ReviewerName>
-                {userInformationQuery.data?.nickname && userInformationQuery.data?.nickname + "님 "}
+                {userInformationQuery.data?.nickname && userInformationQuery.data?.nickname + "님"}
               </ReviewerName>
-              리뷰를 남겨주세요
+              &nbsp;리뷰를 남겨주세요
             </ReviewHeaderTitle>
             <LargeStarContainer
               onClick={handleNavigateReviewCreatePage}
