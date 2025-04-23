@@ -243,7 +243,7 @@ export const DetailPage = () => {
         <Divider />
 
         <RecommendWrapper>
-          <ReviewTitle>리뷰</ReviewTitle>
+          <ReviewTitle>라멘로드 추천 메뉴</ReviewTitle>
           <RecommendBox>
             <RecommendMenuTitle>추천 메뉴</RecommendMenuTitle>
             <RecommendMenuContainer>
