@@ -21,12 +21,18 @@ export const CreateReviewPage = () => {
   const { id } = useParams();
   const { mutate: createReview, isPending: isSubmitting } =
     useRamenyaReviewMutation();
-  const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
+  const { data: ramenyaDetail, isLoading, isError } = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
-  const [isFormDirty, setIsFormDirty] = useState(false);
   const { isSignIn } = useSignInStore();
+
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const [customMenuInput, setCustomMenuInput] = useState("");
+  const [menuList, setMenuList] = useState(ramenyaDetail?.menus?.map((menu) => menu) || []);
+  const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const fileInputRef = createRef<HTMLInputElement>();
 
   const {
     control,
@@ -36,7 +42,7 @@ export const CreateReviewPage = () => {
     setValue,
   } = useForm<Review>({
     defaultValues: {
-      ramenyaId: useParams().id,
+      ramenyaId: id,
       rating: 0,
       review: "",
       reviewImages: [],
@@ -47,68 +53,16 @@ export const CreateReviewPage = () => {
 
   const formValues = watch();
 
-  const [customMenuInput, setCustomMenuInput] = useState("");
-  const [menuList, setMenuList] = useState(
-    ramenyaDetailQuery.data?.menus?.map((menu) => menu) || []
-  );
-
-  const fileInputRef = createRef<HTMLInputElement>();
-
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
-
-  useEffect(() => {
-    const hasChanges =
-      isDirty ||
-      (formValues.reviewImages?.length ?? 0) > 0 ||
-      formValues.rating > 0 ||
-      (Array.isArray(formValues.menus) ? formValues.menus.length > 0 : false) ||
-      formValues.review.trim().length > 0;
-
-    setIsFormDirty(hasChanges);
-  }, [
-    isDirty,
-    formValues.reviewImages,
-    formValues.rating,
-    formValues.menus,
-    formValues.review,
-  ]);
-
-  useEffect(() => {
-    const urls =
-      formValues.reviewImages?.map((image) => {
-        if (image instanceof File) {
-          return URL.createObjectURL(image);
-        }
-        return image;
-      }) || [];
-    setImageUrls(urls);
-    return () => {
-      urls.forEach((url) => {
-        if (url.startsWith("blob:")) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    };
-  }, [formValues.reviewImages]);
-
   const handleStarClick = (index: number) => {
     setValue("rating", index, { shouldValidate: true });
   };
 
   const handleMenuClick = (menu: string) => {
-    const currentMenus = formValues.menus ? formValues.menus.split(",") : [];
-
-    if (currentMenus.includes(menu)) {
-      setValue(
-        "menus",
-        currentMenus.filter((item) => item !== menu).join(","),
-        { shouldValidate: true }
-      );
+    if (selectedMenus.includes(menu)) {
+      setSelectedMenus(selectedMenus.filter((item) => item !== menu));
     } else {
-      if (currentMenus.length < 2) {
-        setValue("menus", [...currentMenus, menu].join(","), {
-          shouldValidate: true,
-        });
+      if (selectedMenus.length < 2) {
+        setSelectedMenus([...selectedMenus, menu]);
       }
     }
   };
@@ -116,13 +70,16 @@ export const CreateReviewPage = () => {
   const handleAddCustomMenu = () => {
     if (customMenuInput.trim() !== "" && !menuList.includes(customMenuInput)) {
       setMenuList([...menuList, customMenuInput]);
-      handleMenuClick(customMenuInput);
+      if (selectedMenus.length < 2) {
+        setSelectedMenus([...selectedMenus, customMenuInput]);
+      }
       setCustomMenuInput("");
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      e.preventDefault();
       handleAddCustomMenu();
     }
   };
@@ -152,7 +109,6 @@ export const CreateReviewPage = () => {
       shouldValidate: true,
     });
 
-    // 파일 입력 필드 리셋
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -204,17 +160,6 @@ export const CreateReviewPage = () => {
     }
   };
 
-  const isFormValid =
-    formValues.rating > 0 &&
-    (formValues.menus
-      ? formValues.menus.split(",").filter(Boolean).length > 0
-      : false) &&
-    formValues.review.trim().length >= 10;
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const handleBackClick = () => {
     if (isFormDirty) {
       openBackModal();
@@ -237,150 +182,226 @@ export const CreateReviewPage = () => {
     navigate("/login");
   };
 
+  const isFormValid =
+    formValues.rating > 0 &&
+    (formValues.menus
+      ? formValues.menus.split(",").filter(Boolean).length > 0
+      : false) &&
+    formValues.review.trim().length >= 10;
+
+  useEffect(() => {
+    if (!id) {
+      navigate(-1);
+      return;
+    }
+  }, [id, navigate]);
+
+  useEffect(() => {
+    if (isError) {
+      alert('라멘집 정보를 불러오는데 실패했습니다.');
+      navigate(-1);
+    }
+  }, [isError, navigate]);
+
+  useEffect(() => {
+    if (ramenyaDetail?.menus) {
+      setMenuList(ramenyaDetail.menus.map((menu) => menu));
+    }
+  }, [ramenyaDetail?.menus]);
+
+  useEffect(() => {
+    const hasChanges =
+      isDirty ||
+      (formValues.reviewImages?.length ?? 0) > 0 ||
+      formValues.rating > 0 ||
+      (Array.isArray(formValues.menus) ? formValues.menus.length > 0 : false) ||
+      formValues.review.trim().length > 0;
+
+    setIsFormDirty(hasChanges);
+  }, [
+    isDirty,
+    formValues.reviewImages,
+    formValues.rating,
+    formValues.menus,
+    formValues.review,
+  ]);
+
+  useEffect(() => {
+    const urls =
+      formValues.reviewImages?.map((image) => {
+        if (image instanceof File) {
+          return URL.createObjectURL(image);
+        }
+        return image;
+      }) || [];
+    setImageUrls(urls);
+    return () => {
+      urls.forEach((url) => {
+        if (url.startsWith("blob:")) {
+          URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [formValues.reviewImages]);
+
+  useEffect(() => {
+    setValue("menus", selectedMenus.join(","), { shouldValidate: true });
+  }, [selectedMenus, setValue]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <Wrapper>
       <Header>
         <TopBar title="리뷰 작성하기" onBackClick={handleBackClick} />
       </Header>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <ContentsWrapper>
-          <StarWrapper>
-            <StarTitle>라멘은 만족하셨나요?</StarTitle>
-            <StarContainer>
-              {[1, 2, 3, 4, 5].map((starIndex) => (
-                <StarButton
-                  key={starIndex}
-                  onClick={() => handleStarClick(starIndex)}
-                  type="button"
-                >
-                  <IconStarLarge
-                    color={
-                      starIndex <= formValues.rating ? "#FFCC00" : "#E1E1E1"
-                    }
-                  />
-                </StarButton>
-              ))}
-            </StarContainer>
-            {errors.rating && <ErrorMessage>별점을 선택해주세요</ErrorMessage>}
-          </StarWrapper>
-          <Divider />
-
-          <MenuWrapper>
-            <MenuTitleBox>
-              <MenuTitle>어떤 메뉴를 드셨나요?</MenuTitle>
-              <MenuSubTitle>최대 2개 선택 가능</MenuSubTitle>
-            </MenuTitleBox>
-            <MenuTabContainer>
-              {menuList.map((menu, index) => (
-                <MenuTab
-                  key={index}
-                  selected={formValues.menus.includes(menu)}
-                  onClick={() => handleMenuClick(menu)}
-                >
-                  {menu}
-                </MenuTab>
-              ))}
-            </MenuTabContainer>
-            {errors.menus && <ErrorMessage>메뉴를 선택해주세요</ErrorMessage>}
-          </MenuWrapper>
-
-          <MenuAddWrapper>
-            <MenuAddTitle>
-              찾으시는 메뉴가 없나요? 직접 추가해주세요
-            </MenuAddTitle>
-            <MenuInputContainer>
-              <MenuInput
-                value={customMenuInput}
-                onChange={(e) => setCustomMenuInput(e.target.value)}
-                onKeyDown={handleKeyPress}
-                placeholder="메뉴명을 입력해주세요"
-              />
-              <MenuAddButton onClick={handleAddCustomMenu} type="button">
-                추가
-              </MenuAddButton>
-            </MenuInputContainer>
-          </MenuAddWrapper>
-
-          <ReviewDescriptionWrapper>
-            <ReviewDescriptionTitle>어떤 점이 좋았나요?</ReviewDescriptionTitle>
-            <Controller
-              name="review"
-              control={control}
-              rules={{ required: true, minLength: 10 }}
-              render={({ field }) => (
-                <ReviewTextAreaContainer>
-                  <ReviewDescriptionTextarea
-                    {...field}
-                    placeholder="최소 10자 이상 입력해주세요"
-                  />
-                  <CharacterCount>
-                    <TypedCount>{field.value.length}</TypedCount>/300
-                  </CharacterCount>
-                </ReviewTextAreaContainer>
-              )}
-            />
-            {/* {errors.review && errors.review.type === 'required' &&
-                            <ErrorMessage>리뷰 내용을 입력해주세요</ErrorMessage>}
-                        {errors.review && errors.review.type === 'minLength' &&
-                            <ErrorMessage>최소 10자 이상 입력해주세요</ErrorMessage>} */}
-          </ReviewDescriptionWrapper>
-
-          <ImageUploadWrapper>
-            <ImageUploadHeader>
-              <ImageUploadTitleBox>
-                <ImageUploadTitle>사진 첨부</ImageUploadTitle>
-                <ImageCountBox>
-                  <ImageAdded>{formValues.reviewImages?.length}</ImageAdded>
-                  <ImageAddedText>/</ImageAddedText>
-                  <ImageMax>5</ImageMax>
-                </ImageCountBox>
-              </ImageUploadTitleBox>
-              <ImageUploadSubTitle>
-                라멘과 무관한 사진을 첨부한 리뷰는 무통보 삭제됩니다
-              </ImageUploadSubTitle>
-            </ImageUploadHeader>
-
-            <ImageUploadContent>
-              <ImageUploadContentImage>
-                {formValues.reviewImages?.map((_, index) => (
-                  <ImagePreviewContainer key={index}>
-                    <ImagePreview
-                      src={imageUrls[index]}
-                      alt={`업로드 이미지 ${index + 1}`}
+      {isLoading ? (
+        <LoadingWrapper>
+          <LoadingText>로딩중...</LoadingText>
+        </LoadingWrapper>
+      ) : (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <ContentsWrapper>
+            <StarWrapper>
+              <StarTitle>라멘은 만족하셨나요?</StarTitle>
+              <StarContainer>
+                {[1, 2, 3, 4, 5].map((starIndex) => (
+                  <StarButton
+                    key={starIndex}
+                    onClick={() => handleStarClick(starIndex)}
+                    type="button"
+                  >
+                    <IconStarLarge
+                      color={
+                        starIndex <= formValues.rating ? "#FFCC00" : "#E1E1E1"
+                      }
                     />
-                    <ImageRemoveButton
-                      onClick={() => handleRemoveImage(index)}
-                      type="button"
-                    >
-                      <IconClose width={9} height={9} />
-                    </ImageRemoveButton>
-                  </ImagePreviewContainer>
+                  </StarButton>
                 ))}
-                {(formValues.reviewImages?.length ?? 0) < 5 && (
-                  <ImageAddButton onClick={handleImageClick} type="button">
-                    <IconAdd />
-                  </ImageAddButton>
-                )}
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleImageUpload}
-                  accept="image/*"
-                  multiple
-                  style={{ display: "none" }}
-                />
-              </ImageUploadContentImage>
-            </ImageUploadContent>
-          </ImageUploadWrapper>
+              </StarContainer>
+              {errors.rating && <ErrorMessage>별점을 선택해주세요</ErrorMessage>}
+            </StarWrapper>
+            <Divider />
 
-          <AddReviewButton
-            active={isFormValid}
-            disabled={!isFormValid || isSubmitting}
-          >
-            {isSubmitting ? "등록중..." : "등록하기"}
-          </AddReviewButton>
-        </ContentsWrapper>
-      </form>
+            <MenuWrapper>
+              <MenuTitleBox>
+                <MenuTitle>어떤 메뉴를 드셨나요?</MenuTitle>
+                <MenuSubTitle>최대 2개 선택 가능</MenuSubTitle>
+              </MenuTitleBox>
+              <MenuTabContainer>
+                {menuList.map((menu, index) => (
+                  <MenuTab
+                    key={index}
+                    selected={selectedMenus.includes(menu)}
+                    onClick={() => handleMenuClick(menu)}
+                  >
+                    {menu}
+                  </MenuTab>
+                ))}
+              </MenuTabContainer>
+              {errors.menus && <ErrorMessage>메뉴를 선택해주세요</ErrorMessage>}
+            </MenuWrapper>
+
+            <MenuAddWrapper>
+              <MenuAddTitle>
+                찾으시는 메뉴가 없나요? 직접 추가해주세요
+              </MenuAddTitle>
+              <MenuInputContainer>
+                <MenuInput
+                  value={customMenuInput}
+                  onChange={(e) => setCustomMenuInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="메뉴명을 입력해주세요"
+                />
+                <MenuAddButton onClick={handleAddCustomMenu} type="button">
+                  추가
+                </MenuAddButton>
+              </MenuInputContainer>
+            </MenuAddWrapper>
+
+            <ReviewDescriptionWrapper>
+              <ReviewDescriptionTitle>어떤 점이 좋았나요?</ReviewDescriptionTitle>
+              <Controller
+                name="review"
+                control={control}
+                rules={{ required: true, minLength: 10 }}
+                render={({ field }) => (
+                  <ReviewTextAreaContainer>
+                    <ReviewDescriptionTextarea
+                      {...field}
+                      placeholder="최소 10자 이상 입력해주세요"
+                    />
+                    <CharacterCount>
+                      <TypedCount>{field.value.length}</TypedCount>/300
+                    </CharacterCount>
+                  </ReviewTextAreaContainer>
+                )}
+              />
+              {/* {errors.review && errors.review.type === 'required' &&
+                              <ErrorMessage>리뷰 내용을 입력해주세요</ErrorMessage>}
+                          {errors.review && errors.review.type === 'minLength' &&
+                              <ErrorMessage>최소 10자 이상 입력해주세요</ErrorMessage>} */}
+            </ReviewDescriptionWrapper>
+
+            <ImageUploadWrapper>
+              <ImageUploadHeader>
+                <ImageUploadTitleBox>
+                  <ImageUploadTitle>사진 첨부</ImageUploadTitle>
+                  <ImageCountBox>
+                    <ImageAdded>{formValues.reviewImages?.length}</ImageAdded>
+                    <ImageAddedText>/</ImageAddedText>
+                    <ImageMax>5</ImageMax>
+                  </ImageCountBox>
+                </ImageUploadTitleBox>
+                <ImageUploadSubTitle>
+                  라멘과 무관한 사진을 첨부한 리뷰는 무통보 삭제됩니다
+                </ImageUploadSubTitle>
+              </ImageUploadHeader>
+
+              <ImageUploadContent>
+                <ImageUploadContentImage>
+                  {formValues.reviewImages?.map((_, index) => (
+                    <ImagePreviewContainer key={index}>
+                      <ImagePreview
+                        src={imageUrls[index]}
+                        alt={`업로드 이미지 ${index + 1}`}
+                      />
+                      <ImageRemoveButton
+                        onClick={() => handleRemoveImage(index)}
+                        type="button"
+                      >
+                        <IconClose width={9} height={9} />
+                      </ImageRemoveButton>
+                    </ImagePreviewContainer>
+                  ))}
+                  {(formValues.reviewImages?.length ?? 0) < 5 && (
+                    <ImageAddButton onClick={handleImageClick} type="button">
+                      <IconAdd />
+                    </ImageAddButton>
+                  )}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    multiple
+                    style={{ display: "none" }}
+                  />
+                </ImageUploadContentImage>
+              </ImageUploadContent>
+            </ImageUploadWrapper>
+
+            <AddReviewButton
+              active={isFormValid}
+              disabled={!isFormValid || isSubmitting}
+            >
+              {isSubmitting ? "등록중..." : "등록하기"}
+            </AddReviewButton>
+          </ContentsWrapper>
+        </form>
+      )}
 
       <Modal isOpen={isBackModalOpen} onClose={handleCancelBack}>
         <ModalContent>
@@ -724,4 +745,14 @@ const ModalConfirmButton = tw.button`
     cursor-pointer
     border-none
     bg-transparent
+`;
+
+const LoadingWrapper = tw.div`
+    flex items-center justify-center
+    w-full h-full
+    min-h-200
+`;
+
+const LoadingText = tw.div`
+    font-16-m text-gray-400
 `;
