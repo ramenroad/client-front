@@ -32,6 +32,9 @@ import TopBar from "../../components/common/TopBar";
 import React from "react";
 import { useRamenyaReviewImagesQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
+import { Modal } from "../../components/common/Modal";
+import { useModal } from "../../hooks/common/useModal";
+import { useSignInStore } from "../../states/sign-in";
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
   tue: "화요일",
@@ -49,6 +52,8 @@ export const DetailPage = () => {
   const userInformationQuery = useUserInformationQuery();
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
+  const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
+  const { isSignIn } = useSignInStore();
 
   // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
   useEffect(() => {
@@ -70,6 +75,19 @@ export const DetailPage = () => {
   };
 
   const todayBusinessHour = getTodayBusinessHour();
+
+  const handleNavigateReviewCreatePage = () => {
+    if (!isSignIn) {
+      openLoginModal();
+      return;
+    }
+    navigate(`/review/create/${id}`);
+  };
+
+  const handleLoginConfirm = () => {
+    closeLoginModal();
+    navigate("/login");
+  };
 
   return (
     <Wrapper>
@@ -290,10 +308,13 @@ export const DetailPage = () => {
         <ReviewWrapper>
           <ReviewHeader>
             <ReviewHeaderTitle>
-              <ReviewerName>{userInformationQuery.data?.nickname}</ReviewerName>님 리뷰를 남겨주세요
+              <ReviewerName>
+                {userInformationQuery.data?.nickname && userInformationQuery.data?.nickname + "님 "}
+              </ReviewerName>
+              리뷰를 남겨주세요
             </ReviewHeaderTitle>
             <LargeStarContainer
-              onClick={() => navigate(`/review/create/${id}`)}
+              onClick={handleNavigateReviewCreatePage}
             >
               <IconStarLarge color="#E1E1E1" />
               <IconStarLarge color="#E1E1E1" />
@@ -307,14 +328,13 @@ export const DetailPage = () => {
 
           <ReviewContent>
             <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
-
             {ramenyaDetailQuery.data?.reviews?.length === 0 ? (
               <EmptyReviewContainer>
                 <EmptyReviewImage src={emptyReview} />
                 <EmptyReviewTitle>등록된 리뷰가 없습니다.</EmptyReviewTitle>
                 <EmptyReviewText>리뷰를 작성해주세요!</EmptyReviewText>
                 <CreateReviewButton
-                  onClick={() => navigate(`/review/create/${id}`)}
+                  onClick={handleNavigateReviewCreatePage}
                 >
                   리뷰 작성하기
                 </CreateReviewButton>
@@ -362,6 +382,24 @@ export const DetailPage = () => {
             </LocationWrapper>
           )}
       </Container>
+
+      <Modal isOpen={isLoginModalOpen} onClose={closeLoginModal}>
+        <ModalContent>
+          <ModalTextBox>
+            <ModalTitle>
+              로그인이 필요해요
+            </ModalTitle>
+            <ModalText>
+              로그인 하시겠습니까?
+            </ModalText>
+          </ModalTextBox>
+          <ModalButtonBox>
+            <ModalCancelButton onClick={closeLoginModal}>취소</ModalCancelButton>
+            <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
+          </ModalButtonBox>
+        </ModalContent>
+      </Modal>
+
     </Wrapper>
   );
 };
@@ -690,6 +728,49 @@ const EmptyImageTitle = tw.div`
 
 const EmptyImageText = tw.div`
   font-14-r text-gray-700
+`;
+
+
+const ModalContent = tw.div`
+    flex flex-col gap-16 w-290
+    items-center
+    justify-center
+    bg-white
+    rounded-12
+`;
+
+const ModalTextBox = tw.div`
+    flex flex-col
+`;
+
+const ModalTitle = tw.div`
+    font-16-sb text-gray-900
+    text-center
+`;
+
+const ModalText = tw.div`
+    font-16-r text-gray-900
+    text-center
+`;
+
+const ModalButtonBox = tw.div`
+    flex h-60 w-full
+`;
+
+const ModalCancelButton = tw.button`
+    w-full
+    font-16-r text-black
+    cursor-pointer
+    border-none
+    bg-transparent
+`;
+
+const ModalConfirmButton = tw.button`
+    w-full
+    font-16-r text-orange
+    cursor-pointer
+    border-none
+    bg-transparent
 `;
 
 export default DetailPage;
