@@ -12,7 +12,10 @@ import {
   useLocationStore,
 } from "../../store/location/useLocationStore.ts";
 import { calculateDistance } from "../../util/number.ts";
-import { IconStarSmall, IconTalk } from "../Icon";
+import {
+  IconStarSmall,
+  //IconTalk 
+} from "../Icon";
 
 interface RamenyaCardProps {
   ramenya: Ramenya;
@@ -123,12 +126,13 @@ const RamenyaCard = (props: RamenyaCardProps) => {
           </RamenyaCardBottomSection>
         </RamenyaDescription>
       </Layout>
-      <RamenyaOneLineReview>
+      {/* 추후 한줄 리뷰 사용 논의 후 사용 */}
+      {/* <RamenyaOneLineReview>
         <IconTalk />
         <OneLineReviewText>
           {ramenya.ramenroadReview.oneLineReview}
         </OneLineReviewText>
-      </RamenyaOneLineReview>
+      </RamenyaOneLineReview> */}
     </Wrapper>
   );
 };
@@ -139,7 +143,7 @@ const StyledCountUp = tw(CountUp)`
 
 const Wrapper = tw.section`
   w-full cursor-pointer
-  box-border px-20 pt-20
+  box-border px-20 py-20
 `;
 
 const Layout = tw.section`
@@ -226,13 +230,13 @@ const RamenyaCardBottomSection = tw.section`
   flex flex-col gap-4
 `;
 
-const RamenyaOneLineReview = tw.section`
-  bg-border rounded-md my-20 h-34 flex items-center gap-8 text-gray-700 font-12-r px-10
-  overflow-hidden
-`;
+// const RamenyaOneLineReview = tw.section`
+//   bg-border rounded-md my-20 h-34 flex items-center gap-8 text-gray-700 font-12-r px-10
+//   overflow-hidden
+// `;
 
-const OneLineReviewText = tw.span`
-  truncate min-w-0 flex-1
-`;
+// const OneLineReviewText = tw.span`
+//   truncate min-w-0 flex-1
+// `;
 
 export default RamenyaCard;

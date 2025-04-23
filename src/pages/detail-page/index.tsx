@@ -18,8 +18,8 @@ import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery
 import DetailIconTag from "./DetailIconTag";
 import styled from "@emotion/styled/macro";
 import { useState, useEffect } from "react";
-import quoteStart from "../../assets/images/quotes-start.png";
-import quoteEnd from "../../assets/images/quotes-end.png";
+//import quoteStart from "../../assets/images/quotes-start.png";
+//import quoteEnd from "../../assets/images/quotes-end.png";
 import emptyThumbnail from "../../assets/images/store.png";
 import emptyImage from "../../assets/images/empty-images.png";
 import emptyReview from "../../assets/images/empty-review.png";
@@ -35,6 +35,7 @@ import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQ
 import { Modal } from "../../components/common/Modal";
 import { useModal } from "../../hooks/common/useModal";
 import { useSignInStore } from "../../states/sign-in";
+
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
   tue: "화요일",
@@ -259,7 +260,9 @@ export const DetailPage = () => {
               ))}
             </RecommendMenuContainer>
           </RecommendBox>
-          <RecommendTextContainer>
+
+          {/* 추후 한줄 리뷰 사용 논의 후 사용 */}
+          {/* <RecommendTextContainer>
             <QuoteStartImage src={quoteStart} />
             <RecommendText>
               <RecommendTitle>
@@ -269,7 +272,8 @@ export const DetailPage = () => {
             <QuateEndBox>
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>
-          </RecommendTextContainer>
+          </RecommendTextContainer> */}
+
         </RecommendWrapper>
         <Divider />
 
@@ -555,35 +559,35 @@ const RecommendMenuPrice = tw.div`
   font-14-sb 
 `;
 
-const RecommendTextContainer = tw.div`
-  flex flex-col p-20 gap-4
-  w-350 box-border
-  bg-orange/[0.02] border-solid border-1 border-orange/30 rounded-8
-`;
-
 const RecommendWrapper = tw.div`
   flex flex-col gap-16 
   px-20 py-32
 `;
 
-const RecommendText = tw.div`
-  flex items-center justify-center
-`;
+// const RecommendTextContainer = tw.div`
+//   flex flex-col p-20 gap-4
+//   w-350 box-border
+//   bg-orange/[0.02] border-solid border-1 border-orange/30 rounded-8
+// `;
 
-const RecommendTitle = tw.div`
-  font-16-sb text-center
-`;
+// const RecommendText = tw.div`
+//   flex items-center justify-center
+// `;
 
-const QuoteStartImage = tw.img`
-  w-30 h-22
-`;
+// const RecommendTitle = tw.div`
+//   font-16-sb text-center
+// `;
 
-const QuateEndBox = tw.div`  flex justify-end
-`;
+// const QuoteStartImage = tw.img`
+//   w-30 h-22
+// `;
 
-const QuoteEndImage = tw.img`
-  w-30 h-22
-`;
+// const QuateEndBox = tw.div`  flex justify-end
+// `;
+
+// const QuoteEndImage = tw.img`
+//   w-30 h-22
+// `;
 
 const ImageTitle = tw.div`
   font-18-sb
