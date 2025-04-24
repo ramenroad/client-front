@@ -31,7 +31,11 @@ export const GroupPage = () => {
               <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
                 {ramenyaList?.map((ramenya, index) => (
                   <>
-                    <RamenyaCard key={ramenya._id} ramenya={ramenya} />
+                    <RamenyaCard
+                      key={ramenya._id}
+                      ramenya={ramenya}
+                      isReview={false}
+                    />
                     {index !== ramenyaList.length - 1 && <SubLine />}
                   </>
                 ))}
