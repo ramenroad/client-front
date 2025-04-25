@@ -2029,7 +2029,7 @@ react-clock@^5.0.0:
 
 react-countup@^6.5.3:
   version "6.5.3"
-  resolved "https://registry.npmjs.org/react-countup/-/react-countup-6.5.3.tgz"
+  resolved "https://registry.yarnpkg.com/react-countup/-/react-countup-6.5.3.tgz#e892aa3eab2d6ba9c3cdba30bf4ed6764826d848"
   integrity sha512-udnqVQitxC7QWADSPDOxVWULkLvKUWrDapn5i53HE4DPRVgs+Y5rr4bo25qEl8jSh+0l2cToJgGMx+clxPM3+w==
   dependencies:
     countup.js "^2.8.0"
