@@ -14,11 +14,12 @@ import {
 import { calculateDistance } from "../../util/number.ts";
 import {
   IconStarSmall,
-  //IconTalk 
+  //IconTalk
 } from "../Icon";
 
 interface RamenyaCardProps {
   ramenya: Ramenya;
+  isReview?: boolean;
 }
 
 const RamenyaCard = (props: RamenyaCardProps) => {
@@ -67,20 +68,23 @@ const RamenyaCard = (props: RamenyaCardProps) => {
         <RamenyaDescription>
           <RamenyaDescriptionHeader>
             <RamenyaTitle>{ramenya.name}</RamenyaTitle>
-            <RamenyaReviewBox>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <IconStarSmall
-                  key={star}
-                  color={
-                    ramenya.reviewCount > 0 && Math.round(ramenya.rating) >= star
-                      ? "#FFCC00"
-                      : "#E1E1E1"
-                  }
-                />
-              ))}
-              <RamenyaScore>{ramenya.rating.toFixed(1)}</RamenyaScore>
-              <RamenyaReviewCount>({ramenya.reviewCount})</RamenyaReviewCount>
-            </RamenyaReviewBox>
+            {props.isReview !== false && (
+              <RamenyaReviewBox>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <IconStarSmall
+                    key={star}
+                    color={
+                      ramenya.reviewCount > 0 &&
+                      Math.round(ramenya.rating) >= star
+                        ? "#FFCC00"
+                        : "#E1E1E1"
+                    }
+                  />
+                ))}
+                <RamenyaScore>{ramenya.rating.toFixed(1)}</RamenyaScore>
+                <RamenyaReviewCount>({ramenya.reviewCount})</RamenyaReviewCount>
+              </RamenyaReviewBox>
+            )}
             <RamenyaLocation>
               {current.latitude !== 0 && (
                 <>
@@ -109,14 +113,14 @@ const RamenyaCard = (props: RamenyaCardProps) => {
               </RamenyaOpenStatus>
               {checkBusinessStatus(ramenya.businessHours).todayHours
                 ?.operatingTime && (
-                  <>
-                    <span>·</span>
-                    <RamenyaOpenTime>
-                      {checkBusinessStatus(ramenya.businessHours).todayHours
-                        ?.operatingTime || ""}
-                    </RamenyaOpenTime>
-                  </>
-                )}
+                <>
+                  <span>·</span>
+                  <RamenyaOpenTime>
+                    {checkBusinessStatus(ramenya.businessHours).todayHours
+                      ?.operatingTime || ""}
+                  </RamenyaOpenTime>
+                </>
+              )}
             </RamenyaOpenStatusWrapper>
             <RamenyaTagWrapper>
               {ramenya.genre.map((genre, index) => (
@@ -162,7 +166,6 @@ const RamenyaDescription = tw.section`
   flex flex-col h-full min-w-0 w-full justify-center gap-12
 `;
 
-
 const RamenyaDescriptionHeader = tw.section`
   flex flex-col h-full justify-center
   gap-2
@@ -176,11 +179,9 @@ const RamenyaScore = tw.span`
   font-12-m text-black
 `;
 
-
 const RamenyaTitle = tw.span`
   font-16-sb h-19
 `;
-
 
 const RamenyaReviewCount = tw.span`
   font-12-r text-gray-700

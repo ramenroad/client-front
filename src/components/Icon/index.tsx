@@ -18,7 +18,7 @@ export const IconSample = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconFilter = ({ color, ...rest }: IconProps) => (
+export const IconFilterWithTag = ({ color, ...rest }: IconProps) => (
   <svg
     width="24"
     height="24"
@@ -609,6 +609,41 @@ export const IconUnSignInUserProfile = () => (
       strokeWidth="1.2"
       strokeMiterlimit="10"
       strokeLinecap="round"
+    />
+  </svg>
+);
+
+export const IconFilterWithOrder = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M6 4V11"
+      stroke="#888888"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10 12V5"
+      stroke="#888888"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M4.5 10L6 12L7.5 10"
+      stroke="#888888"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8.5 6L10 4L11.5 6"
+      stroke="#888888"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 );

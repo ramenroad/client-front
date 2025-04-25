@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { useMemo, useState } from "react";
-import { IconFilter } from "../../components/Icon";
+import { IconFilterWithOrder, IconFilterWithTag } from "../../components/Icon";
 import styled from "@emotion/styled";
 import { RAMENYA_TYPES } from "../../constants";
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
@@ -10,6 +10,8 @@ import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 import TopBar from "../../components/common/TopBar.tsx";
 import { Line } from "../../components/common/Line.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
+import { useLocationStore } from "../../store/location/useLocationStore.ts";
+import { calculateDistanceValue } from "../../util/number.ts";
 
 export const LocationPage = () => {
   useScrollToTop();
@@ -22,6 +24,10 @@ export const LocationPage = () => {
   });
 
   const [selectedFilterList, setSelectedFilterList] = useState<string[]>([]);
+  const [filterType, setFilterType] = useState<"distance" | "rating">(
+    "distance"
+  );
+  const { current } = useLocationStore();
 
   const ramenyaList = useMemo(() => {
     if (selectedFilterList.length === 0) {
@@ -32,6 +38,26 @@ export const LocationPage = () => {
       ramenya.genre.some((genre) => selectedFilterList.includes(genre))
     );
   }, [selectedFilterList, ramenyaListQuery.data]);
+
+  const filteredRamenyaList = useMemo(() => {
+    if (filterType === "distance") {
+      if (current.latitude === 0 || current.longitude === 0) {
+        return ramenyaList;
+      }
+      return ramenyaList?.sort(
+        (a, b) =>
+          calculateDistanceValue(current, {
+            latitude: a.latitude,
+            longitude: a.longitude,
+          }) -
+          calculateDistanceValue(current, {
+            latitude: b.latitude,
+            longitude: b.longitude,
+          })
+      );
+    }
+    return ramenyaList?.sort((a, b) => b.rating - a.rating);
+  }, [current, filterType, ramenyaList]);
 
   const handleFilterClick = (type: string) => {
     if (selectedFilterList.includes(type)) {
@@ -98,9 +124,28 @@ export const LocationPage = () => {
             <NoStoreBox />
           ) : (
             <>
-              <InformationHeader>가게 정보</InformationHeader>
+              <RamenyaListHeader>
+                <InformationHeader>가게 정보</InformationHeader>
+                <FilterButtonContainer>
+                  <StyledIconOrderFilter />
+                  <FilterButtonWrapper>
+                    <FilterButtonText
+                      isActive={filterType === "distance"}
+                      onClick={() => setFilterType("distance")}
+                    >
+                      거리순
+                    </FilterButtonText>
+                    <FilterButtonText
+                      isActive={filterType === "rating"}
+                      onClick={() => setFilterType("rating")}
+                    >
+                      평점순
+                    </FilterButtonText>
+                  </FilterButtonWrapper>
+                </FilterButtonContainer>
+              </RamenyaListHeader>
               <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
-                {ramenyaList?.map((ramenya) => (
+                {filteredRamenyaList?.map((ramenya) => (
                   <>
                     <RamenyaCard key={ramenya._id} ramenya={ramenya} />
                     <SubLine />
@@ -142,9 +187,37 @@ const FilterWrapper = tw.section`
   box-border h-100 pl-20 pt-20 py-16 gap-8 w-full pr-2
 `;
 
-const StyledIconFilter = tw(IconFilter)`
+const RamenyaListHeader = tw.div`
+  flex justify-between
+  w-full px-20
+  bg-white
+  box-border
+`;
+
+const StyledIconFilter = tw(IconFilterWithTag)`
   cursor-pointer
 `;
+
+const StyledIconOrderFilter = tw(IconFilterWithOrder)`
+  mr-2
+`;
+
+const FilterButtonContainer = tw.div`
+  flex flex-row items-center box-border justify-end
+  font-14-sb
+  flex-1
+  bg-white
+  select-none
+`;
+
+const FilterButtonWrapper = tw.div`
+  flex flex-row items-center gap-8
+`;
+
+const FilterButtonText = styled.span<{ isActive: boolean }>(({ isActive }) => [
+  tw`cursor-pointer`,
+  !isActive && tw`text-gray-400`,
+]);
 
 const TagWrapper = tw.div`
   flex overflow-x-auto gap-8 flex-1 scrollbar-hide flex-col box-border
@@ -176,7 +249,7 @@ const InformationWrapper = tw.section`
 `;
 
 const InformationHeader = tw.span`
-  px-20 font-14-sb self-start text-gray-900
+  font-14-sb self-start text-gray-900
 `;
 
 interface RamenyaListWrapperProps {

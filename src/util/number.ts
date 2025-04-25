@@ -14,7 +14,7 @@ export const formatNumber = (num: number): string => {
 
 export const calculateDistance = (
   coord1: Coordinate,
-  coord2: Coordinate,
+  coord2: Coordinate
 ): string => {
   const toRadians = (degree: number) => (degree * Math.PI) / 180;
 
@@ -38,4 +38,27 @@ export const calculateDistance = (
   return distanceInKm < 1
     ? `${(distanceInKm * 1000).toFixed(2)}m` // 소수점 2자리 유지
     : `${distanceInKm.toFixed(2)}km`;
+};
+
+export const calculateDistanceValue = (
+  coord1: Coordinate,
+  coord2: Coordinate
+): number => {
+  const toRadians = (degree: number) => (degree * Math.PI) / 180;
+
+  const R = 6371;
+  const lat1 = toRadians(coord1.latitude);
+  const lon1 = toRadians(coord1.longitude);
+  const lat2 = toRadians(coord2.latitude);
+  const lon2 = toRadians(coord2.longitude);
+
+  const dLat = lat2 - lat1;
+  const dLon = lon2 - lon1;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // km 단위로 반환
 };
