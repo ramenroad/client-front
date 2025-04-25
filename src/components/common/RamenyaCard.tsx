@@ -92,6 +92,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
                     <StyledCountUp
                       start={0}
                       end={parseFloat(currentDistance.replace(/[^0-9.]/g, ""))}
+                      // @ts-ignore
                       duration={1}
                       decimals={2}
                     />
