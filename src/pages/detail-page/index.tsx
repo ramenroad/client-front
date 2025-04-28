@@ -60,11 +60,6 @@ export const DetailPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
-  // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   // 오늘 요일 구하기
   const getCurrentDayIndex = () => {
     const days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
@@ -103,6 +98,11 @@ export const DetailPage = () => {
   const handleNavigateImagesPage = () => {
     navigate(`/images/${id}`);
   };
+
+  // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Wrapper>
@@ -340,11 +340,7 @@ export const DetailPage = () => {
             <LargeStarContainer
               onClick={handleNavigateReviewCreatePage}
             >
-              <IconStarLarge color="#E1E1E1" />
-              <IconStarLarge color="#E1E1E1" />
-              <IconStarLarge color="#E1E1E1" />
-              <IconStarLarge color="#E1E1E1" />
-              <IconStarLarge color="#E1E1E1" />
+              {[...Array(5)].map((_, i) => <IconStarLarge key={i} color="#E1E1E1" />)}
             </LargeStarContainer>
           </ReviewHeader>
 
@@ -367,11 +363,7 @@ export const DetailPage = () => {
               <>
                 <ReviewCardContainer>
                   {ramenyaDetailQuery.data?.reviews
-                    ?.sort(
-                      (a, b) =>
-                        new Date(b.createdAt).getTime() -
-                        new Date(a.createdAt).getTime()
-                    )
+                    ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                     .slice(0, 3)
                     .map((review) => (
                       <React.Fragment key={review._id}>
