@@ -57,6 +57,8 @@ export const DetailPage = () => {
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
   const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
   const { isSignIn } = useSignInStore();
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
   useEffect(() => {
@@ -92,7 +94,9 @@ export const DetailPage = () => {
     navigate("/login");
   };
 
-  const handleOpenImagePopup = () => {
+  const handleOpenImagePopup = (index: number, images: string[]) => {
+    setSelectedImageIndex(index);
+    setSelectedImages(images);
     openImagePopup();
   };
 
@@ -303,9 +307,8 @@ export const DetailPage = () => {
                   <ImageBox key={index}>
                     <ReviewImage
                       image={image}
-                      isImagePopupOpen={isImagePopupOpen}
-                      closeImagePopup={closeImagePopup}
-                      onClick={handleOpenImagePopup} />
+                      onClick={() => handleOpenImagePopup(index, ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.slice(0, 5) || [])}
+                    />
                   </ImageBox>
                 ))}
               {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
@@ -419,6 +422,28 @@ export const DetailPage = () => {
             <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
           </ModalButtonBox>
         </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isImagePopupOpen} onClose={closeImagePopup}>
+        {selectedImageIndex !== null && selectedImages.length > 0 && (
+          <PopupContainer>
+            <CloseButton onClick={closeImagePopup}>×</CloseButton>
+            <ImageCounter>
+              {selectedImageIndex + 1}/{selectedImages.length}
+            </ImageCounter>
+            <PopUpImage src={selectedImages[selectedImageIndex]} alt="popup" />
+            {typeof selectedImageIndex === 'number' && selectedImageIndex > 0 && (
+              <NavButtonLeft onClick={() => setSelectedImageIndex(selectedImageIndex - 1)}>
+                {"<"}
+              </NavButtonLeft>
+            )}
+            {typeof selectedImageIndex === 'number' && selectedImageIndex < selectedImages.length - 1 && (
+              <NavButtonRight onClick={() => setSelectedImageIndex(selectedImageIndex + 1)}>
+                {">"}
+              </NavButtonRight>
+            )}
+          </PopupContainer>
+        )}
       </Modal>
 
     </Wrapper>
@@ -792,6 +817,33 @@ const ModalConfirmButton = tw.button`
     cursor-pointer
     border-none
     bg-transparent
+`;
+
+const PopupContainer = tw.div`
+  flex flex-col 
+  items-center 
+  justify-center 
+  w-390 h-screen bg-black
+`;
+
+const CloseButton = tw.button`
+  top-4 left-4 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
+`;
+
+const ImageCounter = tw.div`
+   top-4 left-1/2 transform -translate-x-1/2 text-white text-lg z-10
+`;
+
+const NavButtonLeft = tw.button`
+   left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
+`;
+
+const NavButtonRight = tw.button`
+   right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
+`;
+
+const PopUpImage = tw.img`
+    w-390 h-fit object-cover
 `;
 
 export default DetailPage;
