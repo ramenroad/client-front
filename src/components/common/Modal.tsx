@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import tw from 'twin.macro';
 
 interface ModalProps {
@@ -7,9 +7,18 @@ interface ModalProps {
     children?: React.ReactNode;
 }
 
-
-
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+        return () => {
+            document.body.style.overflow = 'auto';
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (

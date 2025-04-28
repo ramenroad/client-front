@@ -824,14 +824,24 @@ const ModalConfirmButton = tw.button`
 `;
 
 const PopupContainer = tw.div`
-  flex flex-col 
+  flex 
+  flex-col 
   items-center 
-  justify-center 
-  w-390 h-screen bg-black
+  w-390 h-screen 
+  bg-black
 `;
 
 const PopupHeader = tw.div`
-  flex gap-4 items-start
+  flex w-full
+  justify-between 
+  pt-32
+`;
+
+const PopupContent = tw.div`
+  relative 
+  flex flex-col 
+  h-full
+  gap-4 items-start justify-center
 `;
 
 const CloseButton = tw.button`
@@ -842,9 +852,6 @@ const ImageCounter = tw.div`
   text-white text-lg z-10
 `;
 
-const PopupContent = tw.div`
-  relative flex flex-col gap-4 items-start
-`;
 
 const NavButtonLeft = tw.button`
   absolute top-1/2 left-4 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
