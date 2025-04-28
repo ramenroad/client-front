@@ -229,7 +229,7 @@ const ReviewImage = styled.img<{ index: number; totalImages: number }>(({ totalI
 ])
 
 const ModalContent = tw.div`
-    flex flex-col gap-16 w-290
+    flex flex-col gap-16 w-290 pt-32
     items-center
     justify-center
     bg-white

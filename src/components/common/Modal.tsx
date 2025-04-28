@@ -29,7 +29,7 @@ const Overlay = tw.div`
 `
 
 const Wrapper = tw.div`
-    flex flex-col pt-32
+    flex flex-col
     bg-white
     rounded-12
     shadow-lg

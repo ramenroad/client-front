@@ -427,21 +427,25 @@ export const DetailPage = () => {
       <Modal isOpen={isImagePopupOpen} onClose={closeImagePopup}>
         {selectedImageIndex !== null && selectedImages.length > 0 && (
           <PopupContainer>
-            <CloseButton onClick={closeImagePopup}>×</CloseButton>
-            <ImageCounter>
-              {selectedImageIndex + 1}/{selectedImages.length}
-            </ImageCounter>
-            <PopUpImage src={selectedImages[selectedImageIndex]} alt="popup" />
-            {typeof selectedImageIndex === 'number' && selectedImageIndex > 0 && (
-              <NavButtonLeft onClick={() => setSelectedImageIndex(selectedImageIndex - 1)}>
-                {"<"}
-              </NavButtonLeft>
-            )}
-            {typeof selectedImageIndex === 'number' && selectedImageIndex < selectedImages.length - 1 && (
-              <NavButtonRight onClick={() => setSelectedImageIndex(selectedImageIndex + 1)}>
-                {">"}
-              </NavButtonRight>
-            )}
+            <PopupHeader>
+              <CloseButton onClick={closeImagePopup}>×</CloseButton>
+              <ImageCounter>
+                {selectedImageIndex + 1}/{selectedImages.length}
+              </ImageCounter>
+            </PopupHeader>
+            <PopupContent>
+              {typeof selectedImageIndex === 'number' && selectedImageIndex > 0 && (
+                <NavButtonLeft onClick={() => setSelectedImageIndex(selectedImageIndex - 1)}>
+                  {"<"}
+                </NavButtonLeft>
+              )}
+              <PopUpImage src={selectedImages[selectedImageIndex]} alt="popup" />
+              {typeof selectedImageIndex === 'number' && selectedImageIndex < selectedImages.length - 1 && (
+                <NavButtonRight onClick={() => setSelectedImageIndex(selectedImageIndex + 1)}>
+                  {">"}
+                </NavButtonRight>
+              )}
+            </PopupContent>
           </PopupContainer>
         )}
       </Modal>
@@ -778,7 +782,7 @@ const EmptyImageText = tw.div`
 
 
 const ModalContent = tw.div`
-    flex flex-col gap-16 w-290
+    flex flex-col gap-16 w-290 pt-32
     items-center
     justify-center
     bg-white
@@ -826,20 +830,28 @@ const PopupContainer = tw.div`
   w-390 h-screen bg-black
 `;
 
+const PopupHeader = tw.div`
+  flex gap-4 items-start
+`;
+
 const CloseButton = tw.button`
-  top-4 left-4 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
+  text-white text-3xl z-10 bg-transparent border-none cursor-pointer
 `;
 
 const ImageCounter = tw.div`
-   top-4 left-1/2 transform -translate-x-1/2 text-white text-lg z-10
+  text-white text-lg z-10
+`;
+
+const PopupContent = tw.div`
+  relative flex flex-col gap-4 items-start
 `;
 
 const NavButtonLeft = tw.button`
-   left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
+  absolute top-1/2 left-4 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
 `;
 
 const NavButtonRight = tw.button`
-   right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
+  absolute top-1/2 right-4 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
 `;
 
 const PopUpImage = tw.img`
