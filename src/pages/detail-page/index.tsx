@@ -35,6 +35,7 @@ import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQ
 import { Modal } from "../../components/common/Modal";
 import { useModal } from "../../hooks/common/useModal";
 import { useSignInStore } from "../../states/sign-in";
+import { ReviewImage } from "../../components/common/ReviewImage";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -54,6 +55,7 @@ export const DetailPage = () => {
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
+  const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
   const { isSignIn } = useSignInStore();
 
   // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
@@ -88,6 +90,14 @@ export const DetailPage = () => {
   const handleLoginConfirm = () => {
     closeLoginModal();
     navigate("/login");
+  };
+
+  const handleOpenImagePopup = () => {
+    openImagePopup();
+  };
+
+  const handleNavigateImagesPage = () => {
+    navigate(`/images/${id}`);
   };
 
   return (
@@ -290,13 +300,20 @@ export const DetailPage = () => {
               {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls
                 ?.slice(0, 5)
                 .map((image: string, index: number) => (
-                  <Image key={index} src={image} />
+                  <ImageBox key={index}>
+                    <ReviewImage
+                      image={image}
+                      isImagePopupOpen={isImagePopupOpen}
+                      closeImagePopup={closeImagePopup}
+                      onClick={handleOpenImagePopup} />
+                  </ImageBox>
                 ))}
               {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
-                <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
-                  <Image
-                    src={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]}
-                  />
+                <MoreImageWrapper onClick={handleNavigateImagesPage}>
+                  <ImageBox>
+                    <ReviewImage
+                      image={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
+                  </ImageBox>
                   <MoreOverlay>
                     <MoreText>더보기</MoreText>
                     <IconArrowRight color="#FFFFFF" />
@@ -604,8 +621,8 @@ const ImageContainer = tw.div`
   rounded-8 overflow-hidden
 `;
 
-const Image = tw.img`
-  w-116 h-116 object-cover
+const ImageBox = tw.div`
+  w-116 h-116
 `;
 
 const ReviewWrapper = tw.div`

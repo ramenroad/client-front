@@ -2,10 +2,15 @@ import { useParams } from 'react-router-dom';
 import TopBar from '../../../components/common/TopBar'
 import tw from 'twin.macro'
 import { useRamenyaReviewImagesQuery } from '../../../hooks/queries/useRamenyaReviewQuery';
+import { useEffect } from 'react';
 
 export const ImagesPage = () => {
     const { id } = useParams();
     const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
     return (
         <Wrapper>
             <Header>
