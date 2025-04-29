@@ -36,6 +36,7 @@ import { Modal } from "../../components/common/Modal";
 import { useModal } from "../../hooks/common/useModal";
 import { useSignInStore } from "../../states/sign-in";
 import { ReviewImage } from "../../components/common/ReviewImage";
+import { ImagePopup } from "../../components/common/ImagePopup";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -418,27 +419,13 @@ export const DetailPage = () => {
 
       <Modal isOpen={isImagePopupOpen} onClose={closeImagePopup}>
         {selectedImageIndex !== null && selectedImages.length > 0 && (
-          <PopupContainer>
-            <PopupHeader>
-              <CloseButton onClick={closeImagePopup}>×</CloseButton>
-              <ImageCounter>
-                {selectedImageIndex + 1}/{selectedImages.length}
-              </ImageCounter>
-            </PopupHeader>
-            <PopupContent>
-              {typeof selectedImageIndex === 'number' && selectedImageIndex > 0 && (
-                <NavButtonLeft onClick={() => setSelectedImageIndex(selectedImageIndex - 1)}>
-                  {"<"}
-                </NavButtonLeft>
-              )}
-              <PopUpImage src={selectedImages[selectedImageIndex]} alt="popup" />
-              {typeof selectedImageIndex === 'number' && selectedImageIndex < selectedImages.length - 1 && (
-                <NavButtonRight onClick={() => setSelectedImageIndex(selectedImageIndex + 1)}>
-                  {">"}
-                </NavButtonRight>
-              )}
-            </PopupContent>
-          </PopupContainer>
+          <ImagePopup
+            isOpen={isImagePopupOpen}
+            onClose={closeImagePopup}
+            images={selectedImages}
+            selectedIndex={selectedImageIndex}
+            onIndexChange={setSelectedImageIndex}
+          />
         )}
       </Modal>
 
@@ -772,7 +759,6 @@ const EmptyImageText = tw.div`
   font-14-r text-gray-700
 `;
 
-
 const ModalContent = tw.div`
     flex flex-col gap-16 w-290 pt-32
     items-center
@@ -813,48 +799,6 @@ const ModalConfirmButton = tw.button`
     cursor-pointer
     border-none
     bg-transparent
-`;
-
-const PopupContainer = tw.div`
-  flex 
-  flex-col 
-  items-center 
-  w-390 h-screen 
-  bg-black
-`;
-
-const PopupHeader = tw.div`
-  flex w-full
-  justify-between 
-  pt-32
-`;
-
-const PopupContent = tw.div`
-  relative 
-  flex flex-col 
-  h-full
-  gap-4 items-start justify-center
-`;
-
-const CloseButton = tw.button`
-  text-white text-3xl z-10 bg-transparent border-none cursor-pointer
-`;
-
-const ImageCounter = tw.div`
-  text-white text-lg z-10
-`;
-
-
-const NavButtonLeft = tw.button`
-  absolute top-1/2 left-4 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
-`;
-
-const NavButtonRight = tw.button`
-  absolute top-1/2 right-4 transform -translate-y-1/2 text-white text-3xl z-10 bg-transparent border-none cursor-pointer
-`;
-
-const PopUpImage = tw.img`
-    w-390 h-fit object-cover
 `;
 
 export default DetailPage;

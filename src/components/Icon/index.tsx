@@ -647,3 +647,44 @@ export const IconFilterWithOrder = () => (
     />
   </svg>
 );
+
+
+export const IconNavLeft = () => (
+  <svg width="21" height="29" viewBox="0 0 21 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#filter0_d_1125_1151)">
+      <path d="M16 25L4.70711 13.7071C4.31658 13.3166 4.31658 12.6834 4.70711 12.2929L16 1" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+    </g>
+    <defs>
+      <filter id="filter0_d_1125_1151" x="-0.335938" y="0.25" width="21.0859" height="33.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+        <feOffset dy="4" />
+        <feGaussianBlur stdDeviation="2" />
+        <feComposite in2="hardAlpha" operator="out" />
+        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1125_1151" />
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1125_1151" result="shape" />
+      </filter>
+    </defs>
+  </svg>
+);
+
+export const IconNavRight = () => (
+  <svg width="21" height="29" viewBox="0 0 21 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#filter0_d_1125_1153)">
+      <path d="M5 25L16.2929 13.7071C16.6834 13.3166 16.6834 12.6834 16.2929 12.2929L5 1" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+    </g>
+    <defs>
+      <filter id="filter0_d_1125_1153" x="0.25" y="0.25" width="21.0859" height="33.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+        <feOffset dy="4" />
+        <feGaussianBlur stdDeviation="2" />
+        <feComposite in2="hardAlpha" operator="out" />
+        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1125_1153" />
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1125_1153" result="shape" />
+      </filter>
+    </defs>
+  </svg>
+);
