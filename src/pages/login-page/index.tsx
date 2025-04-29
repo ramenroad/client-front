@@ -1,5 +1,5 @@
 import TopBar from "../../components/common/TopBar";
-import RamenroadMainLogo from "../../assets/images/ramenroad-main-logo.svg";
+import RamenroadMainLogo from "../../assets/images/ramenroad-main-logo.png";
 import tw from "twin.macro";
 import { Line } from "../../components/common/Line";
 import { IconKakao } from "../../components/Icon";
@@ -23,7 +23,7 @@ const LoginPage = () => {
       <TopBar title="" />
       <LogoWrapper>
         <LogoImage src={RamenroadMainLogo} alt="ramenroad-main-logo" />
-        <LogoText>라멘 맛집 찾는다면, 라멘로드</LogoText>
+        <LogoText>라멘 맛집 찾는다면?</LogoText>
       </LogoWrapper>
       <LoginActionWrapper>
         <LoginTextWrapper>
@@ -60,7 +60,9 @@ const LogoWrapper = tw.div`
   mt-200
 `;
 
-const LogoImage = tw.img``;
+const LogoImage = tw.img`
+  w-175
+`;
 
 const LogoText = tw.span`
   font-14-m text-gray-700

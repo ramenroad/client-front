@@ -235,7 +235,7 @@ export const DetailPage = () => {
               <DetailIconTag icon={<IconCall />} text="전화번호" />
               <MarketDetailBoxContent>
                 <PhoneNumberText>
-                  {ramenyaDetailQuery.data?.contactNumber}
+                  {ramenyaDetailQuery.data?.contactNumber || '미공개'}
                 </PhoneNumberText>
               </MarketDetailBoxContent>
             </MarketDetailBox>
@@ -243,13 +243,17 @@ export const DetailPage = () => {
             <MarketDetailBox>
               <DetailIconTag icon={<IconInstagram />} text="인스타그램" />
               <MarketDetailBoxContent>
-                <InstagramLink
-                  href={ramenyaDetailQuery.data?.instagramProfile}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {ramenyaDetailQuery.data?.instagramProfile}
-                </InstagramLink>
+                {ramenyaDetailQuery.data?.instagramProfile ? (
+                  <InstagramLink
+                    href={ramenyaDetailQuery.data?.instagramProfile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {ramenyaDetailQuery.data?.instagramProfile}
+                  </InstagramLink>
+                ) : (
+                  <PhoneNumberText>미공개</PhoneNumberText>
+                )}
               </MarketDetailBoxContent>
             </MarketDetailBox>
           </MarketDetailBoxContainer>
@@ -610,8 +614,7 @@ const RecommendWrapper = tw.div`
 // const QuateEndBox = tw.div`  flex justify-end
 // `;
 
-// const QuoteEndImage = tw.img`
-//   w-30 h-22
+// const QuoteEndImage = tw.img`//   w-30 h-22
 // `;
 
 const ImageTitle = tw.div`
@@ -802,4 +805,5 @@ const ModalConfirmButton = tw.button`
 `;
 
 export default DetailPage;
+
 

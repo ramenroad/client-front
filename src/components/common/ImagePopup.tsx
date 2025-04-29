@@ -22,8 +22,8 @@ export const ImagePopup: React.FC<ImagePopupProps> = ({
     return (
         <PopupContainer>
             <PopupHeader>
-                <CloseButtonWrapper>
-                    <IconClose width={14} height={14} onClick={onClose} color="#FFFFFF" />
+                <CloseButtonWrapper onClick={onClose}>
+                    <IconClose width={14} height={14} color="#FFFFFF" />
                 </CloseButtonWrapper>
                 <ImageCounter>
                     {selectedIndex + 1}/{images.length}
