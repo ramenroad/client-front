@@ -28,7 +28,7 @@ const InformationPage = () => {
 
   return (
     <Layout>
-      <TopBar title="내 정보" navigate="/main" />
+      <TopBar title="내 정보" navigate="/mypage" />
       <Wrapper>
         <ProfileWrapper>
           <ProfileImageWrapper
