@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import tw from 'twin.macro';
 
 interface ModalProps {
@@ -7,9 +7,22 @@ interface ModalProps {
     children?: React.ReactNode;
 }
 
-
-
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+    useEffect(() => {
+        if (isOpen) {
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            document.body.style.overflow = 'hidden';
+            document.body.style.paddingRight = `${scrollbarWidth}px`;
+        } else {
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '0';
+        }
+        return () => {
+            document.body.style.overflow = 'auto';
+            document.body.style.paddingRight = '0';
+        };
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
@@ -29,7 +42,7 @@ const Overlay = tw.div`
 `
 
 const Wrapper = tw.div`
-    flex flex-col pt-32
+    flex flex-col
     bg-white
     rounded-12
     shadow-lg

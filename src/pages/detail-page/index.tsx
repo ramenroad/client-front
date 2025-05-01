@@ -35,6 +35,8 @@ import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQ
 import { Modal } from "../../components/common/Modal";
 import { useModal } from "../../hooks/common/useModal";
 import { useSignInStore } from "../../states/sign-in";
+import { ReviewImage } from "../../components/common/ReviewImage";
+import { ImagePopup } from "../../components/common/ImagePopup";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -54,12 +56,10 @@ export const DetailPage = () => {
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
+  const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
   const { isSignIn } = useSignInStore();
-
-  // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   // 오늘 요일 구하기
   const getCurrentDayIndex = () => {
@@ -89,6 +89,21 @@ export const DetailPage = () => {
     closeLoginModal();
     navigate("/login");
   };
+
+  const handleOpenImagePopup = (index: number, images: string[]) => {
+    setSelectedImageIndex(index);
+    setSelectedImages(images);
+    openImagePopup();
+  };
+
+  const handleNavigateImagesPage = () => {
+    navigate(`/images/${id}`);
+  };
+
+  // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Wrapper>
@@ -220,7 +235,7 @@ export const DetailPage = () => {
               <DetailIconTag icon={<IconCall />} text="전화번호" />
               <MarketDetailBoxContent>
                 <PhoneNumberText>
-                  {ramenyaDetailQuery.data?.contactNumber}
+                  {ramenyaDetailQuery.data?.contactNumber || '미공개'}
                 </PhoneNumberText>
               </MarketDetailBoxContent>
             </MarketDetailBox>
@@ -228,13 +243,17 @@ export const DetailPage = () => {
             <MarketDetailBox>
               <DetailIconTag icon={<IconInstagram />} text="인스타그램" />
               <MarketDetailBoxContent>
-                <InstagramLink
-                  href={ramenyaDetailQuery.data?.instagramProfile}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {ramenyaDetailQuery.data?.instagramProfile}
-                </InstagramLink>
+                {ramenyaDetailQuery.data?.instagramProfile ? (
+                  <InstagramLink
+                    href={ramenyaDetailQuery.data?.instagramProfile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {ramenyaDetailQuery.data?.instagramProfile}
+                  </InstagramLink>
+                ) : (
+                  <PhoneNumberText>미공개</PhoneNumberText>
+                )}
               </MarketDetailBoxContent>
             </MarketDetailBox>
           </MarketDetailBoxContainer>
@@ -290,13 +309,19 @@ export const DetailPage = () => {
               {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls
                 ?.slice(0, 5)
                 .map((image: string, index: number) => (
-                  <Image key={index} src={image} />
+                  <ImageBox key={index}>
+                    <ReviewImage
+                      image={image}
+                      onClick={() => handleOpenImagePopup(index, ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.slice(0, 5) || [])}
+                    />
+                  </ImageBox>
                 ))}
               {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
-                <MoreImageWrapper onClick={() => navigate(`/images/${id}`)}>
-                  <Image
-                    src={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]}
-                  />
+                <MoreImageWrapper onClick={handleNavigateImagesPage}>
+                  <ImageBox>
+                    <ReviewImage
+                      image={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
+                  </ImageBox>
                   <MoreOverlay>
                     <MoreText>더보기</MoreText>
                     <IconArrowRight color="#FFFFFF" />
@@ -320,11 +345,7 @@ export const DetailPage = () => {
             <LargeStarContainer
               onClick={handleNavigateReviewCreatePage}
             >
-              <IconStarLarge color="#E1E1E1" />
-              <IconStarLarge color="#E1E1E1" />
-              <IconStarLarge color="#E1E1E1" />
-              <IconStarLarge color="#E1E1E1" />
-              <IconStarLarge color="#E1E1E1" />
+              {[...Array(5)].map((_, i) => <IconStarLarge key={i} color="#E1E1E1" />)}
             </LargeStarContainer>
           </ReviewHeader>
 
@@ -347,11 +368,7 @@ export const DetailPage = () => {
               <>
                 <ReviewCardContainer>
                   {ramenyaDetailQuery.data?.reviews
-                    ?.sort(
-                      (a, b) =>
-                        new Date(b.createdAt).getTime() -
-                        new Date(a.createdAt).getTime()
-                    )
+                    ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                     .slice(0, 3)
                     .map((review) => (
                       <React.Fragment key={review._id}>
@@ -402,6 +419,18 @@ export const DetailPage = () => {
             <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
           </ModalButtonBox>
         </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isImagePopupOpen} onClose={closeImagePopup}>
+        {selectedImageIndex !== null && selectedImages.length > 0 && (
+          <ImagePopup
+            isOpen={isImagePopupOpen}
+            onClose={closeImagePopup}
+            images={selectedImages}
+            selectedIndex={selectedImageIndex}
+            onIndexChange={setSelectedImageIndex}
+          />
+        )}
       </Modal>
 
     </Wrapper>
@@ -585,8 +614,7 @@ const RecommendWrapper = tw.div`
 // const QuateEndBox = tw.div`  flex justify-end
 // `;
 
-// const QuoteEndImage = tw.img`
-//   w-30 h-22
+// const QuoteEndImage = tw.img`//   w-30 h-22
 // `;
 
 const ImageTitle = tw.div`
@@ -604,8 +632,8 @@ const ImageContainer = tw.div`
   rounded-8 overflow-hidden
 `;
 
-const Image = tw.img`
-  w-116 h-116 object-cover
+const ImageBox = tw.div`
+  w-116 h-116
 `;
 
 const ReviewWrapper = tw.div`
@@ -734,9 +762,8 @@ const EmptyImageText = tw.div`
   font-14-r text-gray-700
 `;
 
-
 const ModalContent = tw.div`
-    flex flex-col gap-16 w-290
+    flex flex-col gap-16 w-290 pt-32
     items-center
     justify-center
     bg-white
@@ -778,4 +805,5 @@ const ModalConfirmButton = tw.button`
 `;
 
 export default DetailPage;
+
 
