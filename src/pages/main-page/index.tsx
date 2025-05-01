@@ -8,6 +8,7 @@ import { Banner } from "../../components/common/Banner";
 import { GroupListBox } from "../../components/main-page/GroupListBox";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 import { useRegionsQuery } from "../../hooks/queries/useRamenyaListQuery";
+import { Swiper, SwiperSlide } from "swiper/react";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -52,26 +53,31 @@ const MainPage = () => {
           <GroupInfoBox>
             <GroupTitleBox>
               <GroupTitleText>{group.name}</GroupTitleText>
-              <GroupTitleButtonBox onClick={() => navigate(`/group`)}>
+              <GroupTitleButtonBox
+                onClick={() => navigate(`/group/${group._id}`)}
+              >
                 <GroupTitleButtonText>더보기</GroupTitleButtonText>
                 <IconArrowRight color="#888888" />
               </GroupTitleButtonBox>
             </GroupTitleBox>
             <GroupSubTitle>{group.description}</GroupSubTitle>
           </GroupInfoBox>
-          <GroupListWrapper>
-            {group.ramenyas.map((data) => (
-              <GroupListBox
-                key={data._id}
-                title={data.name}
-                subTitle={data.genre[0]}
-                image={data.thumbnailUrl ?? ""}
-                onClick={() => navigate(`/detail/${data._id}`)}
-                type={group.type}
-                region={data.region}
-              />
-            ))}
-          </GroupListWrapper>
+          <SwiperContainer>
+            <Swiper slidesPerView={2.1} spaceBetween={10} modules={[]}>
+              {group.ramenyas.map((data) => (
+                <SwiperSlide key={data._id}>
+                  <GroupListBox
+                    title={data.name}
+                    subTitle={data.genre[0]}
+                    image={data.thumbnailUrl ?? ""}
+                    onClick={() => navigate(`/detail/${data._id}`)}
+                    type={group.type}
+                    region={data.region}
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </SwiperContainer>
         </GroupViewingWrapper>
       ))}
     </Wrapper>
@@ -158,8 +164,8 @@ const GroupSubTitle = tw.span`
   flex font-14-r text-gray-800
 `;
 
-const GroupListWrapper = tw.div`
-  flex gap-10 w-full overflow-x-scroll scrollbar-hide
+const SwiperContainer = tw.div`
+  w-full
 `;
 
 export default MainPage;
