@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-
+import { useParams } from "react-router-dom";
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
 import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 import styled from "@emotion/styled";
@@ -8,20 +8,22 @@ import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 
 export const GroupPage = () => {
+  const { id } = useParams();
   useScrollToTop();
 
-  const { data: ramenyaGroup } = useRamenyaGroupQuery();
-  const ramenyaList = ramenyaGroup?.[0]?.ramenyas;
+  const { data: ramenyaGroupList } = useRamenyaGroupQuery();
+  const ramenyaGroup = ramenyaGroupList?.find((group) => group._id === id);
+  const ramenyaList = ramenyaGroup?.ramenyas;
 
   return (
     <Layout>
       <Wrapper>
         <HeaderSectionWrapper>
           <HeaderSection>
-            <TopBar title={ramenyaGroup?.[0]?.name || ""} />
-            <HeaderImage src={ramenyaGroup?.[0]?.descriptionImageUrl || ""} />
+            <TopBar title={ramenyaGroup?.name || ""} />
           </HeaderSection>
         </HeaderSectionWrapper>
+        <HeaderImage src={ramenyaGroup?.descriptionImageUrl || ""} />
         <InformationWrapper>
           {ramenyaList?.length === 0 ? (
             <NoStoreBox />
@@ -69,7 +71,7 @@ export const HeaderSection = tw.section`
 `;
 
 const HeaderImage = tw.img`
-  w-full h-78
+  w-full h-78 pt-44
 `;
 
 const SubLine = tw.div`
@@ -77,8 +79,7 @@ const SubLine = tw.div`
 `;
 
 const InformationWrapper = tw.section`
-  flex flex-col w-full h-full overflow-y-auto
-  pt-132
+  flex flex-col w-full h-full overflow-y-auto pt-10
 `;
 
 const InformationHeader = tw.span`
