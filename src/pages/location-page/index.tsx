@@ -12,10 +12,13 @@ import { Line } from "../../components/common/Line.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 import { useLocationStore } from "../../store/location/useLocationStore.ts";
 import { calculateDistanceValue } from "../../util/number.ts";
+import { usePopup } from "../../hooks/common/usePopup.ts";
+import { PopupType } from "../../types/index.ts";
 
 export const LocationPage = () => {
   useScrollToTop();
 
+  const { openPopup } = usePopup();
   const { location } = useParams();
 
   const ramenyaListQuery = useRamenyaListQuery({
@@ -77,7 +80,8 @@ export const LocationPage = () => {
             <TopBar title={location || ""} />
             <FilterWrapper>
               <StyledIconFilter
-                onClick={() => setSelectedFilterList([])}
+                // onClick={() => setSelectedFilterList([])}
+                onClick={() => openPopup(PopupType.FILTER)}
                 color={selectedFilterList.length >= 1 ? "#FF5E00" : "black"}
               />
               <TagWrapper>

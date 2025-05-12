@@ -59,6 +59,15 @@ module.exports = {
 
         kakao: "#FEE500",
         naver: "#03C75A",
+
+        filter: {
+          background: "#F6F6F6",
+          text: "#A0A0A0",
+          active: {
+            background: "#FFF4EB",
+            text: "#FF5E00",
+          },
+        },
       },
 
       fontFamily: {

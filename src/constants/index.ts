@@ -86,7 +86,9 @@ export const genrePath = [
   {
     genre: "마제소바",
     image: mazemen,
-  }
+  },
 ];
 
 export const ramenroadEmail = "ramenroad99@gmail.com";
+
+export const SORT_TYPES = ["추천순", "거리순", "평점순"];
