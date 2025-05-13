@@ -536,10 +536,10 @@ const MenuInput = tw.input`
     bg-border box-border
     px-12 py-10
     font-16-r
-    border-none
+    border-solid border-1 border-transparent
     outline-none
     text-black
-    focus-within:(border-orange border-solid border-1)
+    focus-within:(border-orange)
 `;
 
 const MenuAddButton = tw.button`
@@ -563,9 +563,10 @@ const ReviewTextAreaContainer = tw.div`
     rounded-8
     px-12 pt-10
     pb-36
-    border-none
+    border-solid border-1 border-transparent
     outline-none
-    focus-within:(border-orange border-solid border-1)
+    box-border
+    focus-within:(border-orange)
 `;
 
 const ReviewDescriptionTextarea = styled.textarea(() => [
