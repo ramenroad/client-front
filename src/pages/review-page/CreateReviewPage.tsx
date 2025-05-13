@@ -709,7 +709,7 @@ const ErrorMessage = tw.div`
 `;
 
 const ModalContent = tw.div`
-    flex flex-col gap-16 w-290
+    flex flex-col gap-16 w-290 pt-32
     items-center
     justify-center
     bg-white
@@ -721,7 +721,7 @@ const ModalTextBox = tw.div`
 `;
 
 const ModalTitle = tw.div`
-    font-16-sb text-gray-900
+    font-16-r text-gray-900
     text-center
 `;
 
