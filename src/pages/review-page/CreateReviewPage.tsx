@@ -538,6 +538,7 @@ const MenuInput = tw.input`
     font-16-r
     border-none
     outline-none
+    text-black
     focus-within:(border-orange border-solid border-1)
 `;
 
@@ -575,6 +576,7 @@ const ReviewDescriptionTextarea = styled.textarea(() => [
     font-16-r
     resize-none
     outline-none
+    text-black
     `,
   css`
     &::-webkit-scrollbar {
