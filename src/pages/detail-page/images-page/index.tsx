@@ -41,7 +41,7 @@ export const ImagesPage = () => {
                 ))}
             </ImageContainer>
 
-            <Modal isOpen={isImagePopupOpen} onClose={closeImagePopup} fullScreen>
+            <Modal isOpen={isImagePopupOpen} onClose={closeImagePopup}>
                 {selectedImageIndex !== null && ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls && (
                     <ImagePopup
                         isOpen={isImagePopupOpen}
