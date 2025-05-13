@@ -60,6 +60,7 @@ export const DetailPage = () => {
   const { isSignIn } = useSignInStore();
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [selectedRating, setSelectedRating] = useState<number>(0);
 
   // 오늘 요일 구하기
   const getCurrentDayIndex = () => {
@@ -77,12 +78,17 @@ export const DetailPage = () => {
 
   const todayBusinessHour = getTodayBusinessHour();
 
-  const handleNavigateReviewCreatePage = () => {
+  const handleStarClick = (rating: number) => {
+    setSelectedRating(rating);
+    handleNavigateReviewCreatePage(rating);
+  };
+
+  const handleNavigateReviewCreatePage = (rating: number = 0) => {
     if (!isSignIn) {
       openLoginModal();
       return;
     }
-    navigate(`/review/create/${id}`);
+    navigate(`/review/create/${id}?rating=${rating}`);
   };
 
   const handleLoginConfirm = () => {
@@ -342,10 +348,15 @@ export const DetailPage = () => {
               </ReviewerName>
               &nbsp;리뷰를 남겨주세요
             </ReviewHeaderTitle>
-            <LargeStarContainer
-              onClick={handleNavigateReviewCreatePage}
-            >
-              {[...Array(5)].map((_, i) => <IconStarLarge key={i} color="#E1E1E1" />)}
+            <LargeStarContainer>
+              {[...Array(5)].map((_, i) => (
+                <IconStarLarge
+                  key={i}
+                  color={i < selectedRating ? "#FFCC00" : "#E1E1E1"}
+                  onClick={() => handleStarClick(i + 1)}
+                  style={{ cursor: 'pointer' }}
+                />
+              ))}
             </LargeStarContainer>
           </ReviewHeader>
 
@@ -359,7 +370,7 @@ export const DetailPage = () => {
                 <EmptyReviewTitle>등록된 리뷰가 없습니다.</EmptyReviewTitle>
                 <EmptyReviewText>리뷰를 작성해주세요!</EmptyReviewText>
                 <CreateReviewButton
-                  onClick={handleNavigateReviewCreatePage}
+                  onClick={() => handleNavigateReviewCreatePage()}
                 >
                   리뷰 작성하기
                 </CreateReviewButton>

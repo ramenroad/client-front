@@ -27,6 +27,9 @@ export const CreateReviewPage = () => {
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
   const { isSignIn } = useSignInStore();
 
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialRating = parseInt(searchParams.get('rating') || '0', 10);
+
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [customMenuInput, setCustomMenuInput] = useState("");
   const [menuList, setMenuList] = useState(ramenyaDetail?.menus?.map((menu) => menu) || []);
@@ -43,7 +46,7 @@ export const CreateReviewPage = () => {
   } = useForm<Review>({
     defaultValues: {
       ramenyaId: id,
-      rating: 0,
+      rating: initialRating,
       review: "",
       reviewImages: [],
       menus: "",
