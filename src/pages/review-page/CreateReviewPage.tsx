@@ -408,7 +408,7 @@ export const CreateReviewPage = () => {
 
       <Modal isOpen={isBackModalOpen} onClose={handleCancelBack}>
         <ModalContent>
-          <ModalTitle>리뷰 작성을 멈추고 뒤로 갈까요?</ModalTitle>
+          <ModalText>리뷰 작성을 멈추고 뒤로 갈까요?</ModalText>
           <ModalButtonBox>
             <ModalCancelButton onClick={handleCancelBack}>
               취소
@@ -721,7 +721,7 @@ const ModalTextBox = tw.div`
 `;
 
 const ModalTitle = tw.div`
-    font-16-r text-gray-900
+    font-16-sb text-gray-900
     text-center
 `;
 
