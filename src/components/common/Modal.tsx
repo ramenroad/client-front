@@ -9,17 +9,9 @@ interface ModalProps {
 
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     useEffect(() => {
-        if (isOpen) {
-            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-            document.body.style.overflow = 'hidden';
-            document.body.style.paddingRight = `${scrollbarWidth}px`;
-        } else {
-            document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = '0';
-        }
+        document.body.style.overflow = isOpen ? 'hidden' : 'auto';
         return () => {
             document.body.style.overflow = 'auto';
-            document.body.style.paddingRight = '0';
         };
     }, [isOpen]);
 
