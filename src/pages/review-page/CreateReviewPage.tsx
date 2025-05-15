@@ -571,7 +571,7 @@ const ReviewTextAreaContainer = tw.div`
 
 const ReviewDescriptionTextarea = styled.textarea(() => [
   tw`
-    flex h-214 w-350
+    flex h-214 w-full
     bg-transparent
     border-none
     font-16-r
