@@ -30,6 +30,7 @@ const AppBarWrapper = tw.div`
   bg-white
   border-0 border-t border-border border-solid
   shadow-[0_-4px_4px_-4px_rgba(0,0,0,0.08)]
+  z-50
 `;
 
 const AppBarContainer = tw.div`
