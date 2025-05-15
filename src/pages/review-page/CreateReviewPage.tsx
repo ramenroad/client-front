@@ -27,6 +27,9 @@ export const CreateReviewPage = () => {
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
   const { isSignIn } = useSignInStore();
 
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialRating = parseInt(searchParams.get('rating') || '0', 10);
+
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [customMenuInput, setCustomMenuInput] = useState("");
   const [menuList, setMenuList] = useState(ramenyaDetail?.menus?.map((menu) => menu) || []);
@@ -43,7 +46,7 @@ export const CreateReviewPage = () => {
   } = useForm<Review>({
     defaultValues: {
       ramenyaId: id,
-      rating: 0,
+      rating: initialRating,
       review: "",
       reviewImages: [],
       menus: "",
@@ -405,7 +408,7 @@ export const CreateReviewPage = () => {
 
       <Modal isOpen={isBackModalOpen} onClose={handleCancelBack}>
         <ModalContent>
-          <ModalTitle>리뷰 작성을 멈추고 뒤로 갈까요?</ModalTitle>
+          <ModalText>리뷰 작성을 멈추고 뒤로 갈까요?</ModalText>
           <ModalButtonBox>
             <ModalCancelButton onClick={handleCancelBack}>
               취소
@@ -533,9 +536,10 @@ const MenuInput = tw.input`
     bg-border box-border
     px-12 py-10
     font-16-r
-    border-none
+    border-solid border-1 border-transparent
     outline-none
-    focus-within:(border-orange border-solid border-1)
+    text-black
+    focus-within:(border-orange)
 `;
 
 const MenuAddButton = tw.button`
@@ -559,9 +563,10 @@ const ReviewTextAreaContainer = tw.div`
     rounded-8
     px-12 pt-10
     pb-36
-    border-none
+    border-solid border-1 border-transparent
     outline-none
-    focus-within:(border-orange border-solid border-1)
+    box-border
+    focus-within:(border-orange)
 `;
 
 const ReviewDescriptionTextarea = styled.textarea(() => [
@@ -572,6 +577,7 @@ const ReviewDescriptionTextarea = styled.textarea(() => [
     font-16-r
     resize-none
     outline-none
+    text-black
     `,
   css`
     &::-webkit-scrollbar {
@@ -706,7 +712,7 @@ const ErrorMessage = tw.div`
 `;
 
 const ModalContent = tw.div`
-    flex flex-col gap-16 w-290
+    flex flex-col gap-16 w-290 pt-32
     items-center
     justify-center
     bg-white

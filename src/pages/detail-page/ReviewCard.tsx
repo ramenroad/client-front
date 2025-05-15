@@ -9,13 +9,16 @@ import { Modal } from '../../components/common/Modal'
 import { useUserInformationQuery } from '../../hooks/queries/useUserInformationQuery'
 import { useRamenyaReviewDeleteMutation } from '../../hooks/queries/useRamenyaReviewQuery'
 import { useRamenyaDetailQuery } from '../../hooks/queries/useRamenyaDetailQuery'
+import { ImagePopup } from '../../components/common/ImagePopup'
 
 export const ReviewCard = ({ review }: { review: UserReview }) => {
     const userInformationQuery = useUserInformationQuery();
     const { mutate: deleteReview } = useRamenyaReviewDeleteMutation();
     const { refetch: refetchRamenyaDetail } = useRamenyaDetailQuery(review.ramenyaId);
     const { isOpen, open, close } = useModal()
+    const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal()
     const [isExpanded, setIsExpanded] = React.useState(false)
+    const [selectedImageIndex, setSelectedImageIndex] = React.useState<number | null>(null)
     const MAX_TEXT_LENGTH = 97
     const isTextLong = review.review.length > MAX_TEXT_LENGTH
 
@@ -26,7 +29,6 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
     const displayText = isTextLong && !isExpanded
         ? `${review.review.slice(0, MAX_TEXT_LENGTH)}...`
         : review.review
-
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -48,6 +50,11 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                 close();
             }
         });
+    }
+
+    const handleOpenImagePopup = (index: number) => {
+        setSelectedImageIndex(index);
+        openImagePopup();
     }
 
     return (
@@ -110,6 +117,8 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                             src={image}
                             index={index}
                             totalImages={review.reviewImageUrls?.length || 0}
+                            onClick={() => handleOpenImagePopup(index)}
+                            style={{ cursor: 'pointer' }}
                         />
                     ))}
                 </ReviewImages>
@@ -129,6 +138,17 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                     </ModalContent>
                 </Modal>
             }
+            <Modal isOpen={isImagePopupOpen} onClose={closeImagePopup}>
+                {selectedImageIndex !== null && review.reviewImageUrls && (
+                    <ImagePopup
+                        isOpen={isImagePopupOpen}
+                        onClose={closeImagePopup}
+                        images={review.reviewImageUrls}
+                        selectedIndex={selectedImageIndex}
+                        onIndexChange={setSelectedImageIndex}
+                    />
+                )}
+            </Modal>
         </>
     )
 }
