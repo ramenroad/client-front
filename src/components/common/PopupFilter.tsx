@@ -1,22 +1,22 @@
 import React, { useState } from "react";
 import tw from "twin.macro";
-import { FilterOptions } from "../../types/filter";
+import { FilterOptions, SortType } from "../../types/filter";
 import { Toggle } from "./Toggle";
-import { RAMENYA_TYPES, SORT_TYPES } from "../../constants";
+import { RAMENYA_TYPES } from "../../constants";
 import styled from "@emotion/styled";
 import { IconClose } from "../Icon";
 import { Button } from "./Button";
+import { ModalProps } from "../../types";
 
-interface PopupFilterProps {
-  onClose: () => void;
+export interface PopupFilterProps {
+  initialFilterOptions: FilterOptions;
+  onChange: (filterOptions: FilterOptions | null) => void;
 }
 
-export const PopupFilter: React.FC<PopupFilterProps> = ({ onClose }) => {
-  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
-    isOpen: true,
-    sort: [],
-    genre: [],
-  });
+export const PopupFilter: React.FC<PopupFilterProps & ModalProps> = (props) => {
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>(
+    props.initialFilterOptions
+  );
 
   const handleFilterChange = (type: keyof FilterOptions, value: string) => {
     if (type === "isOpen") {
@@ -25,7 +25,7 @@ export const PopupFilter: React.FC<PopupFilterProps> = ({ onClose }) => {
       if (type === "sort") {
         setFilterOptions((prev) => ({
           ...prev,
-          sort: [value],
+          sort: value as SortType,
         }));
       } else {
         if (filterOptions[type].includes(value)) {
@@ -47,7 +47,7 @@ export const PopupFilter: React.FC<PopupFilterProps> = ({ onClose }) => {
     <Wrapper>
       <Header>
         <Title>필터</Title>
-        <CloseButton onClick={onClose} />
+        <CloseButton onClick={props.onClose} />
       </Header>
       <Section>
         <Flex>
@@ -63,9 +63,9 @@ export const PopupFilter: React.FC<PopupFilterProps> = ({ onClose }) => {
       <Section>
         <SectionTitle>정렬</SectionTitle>
         <ButtonGroup>
-          {SORT_TYPES.map((type) => (
+          {Object.values(SortType).map((type) => (
             <FilterButton
-              active={filterOptions.sort.includes(type)}
+              active={filterOptions.sort === type}
               key={type}
               onClick={() => handleFilterChange("sort", type)}
             >
@@ -89,8 +89,23 @@ export const PopupFilter: React.FC<PopupFilterProps> = ({ onClose }) => {
         </ButtonGroup>
       </Section>
       <Flex>
-        <Button>적용하기</Button>
-        <Button variant="secondary">초기화</Button>
+        <Button
+          onClick={() => {
+            props.onChange(filterOptions);
+            props.onClose();
+          }}
+        >
+          적용하기
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setFilterOptions(props.initialFilterOptions);
+            props.onClose();
+          }}
+        >
+          초기화
+        </Button>
       </Flex>
     </Wrapper>
   );

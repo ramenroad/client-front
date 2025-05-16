@@ -26,7 +26,7 @@ const Overlay = tw.div`
 `;
 
 const PopupWrapper = tw.div`
-  w-full max-w-390 min-w-0 h-494
+  w-full max-w-390 min-w-0
   rounded-t-24 bg-white shadow-lg
   pt-32 px-20 pb-16
   box-border

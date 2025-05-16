@@ -1,14 +1,15 @@
-import React, {
+import {
   createContext,
   useContext,
   useState,
   ReactNode,
   useCallback,
-  useEffect,
 } from "react";
 import { Popup } from "./Popup";
 import { PopupType } from "../../types";
-import { PopupFilter } from "./PopupFilter";
+import { PopupFilter, PopupFilterProps } from "./PopupFilter";
+import { PopupSort } from "./PopupSort";
+import { PopupSortProps } from "./PopupSort";
 
 interface PopupContextType {
   openPopup: (type: PopupType, options?: unknown) => void;
@@ -36,20 +37,32 @@ export const PopupProvider = ({ children }: { children: ReactNode }) => {
 
   let popupContent: ReactNode = null;
 
-  useEffect(() => {
-    console.log(popupType);
-  }, [popupType]);
-
-  if (popupType === PopupType.FILTER) {
-    popupContent = <PopupFilter onClose={closePopup} />;
+  switch (popupType) {
+    case PopupType.FILTER:
+      popupContent = (
+        <PopupFilter
+          onClose={closePopup}
+          {...(popupOptions as PopupFilterProps)}
+        />
+      );
+      break;
+    case PopupType.SORT:
+      popupContent = (
+        <PopupSort onClose={closePopup} {...(popupOptions as PopupSortProps)} />
+      );
+      break;
+    default:
+      popupContent = null;
   }
 
   return (
     <PopupContext.Provider value={{ openPopup, closePopup }}>
       {children}
-      <Popup isOpen={isOpen} onClose={closePopup}>
-        {popupContent}
-      </Popup>
+      {popupContent && (
+        <Popup isOpen={isOpen} onClose={closePopup}>
+          {popupContent}
+        </Popup>
+      )}
     </PopupContext.Provider>
   );
 };
