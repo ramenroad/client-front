@@ -7,15 +7,36 @@ import NoStoreBox from "../../components/common/NoStoreBox.tsx";
 import styled from "@emotion/styled";
 import TopBar from "../../components/common/TopBar.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
-import { useMemo, useState } from "react";
-import { IconFilterWithOrder } from "../../components/Icon/index.tsx";
+import { useMemo } from "react";
+import { IconFilterWithTag } from "../../components/Icon/index.tsx";
 import { useLocationStore } from "../../store/location/useLocationStore.ts";
 import { calculateDistanceValue } from "../../util/number.ts";
+import { FilterOptions, SortType } from "../../types/filter/index.ts";
+import { usePopup } from "../../hooks/common/usePopup.ts";
+import { PopupType } from "../../types/index.ts";
+import { initialFilterOptions, OpenStatus } from "../../constants/index.ts";
+import { checkBusinessStatus } from "../../util/index.ts";
+import { useSessionStorage } from "usehooks-ts";
 
 export const GenrePage = () => {
   useScrollToTop();
 
+  const { openPopup } = usePopup();
+
   const { genre } = useParams();
+
+  const [filterOptions, setFilterOptions] = useSessionStorage<FilterOptions>(
+    "genrePageFilterOptions",
+    initialFilterOptions
+  );
+
+  const filterCount = useMemo(() => {
+    let count = 0;
+    if (filterOptions.isOpen) count++;
+    if (filterOptions.sort !== SortType.DEFAULT) count++;
+    if (filterOptions.genre.length > 1) count += filterOptions.genre.length - 1;
+    return count;
+  }, [filterOptions]);
 
   const ramenyaListQuery = useRamenyaListQuery({
     type: "genre",
@@ -23,18 +44,36 @@ export const GenrePage = () => {
   });
 
   const { current } = useLocationStore();
-  const [filterType, setFilterType] = useState<"distance" | "rating">(
-    "distance"
-  );
 
-  const ramenyaList = ramenyaListQuery.data;
+  const ramenyaList = useMemo(() => {
+    if (!ramenyaListQuery.data) return [];
 
-  const filteredRamenyaList = useMemo(() => {
-    if (filterType === "distance") {
+    let filtered = ramenyaListQuery.data;
+
+    // 0. 영업중 필터링
+    if (filterOptions.isOpen) {
+      filtered = filtered.filter(
+        (ramenya) =>
+          checkBusinessStatus(ramenya.businessHours).status === OpenStatus.OPEN
+      );
+    }
+
+    // 1. 장르 필터링
+    if (filterOptions.genre.length > 0) {
+      filtered = filtered.filter((ramenya) =>
+        filterOptions.genre.every((selectedGenre) =>
+          ramenya.genre.includes(selectedGenre)
+        )
+      );
+    }
+
+    // 2. 정렬
+    if (filterOptions.sort === SortType.DISTANCE) {
       if (current.latitude === 0 || current.longitude === 0) {
-        return ramenyaList;
+        return filtered;
       }
-      return ramenyaList?.sort(
+
+      return [...filtered].sort(
         (a, b) =>
           calculateDistanceValue(current, {
             latitude: a.latitude,
@@ -46,8 +85,10 @@ export const GenrePage = () => {
           })
       );
     }
-    return ramenyaList?.sort((a, b) => b.rating - a.rating);
-  }, [current, filterType, ramenyaList]);
+
+    // 평점 순 정렬
+    return [...filtered].sort((a, b) => b.rating - a.rating);
+  }, [filterOptions, ramenyaListQuery.data, current]);
 
   return (
     <Layout>
@@ -55,6 +96,69 @@ export const GenrePage = () => {
         <HeaderSectionWrapper>
           <HeaderSection>
             <TopBar title={genre || ""} />
+            <FilterWrapper>
+              <RelativeWrapper>
+                <StyledIconFilter
+                  onClick={() =>
+                    openPopup(PopupType.FILTER, {
+                      initialFilterOptions: initialFilterOptions,
+                      currentFilterOptions: filterOptions,
+                      pinned: genre,
+                      onChange: (filterOptions: FilterOptions | null) => {
+                        if (filterOptions) {
+                          setFilterOptions(filterOptions);
+                          return;
+                        }
+                        setFilterOptions(initialFilterOptions);
+                      },
+                    })
+                  }
+                  color={filterCount === 0 ? "black" : "#FF5E00"}
+                />
+                {filterCount > 1 && <FilterCount>{filterCount}</FilterCount>}
+              </RelativeWrapper>
+              <FilterButton
+                active={filterOptions.isOpen}
+                onClick={() => {
+                  setFilterOptions((prev) => ({
+                    ...prev,
+                    isOpen: !prev.isOpen,
+                  }));
+                }}
+              >
+                영업중
+              </FilterButton>
+              <FilterButton
+                active
+                onClick={() => {
+                  openPopup(PopupType.SORT, {
+                    sortOption: filterOptions.sort,
+                    onChange: (sortOption: SortType | null) => {
+                      if (sortOption) {
+                        setFilterOptions((prev) => ({
+                          ...prev,
+                          sort: sortOption,
+                        }));
+                        return;
+                      }
+                      setFilterOptions(initialFilterOptions);
+                    },
+                  });
+                }}
+              >
+                {filterOptions.sort}
+              </FilterButton>
+              {filterOptions.genre?.length > 0 && (
+                <>
+                  <Divider />
+                  {filterOptions.genre.map((genre) => (
+                    <FilterButton key={genre} active>
+                      {genre}
+                    </FilterButton>
+                  ))}
+                </>
+              )}
+            </FilterWrapper>
           </HeaderSection>
         </HeaderSectionWrapper>
         <InformationWrapper>
@@ -62,31 +166,11 @@ export const GenrePage = () => {
             <NoStoreBox />
           ) : (
             <>
-              <RamenyaListHeader>
-                <InformationHeader>가게 정보</InformationHeader>
-                <FilterButtonContainer>
-                  <StyledIconFilter />
-                  <FilterButtonWrapper>
-                    <FilterButtonText
-                      isActive={filterType === "distance"}
-                      onClick={() => setFilterType("distance")}
-                    >
-                      거리순
-                    </FilterButtonText>
-                    <FilterButtonText
-                      isActive={filterType === "rating"}
-                      onClick={() => setFilterType("rating")}
-                    >
-                      평점순
-                    </FilterButtonText>
-                  </FilterButtonWrapper>
-                </FilterButtonContainer>
-              </RamenyaListHeader>
               <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
-                {filteredRamenyaList?.map((ramenya, index) => (
+                {ramenyaList?.map((ramenya, index) => (
                   <>
                     <RamenyaCard key={ramenya._id} ramenya={ramenya} />
-                    {index !== filteredRamenyaList.length - 1 && <SubLine />}
+                    {index !== ramenyaList.length - 1 && <SubLine />}
                   </>
                 ))}
               </RamenyaListWrapper>
@@ -118,33 +202,9 @@ export const HeaderSection = tw.section`
   border-0 border-x border-border border-solid box-border
 `;
 
-const RamenyaListHeader = tw.div`
-  flex justify-between
-  w-full px-20
-  bg-white
-  box-border
+const StyledIconFilter = tw(IconFilterWithTag)`
+  cursor-pointer
 `;
-
-const StyledIconFilter = tw(IconFilterWithOrder)`
-  mr-2
-`;
-
-const FilterButtonContainer = tw.div`
-  flex flex-row items-center box-border justify-end
-  font-14-sb
-  flex-1
-  bg-white
-  select-none
-`;
-
-const FilterButtonWrapper = tw.div`
-  flex flex-row items-center gap-8
-`;
-
-const FilterButtonText = styled.span<{ isActive: boolean }>(({ isActive }) => [
-  tw`cursor-pointer`,
-  !isActive && tw`text-gray-400`,
-]);
 
 const SubLine = tw.div`
   w-full h-1 bg-border box-border mx-20
@@ -152,11 +212,7 @@ const SubLine = tw.div`
 
 const InformationWrapper = tw.section`
   flex flex-col w-full h-full overflow-y-auto box-border
-  pt-60
-`;
-
-const InformationHeader = tw.span`
-  font-14-sb box-border
+  mt-84
 `;
 
 interface RamenyaListWrapperProps {
@@ -169,5 +225,42 @@ const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
     isEmpty && tw`h-full`,
   ]
 );
+
+const FilterWrapper = tw.section`
+  flex flex-nowrap items-center
+  box-border h-30 mt-11 mb-20 px-20 gap-8 w-full 
+  overflow-x-auto overflow-y-hidden scrollbar-hide
+  whitespace-nowrap
+  box-border
+`;
+
+const RelativeWrapper = tw.div`
+  relative flex-shrink-0 box-border
+  h-30
+`;
+
+interface FilterButtonProps {
+  active?: boolean;
+}
+
+const FilterButton = styled.button<FilterButtonProps>(({ active }) => [
+  tw`
+    px-12 py-4 rounded-50 font-14-r border-none cursor-pointer
+    bg-filter-background text-filter-text
+    flex-shrink-0 inline-block
+  `,
+  active && tw`bg-filter-active-background text-filter-active-text`,
+]);
+
+const FilterCount = tw.div`
+  absolute top-0 right-0 w-14 h-14
+  flex items-center justify-center
+  rounded-full bg-orange text-white
+  text-9
+`;
+
+const Divider = tw.div`
+  w-1 h-24 bg-border box-border flex-shrink-0 inline-block
+`;
 
 export default GenrePage;

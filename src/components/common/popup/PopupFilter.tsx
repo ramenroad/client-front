@@ -1,22 +1,29 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import tw from "twin.macro";
-import { FilterOptions, SortType } from "../../types/filter";
-import { Toggle } from "./Toggle";
-import { RAMENYA_TYPES } from "../../constants";
+import { FilterOptions, SortType } from "../../../types/filter";
+import { Toggle } from "../Toggle";
+import { RAMENYA_TYPES } from "../../../constants";
 import styled from "@emotion/styled";
-import { IconClose } from "../Icon";
-import { Button } from "./Button";
-import { ModalProps } from "../../types";
+import { IconClose, IconPinned } from "../../Icon";
+import { Button } from "../Button";
+import { ModalProps } from "../../../types";
 
 export interface PopupFilterProps {
   initialFilterOptions: FilterOptions;
+  currentFilterOptions: FilterOptions;
+  pinned?: (typeof RAMENYA_TYPES)[number];
   onChange: (filterOptions: FilterOptions | null) => void;
 }
 
 export const PopupFilter: React.FC<PopupFilterProps & ModalProps> = (props) => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(
-    props.initialFilterOptions
+    props.currentFilterOptions
   );
+
+  const ramenyaGenre = useMemo(() => {
+    const filteredTypes = RAMENYA_TYPES.filter((type) => type !== props.pinned);
+    return props.pinned ? [props.pinned, ...filteredTypes] : filteredTypes;
+  }, [props.pinned]);
 
   const handleFilterChange = (type: keyof FilterOptions, value: string) => {
     if (type === "isOpen") {
@@ -77,18 +84,42 @@ export const PopupFilter: React.FC<PopupFilterProps & ModalProps> = (props) => {
       <Section>
         <SectionTitle>장르</SectionTitle>
         <ButtonGroup>
-          {RAMENYA_TYPES.map((type) => (
-            <FilterButton
-              active={filterOptions.genre.includes(type)}
-              key={type}
-              onClick={() => handleFilterChange("genre", type)}
-            >
-              {type}
-            </FilterButton>
-          ))}
+          {ramenyaGenre.map((type) => {
+            if (type === props.pinned) {
+              return (
+                <FilterButton
+                  active={true}
+                  key={type}
+                  // onClick={() => handleFilterChange("genre", type)}
+                >
+                  <IconPinned />
+                  {type}
+                </FilterButton>
+              );
+            }
+            return (
+              <FilterButton
+                active={filterOptions.genre.includes(type)}
+                key={type}
+                onClick={() => handleFilterChange("genre", type)}
+              >
+                {type}
+              </FilterButton>
+            );
+          })}
         </ButtonGroup>
       </Section>
       <Flex>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setFilterOptions(props.initialFilterOptions);
+            props.onChange(props.initialFilterOptions);
+            props.onClose();
+          }}
+        >
+          초기화
+        </Button>
         <Button
           onClick={() => {
             props.onChange(filterOptions);
@@ -96,15 +127,6 @@ export const PopupFilter: React.FC<PopupFilterProps & ModalProps> = (props) => {
           }}
         >
           적용하기
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={() => {
-            setFilterOptions(props.initialFilterOptions);
-            props.onClose();
-          }}
-        >
-          초기화
         </Button>
       </Flex>
     </Wrapper>
@@ -144,6 +166,7 @@ const FilterButton = styled.button<FilterButtonProps>(({ active }) => [
   tw`
     px-12 py-6 rounded-50 font-14-r border-none cursor-pointer
     bg-filter-background text-filter-text
+    flex items-center gap-[1.5px]
   `,
   active && tw`bg-filter-active-background text-filter-active-text`,
 ]);

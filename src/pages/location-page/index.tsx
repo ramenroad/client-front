@@ -14,12 +14,8 @@ import { usePopup } from "../../hooks/common/usePopup.ts";
 import { PopupType } from "../../types/index.ts";
 import { FilterOptions, SortType } from "../../types/filter/index.ts";
 import { IconFilterWithTag } from "../../components/Icon/index.tsx";
-
-const initialFilterOptions: FilterOptions = {
-  isOpen: true,
-  sort: SortType.DEFAULT,
-  genre: [],
-};
+import { initialFilterOptions } from "../../constants/index.ts";
+import { useSessionStorage } from "usehooks-ts";
 
 export const LocationPage = () => {
   useScrollToTop();
@@ -34,12 +30,14 @@ export const LocationPage = () => {
 
   const [selectedFilterList, setSelectedFilterList] = useState<string[]>([]);
   const { current } = useLocationStore();
-  const [filterOptions, setFilterOptions] =
-    useState<FilterOptions>(initialFilterOptions);
+  const [filterOptions, setFilterOptions] = useSessionStorage<FilterOptions>(
+    "locationPageFilterOptions",
+    initialFilterOptions
+  );
 
   const filterCount = useMemo(() => {
     let count = 0;
-    if (!initialFilterOptions.isOpen) count++;
+    if (filterOptions.isOpen) count++;
     if (filterOptions.sort !== SortType.DEFAULT) count++;
     if (filterOptions.genre.length > 1) count += filterOptions.genre.length - 1;
     return count;
@@ -52,7 +50,9 @@ export const LocationPage = () => {
     let filtered = ramenyaListQuery.data;
     if (filterOptions.genre.length > 0) {
       filtered = filtered.filter((ramenya) =>
-        ramenya.genre.some((genre) => filterOptions.genre.includes(genre))
+        filterOptions.genre.every((selectedGenre) =>
+          ramenya.genre.includes(selectedGenre)
+        )
       );
     }
 
@@ -104,10 +104,10 @@ export const LocationPage = () => {
             <FilterWrapper>
               <RelativeWrapper>
                 <StyledIconFilter
-                  // onClick={() => setSelectedFilterList([])}
                   onClick={() =>
                     openPopup(PopupType.FILTER, {
-                      initialFilterOptions: filterOptions,
+                      initialFilterOptions: initialFilterOptions,
+                      currentFilterOptions: filterOptions,
                       onChange: (filterOptions: FilterOptions | null) => {
                         console.log(filterOptions);
                         if (filterOptions) {
@@ -118,9 +118,7 @@ export const LocationPage = () => {
                       },
                     })
                   }
-                  color={
-                    filterOptions === initialFilterOptions ? "black" : "#FF5E00"
-                  }
+                  color={filterCount === 0 ? "black" : "#FF5E00"}
                 />
                 {filterCount > 1 && <FilterCount>{filterCount}</FilterCount>}
               </RelativeWrapper>
@@ -189,8 +187,6 @@ export const LocationPage = () => {
             </>
           )}
         </InformationWrapper>
-
-        {/*<div onClick={() => navigate("/detail/라멘야1")}>디테일페이지</div>*/}
       </Wrapper>
     </Layout>
   );
@@ -218,7 +214,7 @@ export const HeaderSection = tw.section`
 
 const FilterWrapper = tw.section`
   flex flex-nowrap items-center
-  box-border h-30 mt-11 px-20 gap-8 w-full 
+  box-border h-30 mt-11 mb-20 px-20 gap-8 w-full 
   overflow-x-auto overflow-y-hidden scrollbar-hide
   whitespace-nowrap
   box-border

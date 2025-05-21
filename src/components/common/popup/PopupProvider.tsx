@@ -5,8 +5,8 @@ import {
   ReactNode,
   useCallback,
 } from "react";
-import { Popup } from "./Popup";
-import { PopupType } from "../../types";
+import { Popup } from "../Popup";
+import { PopupType } from "../../../types";
 import { PopupFilter, PopupFilterProps } from "./PopupFilter";
 import { PopupSort } from "./PopupSort";
 import { PopupSortProps } from "./PopupSort";

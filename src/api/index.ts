@@ -3,7 +3,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { useSignInStore } from "../states/sign-in";
 import { refreshToken } from "./auth";
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV !== "production";
 
 export const createAxiosInstance = (
   queryClient: QueryClient,
