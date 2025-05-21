@@ -11,6 +11,7 @@ import {
   IconTime,
   IconArrowRight,
   IconStarMedium,
+  IconMap,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -55,10 +56,20 @@ export const DetailPage = () => {
   const userInformationQuery = useUserInformationQuery();
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
-  const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
-  const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
+  const {
+    isOpen: isLoginModalOpen,
+    open: openLoginModal,
+    close: closeLoginModal,
+  } = useModal();
+  const {
+    isOpen: isImagePopupOpen,
+    open: openImagePopup,
+    close: closeImagePopup,
+  } = useModal();
   const { isSignIn } = useSignInStore();
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null
+  );
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number>(0);
 
@@ -106,6 +117,10 @@ export const DetailPage = () => {
     navigate(`/images/${id}`);
   };
 
+  const handleOpenMapURL = (url: string) => {
+    window.open(url, "_blank");
+  };
+
   // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -139,7 +154,7 @@ export const DetailPage = () => {
                       key={star}
                       color={
                         (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
-                          Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
+                        Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
                           ? "#FFCC00"
                           : "#E1E1E1"
                       }
@@ -241,7 +256,7 @@ export const DetailPage = () => {
               <DetailIconTag icon={<IconCall />} text="전화번호" />
               <MarketDetailBoxContent>
                 <PhoneNumberText>
-                  {ramenyaDetailQuery.data?.contactNumber || '미공개'}
+                  {ramenyaDetailQuery.data?.contactNumber || "미공개"}
                 </PhoneNumberText>
               </MarketDetailBoxContent>
             </MarketDetailBox>
@@ -298,17 +313,19 @@ export const DetailPage = () => {
               <QuoteEndImage src={quoteEnd} />
             </QuateEndBox>
           </RecommendTextContainer> */}
-
         </RecommendWrapper>
         <Divider />
 
         <ImageWrapper>
           <ImageTitle>사진</ImageTitle>
-          {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length === 0 ? (
+          {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length ===
+          0 ? (
             <EmptyImageContainer>
               <EmptyImageImage src={emptyImage} />
               <EmptyImageTitle>등록된 사진이 없습니다.</EmptyImageTitle>
-              <EmptyImageText>리뷰를 작성하고 사진을 등록해주세요!</EmptyImageText>
+              <EmptyImageText>
+                리뷰를 작성하고 사진을 등록해주세요!
+              </EmptyImageText>
             </EmptyImageContainer>
           ) : (
             <ImageContainer>
@@ -318,15 +335,28 @@ export const DetailPage = () => {
                   <ImageBox key={index}>
                     <ReviewImage
                       image={image}
-                      onClick={() => handleOpenImagePopup(index, ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.slice(0, 5) || [])}
+                      onClick={() =>
+                        handleOpenImagePopup(
+                          index,
+                          ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.slice(
+                            0,
+                            5
+                          ) || []
+                        )
+                      }
                     />
                   </ImageBox>
                 ))}
-              {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
+              {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length >
+                5 && (
                 <MoreImageWrapper onClick={handleNavigateImagesPage}>
                   <ImageBox>
                     <ReviewImage
-                      image={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
+                      image={
+                        ramenyaReviewImagesQuery.data
+                          ?.ramenyaReviewImagesUrls?.[5]
+                      }
+                    />
                   </ImageBox>
                   <MoreOverlay>
                     <MoreText>더보기</MoreText>
@@ -344,7 +374,8 @@ export const DetailPage = () => {
           <ReviewHeader>
             <ReviewHeaderTitle>
               <ReviewerName>
-                {userInformationQuery.data?.nickname && userInformationQuery.data?.nickname + "님"}
+                {userInformationQuery.data?.nickname &&
+                  userInformationQuery.data?.nickname + "님"}
               </ReviewerName>
               &nbsp;리뷰를 남겨주세요
             </ReviewHeaderTitle>
@@ -354,7 +385,7 @@ export const DetailPage = () => {
                   key={i}
                   color={i < selectedRating ? "#FFCC00" : "#E1E1E1"}
                   onClick={() => handleStarClick(i + 1)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 />
               ))}
             </LargeStarContainer>
@@ -379,7 +410,11 @@ export const DetailPage = () => {
               <>
                 <ReviewCardContainer>
                   {ramenyaDetailQuery.data?.reviews
-                    ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                    ?.sort(
+                      (a, b) =>
+                        new Date(b.createdAt).getTime() -
+                        new Date(a.createdAt).getTime()
+                    )
                     .slice(0, 3)
                     .map((review) => (
                       <React.Fragment key={review._id}>
@@ -396,8 +431,6 @@ export const DetailPage = () => {
                 </AllReviewButton>
               </>
             )}
-
-
           </ReviewContent>
         </ReviewWrapper>
 
@@ -413,21 +446,62 @@ export const DetailPage = () => {
               />
             </LocationWrapper>
           )}
+        <MapRedirectButtonContainer>
+          {ramenyaDetailQuery.data?.naverMapUrl && (
+            <MapRedirectButton
+              onClick={() => {
+                if (ramenyaDetailQuery.data?.naverMapUrl) {
+                  handleOpenMapURL(ramenyaDetailQuery.data?.naverMapUrl);
+                }
+              }}
+            >
+              <IconMap type={"naver"} />
+              <span>네이버 지도 바로가기</span>
+              <StyledIconArrowRight color="#888888" />
+            </MapRedirectButton>
+          )}
+          {ramenyaDetailQuery.data?.kakaoMapUrl && (
+            <MapRedirectButton
+              onClick={() => {
+                if (ramenyaDetailQuery.data?.kakaoMapUrl) {
+                  handleOpenMapURL(ramenyaDetailQuery.data?.kakaoMapUrl);
+                }
+              }}
+            >
+              <IconMap type={"kakao"} />
+              <span>카카오맵 바로가기</span>
+              <StyledIconArrowRight color="#888888" />
+            </MapRedirectButton>
+          )}
+          {ramenyaDetailQuery.data?.googleMapUrl && (
+            <MapRedirectButton
+              onClick={() => {
+                if (ramenyaDetailQuery.data?.googleMapUrl) {
+                  handleOpenMapURL(ramenyaDetailQuery.data?.googleMapUrl);
+                }
+              }}
+            >
+              <IconMap type={"google"} />
+              <span>구글맵 바로가기</span>
+              <StyledIconArrowRight color="#888888" />
+            </MapRedirectButton>
+          )}
+        </MapRedirectButtonContainer>
       </Container>
 
       <Modal isOpen={isLoginModalOpen} onClose={closeLoginModal}>
         <ModalContent>
           <ModalTextBox>
-            <ModalTitle>
-              로그인이 필요해요
-            </ModalTitle>
-            <ModalText>
-              로그인 하시겠습니까?
-            </ModalText>
+            <ModalTitle>로그인이 필요해요</ModalTitle>
+            <ModalText>로그인 하시겠습니까?</ModalText>
           </ModalTextBox>
           <ModalButtonBox>
-            <ModalCancelButton onClick={closeLoginModal}>취소</ModalCancelButton>
-            <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
+            <ModalCancelButton onClick={closeLoginModal}>
+              취소
+            </ModalCancelButton>
+            <ModalConfirmButton onClick={handleLoginConfirm}>
+              확인
+            </ModalConfirmButton>
           </ModalButtonBox>
         </ModalContent>
       </Modal>
@@ -443,7 +517,6 @@ export const DetailPage = () => {
           />
         )}
       </Modal>
-
     </Wrapper>
   );
 };
@@ -815,6 +888,22 @@ const ModalConfirmButton = tw.button`
     bg-transparent
 `;
 
+const MapRedirectButtonContainer = tw.div`
+  flex flex-col px-20 gap-8
+`;
+
+const MapRedirectButton = tw.button`
+  bg-transparent box-border
+  border border-solid border-gray-100 rounded-8
+  flex items-center gap-10
+  py-14 px-20 h-52
+  font-14-r
+  text-black
+  cursor-pointer
+`;
+
+const StyledIconArrowRight = tw(IconArrowRight)`
+  ml-auto
+`;
+
 export default DetailPage;
-
-
