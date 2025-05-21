@@ -3,54 +3,60 @@ import tw from 'twin.macro';
 import { IconClose, IconNavLeft, IconNavRight } from '../Icon';
 
 interface ImagePopupProps {
-    isOpen: boolean;
-    onClose: () => void;
-    images: string[];
-    selectedIndex: number;
-    onIndexChange: (index: number) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  images: string[];
+  selectedIndex: number;
+  onIndexChange: (index: number) => void;
+  title?: string;
 }
 
 export const ImagePopup: React.FC<ImagePopupProps> = ({
-    isOpen,
-    onClose,
-    images,
-    selectedIndex,
-    onIndexChange,
+  isOpen,
+  onClose,
+  images,
+  selectedIndex,
+  onIndexChange,
+  title,
 }) => {
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    return (
-        <PopupContainer>
-            <PopupHeader>
-                <CloseButtonWrapper onClick={onClose}>
-                    <IconClose width={14} height={14} color="#FFFFFF" />
-                </CloseButtonWrapper>
-                <ImageCounter>
-                    {selectedIndex + 1}/{images.length}
-                </ImageCounter>
-            </PopupHeader>
-            <PopupContent>
-                {selectedIndex > 0 && (
-                    <NavButtonLeft onClick={() => onIndexChange(selectedIndex - 1)}>
-                        <IconNavLeft />
-                    </NavButtonLeft>
-                )}
-                <PopUpImage src={images[selectedIndex]} alt="popup" />
-                {selectedIndex < images.length - 1 && (
-                    <NavButtonRight onClick={() => onIndexChange(selectedIndex + 1)}>
-                        <IconNavRight />
-                    </NavButtonRight>
-                )}
-            </PopupContent>
-        </PopupContainer>
-    );
+  return (
+    <PopupContainer>
+      <PopupHeader>
+        <CloseButtonWrapper onClick={onClose}>
+          <IconClose width={14} height={14} color="#FFFFFF" />
+        </CloseButtonWrapper>
+        {title ? (
+          <Title>{title}</Title>
+        ) : (
+          <ImageCounter>
+            {selectedIndex + 1}/{images.length}
+          </ImageCounter>
+        )}
+      </PopupHeader>
+      <PopupContent>
+        {selectedIndex > 0 && (
+          <NavButtonLeft onClick={() => onIndexChange(selectedIndex - 1)}>
+            <IconNavLeft />
+          </NavButtonLeft>
+        )}
+        <PopUpImage src={images[selectedIndex]} alt="popup" />
+        {selectedIndex < images.length - 1 && (
+          <NavButtonRight onClick={() => onIndexChange(selectedIndex + 1)}>
+            <IconNavRight />
+          </NavButtonRight>
+        )}
+      </PopupContent>
+    </PopupContainer>
+  );
 };
 
 const PopupContainer = tw.div`
   flex 
   flex-col 
   items-center 
-  w-390 h-screen 
+  w-full h-screen 
   bg-black
 `;
 
@@ -78,9 +84,12 @@ const ImageCounter = tw.div`
   text-white font-16-sb
 `;
 
+const Title = tw.div`
+  text-white font-16-sb
+`;
+
 const PopUpImage = tw.img`
   w-390 h-fit object-cover
-
 `;
 
 const NavButtonLeft = tw.button`
