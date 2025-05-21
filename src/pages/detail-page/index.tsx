@@ -889,7 +889,7 @@ const ModalConfirmButton = tw.button`
 `;
 
 const MapRedirectButtonContainer = tw.div`
-  flex flex-col px-20 gap-8
+  flex flex-col px-20 gap-8 mt-16
 `;
 
 const MapRedirectButton = tw.button`
