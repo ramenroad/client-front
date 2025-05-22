@@ -34,7 +34,7 @@ export const GenrePage = () => {
     let count = 0;
     if (filterOptions.isOpen) count++;
     if (filterOptions.sort !== SortType.DEFAULT) count++;
-    if (filterOptions.genre.length > 1) count += filterOptions.genre.length - 1;
+    count += filterOptions.genre.length;
     return count;
   }, [filterOptions]);
 

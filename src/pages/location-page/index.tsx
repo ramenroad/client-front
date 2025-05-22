@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/queries/useRamenyaListQuery";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 import styled from "@emotion/styled";
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
@@ -38,7 +38,7 @@ export const LocationPage = () => {
     let count = 0;
     if (filterOptions.isOpen) count++;
     if (filterOptions.sort !== SortType.DEFAULT) count++;
-    count += filterOptions.genre.length - 1;
+    count += filterOptions.genre.length;
     return count;
   }, [filterOptions]);
 
