@@ -4,18 +4,20 @@ import { queryClient } from "./core/queryClient";
 import tw from "twin.macro";
 import { ToastProvider } from "./components/ToastProvider.tsx";
 import "swiper/css";
-
+import { PopupProvider } from "./components/common/popup/PopupProvider.tsx";
 function App() {
   return (
-    <ToastProvider>
-      <QueryClientProvider client={queryClient}>
-        <Screen>
-          <View>
-            <Routes />
-          </View>
-        </Screen>
-      </QueryClientProvider>
-    </ToastProvider>
+    <PopupProvider>
+      <ToastProvider>
+        <QueryClientProvider client={queryClient}>
+          <Screen>
+            <View>
+              <Routes />
+            </View>
+          </Screen>
+        </QueryClientProvider>
+      </ToastProvider>
+    </PopupProvider>
   );
 }
 

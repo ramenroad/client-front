@@ -119,3 +119,12 @@ export interface UserReview extends Review {
   updatedAt: Date;
   reviewImageUrls?: string[];
 }
+
+export enum PopupType {
+  FILTER = "FILTER",
+  SORT = "SORT",
+}
+
+export interface ModalProps {
+  onClose: () => void;
+}

@@ -20,54 +20,38 @@ export const IconSample = ({ color, ...rest }: IconProps) => (
 
 export const IconFilterWithTag = ({ color, ...rest }: IconProps) => (
   <svg
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
+    width="30"
+    height="30"
+    viewBox="0 0 30 30"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
     {...rest}
   >
+    <rect x="0.5" y="0.5" width="29" height="29" rx="14.5" stroke="#D9D9D9" />
     <path
-      d="M3 6H21"
-      stroke={color ?? "#414141"}
+      d="M8 12.5H11.5M14.25 12.5H23"
+      stroke={color ?? "#FF5E00"}
       strokeWidth="1.5"
       strokeLinecap="round"
     />
     <path
-      d="M3 12H21"
-      stroke={color ?? "#414141"}
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-    <path
-      d="M3 18H21"
-      stroke={color ?? "#414141"}
+      d="M8 17.5H17.5M20.5 17.5H23"
+      stroke={color ?? "#FF5E00"}
       strokeWidth="1.5"
       strokeLinecap="round"
     />
     <circle
-      cx="8.5"
-      cy="6"
-      r="1.75"
-      fill="white"
-      stroke={color ?? "#414141"}
+      cx="13"
+      cy="12.5"
+      r="1.25"
+      stroke={color ?? "#FF5E00"}
       strokeWidth="1.5"
     />
     <circle
-      cx="15.5"
-      cy="12"
-      r="1.75"
-      fill="white"
-      stroke={color ?? "#414141"}
-      strokeWidth="1.5"
-    />
-    <circle
-      cx="10.5"
-      cy="18"
-      r="1.75"
-      fill="white"
-      stroke={color ?? "#414141"}
+      cx="19"
+      cy="17.5"
+      r="1.25"
+      stroke={color ?? "#FF5E00"}
       strokeWidth="1.5"
     />
   </svg>
@@ -757,6 +741,61 @@ export const IconNavRight = () => (
         />
       </filter>
     </defs>
+  </svg>
+);
+
+export const IconCheck = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M4.5 9L8 13L15.5 6.5"
+      stroke="#FF5E00"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const IconPinned = () => (
+  <svg
+    width="18"
+    height="19"
+    viewBox="0 0 18 19"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <mask
+      id="mask0_1303_2011"
+      style={{ maskType: "alpha" }}
+      maskUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="18"
+      height="19"
+    >
+      <rect y="0.5" width="18" height="18" fill="#D9D9D9" />
+    </mask>
+    <g mask="url(#mask0_1303_2011)">
+      <rect
+        x="8.43945"
+        y="10.3535"
+        width="1"
+        height="5"
+        rx="0.5"
+        transform="rotate(45 8.43945 10.3535)"
+        fill="#888888"
+      />
+      <path
+        d="M14.8031 6.818C15.1936 7.20853 15.1936 7.84169 14.8031 8.23222C14.437 8.59818 13.8576 8.62149 13.4649 8.30127L13.3889 8.23222L10.9948 10.6263C11.2949 11.6395 11.1158 12.8138 10.4783 13.8179C10.1823 14.2839 9.53744 14.2799 9.14695 13.8898L5.61141 10.3542C5.22096 9.96377 5.21653 9.31828 5.68254 9.02219C6.68624 8.38494 7.85995 8.20611 8.8728 8.50567L11.2676 6.1109L11.1985 6.03494C10.8784 5.64221 10.9017 5.06272 11.2676 4.69668C11.6581 4.30618 12.2913 4.30623 12.6818 4.69668L14.8031 6.818Z"
+        fill="#FF5E00"
+      />
+    </g>
   </svg>
 );
 

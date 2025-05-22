@@ -11,6 +11,8 @@ import tsukemen from "../assets/images/ramen/tsukemen.png";
 import miso from "../assets/images/ramen/miso.png";
 import dandan from "../assets/images/ramen/dandan.png";
 import mazemen from "../assets/images/ramen/mazemen.png";
+import { FilterOptions } from "../types/filter";
+import { SortType } from "../types/filter";
 
 export const RAMENYA_TYPES = [
   "이에케",
@@ -24,7 +26,7 @@ export const RAMENYA_TYPES = [
   "탄탄멘",
   "토리",
   "츠케멘",
-];
+] as const;
 
 export enum OpenStatus {
   OPEN = "영업 중",
@@ -86,7 +88,13 @@ export const genrePath = [
   {
     genre: "마제소바",
     image: mazemen,
-  }
+  },
 ];
 
 export const ramenroadEmail = "ramenroad99@gmail.com";
+
+export const initialFilterOptions: FilterOptions = {
+  isOpen: false,
+  sort: SortType.DEFAULT,
+  genre: [],
+};
