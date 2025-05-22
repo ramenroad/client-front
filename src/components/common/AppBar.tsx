@@ -26,7 +26,7 @@ const AppBar = () => {
 const AppBarWrapper = tw.div`
   box-border
   fixed bottom-0 -translate-x-1/2
-  w-388 h-48
+  w-388 h-56
   bg-white
   border-0 border-t border-border border-solid
   shadow-[0_-4px_4px_-4px_rgba(0,0,0,0.08)]
@@ -40,14 +40,15 @@ const AppBarContainer = tw.div`
 `;
 
 const AppBarItem = tw.div`
-  flex flex-col items-center justify-center
+  flex flex-col items-center justify-center gap-1
+  pt-4 pb-8
   w-54 h-full
   cursor-pointer
-  box-border px-15 py-3
+  box-border
 `;
 
 const ItemText = styled.span<{ selected: boolean }>(({ selected }) => [
-  tw`font-12-r mt-1 text-gray-200`,
+  tw`font-12-r text-gray-200 h-12 leading-12`,
   selected && tw`text-black`,
 ]);
 
