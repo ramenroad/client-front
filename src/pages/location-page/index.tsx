@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/queries/useRamenyaListQuery";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 
 import styled from "@emotion/styled";
 import RamenyaCard from "../../components/common/RamenyaCard.tsx";
@@ -28,7 +28,6 @@ export const LocationPage = () => {
     value: location!,
   });
 
-  const [selectedFilterList, setSelectedFilterList] = useState<string[]>([]);
   const { current } = useLocationStore();
   const [filterOptions, setFilterOptions] = useSessionStorage<FilterOptions>(
     "locationPageFilterOptions",
@@ -39,7 +38,7 @@ export const LocationPage = () => {
     let count = 0;
     if (filterOptions.isOpen) count++;
     if (filterOptions.sort !== SortType.DEFAULT) count++;
-    if (filterOptions.genre.length > 1) count += filterOptions.genre.length - 1;
+    count += filterOptions.genre.length - 1;
     return count;
   }, [filterOptions]);
 
@@ -79,22 +78,6 @@ export const LocationPage = () => {
     return [...filtered].sort((a, b) => b.rating - a.rating);
   }, [ramenyaListQuery.data, filterOptions.genre, filterOptions.sort, current]);
 
-  const handleFilterClick = (type: string) => {
-    if (selectedFilterList.includes(type)) {
-      setSelectedFilterList((prev) =>
-        prev.filter((prevType) => prevType !== type)
-      );
-    } else {
-      setSelectedFilterList((prev) => [...prev, type]);
-    }
-  };
-
-  useEffect(() => {
-    console.log(filterOptions);
-    console.log(initialFilterOptions);
-    console.log(filterOptions === initialFilterOptions);
-  }, [filterOptions]);
-
   return (
     <Layout>
       <Wrapper>
@@ -109,7 +92,6 @@ export const LocationPage = () => {
                       initialFilterOptions: initialFilterOptions,
                       currentFilterOptions: filterOptions,
                       onChange: (filterOptions: FilterOptions | null) => {
-                        console.log(filterOptions);
                         if (filterOptions) {
                           setFilterOptions(filterOptions);
                           return;
@@ -157,11 +139,7 @@ export const LocationPage = () => {
                 <>
                   <Divider />
                   {filterOptions.genre.map((genre) => (
-                    <FilterButton
-                      key={genre}
-                      active
-                      onClick={() => handleFilterClick(genre)}
-                    >
+                    <FilterButton key={genre} active>
                       {genre}
                     </FilterButton>
                   ))}
