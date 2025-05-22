@@ -23,6 +23,9 @@ export interface Ramenya {
   longitude: number;
   rating: number;
   reviewCount: number;
+  kakaoMapUrl?: string;
+  naverMapUrl?: string;
+  googleMapUrl?: string;
 }
 
 export interface BusinessStatus {
@@ -57,6 +60,9 @@ export interface RemenyaDetail {
   rating?: number;
   reviews?: UserReview[];
   menus?: string[];
+  naverMapUrl?: string;
+  kakaoMapUrl?: string;
+  googleMapUrl?: string;
 }
 
 export interface Banner {
