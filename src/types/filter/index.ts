@@ -5,7 +5,7 @@ export interface FilterOptions {
 }
 
 export enum SortType {
-  DEFAULT = "추천순",
+  DEFAULT = "기본순",
   RATING = "평점 높은 순",
   DISTANCE = "거리 가까운 순",
 }

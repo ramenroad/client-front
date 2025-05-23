@@ -28,7 +28,7 @@ const MainPage = () => {
       </MainImageContainer>
 
       <GenreViewingWrapper>
-        <LocationViewingText>장르별 보기</LocationViewingText>
+        <LocationViewingText>어떤 라멘을 찾으시나요?</LocationViewingText>
         <GenrePathContainer>
           {genrePath.map((genre, index) => (
             <Genre onClick={() => navigate(`/genre/${genre.genre}`)}>
