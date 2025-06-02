@@ -375,7 +375,7 @@ export const CreateReviewPage = () => {
                         onClick={() => handleRemoveImage(index)}
                         type="button"
                       >
-                        <IconClose width={9} height={9} />
+                        <IconClose width={9} height={9} color="#585858" />
                       </ImageRemoveButton>
                     </ImagePreviewContainer>
                   ))}
