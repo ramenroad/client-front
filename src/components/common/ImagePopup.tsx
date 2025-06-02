@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import tw from 'twin.macro';
 import { IconClose, IconNavLeft, IconNavRight } from '../Icon';
 
@@ -19,10 +19,25 @@ export const ImagePopup: React.FC<ImagePopupProps> = ({
   onIndexChange,
   title,
 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      containerRef.current.style.marginRight = `${scrollbarWidth}px`;
+    }
+
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.style.marginRight = '0px';
+      }
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <PopupContainer>
+    <PopupContainer ref={containerRef}>
       <PopupHeader>
         <CloseButtonWrapper onClick={onClose}>
           <IconClose width={14} height={14} color="#FFFFFF" />
