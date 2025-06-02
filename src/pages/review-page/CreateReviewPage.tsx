@@ -99,7 +99,7 @@ export const CreateReviewPage = () => {
       return;
     }
 
-    // Convert FileList to Array and reverse it for mobile browsers
+    // 모바일 브라우저에서는 역순으로 업로드
     const fileArray = Array.from(files);
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     if (isMobile) {
