@@ -6,6 +6,7 @@ import styled from "@emotion/styled";
 import TopBar from "../../components/common/TopBar.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
+import { Helmet } from "react-helmet";
 
 export const GroupPage = () => {
   const { id } = useParams();
@@ -16,37 +17,43 @@ export const GroupPage = () => {
   const ramenyaList = ramenyaGroup?.ramenyas;
 
   return (
-    <Layout>
-      <Wrapper>
-        <HeaderSectionWrapper>
-          <HeaderSection>
-            <TopBar title={ramenyaGroup?.name || ""} />
-          </HeaderSection>
-        </HeaderSectionWrapper>
-        <HeaderImage src={ramenyaGroup?.descriptionImageUrl || ""} />
-        <InformationWrapper>
-          {ramenyaList?.length === 0 ? (
-            <NoStoreBox />
-          ) : (
-            <>
-              <InformationHeader>가게 정보</InformationHeader>
-              <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
-                {ramenyaList?.map((ramenya, index) => (
-                  <>
-                    <RamenyaCard
-                      key={ramenya._id}
-                      ramenya={ramenya}
-                      isReview={false}
-                    />
-                    {index !== ramenyaList.length - 1 && <SubLine />}
-                  </>
-                ))}
-              </RamenyaListWrapper>
-            </>
-          )}
-        </InformationWrapper>
-      </Wrapper>
-    </Layout>
+    <>
+      <Helmet>
+        <title>{ramenyaGroup?.name}</title>
+        <meta name="description" content={ramenyaGroup?.description} />
+      </Helmet>
+      <Layout>
+        <Wrapper>
+          <HeaderSectionWrapper>
+            <HeaderSection>
+              <TopBar title={ramenyaGroup?.name || ""} />
+            </HeaderSection>
+          </HeaderSectionWrapper>
+          <HeaderImage src={ramenyaGroup?.descriptionImageUrl || ""} />
+          <InformationWrapper>
+            {ramenyaList?.length === 0 ? (
+              <NoStoreBox />
+            ) : (
+              <>
+                <InformationHeader>가게 정보</InformationHeader>
+                <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
+                  {ramenyaList?.map((ramenya, index) => (
+                    <>
+                      <RamenyaCard
+                        key={ramenya._id}
+                        ramenya={ramenya}
+                        isReview={false}
+                      />
+                      {index !== ramenyaList.length - 1 && <SubLine />}
+                    </>
+                  ))}
+                </RamenyaListWrapper>
+              </>
+            )}
+          </InformationWrapper>
+        </Wrapper>
+      </Layout>
+    </>
   );
 };
 
