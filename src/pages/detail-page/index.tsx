@@ -118,7 +118,7 @@ export const DetailPage = () => {
   };
 
   const handleOpenMapURL = (url: string) => {
-    window.open(url, "_blank");
+    window.location.href = url;
   };
 
   // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
