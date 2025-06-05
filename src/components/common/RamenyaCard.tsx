@@ -12,10 +12,7 @@ import {
   useLocationStore,
 } from "../../store/location/useLocationStore.ts";
 import { calculateDistance } from "../../util/number.ts";
-import {
-  IconStarSmall,
-  //IconTalk
-} from "../Icon";
+import { IconStarSmall } from "../Icon";
 
 interface RamenyaCardProps {
   ramenya: Ramenya;
@@ -75,7 +72,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
                     key={star}
                     color={
                       ramenya.reviewCount > 0 &&
-                      Math.round(ramenya.rating) >= star
+                        Math.round(ramenya.rating) >= star
                         ? "#FFCC00"
                         : "#E1E1E1"
                     }
@@ -92,7 +89,6 @@ const RamenyaCard = (props: RamenyaCardProps) => {
                     <StyledCountUp
                       start={0}
                       end={parseFloat(currentDistance.replace(/[^0-9.]/g, ""))}
-                      // @ts-ignore
                       duration={1}
                       decimals={2}
                     />
@@ -114,14 +110,14 @@ const RamenyaCard = (props: RamenyaCardProps) => {
               </RamenyaOpenStatus>
               {checkBusinessStatus(ramenya.businessHours).todayHours
                 ?.operatingTime && (
-                <>
-                  <span>·</span>
-                  <RamenyaOpenTime>
-                    {checkBusinessStatus(ramenya.businessHours).todayHours
-                      ?.operatingTime || ""}
-                  </RamenyaOpenTime>
-                </>
-              )}
+                  <>
+                    <span>·</span>
+                    <RamenyaOpenTime>
+                      {checkBusinessStatus(ramenya.businessHours).todayHours
+                        ?.operatingTime || ""}
+                    </RamenyaOpenTime>
+                  </>
+                )}
             </RamenyaOpenStatusWrapper>
             <RamenyaTagWrapper>
               {ramenya.genre.map((genre, index) => (
@@ -217,7 +213,7 @@ const RamenyaOpenTime = tw.span`
 `;
 
 const RamenyaTagWrapper = tw.section`
-  flex gap-4
+  flex gap-4 flex-wrap
 `;
 
 const RamenyaTag = tw.span`
