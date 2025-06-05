@@ -268,6 +268,13 @@ export const CreateReviewPage = () => {
 
   return (
     <Wrapper>
+      {isSubmitting && (
+        <LoadingOverlay>
+          <LottieWrapper>
+            <Lottie animationData={loadingAnimation} loop={true} />
+          </LottieWrapper>
+        </LoadingOverlay>
+      )}
       <Header>
         <TopBar title="리뷰 작성하기" onBackClick={handleBackClick} />
       </Header>
@@ -278,13 +285,6 @@ export const CreateReviewPage = () => {
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <ContentsWrapper>
-            {isSubmitting && (
-              <LoadingOverlay>
-                <LottieWrapper>
-                  <Lottie animationData={loadingAnimation} loop={true} />
-                </LottieWrapper>
-              </LoadingOverlay>
-            )}
             <StarWrapper>
               <StarTitle>라멘은 만족하셨나요?</StarTitle>
               <StarContainer>
