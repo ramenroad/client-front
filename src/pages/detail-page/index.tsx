@@ -376,9 +376,9 @@ export const DetailPage = () => {
             <ReviewHeaderTitle>
               <ReviewerName>
                 {userInformationQuery.data?.nickname &&
-                  userInformationQuery.data?.nickname + "님"}
+                  userInformationQuery.data?.nickname}
               </ReviewerName>
-              {isSignIn ? "리뷰를 남겨주세요" : "로그인 후 리뷰를 남겨주세요"}
+              {isSignIn ? "님 리뷰를 남겨주세요" : "로그인 후 리뷰를 남겨주세요"}
             </ReviewHeaderTitle>
 
             <LargeStarContainer>
@@ -740,9 +740,10 @@ const ReviewHeader = tw.div`
 
 const ReviewHeaderTitle = tw.div`
   font-18-r text-black
+  flex items-center
 `;
 
-const ReviewerName = tw.div`
+const ReviewerName = tw.span`
   text-orange
 `;
 
