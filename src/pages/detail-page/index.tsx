@@ -736,6 +736,7 @@ const ReviewWrapper = tw.div`
 const ReviewHeader = tw.div`
   flex flex-col gap-10 items-center
   px-20
+  mb-32
 `;
 
 const ReviewHeaderTitle = tw.div`
@@ -754,7 +755,7 @@ const StarContainer = tw.div`
 
 const LargeStarContainer = tw.div`
   flex gap-2 items-center
-  cursor-pointer mb-16
+  cursor-pointer
 `;
 
 const LoginButton = tw.div`
@@ -765,7 +766,6 @@ const LoginButton = tw.div`
   bg-brightOrange rounded-100 gap-2
   cursor-pointer
   text-orange
-  mb-32
 `;
 
 const ReviewDivider = tw.div`
