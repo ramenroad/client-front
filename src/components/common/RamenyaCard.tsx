@@ -160,7 +160,7 @@ const RamenyaThumbnail = styled.img(
 );
 
 const RamenyaDescription = tw.section`
-  flex flex-col h-full min-w-0 w-full justify-center gap-12
+  flex flex-col h-full min-w-0 w-full justify-center gap-8
 `;
 
 const RamenyaDescriptionHeader = tw.section`
@@ -217,7 +217,7 @@ const RamenyaTagWrapper = tw.section`
 `;
 
 const RamenyaTag = tw.span`
-  font-10-r text-gray-700 rounded-sm bg-border p-3 leading-10
+  font-10-r text-gray-700 rounded-sm bg-border p-2 leading-10
 `;
 
 const RamenyaDistance = tw.section`
