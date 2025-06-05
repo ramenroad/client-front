@@ -461,7 +461,7 @@ export const CreateReviewPage = () => {
 const LoadingOverlay = tw.div`
     fixed
     top-0 left-0 right-0 bottom-0
-    bg-white/80
+    bg-[#000000]/20
     flex flex-col justify-start items-center
     pt-[40vh]
     z-10
