@@ -17,6 +17,8 @@ import { css } from "@emotion/react";
 import { useSignInStore } from "../../states/sign-in";
 import { useModal } from "../../hooks/common/useModal";
 import { correctImageOrientation } from "../../util/image";
+import Lottie from "lottie-react";
+import loadingAnimation from "../../assets/lotties/loading.json";
 
 export const CreateReviewPage = () => {
   const { id } = useParams();
@@ -266,6 +268,13 @@ export const CreateReviewPage = () => {
 
   return (
     <Wrapper>
+      {isSubmitting && (
+        <LoadingOverlay>
+          <LottieWrapper>
+            <Lottie animationData={loadingAnimation} loop={true} />
+          </LottieWrapper>
+        </LoadingOverlay>
+      )}
       <Header>
         <TopBar title="리뷰 작성하기" onBackClick={handleBackClick} />
       </Header>
@@ -448,6 +457,18 @@ export const CreateReviewPage = () => {
     </Wrapper>
   );
 };
+
+const LoadingOverlay = tw.div`
+    fixed
+    top-0 left-0 right-0 bottom-0
+    bg-white/80
+    flex flex-col justify-start items-center
+    pt-[40vh]
+    z-10
+`;
+
+const LottieWrapper = tw.div`
+`;
 
 const Wrapper = tw.div`
     flex 
