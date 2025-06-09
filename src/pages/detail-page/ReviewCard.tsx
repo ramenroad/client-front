@@ -1,6 +1,7 @@
 import React from 'react'
 import tw from 'twin.macro'
 import styled from '@emotion/styled'
+import { useNavigate } from 'react-router-dom'
 import defaultProfile from '../../assets/images/profile-default.png'
 import { IconStarMedium } from '../../components/Icon'
 import { UserReview } from '../../types'
@@ -12,6 +13,7 @@ import { useRamenyaDetailQuery } from '../../hooks/queries/useRamenyaDetailQuery
 import { ImagePopup } from '../../components/common/ImagePopup'
 
 export const ReviewCard = ({ review }: { review: UserReview }) => {
+    const navigate = useNavigate();
     const userInformationQuery = useUserInformationQuery();
     const { mutate: deleteReview } = useRamenyaReviewDeleteMutation();
     const { refetch: refetchRamenyaDetail } = useRamenyaDetailQuery(review.ramenyaId);
@@ -57,6 +59,10 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
         openImagePopup();
     }
 
+    const handleEditReview = () => {
+        navigate(`/review/edit/${review._id}`);
+    }
+
     return (
         <>
             <Wrapper>
@@ -68,9 +74,16 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                         </ReviewerName>
                     </ReviewNameBox>
 
-                    {review.userId._id === userInformationQuery.data?._id && <ReviewDeleteButton onClick={handleOpenDeleteModal}>
-                        삭제
-                    </ReviewDeleteButton>}
+                    {review.userId._id === userInformationQuery.data?._id && (
+                        <ButtonContainer>
+                            <ReviewButton onClick={handleEditReview}>
+                                수정
+                            </ReviewButton>
+                            <ReviewButton onClick={handleOpenDeleteModal}>
+                                삭제
+                            </ReviewButton>
+                        </ButtonContainer>
+                    )}
                 </ReviewHeader>
 
                 <ReviewScore>
@@ -165,7 +178,11 @@ const ReviewNameBox = tw.div`
     flex gap-8 items-center
 `
 
-const ReviewDeleteButton = tw.button`
+const ButtonContainer = tw.div`
+    flex gap-6 items-center
+`
+
+const ReviewButton = tw.button`
     font-12-r text-black
     cursor-pointer
     border-none
@@ -174,6 +191,7 @@ const ReviewDeleteButton = tw.button`
     px-10 py-4
     box-border
 `
+
 const ReviewerProfileImage = tw.img`
     w-24 h-24 rounded-full
 `
