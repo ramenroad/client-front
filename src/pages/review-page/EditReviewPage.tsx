@@ -24,7 +24,7 @@ export const EditReviewPage = () => {
   const { id: reviewId } = useParams();
   const { mutate: editReview, isPending: isSubmitting } = useRamenyaReviewEditMutation(reviewId!);
   const { data: reviewData, isLoading: isReviewLoading } = useRamenyaReviewQuery(reviewId!);
-  const { data: ramenyaDetail, isLoading: isRamenyaLoading, isError } = useRamenyaDetailQuery(reviewData?.ramenyaId || undefined);
+  const { data: ramenyaDetail, isLoading: isRamenyaLoading, isError } = useRamenyaDetailQuery(reviewData?.ramenyaId._id || undefined);
   const navigate = useNavigate();
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
   const { isSignIn } = useSignInStore();
@@ -56,18 +56,12 @@ export const EditReviewPage = () => {
 
   const formValues = watch();
 
-  useEffect(() => {
-    if (reviewData) {
-      reset({
-        ramenyaId: reviewData.ramenyaId,
-        rating: reviewData.rating,
-        review: reviewData.review,
-        menus: Array.isArray(reviewData.menus) ? reviewData.menus.join(",") : reviewData.menus,
-      });
-      setSelectedMenus(Array.isArray(reviewData.menus) ? reviewData.menus : reviewData.menus.split(","));
-      setImageUrls(reviewData.reviewImageUrls || []);
-    }
-  }, [reviewData, reset]);
+  const isFormValid =
+    formValues.rating > 0 &&
+    (formValues.menus
+      ? formValues.menus.split(",").filter(Boolean).length > 0
+      : false) &&
+    formValues.review.trim().length >= 10;
 
   const handleStarClick = (index: number) => {
     setValue("rating", index, { shouldValidate: true });
@@ -199,13 +193,6 @@ export const EditReviewPage = () => {
     closeBackModal();
   };
 
-  const isFormValid =
-    formValues.rating > 0 &&
-    (formValues.menus
-      ? formValues.menus.split(",").filter(Boolean).length > 0
-      : false) &&
-    formValues.review.trim().length >= 10;
-
   useEffect(() => {
     if (!reviewId) {
       navigate(-1);
@@ -268,6 +255,19 @@ export const EditReviewPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if (reviewData) {
+      reset({
+        ramenyaId: reviewData.ramenyaId,
+        rating: reviewData.rating,
+        review: reviewData.review,
+        menus: Array.isArray(reviewData.menus) ? reviewData.menus.join(",") : reviewData.menus,
+      });
+      setSelectedMenus(Array.isArray(reviewData.menus) ? reviewData.menus : reviewData.menus.split(","));
+      setImageUrls(reviewData.reviewImageUrls || []);
+    }
+  }, [reviewData, reset]);
 
   const isLoading = isReviewLoading || isRamenyaLoading;
 
@@ -372,7 +372,7 @@ export const EditReviewPage = () => {
                 <ImageUploadTitleBox>
                   <ImageUploadTitle>사진 첨부</ImageUploadTitle>
                   <ImageCountBox>
-                    <ImageAdded>{formValues.reviewImages?.length}</ImageAdded>
+                    <ImageAdded>{formValues.reviewImages?.length ?? 0}</ImageAdded>
                     <ImageAddedText>/</ImageAddedText>
                     <ImageMax>5</ImageMax>
                   </ImageCountBox>
