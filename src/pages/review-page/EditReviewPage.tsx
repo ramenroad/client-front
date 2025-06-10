@@ -59,7 +59,9 @@ export const EditReviewPage = () => {
   const isFormValid =
     formValues.rating > 0 &&
     (formValues.menus
-      ? formValues.menus.split(",").filter(Boolean).length > 0
+      ? Array.isArray(formValues.menus)
+        ? formValues.menus.filter(Boolean).length > 0
+        : formValues.menus.split(",").filter(Boolean).length > 0
       : false) &&
     formValues.review.trim().length >= 10;
 
@@ -156,8 +158,12 @@ export const EditReviewPage = () => {
       formData.append("menus", values.menus);
 
       if (values.reviewImages) {
-        values.reviewImages.forEach((file) => {
-          formData.append(`reviewImages`, file);
+        values.reviewImages.forEach((image) => {
+          if (image instanceof File) {
+            formData.append(`reviewImages`, image);
+          } else if (typeof image === 'string') {
+            formData.append('existingImages', image);
+          }
         });
       }
 
@@ -263,6 +269,7 @@ export const EditReviewPage = () => {
         rating: reviewData.rating,
         review: reviewData.review,
         menus: Array.isArray(reviewData.menus) ? reviewData.menus.join(",") : reviewData.menus,
+        reviewImages: reviewData.reviewImageUrls || [],
       });
       setSelectedMenus(Array.isArray(reviewData.menus) ? reviewData.menus : reviewData.menus.split(","));
       setImageUrls(reviewData.reviewImageUrls || []);
