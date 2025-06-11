@@ -16,6 +16,9 @@ import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery
 import { css } from "@emotion/react";
 import { useSignInStore } from "../../states/sign-in";
 import { useModal } from "../../hooks/common/useModal";
+import { correctImageOrientation } from "../../util/image";
+import Lottie from "lottie-react";
+import loadingAnimation from "../../assets/lotties/loading.json";
 
 export const CreateReviewPage = () => {
   const { id } = useParams();
@@ -87,7 +90,7 @@ export const CreateReviewPage = () => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
@@ -98,13 +101,21 @@ export const CreateReviewPage = () => {
       return;
     }
 
+    // 모바일 브라우저에서는 역순으로 업로드
+    const fileArray = Array.from(files);
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      fileArray.reverse();
+    }
+
     const newImages: File[] = [];
-    for (let i = 0; i < files.length; i++) {
+    for (const file of fileArray) {
       if (currentImages.length + newImages.length >= 5) break;
 
-      const file = files[i];
       if (file.type.startsWith("image/")) {
-        newImages.push(file);
+        // 이미지 방향 보정
+        const correctedFile = await correctImageOrientation(file);
+        newImages.push(correctedFile);
       }
     }
 
@@ -257,6 +268,13 @@ export const CreateReviewPage = () => {
 
   return (
     <Wrapper>
+      {isSubmitting && (
+        <LoadingOverlay>
+          <LottieWrapper>
+            <Lottie animationData={loadingAnimation} loop={true} />
+          </LottieWrapper>
+        </LoadingOverlay>
+      )}
       <Header>
         <TopBar title="리뷰 작성하기" onBackClick={handleBackClick} />
       </Header>
@@ -375,7 +393,7 @@ export const CreateReviewPage = () => {
                         onClick={() => handleRemoveImage(index)}
                         type="button"
                       >
-                        <IconClose width={9} height={9} />
+                        <IconClose width={9} height={9} color="#585858" />
                       </ImageRemoveButton>
                     </ImagePreviewContainer>
                   ))}
@@ -439,6 +457,18 @@ export const CreateReviewPage = () => {
     </Wrapper>
   );
 };
+
+const LoadingOverlay = tw.div`
+    fixed
+    top-0 left-0 right-0 bottom-0
+    bg-[#000000]/20
+    flex flex-col justify-start items-center
+    pt-[40vh]
+    z-10
+`;
+
+const LottieWrapper = tw.div`
+`;
 
 const Wrapper = tw.div`
     flex 

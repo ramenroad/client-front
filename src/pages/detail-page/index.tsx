@@ -118,7 +118,7 @@ export const DetailPage = () => {
   };
 
   const handleOpenMapURL = (url: string) => {
-    window.open(url, "_blank");
+    window.location.href = url;
   };
 
   // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
@@ -154,7 +154,7 @@ export const DetailPage = () => {
                       key={star}
                       color={
                         (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
-                        Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
+                          Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
                           ? "#FFCC00"
                           : "#E1E1E1"
                       }
@@ -319,7 +319,7 @@ export const DetailPage = () => {
         <ImageWrapper>
           <ImageTitle>사진</ImageTitle>
           {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length ===
-          0 ? (
+            0 ? (
             <EmptyImageContainer>
               <EmptyImageImage src={emptyImage} />
               <EmptyImageTitle>등록된 사진이 없습니다.</EmptyImageTitle>
@@ -349,21 +349,21 @@ export const DetailPage = () => {
                 ))}
               {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length >
                 5 && (
-                <MoreImageWrapper onClick={handleNavigateImagesPage}>
-                  <ImageBox>
-                    <ReviewImage
-                      image={
-                        ramenyaReviewImagesQuery.data
-                          ?.ramenyaReviewImagesUrls?.[5]
-                      }
-                    />
-                  </ImageBox>
-                  <MoreOverlay>
-                    <MoreText>더보기</MoreText>
-                    <IconArrowRight color="#FFFFFF" />
-                  </MoreOverlay>
-                </MoreImageWrapper>
-              )}
+                  <MoreImageWrapper onClick={handleNavigateImagesPage}>
+                    <ImageBox>
+                      <ReviewImage
+                        image={
+                          ramenyaReviewImagesQuery.data
+                            ?.ramenyaReviewImagesUrls?.[5]
+                        }
+                      />
+                    </ImageBox>
+                    <MoreOverlay>
+                      <MoreText>더보기</MoreText>
+                      <IconArrowRight color="#FFFFFF" />
+                    </MoreOverlay>
+                  </MoreImageWrapper>
+                )}
             </ImageContainer>
           )}
         </ImageWrapper>
@@ -372,13 +372,15 @@ export const DetailPage = () => {
 
         <ReviewWrapper>
           <ReviewHeader>
+
             <ReviewHeaderTitle>
               <ReviewerName>
                 {userInformationQuery.data?.nickname &&
-                  userInformationQuery.data?.nickname + "님"}
+                  userInformationQuery.data?.nickname}
               </ReviewerName>
-              &nbsp;리뷰를 남겨주세요
+              {isSignIn ? "님 리뷰를 남겨주세요" : "로그인 후 리뷰를 남겨주세요"}
             </ReviewHeaderTitle>
+
             <LargeStarContainer>
               {[...Array(5)].map((_, i) => (
                 <IconStarLarge
@@ -389,8 +391,14 @@ export const DetailPage = () => {
                 />
               ))}
             </LargeStarContainer>
-          </ReviewHeader>
 
+            {!isSignIn && (
+              <LoginButton onClick={() => navigate("/login")}>
+                로그인하기
+              </LoginButton>
+            )}
+
+          </ReviewHeader>
           <ReviewDivider />
 
           <ReviewContent>
@@ -399,7 +407,7 @@ export const DetailPage = () => {
               <EmptyReviewContainer>
                 <EmptyReviewImage src={emptyReview} />
                 <EmptyReviewTitle>등록된 리뷰가 없습니다.</EmptyReviewTitle>
-                <EmptyReviewText>리뷰를 작성해주세요!</EmptyReviewText>
+                <EmptyReviewText>방문하셨나요? 평가를 남겨보세요!</EmptyReviewText>
                 <CreateReviewButton
                   onClick={() => handleNavigateReviewCreatePage()}
                 >
@@ -728,13 +736,15 @@ const ReviewWrapper = tw.div`
 const ReviewHeader = tw.div`
   flex flex-col gap-10 items-center
   px-20
+  mb-32
 `;
 
 const ReviewHeaderTitle = tw.div`
-  flex font-18-r text-black
+  font-18-r text-black
+  flex items-center
 `;
 
-const ReviewerName = tw.div`
+const ReviewerName = tw.span`
   text-orange
 `;
 
@@ -745,7 +755,17 @@ const StarContainer = tw.div`
 
 const LargeStarContainer = tw.div`
   flex gap-2 items-center
-  cursor-pointer mb-32
+  cursor-pointer
+`;
+
+const LoginButton = tw.div`
+  flex w-fit py-10 px-32
+  box-border
+  justify-center items-center
+  font-16-m
+  bg-brightOrange rounded-100 gap-2
+  cursor-pointer
+  text-orange
 `;
 
 const ReviewDivider = tw.div`
