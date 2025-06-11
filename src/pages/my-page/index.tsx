@@ -2,6 +2,7 @@ import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
 import {
   IconArrowRight,
+  IconReview,
   IconUnSignInUser,
   IconUnSignInUserProfile,
 } from "../../components/Icon";
@@ -9,6 +10,7 @@ import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQ
 import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/common/Button";
+import { RamenroadText } from "../../components/common/RamenroadText";
 
 const MyPage = () => {
   const userInformationQuery = useUserInformationQuery();
@@ -19,31 +21,40 @@ const MyPage = () => {
     <Layout>
       <TopBar title="마이페이지" navigate="/" />
       {userInformationQuery.data ? (
-        <CardLayout
-          onClick={() => {
-            if (userInformationQuery.data) {
-              navigate("/information");
-            }
-          }}
-        >
-          <CardLeftSection>
-            <WelcomeText>반가워요!</WelcomeText>
-            <UserInfoWrapper>
-              <span>{userInformationQuery.data?.nickname}님</span>
-              <IconArrowRight />
-            </UserInfoWrapper>
-          </CardLeftSection>
+        <>
+          <CardLayout
+            onClick={() => {
+              if (userInformationQuery.data) {
+                navigate("/information");
+              }
+            }}
+          >
+            <CardLeftSection>
+              <WelcomeText>반가워요!</WelcomeText>
+              <UserInfoWrapper>
+                <span>{userInformationQuery.data?.nickname}님</span>
+                <IconArrowRight />
+              </UserInfoWrapper>
+            </CardLeftSection>
 
-          <CardRightSection>
-            {userInformationQuery.data?.profileImageUrl ? (
-              <UserProfileImage
-                src={userInformationQuery.data?.profileImageUrl}
-              />
-            ) : (
-              <IconUnSignInUserProfile />
-            )}
-          </CardRightSection>
-        </CardLayout>
+            <CardRightSection>
+              {userInformationQuery.data?.profileImageUrl ? (
+                <UserProfileImage
+                  src={userInformationQuery.data?.profileImageUrl}
+                />
+              ) : (
+                <IconUnSignInUserProfile />
+              )}
+            </CardRightSection>
+          </CardLayout>
+          <MyReviewContainer onClick={() => navigate("/my-review")}>
+            <IconReview />
+            <RamenroadText size={16} weight="m">
+              작성한 리뷰
+            </RamenroadText>
+            <ArrowRightForReview />
+          </MyReviewContainer>
+        </>
       ) : (
         <SignInWrapper>
           <IconUnSignInUser />
@@ -123,6 +134,19 @@ const LoginText = tw.span`
 
 const LoginDescription = tw.span`
   font-18-r
+`;
+
+const MyReviewContainer = tw.section`
+  cursor-pointer
+  w-full flex gap-8 items-center
+  box-border
+  px-12 py-20
+  bg-[#F9F9F9]
+  rounded-8
+`;
+
+const ArrowRightForReview = tw(IconArrowRight)`
+  ml-auto
 `;
 
 export default MyPage;
