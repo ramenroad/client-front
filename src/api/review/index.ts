@@ -1,3 +1,4 @@
+import { MyReview } from "../../types/review";
 import { instanceWithNoVersioning } from "../index";
 
 export const postReview = async (data: FormData) => {
@@ -10,13 +11,20 @@ export const postReview = async (data: FormData) => {
 };
 
 export const getReviewImages = async (reviewId: string) => {
-  const response = await instanceWithNoVersioning.get(
-    `/review/${reviewId}/images`
-  );
+  const response = await instanceWithNoVersioning.get(`/review/${reviewId}/images`);
   return response.data;
 };
 
 export const deleteReview = async (reviewId: string) => {
   const response = await instanceWithNoVersioning.delete(`/review/${reviewId}`);
+  return response.data;
+};
+
+export interface MyReviewResponse {
+  reviews: MyReview[];
+}
+
+export const getMyReview = async () => {
+  const response = await instanceWithNoVersioning.get<MyReviewResponse>("/review/my");
   return response.data;
 };

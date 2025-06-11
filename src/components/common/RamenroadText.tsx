@@ -1,7 +1,8 @@
 import styled from "@emotion/styled";
+import { ComponentProps } from "react";
 import tw from "twin.macro";
 
-interface TextProps {
+interface TextProps extends ComponentProps<"span"> {
   children: React.ReactNode;
   size: 10 | 12 | 14 | 16 | 18 | 20 | 22;
   weight: "r" | "m" | "sb";
@@ -32,9 +33,9 @@ const fontClassMap = {
 };
 
 export const RamenroadText = (props: TextProps) => {
-  const { children, size, weight } = props;
+  const { children, size, weight, ...rest } = props;
   return (
-    <Text size={size} weight={weight}>
+    <Text size={size} weight={weight} {...rest}>
       {children}
     </Text>
   );

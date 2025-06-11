@@ -47,7 +47,7 @@ const MyPage = () => {
               )}
             </CardRightSection>
           </CardLayout>
-          <MyReviewContainer>
+          <MyReviewContainer onClick={() => navigate("/my-review")}>
             <IconReview />
             <RamenroadText size={16} weight="m">
               작성한 리뷰
