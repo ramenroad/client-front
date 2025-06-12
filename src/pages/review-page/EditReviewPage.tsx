@@ -157,15 +157,27 @@ export const EditReviewPage = () => {
       formData.append("review", values.review);
       formData.append("menus", values.menus);
 
+      // 기존 이미지와 새로운 이미지를 구분하여 처리
+      const existingImages: string[] = [];
+      const newImages: File[] = [];
+
       if (values.reviewImages) {
         values.reviewImages.forEach((image) => {
           if (image instanceof File) {
-            formData.append(`reviewImages`, image);
+            newImages.push(image);
           } else if (typeof image === 'string') {
-            formData.append('existingImages', image);
+            existingImages.push(image);
           }
         });
       }
+
+      // 기존 이미지는 쉼표로 구분된 문자열로 전송
+      formData.append('reviewImageUrls', existingImages.join(','));
+
+      // 새로운 이미지는 각각 파일로 전송
+      newImages.forEach((image) => {
+        formData.append('reviewImages', image);
+      });
 
       await editReview(formData, {
         onSuccess: () => {
