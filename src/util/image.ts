@@ -1,91 +1,105 @@
-import EXIF from 'exif-js';
+import EXIF from "exif-js";
+import heic2any from "heic2any";
 
-/**
- * 이미지 파일의 EXIF 방향 정보를 보정하여 올바른 방향으로 회전된 파일을 반환합니다.
- */
-export const correctImageOrientation = (file: File): Promise<File> => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve(file);
-          return;
+export const correctImageOrientation = async (file: File): Promise<File> => {
+  // HEIC 파일 처리
+  if (file.type === "image/heic" || file.name.toLowerCase().endsWith(".heic")) {
+    // heic2any로 JPEG 변환
+    const convertedBlob = (await heic2any({
+      blob: file,
+      toType: "image/jpeg",
+      quality: 0.95,
+    })) as Blob;
+    // 변환된 Blob을 File로 변환
+    const jpegFile = new File(
+      [convertedBlob],
+      file.name.replace(/\.heic$/i, ".jpg"),
+      {
+        type: "image/jpeg",
+        lastModified: file.lastModified,
+      }
+    );
+    // JPEG 변환 후, 아래의 orientation 보정 로직 재귀 호출
+    return correctImageOrientation(jpegFile);
+  }
+
+  // JPG/JPEG/PNG 등 기존 로직
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        resolve(file);
+        return;
+      }
+
+      EXIF.getData(img as any, function (this: { [key: string]: any }) {
+        const orientation = EXIF.getTag(this as any, "Orientation") || 1;
+        let width = img.width;
+        let height = img.height;
+
+        if (orientation > 4) {
+          [width, height] = [height, width];
         }
-  
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        EXIF.getData(img as any, function(this: { [key: string]: any }) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const orientation = EXIF.getTag(this as any, 'Orientation') || 1;
-          
-          let width = img.width;
-          let height = img.height;
-  
-          // 회전이 필요한 방향인 경우 캔버스 크기 조정
-          if (orientation > 4) {
-            [width, height] = [height, width];
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-  
-          // 방향에 따른 적절한 변환 적용
-          ctx.save();
-          switch (orientation) {
-            case 2: // 좌우 반전
-              ctx.transform(-1, 0, 0, 1, width, 0);
-              break;
-            case 3: // 180도 회전
-              ctx.transform(-1, 0, 0, -1, width, height);
-              break;
-            case 4: // 상하 반전
-              ctx.transform(1, 0, 0, -1, 0, height);
-              break;
-            case 5: // 좌우 반전 후 90도 회전
-              ctx.transform(0, 1, 1, 0, 0, 0);
-              break;
-            case 6: // 90도 회전
-              ctx.transform(0, 1, -1, 0, height, 0);
-              break;
-            case 7: // 좌우 반전 후 -90도 회전
-              ctx.transform(0, -1, -1, 0, height, width);
-              break;
-            case 8: // -90도 회전
-              ctx.transform(0, -1, 1, 0, 0, width);
-              break;
-            default: // 기본값 (1)
-              break;
-          }
-  
-          // 이미지 그리기
-          ctx.drawImage(img, 0, 0, img.width, img.height);
-          ctx.restore();
-  
-          // Canvas를 Blob으로 변환
-          canvas.toBlob((blob) => {
+
+        canvas.width = width;
+        canvas.height = height;
+
+        ctx.save();
+        switch (orientation) {
+          case 2:
+            ctx.transform(-1, 0, 0, 1, width, 0);
+            break;
+          case 3:
+            ctx.transform(-1, 0, 0, -1, width, height);
+            break;
+          case 4:
+            ctx.transform(1, 0, 0, -1, 0, height);
+            break;
+          case 5:
+            ctx.transform(0, 1, 1, 0, 0, 0);
+            break;
+          case 6:
+            ctx.transform(0, 1, -1, 0, height, 0);
+            break;
+          case 7:
+            ctx.transform(0, -1, -1, 0, height, width);
+            break;
+          case 8:
+            ctx.transform(0, -1, 1, 0, 0, width);
+            break;
+          default:
+            break;
+        }
+
+        ctx.drawImage(img, 0, 0, img.width, img.height);
+        ctx.restore();
+
+        canvas.toBlob(
+          (blob) => {
             if (!blob) {
               resolve(file);
               return;
             }
-            // Blob을 File로 변환
             const correctedFile = new File([blob], file.name, {
-              type: 'image/jpeg',
+              type: "image/jpeg",
               lastModified: file.lastModified,
             });
             resolve(correctedFile);
-          }, 'image/jpeg', 0.95);
-        });
-      };
-  
-      // 이미지 로드
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (e.target?.result) {
-          img.src = e.target.result as string;
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-  
+          },
+          "image/jpeg",
+          0.95
+        );
+      });
+    };
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        img.src = e.target.result as string;
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+};
