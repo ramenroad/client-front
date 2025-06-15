@@ -19,7 +19,6 @@ import { useModal } from "../../hooks/common/useModal";
 import { correctImageOrientation } from "../../util/image";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
-import { heic2any } from "heic2any";
 
 export const CreateReviewPage = () => {
   const { id } = useParams();
@@ -103,20 +102,6 @@ export const CreateReviewPage = () => {
       e.preventDefault();
       handleAddCustomMenu();
     }
-  };
-
-  const convertHeicToJpeg = async (file: File): Promise<File> => {
-    if (file.name.toLowerCase().endsWith(".heic")) {
-      const convertedFile = await heic2any({
-        blob: file,
-        toType: "image/jpeg",
-        quality: 0.8,
-      });
-      return new File([convertedFile], file.name.replace(".heic", ".jpg"), {
-        type: "image/jpeg",
-      });
-    }
-    return file;
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
