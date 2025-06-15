@@ -19,23 +19,38 @@ import { useModal } from "../../hooks/common/useModal";
 import { correctImageOrientation } from "../../util/image";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
+import { heic2any } from "heic2any";
 
 export const CreateReviewPage = () => {
   const { id } = useParams();
   const { mutate: createReview, isPending: isSubmitting } =
     useRamenyaReviewMutation();
-  const { data: ramenyaDetail, isLoading, isError } = useRamenyaDetailQuery(id!);
+  const {
+    data: ramenyaDetail,
+    isLoading,
+    isError,
+  } = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
-  const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
-  const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
+  const {
+    isOpen: isBackModalOpen,
+    open: openBackModal,
+    close: closeBackModal,
+  } = useModal();
+  const {
+    isOpen: isLoginModalOpen,
+    open: openLoginModal,
+    close: closeLoginModal,
+  } = useModal();
   const { isSignIn } = useSignInStore();
 
   const searchParams = new URLSearchParams(window.location.search);
-  const initialRating = parseInt(searchParams.get('rating') || '0', 10);
+  const initialRating = parseInt(searchParams.get("rating") || "0", 10);
 
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [customMenuInput, setCustomMenuInput] = useState("");
-  const [menuList, setMenuList] = useState(ramenyaDetail?.menus?.map((menu) => menu) || []);
+  const [menuList, setMenuList] = useState(
+    ramenyaDetail?.menus?.map((menu) => menu) || []
+  );
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const fileInputRef = createRef<HTMLInputElement>();
@@ -90,6 +105,20 @@ export const CreateReviewPage = () => {
     }
   };
 
+  const convertHeicToJpeg = async (file: File): Promise<File> => {
+    if (file.name.toLowerCase().endsWith(".heic")) {
+      const convertedFile = await heic2any({
+        blob: file,
+        toType: "image/jpeg",
+        quality: 0.8,
+      });
+      return new File([convertedFile], file.name.replace(".heic", ".jpg"), {
+        type: "image/jpeg",
+      });
+    }
+    return file;
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -103,17 +132,12 @@ export const CreateReviewPage = () => {
 
     // 모바일 브라우저에서는 역순으로 업로드
     const fileArray = Array.from(files);
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      fileArray.reverse();
-    }
-
     const newImages: File[] = [];
+
     for (const file of fileArray) {
       if (currentImages.length + newImages.length >= 5) break;
 
-      if (file.type.startsWith("image/")) {
-        // 이미지 방향 보정
+      if (file.type.startsWith("image")) {
         const correctedFile = await correctImageOrientation(file);
         newImages.push(correctedFile);
       }
@@ -124,7 +148,7 @@ export const CreateReviewPage = () => {
     });
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -212,7 +236,7 @@ export const CreateReviewPage = () => {
 
   useEffect(() => {
     if (isError) {
-      alert('라멘집 정보를 불러오는데 실패했습니다.');
+      alert("라멘집 정보를 불러오는데 실패했습니다.");
       navigate(-1);
     }
   }, [isError, navigate]);
@@ -302,7 +326,9 @@ export const CreateReviewPage = () => {
                   </StarButton>
                 ))}
               </StarContainer>
-              {errors.rating && <ErrorMessage>별점을 선택해주세요</ErrorMessage>}
+              {errors.rating && (
+                <ErrorMessage>별점을 선택해주세요</ErrorMessage>
+              )}
             </StarWrapper>
             <Divider />
 
@@ -343,7 +369,9 @@ export const CreateReviewPage = () => {
             </MenuAddWrapper>
 
             <ReviewDescriptionWrapper>
-              <ReviewDescriptionTitle>어떤 점이 좋았나요?</ReviewDescriptionTitle>
+              <ReviewDescriptionTitle>
+                어떤 점이 좋았나요?
+              </ReviewDescriptionTitle>
               <Controller
                 name="review"
                 control={control}
@@ -441,16 +469,16 @@ export const CreateReviewPage = () => {
       <Modal isOpen={isLoginModalOpen} onClose={closeLoginModal}>
         <ModalContent>
           <ModalTextBox>
-            <ModalTitle>
-              로그인이 필요해요
-            </ModalTitle>
-            <ModalText>
-              로그인 하시겠습니까?
-            </ModalText>
+            <ModalTitle>로그인이 필요해요</ModalTitle>
+            <ModalText>로그인 하시겠습니까?</ModalText>
           </ModalTextBox>
           <ModalButtonBox>
-            <ModalCancelButton onClick={closeLoginModal}>취소</ModalCancelButton>
-            <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
+            <ModalCancelButton onClick={closeLoginModal}>
+              취소
+            </ModalCancelButton>
+            <ModalConfirmButton onClick={handleLoginConfirm}>
+              확인
+            </ModalConfirmButton>
           </ModalButtonBox>
         </ModalContent>
       </Modal>
@@ -542,7 +570,7 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
     cursor-pointer
     `,
   selected &&
-  tw`
+    tw`
         border-orange
         text-orange
     `,
@@ -614,14 +642,14 @@ const ReviewDescriptionTextarea = styled.textarea(() => [
       width: 4px;
     }
 
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-  &::-webkit-scrollbar-thumb {
-    background: #d9d9d9;
-    border-radius: 3px;
-  }
+    &::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 3px;
+    }
   `,
 ]);
 
