@@ -581,6 +581,7 @@ const MarketDetailReviewScore = tw.div`
 
 const MarketDetailGenreBox = tw.div`
   flex gap-8 items-center font-14-r
+  flex-wrap
 `;
 
 const MarketDetailBoxAddressText = tw.div`
