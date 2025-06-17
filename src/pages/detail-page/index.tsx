@@ -31,13 +31,14 @@ import { formatNumber } from "../../util/number";
 import { ReviewCard } from "./ReviewCard";
 import TopBar from "../../components/common/TopBar";
 import React from "react";
-import { useRamenyaReviewImagesQuery } from "../../hooks/queries/useRamenyaReviewQuery";
+import { useRamenyaReviewImagesQuery, useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { Modal } from "../../components/common/Modal";
 import { useModal } from "../../hooks/common/useModal";
 import { useSignInStore } from "../../states/sign-in";
 import { ReviewImage } from "../../components/common/ReviewImage";
 import { ImagePopup } from "../../components/common/ImagePopup";
+import { UserReview } from "../../types";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -52,6 +53,7 @@ const dayMapping: { [key: string]: string } = {
 export const DetailPage = () => {
   const { id } = useParams();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
+  const ramenyaReviewQuery = useRamenyaReviewQuery(id!);
   const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
   const userInformationQuery = useUserInformationQuery();
   const navigate = useNavigate();
@@ -125,6 +127,8 @@ export const DetailPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  console.log(ramenyaReviewQuery.data?.reviews);
 
   return (
     <Wrapper>
@@ -403,7 +407,7 @@ export const DetailPage = () => {
 
           <ReviewContent>
             <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
-            {ramenyaDetailQuery.data?.reviews?.length === 0 ? (
+            {ramenyaReviewQuery.data?.reviews?.length === 0 ? (
               <EmptyReviewContainer>
                 <EmptyReviewImage src={emptyReview} />
                 <EmptyReviewTitle>등록된 리뷰가 없습니다.</EmptyReviewTitle>
@@ -417,14 +421,14 @@ export const DetailPage = () => {
             ) : (
               <>
                 <ReviewCardContainer>
-                  {ramenyaDetailQuery.data?.reviews
+                  {ramenyaReviewQuery.data?.reviews
                     ?.sort(
-                      (a, b) =>
+                      (a: UserReview, b: UserReview) =>
                         new Date(b.createdAt).getTime() -
                         new Date(a.createdAt).getTime()
                     )
                     .slice(0, 3)
-                    .map((review) => (
+                    .map((review: UserReview) => (
                       <React.Fragment key={review._id}>
                         <ReviewCardBox>
                           <ReviewCard review={review} />

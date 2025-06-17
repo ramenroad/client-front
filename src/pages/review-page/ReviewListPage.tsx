@@ -3,12 +3,13 @@ import { ReviewCard } from '../detail-page/ReviewCard'
 import tw from 'twin.macro'
 
 import { useParams } from 'react-router-dom'
-import { useRamenyaDetailQuery } from '../../hooks/queries/useRamenyaDetailQuery'
+import { useRamenyaReviewQuery } from '../../hooks/queries/useRamenyaReviewQuery'
+import { UserReview } from '../../types'
 
 export const ReviewListPage = () => {
     const { id } = useParams();
-    const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
-    const reviews = ramenyaDetailQuery.data?.reviews;
+    const ramenyaReviewQuery = useRamenyaReviewQuery(id!);
+    const reviews = ramenyaReviewQuery.data?.reviews;
     return (
         <Wrapper>
             <TopBar
@@ -17,7 +18,7 @@ export const ReviewListPage = () => {
             <Container>
                 <ReviewListTitle>고객 리뷰</ReviewListTitle>
                 <ReviewListContainer>
-                    {reviews?.map((review) => (
+                    {reviews?.map((review: UserReview) => (
                         <>
                             <ReviewCard review={review} />
                             <ReviewDivider />

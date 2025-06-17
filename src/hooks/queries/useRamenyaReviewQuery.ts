@@ -36,9 +36,9 @@ export const useRamenyaReviewDeleteMutation = () => {
   });
 };
 
-export const useRamenyaReviewQuery = (reviewId: string) => {
+export const useRamenyaReviewQuery = (ramenyaId: string, page: number = 1, limit: number = 10) => {
   return useQuery({
-    queryKey: ["ramenyaReview", reviewId],
-    queryFn: () => getReview(reviewId),
+    queryKey: ["ramenyaReview", ramenyaId, page, limit],
+    queryFn: () => getReview(ramenyaId, page, limit),
   });
 };
