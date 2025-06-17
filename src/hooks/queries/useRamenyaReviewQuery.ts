@@ -1,5 +1,5 @@
-import { deleteReview, editReview, getMyReview, getReview, getReviewImages, postReview } from "../../api/review";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteReview, editReview, getReview, getReviewImages, getUserReview, postReview } from "../../api/review";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "./queryKeys";
 
 export const useRamenyaReviewMutation = () => {
@@ -21,13 +21,15 @@ export const useRamenyaReviewImagesQuery = (reviewId: string) => {
   });
 };
 
-export const useMyReviewQuery = () => {
-  const myReviewQuery = useQuery({
-    ...queryKeys.review.myReview,
-    queryFn: getMyReview,
-    select: (data) => data.reviews,
+export const useMyReviewQuery = (userId?: string) => {
+  const userReviewQuery = useInfiniteQuery({
+    ...queryKeys.review.userReview(userId!),
+    queryFn: ({ pageParam = 1 }) => getUserReview({ userId: userId!, page: pageParam, limit: 10 }),
+    getNextPageParam: (lastPage, allPages) => (lastPage.reviews.length === 10 ? allPages.length + 1 : undefined),
+    initialPageParam: 1,
+    enabled: !!userId,
   });
-  return { myReviewQuery };
+  return { userReviewQuery };
 };
 
 export const useRamenyaReviewDeleteMutation = () => {

@@ -29,12 +29,22 @@ export const deleteReview = async (reviewId: string) => {
   return response.data;
 };
 
-export interface MyReviewResponse {
+export interface UserReviewResponse {
   reviews: MyReview[];
+  reviewCount: number;
+  lastPage: number;
 }
 
-export const getMyReview = async () => {
-  const response = await instanceWithNoVersioning.get<MyReviewResponse>("/review/my");
+export interface UserReviewParams {
+  userId: string;
+  page: number;
+  limit: number;
+}
+
+export const getUserReview = async (params: UserReviewParams) => {
+  const response = await instanceWithNoVersioning.get<UserReviewResponse>(`/review/${params.userId}/reviews`, {
+    params: { page: params.page, limit: params.limit },
+  });
   return response.data;
 };
 

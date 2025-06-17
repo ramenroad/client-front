@@ -4,9 +4,15 @@ import TopBar from "../../components/common/TopBar";
 import { useMyReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { Line } from "../../components/common/Line";
 import { MyReviewCard } from "../../components/review/MyReviewCard";
+import { useParams } from "react-router-dom";
+import { useIntersectionObserver } from "../../hooks/common/useIntersectionObserver";
 
-const MyReviewPage = () => {
-  const { myReviewQuery } = useMyReviewQuery();
+const UserReviewPage = () => {
+  const { id: userId } = useParams();
+  const { userReviewQuery } = useMyReviewQuery(userId);
+  const ref = useIntersectionObserver({
+    onIntersect: userReviewQuery.fetchNextPage,
+  });
 
   return (
     <>
@@ -14,11 +20,14 @@ const MyReviewPage = () => {
       <PageWrapper>
         <ReviewResultWrapper>
           <RamenroadText size={18} weight="m">
-            총 작성 리뷰 {myReviewQuery.data?.length}개
+            총 작성 리뷰 {userReviewQuery.data?.pages[0].reviewCount}개
           </RamenroadText>
         </ReviewResultWrapper>
         <Line />
-        {myReviewQuery.data?.map((review) => <MyReviewCard key={review._id} review={review} />)}
+        {userReviewQuery.data?.pages.map((page) =>
+          page.reviews.map((review) => <MyReviewCard key={review._id} review={review} />),
+        )}
+        <div ref={ref} />
       </PageWrapper>
     </>
   );
@@ -33,4 +42,4 @@ const ReviewResultWrapper = tw.section`
   p-20
 `;
 
-export default MyReviewPage;
+export default UserReviewPage;
