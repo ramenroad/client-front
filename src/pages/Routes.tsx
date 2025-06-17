@@ -16,6 +16,7 @@ import MyPage from "./my-page";
 import { CreateReviewPage } from "./review-page/CreateReviewPage";
 import { ReviewListPage } from "./review-page/ReviewListPage";
 import { ImagesPage } from "./detail-page/images-page";
+import MyReviewPage from "./my-review-page";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
       {
         path: "information",
         element: <InformationPage />,
+      },
+      {
+        path: "my-review",
+        element: <MyReviewPage />,
       },
     ],
   },
