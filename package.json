@@ -17,6 +17,7 @@
     "@types/react-helmet": "^6.1.11",
     "axios": "^1.7.7",
     "exif-js": "^2.3.0",
+    "heic2any": "^0.0.4",
     "dayjs": "^1.11.13",
     "immer": "^10.1.1",
     "lottie-react": "^2.4.1",
