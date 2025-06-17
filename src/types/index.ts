@@ -114,6 +114,8 @@ export interface UserReview extends Review {
     _id: string;
     nickname: string;
     profileImageUrl: string;
+    avgReviewRating: number;
+    reviewCount: number;
   };
   createdAt: Date;
   updatedAt: Date;

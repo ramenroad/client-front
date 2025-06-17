@@ -38,7 +38,7 @@ export const getMyReview = async () => {
   return response.data;
 };
 
-export const getReview = async (reviewId: string) => {
-  const response = await instanceWithNoVersioning.get(`/review/${reviewId}`);
+export const getReview = async (ramenyaId: string, page: number = 1, limit: number = 10) => {
+  const response = await instanceWithNoVersioning.get(`/review?ramenyaId=${ramenyaId}&page=${page}&limit=${limit}`);
   return response.data;
 };
