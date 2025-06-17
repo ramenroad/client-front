@@ -63,6 +63,11 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
         navigate(`/review/edit/${review._id}`);
     }
 
+    console.log(review)
+    console.log(review.userId)
+    console.log(review.userId.avgReviewRating)
+    console.log(review.userId.reviewCount)
+
     return (
         <>
             <Wrapper>
