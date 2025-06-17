@@ -76,7 +76,7 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
                             </ReviewerName>
                             <ReviewerReviewInfo>
                                 <ReviewerReviewRating>
-                                    평균 별점 {review.userId.avgReviewRating}
+                                    평균 별점 {review.userId.avgReviewRating?.toFixed(1)}
                                 </ReviewerReviewRating>
                                 <ReviewerReviewCountDivider />
                                 <ReviewerReviewCount>
