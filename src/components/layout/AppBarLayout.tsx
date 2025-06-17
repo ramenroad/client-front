@@ -15,7 +15,7 @@ const AppBarLayout = () => {
 };
 
 const Space = tw.div`
-  h-48
+  h-55 min-h-55
 `;
 
 export default AppBarLayout;

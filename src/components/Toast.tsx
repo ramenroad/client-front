@@ -33,12 +33,12 @@ export const Toast = ({ message, isOpen, onClose }: ToastProps) => {
         <ToastContent>{message}</ToastContent>
       </ToastWrapper>
     </ToastContainer>,
-    document.body
+    document.body,
   );
 };
 
 const ToastContainer = tw.div`
-  fixed bottom-200 z-50 w-full
+  fixed bottom-140 z-50 w-full
   flex justify-center items-center
 `;
 
@@ -50,5 +50,5 @@ const ToastWrapper = styled.div<{ isVisible: boolean }>(({ isVisible }) => [
 ]);
 
 const ToastContent = tw.div`
-  bg-black/80 text-white px-6 py-3 rounded-lg font-16-sb w-350 flex justify-center items-center
+  bg-black/80 text-white px-6 py-3 rounded-lg font-16-sb w-350 h-48 flex justify-center items-center
 `;
