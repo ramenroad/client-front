@@ -67,11 +67,23 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
         <>
             <Wrapper>
                 <ReviewHeader>
+
                     <ReviewNameBox>
                         <ReviewerProfileImage src={defaultProfile} />
-                        <ReviewerName>
-                            {review.userId.nickname}
-                        </ReviewerName>
+                        <ReviewerInfoBox>
+                            <ReviewerName>
+                                {review.userId.nickname}
+                            </ReviewerName>
+                            <ReviewerReviewInfo>
+                                <ReviewerReviewRating>
+                                    평균 별점 {review.userId.avgReviewRating}
+                                </ReviewerReviewRating>
+                                <ReviewerReviewCountDivider />
+                                <ReviewerReviewCount>
+                                    리뷰  {review.userId.reviewCount}
+                                </ReviewerReviewCount>
+                            </ReviewerReviewInfo>
+                        </ReviewerInfoBox>
                     </ReviewNameBox>
 
                     {review.userId._id === userInformationQuery.data?._id && (
@@ -175,7 +187,7 @@ const ReviewHeader = tw.div`
 `
 
 const ReviewNameBox = tw.div`
-    flex gap-8 items-center
+    flex gap-10 items-center
 `
 
 const ButtonContainer = tw.div`
@@ -193,7 +205,27 @@ const ReviewButton = tw.button`
 `
 
 const ReviewerProfileImage = tw.img`
-    w-24 h-24 rounded-full
+    w-36 h-36 rounded-full
+`
+
+const ReviewerInfoBox = tw.div`
+    flex flex-col
+`
+
+const ReviewerReviewInfo = tw.div`
+    flex gap-6 items-center
+`
+
+const ReviewerReviewRating = tw.div`
+    font-12-r text-gray-70
+`
+
+const ReviewerReviewCountDivider = tw.div`
+    w-1 h-10 bg-gray-100
+`
+
+const ReviewerReviewCount = tw.div`
+    font-12-r text-gray-70
 `
 
 const ReviewerName = tw.div`
