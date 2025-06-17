@@ -6,25 +6,28 @@ interface ToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
+  onText?: string;
+  offText?: string;
 }
 
-export const Toggle: React.FC<ToggleProps> = ({
-  checked,
-  onChange,
-  disabled,
-}) => {
+export const Toggle: React.FC<ToggleProps> = ({ checked, onChange, disabled, onText, offText }) => {
   return (
     <ToggleLabel disabled={disabled}>
-      <ToggleInput
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        disabled={disabled}
-      />
+      <ToggleInput type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} disabled={disabled} />
       <Slider checked={checked} />
+      <ToggleText checked={checked}>{checked ? onText : offText}</ToggleText>
     </ToggleLabel>
   );
 };
+
+const ToggleText = styled.span<{ checked: boolean }>(({ checked }) => [
+  tw`text-8 absolute text-white leading-12`,
+  checked ? tw`left-4` : tw`right-4`,
+  {
+    top: "50%",
+    transform: "translateY(-50%)",
+  },
+]);
 
 const ToggleLabel = styled.label<{ disabled?: boolean }>(({ disabled }) => [
   tw`

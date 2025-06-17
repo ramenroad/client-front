@@ -1,4 +1,13 @@
-import { deleteReview, editReview, getReview, getReviewImages, getUserReview, postReview } from "../../api/review";
+import {
+  deleteReview,
+  editReview,
+  getMyReviews,
+  getReview,
+  getReviewDetail,
+  getReviewImages,
+  getUserReview,
+  postReview,
+} from "../../api/review";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "./queryKeys";
 
@@ -21,7 +30,7 @@ export const useRamenyaReviewImagesQuery = (reviewId: string) => {
   });
 };
 
-export const useMyReviewQuery = (userId?: string) => {
+export const useUserReviewQuery = (userId?: string) => {
   const userReviewQuery = useInfiniteQuery({
     ...queryKeys.review.userReview(userId!),
     queryFn: ({ pageParam = 1 }) => getUserReview({ userId: userId!, page: pageParam, limit: 10 }),
@@ -30,6 +39,17 @@ export const useMyReviewQuery = (userId?: string) => {
     enabled: !!userId,
   });
   return { userReviewQuery };
+};
+
+export const useMyReviewQuery = (enabled: boolean) => {
+  const myReviewQuery = useInfiniteQuery({
+    ...queryKeys.review.my,
+    queryFn: ({ pageParam = 1 }) => getMyReviews({ page: pageParam, limit: 10 }),
+    getNextPageParam: (lastPage, allPages) => (lastPage.reviews.length === 10 ? allPages.length + 1 : undefined),
+    initialPageParam: 1,
+    enabled: !!enabled,
+  });
+  return { myReviewQuery };
 };
 
 export const useRamenyaReviewDeleteMutation = () => {
@@ -42,5 +62,13 @@ export const useRamenyaReviewQuery = (ramenyaId: string, page: number = 1, limit
   return useQuery({
     queryKey: ["ramenyaReview", ramenyaId, page, limit],
     queryFn: () => getReview(ramenyaId, page, limit),
+  });
+};
+
+export const useRamenyaReviewDetailQuery = (reviewId: string) => {
+  return useQuery({
+    queryKey: ["ramenyaReviewDetail", reviewId],
+    queryFn: () => getReviewDetail(reviewId),
+    enabled: !!reviewId,
   });
 };

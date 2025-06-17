@@ -8,7 +8,8 @@ import { Button } from "../../components/common/Button";
 import { RamenroadText } from "../../components/common/RamenroadText";
 
 const MyPage = () => {
-  const userInformationQuery = useUserInformationQuery();
+  const { userInformationQuery } = useUserInformationQuery();
+
   const { logout } = useAuthMutation();
   const navigate = useNavigate();
 

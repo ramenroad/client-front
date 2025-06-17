@@ -16,9 +16,8 @@ import { CreateReviewPage } from "./review-page/CreateReviewPage";
 import { ReviewListPage } from "./review-page/ReviewListPage";
 import { ImagesPage } from "./detail-page/images-page";
 import UserReviewPage from "./user-review-page";
-
-import MyReviewPage from "./my-review-page";
 import { EditReviewPage } from "./review-page/EditReviewPage";
+
 const router = createBrowserRouter([
   {
     path: "/",

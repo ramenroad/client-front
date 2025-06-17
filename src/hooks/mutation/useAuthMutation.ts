@@ -7,6 +7,9 @@ import { queryClient } from "../../core/queryClient";
 import { useNavigate } from "react-router-dom";
 import { queryKeys } from "../queries/queryKeys";
 import { useToast } from "../../components/ToastProvider";
+import { setUserInformation } from "../../store/location/useUserInformationStore";
+import { jwtDecode } from "jwt-decode";
+import { UserInformation } from "../../types/user";
 
 export const useAuthMutation = () => {
   const navigate = useNavigate();
@@ -21,6 +24,15 @@ export const useAuthMutation = () => {
     onSuccess: (data) => {
       openToast("로그인 성공");
       sessionStorage.setItem("isAuthenticated", "true");
+
+      const decodedToken: UserInformation = jwtDecode(data.accessToken);
+
+      setUserInformation({
+        id: decodedToken.id,
+        email: decodedToken.email,
+        nickname: decodedToken.nickname,
+      });
+
       setTokens(data);
       queryClient.invalidateQueries({ ...queryKeys.user.information });
       if (data.type === "signup") {
