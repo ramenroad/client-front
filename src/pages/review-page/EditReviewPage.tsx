@@ -227,9 +227,15 @@ export const EditReviewPage = () => {
 
   useEffect(() => {
     if (ramenyaDetail?.menus) {
-      setMenuList(ramenyaDetail.menus.map((menu) => menu));
+      const ramenyaMenus = ramenyaDetail.menus.map((menu) => menu);
+      const reviewMenus = Array.isArray(reviewData?.menus)
+        ? reviewData.menus
+        : reviewData?.menus?.split(",") || [];
+
+      const combinedMenus = [...new Set([...ramenyaMenus, ...reviewMenus])];
+      setMenuList(combinedMenus);
     }
-  }, [ramenyaDetail?.menus]);
+  }, [ramenyaDetail?.menus, reviewData?.menus]);
 
   useEffect(() => {
     const hasChanges =
