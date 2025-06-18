@@ -5,9 +5,12 @@ import { useToast } from "../../components/ToastProvider";
 export const useUserMyPageMutation = () => {
   const { openToast } = useToast();
   const updateUserMyPageMutation = useMutation({
-    mutationFn: patchMyPagePublic,
-    onSuccess: () => {
-      openToast("리뷰 공개 여부가 변경되었습니다.");
+    mutationFn: async (isPublic: boolean) => {
+      await patchMyPagePublic(isPublic);
+      return isPublic;
+    },
+    onSuccess: (isPublic) => {
+      openToast(isPublic ? "내 리뷰가 상대방에게 보입니다." : "내 리뷰가 상대방에게 보이지 않습니다.");
     },
   });
 

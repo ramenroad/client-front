@@ -8,11 +8,10 @@ import { Review } from "../../types";
 import {
   useRamenyaReviewDetailQuery,
   useRamenyaReviewEditMutation,
-  useRamenyaReviewQuery,
 } from "../../hooks/queries/useRamenyaReviewQuery.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { Modal } from "../../components/common/Modal";
-import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
+
 import { css } from "@emotion/react";
 import { useSignInStore } from "../../states/sign-in";
 import { useModal } from "../../hooks/common/useModal";
@@ -23,13 +22,11 @@ import loadingAnimation from "../../assets/lotties/loading.json";
 export const EditReviewPage = () => {
   const { id: reviewId } = useParams();
   const { mutate: editReview, isPending: isSubmitting } = useRamenyaReviewEditMutation(reviewId!);
-  const { data: reviewData, isLoading: isReviewLoading } = useRamenyaReviewQuery(reviewId!);
-  const { data: reviewDetail } = useRamenyaReviewDetailQuery(reviewId!);
-  const {
-    data: ramenyaDetail,
-    isLoading: isRamenyaLoading,
-    isError,
-  } = useRamenyaDetailQuery(reviewDetail?.ramenyaId._id);
+
+  const { reviewDetailQuery } = useRamenyaReviewDetailQuery(reviewId!);
+
+  const reviewDetail = reviewDetailQuery.data;
+
   const navigate = useNavigate();
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
   const { isSignIn } = useSignInStore();
@@ -224,13 +221,6 @@ export const EditReviewPage = () => {
   }, [reviewId, navigate]);
 
   useEffect(() => {
-    if (isError) {
-      alert("라멘집 정보를 불러오는데 실패했습니다.");
-      navigate(-1);
-    }
-  }, [isError, navigate]);
-
-  useEffect(() => {
     if (reviewDetail?.menus) {
       const reviewMenus = Array.isArray(reviewDetail?.menus)
         ? reviewDetail.menus
@@ -242,6 +232,8 @@ export const EditReviewPage = () => {
   }, [reviewDetail?.menus]);
 
   useEffect(() => {
+    if (!reviewDetail) return;
+
     const hasChanges =
       isDirty ||
       (formValues.reviewImages?.length ?? 0) > 0 ||
@@ -250,7 +242,7 @@ export const EditReviewPage = () => {
       formValues.review.trim().length > 0;
 
     setIsFormDirty(hasChanges);
-  }, [isDirty, formValues.reviewImages, formValues.rating, formValues.menus, formValues.review]);
+  }, [isDirty, formValues.reviewImages, formValues.rating, formValues.menus, formValues.review, reviewDetail]);
 
   useEffect(() => {
     const urls =
@@ -279,20 +271,20 @@ export const EditReviewPage = () => {
   }, []);
 
   useEffect(() => {
-    if (reviewData) {
+    if (reviewDetail && reviewDetailQuery.isSuccess) {
       reset({
-        ramenyaId: reviewData.ramenyaId,
-        rating: reviewData.rating,
-        review: reviewData.review,
-        menus: Array.isArray(reviewData.menus) ? reviewData.menus.join(",") : reviewData.menus,
-        reviewImages: reviewData.reviewImageUrls || [],
+        ramenyaId: reviewDetail.ramenyaId._id,
+        rating: reviewDetail.rating,
+        review: reviewDetail.review,
+        menus: Array.isArray(reviewDetail.menus) ? reviewDetail.menus.join(",") : reviewDetail.menus,
+        reviewImages: reviewDetail.reviewImageUrls || [],
       });
-      setSelectedMenus(Array.isArray(reviewData.menus) ? reviewData.menus : reviewData.menus?.split(",") || []);
-      setImageUrls(reviewData.reviewImageUrls || []);
+      setSelectedMenus(reviewDetail.menus ?? []);
+      setImageUrls(reviewDetail.reviewImageUrls || []);
     }
-  }, [reviewData, reset]);
+  }, [reviewDetail, reset, reviewDetailQuery.isSuccess]);
 
-  const isLoading = isReviewLoading || isRamenyaLoading;
+  const isLoading = reviewDetailQuery.isLoading;
 
   return (
     <Wrapper>

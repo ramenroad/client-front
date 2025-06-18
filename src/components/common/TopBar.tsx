@@ -6,6 +6,8 @@ interface TopBarProps {
   title: string;
   navigate?: string;
   onBackClick?: () => void;
+  icon?: React.ReactNode;
+  onIconClick?: () => void;
 }
 
 const TopBar = (props: TopBarProps) => {
@@ -29,6 +31,7 @@ const TopBar = (props: TopBarProps) => {
         <StyledIconBack onClick={handleBackClick} />
       </IconWrapper>
       <HeaderTitle>{props.title}</HeaderTitle>
+      {props.icon && <AdditionalIconWrapper onClick={props.onIconClick}>{props.icon}</AdditionalIconWrapper>}
     </TopBarWrapper>
   );
 };
@@ -49,6 +52,12 @@ const StyledIconBack = tw(IconBack)`
 
 const HeaderTitle = tw.span`
   font-16-sb text-black
+`;
+
+const AdditionalIconWrapper = tw.div`
+  absolute right-20
+  w-24 h-24
+  cursor-pointer
 `;
 
 export default TopBar;

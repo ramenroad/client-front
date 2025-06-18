@@ -66,9 +66,11 @@ export const useRamenyaReviewQuery = (ramenyaId: string, page: number = 1, limit
 };
 
 export const useRamenyaReviewDetailQuery = (reviewId: string) => {
-  return useQuery({
+  const reviewDetailQuery = useQuery({
     queryKey: ["ramenyaReviewDetail", reviewId],
     queryFn: () => getReviewDetail(reviewId),
     enabled: !!reviewId,
   });
+
+  return { reviewDetailQuery };
 };
