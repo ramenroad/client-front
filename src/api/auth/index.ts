@@ -1,7 +1,13 @@
 import { instanceWithNoVersioning } from "..";
 
+export interface oAuthLoginResponse {
+  type: "signup" | "signin";
+  accessToken: string;
+  refreshToken: string;
+}
+
 export const oAuthLogin = async (id: string, code: string) => {
-  const response = await instanceWithNoVersioning.post(`/auth/signin/${id}`, {
+  const response = await instanceWithNoVersioning.post<oAuthLoginResponse>(`/auth/signin/${id}`, {
     authorizationCode: code,
   });
 
@@ -9,8 +15,7 @@ export const oAuthLogin = async (id: string, code: string) => {
 };
 
 export const refreshToken = async (refreshToken: string) => {
-  instanceWithNoVersioning.defaults.headers.common["Authorization"] =
-    `Bearer ${refreshToken}`;
+  instanceWithNoVersioning.defaults.headers.common["Authorization"] = `Bearer ${refreshToken}`;
   const response = await instanceWithNoVersioning.post("/auth/refresh");
 
   return response.data;
@@ -36,13 +41,9 @@ export const updateUserNickname = async (nickname: string) => {
 };
 
 export const updateUserImage = async (formData: FormData) => {
-  const response = await instanceWithNoVersioning.patch(
-    "/mypage/image",
-    formData,
-    {
-      headers: { "Content-Type": "multipart/form-data" },
-    }
-  );
+  const response = await instanceWithNoVersioning.patch("/mypage/image", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 
   return response.data;
 };

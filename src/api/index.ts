@@ -39,9 +39,9 @@ export const createAxiosInstance = (queryClient: QueryClient, versioning: boolea
 
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
-        console.log("401 에러 발생");
 
         try {
+          useSignInStore.setState({ ...useSignInStore.getState(), accessToken: null, isSignIn: false });
           const tokens = await refreshToken(useSignInStore.getState().refreshToken as string);
 
           useSignInStore.getState().setTokens(tokens);

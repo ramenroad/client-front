@@ -1,37 +1,41 @@
 import TopBar from "../../components/common/TopBar.tsx";
 import tw from "twin.macro";
-import {
-  IconStarLarge,
-  IconAdd,
-  IconClose,
-} from "../../components/Icon/index.tsx";
+import { IconStarLarge, IconAdd, IconClose } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { createRef, useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Review } from "../../types";
-import { useRamenyaReviewEditMutation, useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery.ts";
+import {
+  useRamenyaReviewDetailQuery,
+  useRamenyaReviewEditMutation,
+} from "../../hooks/queries/useRamenyaReviewQuery.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { Modal } from "../../components/common/Modal";
-import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
+
 import { css } from "@emotion/react";
 import { useSignInStore } from "../../states/sign-in";
 import { useModal } from "../../hooks/common/useModal";
 import { correctImageOrientation } from "../../util/image";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
+import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 
 export const EditReviewPage = () => {
   const { id: reviewId } = useParams();
   const { mutate: editReview, isPending: isSubmitting } = useRamenyaReviewEditMutation(reviewId!);
-  const { data: reviewData, isLoading: isReviewLoading } = useRamenyaReviewQuery(reviewId!);
-  const { data: ramenyaDetail, isLoading: isRamenyaLoading, isError } = useRamenyaDetailQuery(reviewData?.ramenyaId._id || undefined);
+
+  const { reviewDetailQuery } = useRamenyaReviewDetailQuery(reviewId!);
+  const reviewDetail = reviewDetailQuery.data;
+
+  const { data: ramenyaDetail } = useRamenyaDetailQuery(reviewDetail?.ramenyaId?._id);
+
   const navigate = useNavigate();
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
   const { isSignIn } = useSignInStore();
 
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [customMenuInput, setCustomMenuInput] = useState("");
-  const [menuList, setMenuList] = useState(ramenyaDetail?.menus?.map((menu) => menu) || []);
+  const [menuList, setMenuList] = useState(reviewDetail?.menus?.map((menu) => menu) || []);
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const fileInputRef = createRef<HTMLInputElement>();
@@ -45,11 +49,11 @@ export const EditReviewPage = () => {
     reset,
   } = useForm<Review>({
     defaultValues: {
-      ramenyaId: reviewData?.ramenyaId || "",
-      rating: reviewData?.rating || 0,
-      review: reviewData?.review || "",
+      ramenyaId: reviewDetail?.ramenyaId._id || "",
+      rating: reviewDetail?.rating || 0,
+      review: reviewDetail?.review || "",
       reviewImages: [],
-      menus: reviewData?.menus || "",
+      menus: reviewDetail?.menus?.join(",") || "",
     },
     mode: "onChange",
   });
@@ -73,16 +77,14 @@ export const EditReviewPage = () => {
     if (selectedMenus.includes(menu)) {
       setSelectedMenus(selectedMenus.filter((item) => item !== menu));
     } else {
-      if (selectedMenus.length < 2) {
-        setSelectedMenus([...selectedMenus, menu]);
-      }
+      setSelectedMenus([...selectedMenus, menu]);
     }
   };
 
   const handleAddCustomMenu = () => {
     if (customMenuInput.trim() !== "" && !menuList.includes(customMenuInput)) {
       setMenuList([...menuList, customMenuInput]);
-      if (selectedMenus.length < 2) {
+      if (selectedMenus.length < 1) {
         setSelectedMenus([...selectedMenus, customMenuInput]);
       }
       setCustomMenuInput("");
@@ -128,7 +130,7 @@ export const EditReviewPage = () => {
     });
 
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -165,18 +167,18 @@ export const EditReviewPage = () => {
         values.reviewImages.forEach((image) => {
           if (image instanceof File) {
             newImages.push(image);
-          } else if (typeof image === 'string') {
+          } else if (typeof image === "string") {
             existingImages.push(image);
           }
         });
       }
 
       // 기존 이미지는 쉼표로 구분된 문자열로 전송
-      formData.append('reviewImageUrls', existingImages.join(','));
+      formData.append("reviewImageUrls", existingImages.join(","));
 
       // 새로운 이미지는 각각 파일로 전송
       newImages.forEach((image) => {
-        formData.append('reviewImages', image);
+        formData.append("reviewImages", image);
       });
 
       await editReview(formData, {
@@ -219,25 +221,14 @@ export const EditReviewPage = () => {
   }, [reviewId, navigate]);
 
   useEffect(() => {
-    if (isError) {
-      alert('라멘집 정보를 불러오는데 실패했습니다.');
-      navigate(-1);
-    }
-  }, [isError, navigate]);
-
-  useEffect(() => {
     if (ramenyaDetail?.menus) {
-      const ramenyaMenus = ramenyaDetail.menus.map((menu) => menu);
-      const reviewMenus = Array.isArray(reviewData?.menus)
-        ? reviewData.menus
-        : reviewData?.menus?.split(",") || [];
-
-      const combinedMenus = [...new Set([...ramenyaMenus, ...reviewMenus])];
-      setMenuList(combinedMenus);
+      setMenuList([...new Set([...(ramenyaDetail?.menus ?? []), ...(reviewDetail?.menus ?? [])])]);
     }
-  }, [ramenyaDetail?.menus, reviewData?.menus]);
+  }, [reviewDetail?.menus, ramenyaDetail?.menus]);
 
   useEffect(() => {
+    if (!reviewDetail) return;
+
     const hasChanges =
       isDirty ||
       (formValues.reviewImages?.length ?? 0) > 0 ||
@@ -246,13 +237,7 @@ export const EditReviewPage = () => {
       formValues.review.trim().length > 0;
 
     setIsFormDirty(hasChanges);
-  }, [
-    isDirty,
-    formValues.reviewImages,
-    formValues.rating,
-    formValues.menus,
-    formValues.review,
-  ]);
+  }, [isDirty, formValues.reviewImages, formValues.rating, formValues.menus, formValues.review, reviewDetail]);
 
   useEffect(() => {
     const urls =
@@ -281,20 +266,20 @@ export const EditReviewPage = () => {
   }, []);
 
   useEffect(() => {
-    if (reviewData) {
+    if (reviewDetail && reviewDetailQuery.isSuccess) {
       reset({
-        ramenyaId: reviewData.ramenyaId,
-        rating: reviewData.rating,
-        review: reviewData.review,
-        menus: Array.isArray(reviewData.menus) ? reviewData.menus.join(",") : reviewData.menus,
-        reviewImages: reviewData.reviewImageUrls || [],
+        ramenyaId: reviewDetail.ramenyaId._id,
+        rating: reviewDetail.rating,
+        review: reviewDetail.review,
+        menus: Array.isArray(reviewDetail.menus) ? reviewDetail.menus.join(",") : reviewDetail.menus,
+        reviewImages: reviewDetail.reviewImageUrls || [],
       });
-      setSelectedMenus(Array.isArray(reviewData.menus) ? reviewData.menus : reviewData.menus.split(","));
-      setImageUrls(reviewData.reviewImageUrls || []);
+      setSelectedMenus(reviewDetail.menus ?? []);
+      setImageUrls(reviewDetail.reviewImageUrls || []);
     }
-  }, [reviewData, reset]);
+  }, [reviewDetail, reset, reviewDetailQuery.isSuccess]);
 
-  const isLoading = isReviewLoading || isRamenyaLoading;
+  const isLoading = reviewDetailQuery.isLoading;
 
   return (
     <Wrapper>
@@ -319,16 +304,8 @@ export const EditReviewPage = () => {
               <StarTitle>라멘은 만족하셨나요?</StarTitle>
               <StarContainer>
                 {[1, 2, 3, 4, 5].map((starIndex) => (
-                  <StarButton
-                    key={starIndex}
-                    onClick={() => handleStarClick(starIndex)}
-                    type="button"
-                  >
-                    <IconStarLarge
-                      color={
-                        starIndex <= formValues.rating ? "#FFCC00" : "#E1E1E1"
-                      }
-                    />
+                  <StarButton key={starIndex} onClick={() => handleStarClick(starIndex)} type="button">
+                    <IconStarLarge color={starIndex <= formValues.rating ? "#FFCC00" : "#E1E1E1"} />
                   </StarButton>
                 ))}
               </StarContainer>
@@ -343,11 +320,7 @@ export const EditReviewPage = () => {
               </MenuTitleBox>
               <MenuTabContainer>
                 {menuList.map((menu, index) => (
-                  <MenuTab
-                    key={index}
-                    selected={selectedMenus.includes(menu)}
-                    onClick={() => handleMenuClick(menu)}
-                  >
+                  <MenuTab key={index} selected={selectedMenus.includes(menu)} onClick={() => handleMenuClick(menu)}>
                     {menu}
                   </MenuTab>
                 ))}
@@ -356,9 +329,7 @@ export const EditReviewPage = () => {
             </MenuWrapper>
 
             <MenuAddWrapper>
-              <MenuAddTitle>
-                찾으시는 메뉴가 없나요? 직접 추가해주세요
-              </MenuAddTitle>
+              <MenuAddTitle>찾으시는 메뉴가 없나요? 직접 추가해주세요</MenuAddTitle>
               <MenuInputContainer>
                 <MenuInput
                   value={customMenuInput}
@@ -380,10 +351,7 @@ export const EditReviewPage = () => {
                 rules={{ required: true, minLength: 10 }}
                 render={({ field }) => (
                   <ReviewTextAreaContainer>
-                    <ReviewDescriptionTextarea
-                      {...field}
-                      placeholder="최소 10자 이상 입력해주세요"
-                    />
+                    <ReviewDescriptionTextarea {...field} placeholder="최소 10자 이상 입력해주세요" />
                     <CharacterCount>
                       <TypedCount>{field.value.length}</TypedCount>/300
                     </CharacterCount>
@@ -402,23 +370,15 @@ export const EditReviewPage = () => {
                     <ImageMax>5</ImageMax>
                   </ImageCountBox>
                 </ImageUploadTitleBox>
-                <ImageUploadSubTitle>
-                  라멘과 무관한 사진을 첨부한 리뷰는 무통보 삭제됩니다
-                </ImageUploadSubTitle>
+                <ImageUploadSubTitle>라멘과 무관한 사진을 첨부한 리뷰는 무통보 삭제됩니다</ImageUploadSubTitle>
               </ImageUploadHeader>
 
               <ImageUploadContent>
                 <ImageUploadContentImage>
                   {formValues.reviewImages?.map((_, index) => (
                     <ImagePreviewContainer key={index}>
-                      <ImagePreview
-                        src={imageUrls[index]}
-                        alt={`업로드 이미지 ${index + 1}`}
-                      />
-                      <ImageRemoveButton
-                        onClick={() => handleRemoveImage(index)}
-                        type="button"
-                      >
+                      <ImagePreview src={imageUrls[index]} alt={`업로드 이미지 ${index + 1}`} />
+                      <ImageRemoveButton onClick={() => handleRemoveImage(index)} type="button">
                         <IconClose width={9} height={9} color="#585858" />
                       </ImageRemoveButton>
                     </ImagePreviewContainer>
@@ -440,10 +400,7 @@ export const EditReviewPage = () => {
               </ImageUploadContent>
             </ImageUploadWrapper>
 
-            <AddReviewButton
-              active={isFormValid}
-              disabled={!isFormValid || isSubmitting}
-            >
+            <AddReviewButton active={isFormValid} disabled={!isFormValid || isSubmitting}>
               {isSubmitting ? "수정중..." : "수정하기"}
             </AddReviewButton>
           </ContentsWrapper>
@@ -454,12 +411,8 @@ export const EditReviewPage = () => {
         <ModalContent>
           <ModalText>리뷰 수정을 멈추고 뒤로 갈까요?</ModalText>
           <ModalButtonBox>
-            <ModalCancelButton onClick={handleCancelBack}>
-              취소
-            </ModalCancelButton>
-            <ModalConfirmButton onClick={handleConfirmBack}>
-              확인
-            </ModalConfirmButton>
+            <ModalCancelButton onClick={handleCancelBack}>취소</ModalCancelButton>
+            <ModalConfirmButton onClick={handleConfirmBack}>확인</ModalConfirmButton>
           </ModalButtonBox>
         </ModalContent>
       </Modal>
@@ -551,7 +504,7 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
     cursor-pointer
     `,
   selected &&
-  tw`
+    tw`
         border-orange
         text-orange
     `,
@@ -623,14 +576,14 @@ const ReviewDescriptionTextarea = styled.textarea(() => [
       width: 4px;
     }
 
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
 
-  &::-webkit-scrollbar-thumb {
-    background: #d9d9d9;
-    border-radius: 3px;
-  }
+    &::-webkit-scrollbar-thumb {
+      background: #d9d9d9;
+      border-radius: 3px;
+    }
   `,
 ]);
 
@@ -726,19 +679,17 @@ interface AddReviewButtonProps {
   disabled?: boolean;
 }
 
-const AddReviewButton = styled.button<AddReviewButtonProps>(
-  ({ active, disabled }) => [
-    tw`
+const AddReviewButton = styled.button<AddReviewButtonProps>(({ active, disabled }) => [
+  tw`
     flex items-center justify-center
     mt-32
     w-full h-48 rounded-8 text-white
     px-10 py-10 bg-gray-200
     border-none box-border
     `,
-    active && !disabled && tw`bg-orange cursor-pointer`,
-    (!active || disabled) && tw`cursor-not-allowed`,
-  ]
-);
+  active && !disabled && tw`bg-orange cursor-pointer`,
+  (!active || disabled) && tw`cursor-not-allowed`,
+]);
 
 const StarButton = tw.button`
     bg-transparent border-none cursor-pointer p-0 m-0

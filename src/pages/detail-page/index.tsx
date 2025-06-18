@@ -55,23 +55,13 @@ export const DetailPage = () => {
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const ramenyaReviewQuery = useRamenyaReviewQuery(id!);
   const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
-  const userInformationQuery = useUserInformationQuery();
+  const { userInformationQuery } = useUserInformationQuery();
   const navigate = useNavigate();
   const [isTimeExpanded, setIsTimeExpanded] = useState(false);
-  const {
-    isOpen: isLoginModalOpen,
-    open: openLoginModal,
-    close: closeLoginModal,
-  } = useModal();
-  const {
-    isOpen: isImagePopupOpen,
-    open: openImagePopup,
-    close: closeImagePopup,
-  } = useModal();
+  const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
+  const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
   const { isSignIn } = useSignInStore();
-  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
-    null
-  );
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number>(0);
 
@@ -84,9 +74,7 @@ export const DetailPage = () => {
   // 오늘 영업 시간 찾기
   const getTodayBusinessHour = () => {
     const today = getCurrentDayIndex();
-    return ramenyaDetailQuery.data?.businessHours.find(
-      (hour) => hour.day.toLowerCase() === today
-    );
+    return ramenyaDetailQuery.data?.businessHours.find((hour) => hour.day.toLowerCase() === today);
   };
 
   const todayBusinessHour = getTodayBusinessHour();
@@ -147,10 +135,7 @@ export const DetailPage = () => {
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
             <MarketDetailBox>
-              <DetailIconTag
-                icon={<IconStarMedium color="#CFCFCF" />}
-                text="평점"
-              />
+              <DetailIconTag icon={<IconStarMedium color="#CFCFCF" />} text="평점" />
               <MarketDetailReviewBox>
                 <StarContainer>
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -158,7 +143,7 @@ export const DetailPage = () => {
                       key={star}
                       color={
                         (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
-                          Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
+                        Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
                           ? "#FFCC00"
                           : "#E1E1E1"
                       }
@@ -176,10 +161,7 @@ export const DetailPage = () => {
               <MarketDetailGenreBox>
                 {ramenyaDetailQuery.data?.genre.map((genre, index) => (
                   <MarketDetailGenre key={genre}>
-                    {genre}{" "}
-                    {index !== ramenyaDetailQuery.data?.genre.length - 1 && (
-                      <IconBar />
-                    )}
+                    {genre} {index !== ramenyaDetailQuery.data?.genre.length - 1 && <IconBar />}
                   </MarketDetailGenre>
                 ))}
               </MarketDetailGenreBox>
@@ -187,40 +169,24 @@ export const DetailPage = () => {
 
             <MarketDetailBox>
               <DetailIconTag icon={<IconLocate />} text="주소" />
-              <MarketDetailBoxAddressText>
-                {ramenyaDetailQuery.data?.address}
-              </MarketDetailBoxAddressText>
+              <MarketDetailBoxAddressText>{ramenyaDetailQuery.data?.address}</MarketDetailBoxAddressText>
             </MarketDetailBox>
 
             <MarketDetailBox>
               <DetailIconTag icon={<IconTime />} text="운영시간" />
               <MarketDetailBoxContent>
                 <OperationgTimeTextContainer>
-                  <OpenStatusText
-                    status={
-                      checkBusinessStatus(
-                        ramenyaDetailQuery.data?.businessHours ?? []
-                      ).status
-                    }
-                  >
-                    {
-                      checkBusinessStatus(
-                        ramenyaDetailQuery.data?.businessHours ?? []
-                      ).status
-                    }
+                  <OpenStatusText status={checkBusinessStatus(ramenyaDetailQuery.data?.businessHours ?? []).status}>
+                    {checkBusinessStatus(ramenyaDetailQuery.data?.businessHours ?? []).status}
                   </OpenStatusText>
                   <TimeHeader>
                     {todayBusinessHour?.isOpen
                       ? `${dayMapping[todayBusinessHour.day.toLowerCase()]}: ${todayBusinessHour.operatingTime}`
                       : `매주 ${dayMapping[todayBusinessHour?.day.toLowerCase() ?? ""]} 휴무`}
                     {isTimeExpanded ? (
-                      <StyledIconDropDownSelected
-                        onClick={() => setIsTimeExpanded(false)}
-                      />
+                      <StyledIconDropDownSelected onClick={() => setIsTimeExpanded(false)} />
                     ) : (
-                      <StyledIconDropDown
-                        onClick={() => setIsTimeExpanded(true)}
-                      />
+                      <StyledIconDropDown onClick={() => setIsTimeExpanded(true)} />
                     )}
                   </TimeHeader>
                   {isTimeExpanded && (
@@ -231,10 +197,7 @@ export const DetailPage = () => {
                       </TimeDetails>
                       <TimeDetails>
                         {ramenyaDetailQuery.data?.businessHours
-                          .filter(
-                            (hour) =>
-                              hour.day.toLowerCase() !== getCurrentDayIndex()
-                          )
+                          .filter((hour) => hour.day.toLowerCase() !== getCurrentDayIndex())
                           .map((businessHour) => (
                             <div key={businessHour.day}>
                               {businessHour.isOpen ? (
@@ -259,9 +222,7 @@ export const DetailPage = () => {
             <MarketDetailBox>
               <DetailIconTag icon={<IconCall />} text="전화번호" />
               <MarketDetailBoxContent>
-                <PhoneNumberText>
-                  {ramenyaDetailQuery.data?.contactNumber || "미공개"}
-                </PhoneNumberText>
+                <PhoneNumberText>{ramenyaDetailQuery.data?.contactNumber || "미공개"}</PhoneNumberText>
               </MarketDetailBoxContent>
             </MarketDetailBox>
 
@@ -296,9 +257,7 @@ export const DetailPage = () => {
                   {/* <RecommendMenuImage src={menu.image} alt={menu.name} /> */}
                   <RecommendMenuInfo>
                     <RecommendMenuName>{menu.name}</RecommendMenuName>
-                    <RecommendMenuPrice>
-                      {formatNumber(menu.price)}원
-                    </RecommendMenuPrice>
+                    <RecommendMenuPrice>{formatNumber(menu.price)}원</RecommendMenuPrice>
                   </RecommendMenuInfo>
                 </RecommendMenuBox>
               ))}
@@ -322,14 +281,11 @@ export const DetailPage = () => {
 
         <ImageWrapper>
           <ImageTitle>사진</ImageTitle>
-          {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length ===
-            0 ? (
+          {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length === 0 ? (
             <EmptyImageContainer>
               <EmptyImageImage src={emptyImage} />
               <EmptyImageTitle>등록된 사진이 없습니다.</EmptyImageTitle>
-              <EmptyImageText>
-                리뷰를 작성하고 사진을 등록해주세요!
-              </EmptyImageText>
+              <EmptyImageText>리뷰를 작성하고 사진을 등록해주세요!</EmptyImageText>
             </EmptyImageContainer>
           ) : (
             <ImageContainer>
@@ -342,32 +298,23 @@ export const DetailPage = () => {
                       onClick={() =>
                         handleOpenImagePopup(
                           index,
-                          ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.slice(
-                            0,
-                            5
-                          ) || []
+                          ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.slice(0, 5) || [],
                         )
                       }
                     />
                   </ImageBox>
                 ))}
-              {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length >
-                5 && (
-                  <MoreImageWrapper onClick={handleNavigateImagesPage}>
-                    <ImageBox>
-                      <ReviewImage
-                        image={
-                          ramenyaReviewImagesQuery.data
-                            ?.ramenyaReviewImagesUrls?.[5]
-                        }
-                      />
-                    </ImageBox>
-                    <MoreOverlay>
-                      <MoreText>더보기</MoreText>
-                      <IconArrowRight color="#FFFFFF" />
-                    </MoreOverlay>
-                  </MoreImageWrapper>
-                )}
+              {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
+                <MoreImageWrapper onClick={handleNavigateImagesPage}>
+                  <ImageBox>
+                    <ReviewImage image={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
+                  </ImageBox>
+                  <MoreOverlay>
+                    <MoreText>더보기</MoreText>
+                    <IconArrowRight color="#FFFFFF" />
+                  </MoreOverlay>
+                </MoreImageWrapper>
+              )}
             </ImageContainer>
           )}
         </ImageWrapper>
@@ -376,12 +323,8 @@ export const DetailPage = () => {
 
         <ReviewWrapper>
           <ReviewHeader>
-
             <ReviewHeaderTitle>
-              <ReviewerName>
-                {userInformationQuery.data?.nickname &&
-                  userInformationQuery.data?.nickname}
-              </ReviewerName>
+              <ReviewerName>{userInformationQuery.data?.nickname && userInformationQuery.data?.nickname}</ReviewerName>
               {isSignIn ? "님 리뷰를 남겨주세요" : "로그인 후 리뷰를 남겨주세요"}
             </ReviewHeaderTitle>
 
@@ -396,12 +339,7 @@ export const DetailPage = () => {
               ))}
             </LargeStarContainer>
 
-            {!isSignIn && (
-              <LoginButton onClick={() => navigate("/login")}>
-                로그인하기
-              </LoginButton>
-            )}
-
+            {!isSignIn && <LoginButton onClick={() => navigate("/login")}>로그인하기</LoginButton>}
           </ReviewHeader>
           <ReviewDivider />
 
@@ -412,11 +350,7 @@ export const DetailPage = () => {
                 <EmptyReviewImage src={emptyReview} />
                 <EmptyReviewTitle>등록된 리뷰가 없습니다.</EmptyReviewTitle>
                 <EmptyReviewText>방문하셨나요? 평가를 남겨보세요!</EmptyReviewText>
-                <CreateReviewButton
-                  onClick={() => handleNavigateReviewCreatePage()}
-                >
-                  리뷰 작성하기
-                </CreateReviewButton>
+                <CreateReviewButton onClick={() => handleNavigateReviewCreatePage()}>리뷰 작성하기</CreateReviewButton>
               </EmptyReviewContainer>
             ) : (
               <>
@@ -424,8 +358,7 @@ export const DetailPage = () => {
                   {ramenyaReviewQuery.data?.reviews
                     ?.sort(
                       (a: UserReview, b: UserReview) =>
-                        new Date(b.createdAt).getTime() -
-                        new Date(a.createdAt).getTime()
+                        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
                     )
                     .slice(0, 3)
                     .map((review: UserReview) => (
@@ -448,16 +381,12 @@ export const DetailPage = () => {
 
         <Divider />
 
-        {ramenyaDetailQuery.data?.latitude &&
-          ramenyaDetailQuery.data?.longitude && (
-            <LocationWrapper>
-              <LocationTitle>위치</LocationTitle>
-              <KakaoMap
-                latitude={ramenyaDetailQuery.data?.latitude}
-                longitude={ramenyaDetailQuery.data?.longitude}
-              />
-            </LocationWrapper>
-          )}
+        {ramenyaDetailQuery.data?.latitude && ramenyaDetailQuery.data?.longitude && (
+          <LocationWrapper>
+            <LocationTitle>위치</LocationTitle>
+            <KakaoMap latitude={ramenyaDetailQuery.data?.latitude} longitude={ramenyaDetailQuery.data?.longitude} />
+          </LocationWrapper>
+        )}
         <MapRedirectButtonContainer>
           {ramenyaDetailQuery.data?.naverMapUrl && (
             <MapRedirectButton
@@ -508,12 +437,8 @@ export const DetailPage = () => {
             <ModalText>로그인 하시겠습니까?</ModalText>
           </ModalTextBox>
           <ModalButtonBox>
-            <ModalCancelButton onClick={closeLoginModal}>
-              취소
-            </ModalCancelButton>
-            <ModalConfirmButton onClick={handleLoginConfirm}>
-              확인
-            </ModalConfirmButton>
+            <ModalCancelButton onClick={closeLoginModal}>취소</ModalCancelButton>
+            <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
           </ModalButtonBox>
         </ModalContent>
       </Modal>
@@ -614,11 +539,7 @@ interface OpenStatusTextProps {
 
 const OpenStatusText = styled.div<OpenStatusTextProps>(({ status }) => [
   tw`font-14-r`,
-  status === OpenStatus.OPEN
-    ? tw`text-green`
-    : status === OpenStatus.BREAK
-      ? tw`text-orange`
-      : tw`text-red`,
+  status === OpenStatus.OPEN ? tw`text-green` : status === OpenStatus.BREAK ? tw`text-orange` : tw`text-red`,
 ]);
 
 const TimeHeader = tw.div`

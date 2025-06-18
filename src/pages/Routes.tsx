@@ -12,12 +12,12 @@ import InformationPage from "./information-page";
 import AppBarLayout from "../components/layout/AppBarLayout";
 import WithoutAppBarLayout from "../components/layout/WithoutAppBarLayout";
 import MyPage from "./my-page";
-
 import { CreateReviewPage } from "./review-page/CreateReviewPage";
 import { ReviewListPage } from "./review-page/ReviewListPage";
 import { ImagesPage } from "./detail-page/images-page";
-import MyReviewPage from "./my-review-page";
+import UserReviewPage from "./user-review-page";
 import { EditReviewPage } from "./review-page/EditReviewPage";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -56,8 +56,8 @@ const router = createBrowserRouter([
         element: <InformationPage />,
       },
       {
-        path: "my-review",
-        element: <MyReviewPage />,
+        path: "user-review/:id",
+        element: <UserReviewPage />,
       },
     ],
   },

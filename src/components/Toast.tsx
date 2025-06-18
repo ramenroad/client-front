@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import tw from "twin.macro";
 import styled from "@emotion/styled";
@@ -11,19 +11,27 @@ interface ToastProps {
 
 export const Toast = ({ message, isOpen, onClose }: ToastProps) => {
   const [isVisible, setIsVisible] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
-      const timer = setTimeout(() => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+      timerRef.current = setTimeout(() => {
         setIsVisible(false);
         setTimeout(onClose, 300);
       }, 2000);
-      return () => clearTimeout(timer);
+      return () => {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+      };
     } else {
       setIsVisible(false);
     }
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, message]);
 
   if (!isOpen && !isVisible) return null;
 
@@ -38,7 +46,7 @@ export const Toast = ({ message, isOpen, onClose }: ToastProps) => {
 };
 
 const ToastContainer = tw.div`
-  fixed bottom-140 z-50 w-full
+  fixed bottom-140 z-[150] w-full
   flex justify-center items-center
 `;
 

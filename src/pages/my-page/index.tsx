@@ -1,11 +1,6 @@
 import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
-import {
-  IconArrowRight,
-  IconReview,
-  IconUnSignInUser,
-  IconUnSignInUserProfile,
-} from "../../components/Icon";
+import { IconArrowRight, IconReview, IconUnSignInUser, IconUnSignInUserProfile } from "../../components/Icon";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +8,8 @@ import { Button } from "../../components/common/Button";
 import { RamenroadText } from "../../components/common/RamenroadText";
 
 const MyPage = () => {
-  const userInformationQuery = useUserInformationQuery();
+  const { userInformationQuery } = useUserInformationQuery();
+
   const { logout } = useAuthMutation();
   const navigate = useNavigate();
 
@@ -39,15 +35,13 @@ const MyPage = () => {
 
             <CardRightSection>
               {userInformationQuery.data?.profileImageUrl ? (
-                <UserProfileImage
-                  src={userInformationQuery.data?.profileImageUrl}
-                />
+                <UserProfileImage src={userInformationQuery.data?.profileImageUrl} />
               ) : (
                 <IconUnSignInUserProfile />
               )}
             </CardRightSection>
           </CardLayout>
-          <MyReviewContainer onClick={() => navigate("/my-review")}>
+          <MyReviewContainer onClick={() => navigate(`/user-review/${userInformationQuery.data?._id}`)}>
             <IconReview />
             <RamenroadText size={16} weight="m">
               작성한 리뷰
@@ -65,9 +59,7 @@ const MyPage = () => {
           <Button onClick={() => navigate("/login")}>로그인/회원가입</Button>
         </SignInWrapper>
       )}
-      {userInformationQuery.data && (
-        <LogoutText onClick={() => logout.mutate()}>로그아웃</LogoutText>
-      )}
+      {userInformationQuery.data && <LogoutText onClick={() => logout.mutate()}>로그아웃</LogoutText>}
     </Layout>
   );
 };

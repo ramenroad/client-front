@@ -1,5 +1,14 @@
-import { deleteReview, editReview, getMyReview, getReview, getReviewImages, postReview } from "../../api/review";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  deleteReview,
+  editReview,
+  getMyReviews,
+  getReview,
+  getReviewDetail,
+  getReviewImages,
+  getUserReview,
+  postReview,
+} from "../../api/review";
+import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "./queryKeys";
 
 export const useRamenyaReviewMutation = () => {
@@ -21,11 +30,24 @@ export const useRamenyaReviewImagesQuery = (reviewId: string) => {
   });
 };
 
-export const useMyReviewQuery = () => {
-  const myReviewQuery = useQuery({
-    ...queryKeys.review.myReview,
-    queryFn: getMyReview,
-    select: (data) => data.reviews,
+export const useUserReviewQuery = (userId?: string) => {
+  const userReviewQuery = useInfiniteQuery({
+    ...queryKeys.review.userReview(userId!),
+    queryFn: ({ pageParam = 1 }) => getUserReview({ userId: userId!, page: pageParam, limit: 10 }),
+    getNextPageParam: (lastPage, allPages) => (lastPage.reviews.length === 10 ? allPages.length + 1 : undefined),
+    initialPageParam: 1,
+    enabled: !!userId,
+  });
+  return { userReviewQuery };
+};
+
+export const useMyReviewQuery = (enabled: boolean) => {
+  const myReviewQuery = useInfiniteQuery({
+    ...queryKeys.review.my,
+    queryFn: ({ pageParam = 1 }) => getMyReviews({ page: pageParam, limit: 10 }),
+    getNextPageParam: (lastPage, allPages) => (lastPage.reviews.length === 10 ? allPages.length + 1 : undefined),
+    initialPageParam: 1,
+    enabled: !!enabled,
   });
   return { myReviewQuery };
 };
@@ -41,4 +63,14 @@ export const useRamenyaReviewQuery = (ramenyaId: string, page: number = 1, limit
     queryKey: ["ramenyaReview", ramenyaId, page, limit],
     queryFn: () => getReview(ramenyaId, page, limit),
   });
+};
+
+export const useRamenyaReviewDetailQuery = (reviewId: string) => {
+  const reviewDetailQuery = useQuery({
+    queryKey: ["ramenyaReviewDetail", reviewId],
+    queryFn: () => getReviewDetail(reviewId),
+    enabled: !!reviewId,
+  });
+
+  return { reviewDetailQuery };
 };

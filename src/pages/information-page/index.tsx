@@ -1,11 +1,7 @@
 import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
 import styled from "@emotion/styled";
-import {
-  IconCamera,
-  IconArrowRight,
-  IconUnSignInUserProfile,
-} from "../../components/Icon";
+import { IconCamera, IconArrowRight, IconUnSignInUserProfile } from "../../components/Icon";
 import { useNavigate } from "react-router-dom";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
@@ -14,7 +10,7 @@ import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 const InformationPage = () => {
   const navigate = useNavigate();
 
-  const userInformationQuery = useUserInformationQuery();
+  const { userInformationQuery } = useUserInformationQuery();
   const { userInfoMutation } = useUserInfoMutation();
   const { logout } = useAuthMutation();
 
@@ -31,16 +27,9 @@ const InformationPage = () => {
       <TopBar title="내 정보" navigate="/mypage" />
       <Wrapper>
         <ProfileWrapper>
-          <ProfileImageWrapper
-            onClick={() =>
-              document.getElementById("profileImageInput")?.click()
-            }
-          >
+          <ProfileImageWrapper onClick={() => document.getElementById("profileImageInput")?.click()}>
             {userInformationQuery.data?.profileImageUrl ? (
-              <ProfileImage
-                src={userInformationQuery.data?.profileImageUrl}
-                alt="profile"
-              />
+              <ProfileImage src={userInformationQuery.data?.profileImageUrl} alt="profile" />
             ) : (
               <IconUnSignInUserProfile />
             )}
@@ -62,24 +51,14 @@ const InformationPage = () => {
         <ProfileDescriptionWrapper>
           <ProfileDescription>
             <Label>닉네임</Label>
-            <NicknameEditWrapper
-              onClick={() =>
-                navigate(
-                  `/register?nickname=${userInformationQuery.data?.nickname}`
-                )
-              }
-            >
-              <LabelDescription>
-                {userInformationQuery.data?.nickname}
-              </LabelDescription>
+            <NicknameEditWrapper onClick={() => navigate(`/register?nickname=${userInformationQuery.data?.nickname}`)}>
+              <LabelDescription>{userInformationQuery.data?.nickname}</LabelDescription>
               <IconArrowRight />
             </NicknameEditWrapper>
           </ProfileDescription>
           <ProfileDescription isLast>
             <Label>이메일</Label>
-            <LabelDescription>
-              {userInformationQuery.data?.email}
-            </LabelDescription>
+            <LabelDescription>{userInformationQuery.data?.email}</LabelDescription>
           </ProfileDescription>
         </ProfileDescriptionWrapper>
         <LogoutText onClick={() => logout.mutate()}>로그아웃</LogoutText>

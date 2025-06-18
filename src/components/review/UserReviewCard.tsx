@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import { MyReview } from "../../types/review";
+import { UserReview } from "../../types/review";
 import { RamenroadText } from "../common/RamenroadText";
 import { IconArrowRight, IconStarMedium } from "../Icon";
 import dayjs from "dayjs";
@@ -15,13 +15,15 @@ import { useToast } from "../ToastProvider";
 import { useNavigate } from "react-router-dom";
 
 interface MyReviewCardProps {
-  review: MyReview;
+  review: UserReview;
+  my: boolean;
 }
 
 const MAX_REVIEW_LENGTH = 94;
 
-export const MyReviewCard = (props: MyReviewCardProps) => {
+export const UserReviewCard = (props: MyReviewCardProps) => {
   const { review } = props;
+
   const navigate = useNavigate();
   const { openToast } = useToast();
 
@@ -39,10 +41,14 @@ export const MyReviewCard = (props: MyReviewCardProps) => {
   const displayReview =
     isReviewLong && !isReviewExpanded ? review.review.slice(0, MAX_REVIEW_LENGTH) + "..." : review.review;
 
+  const handleEditReview = () => {
+    navigate(`/review/edit/${review._id}`);
+  };
+
   const handleDeleteReview = () => {
     deleteReview(review._id, {
       onSuccess: () => {
-        queryClient.invalidateQueries({ ...queryKeys.review.myReview });
+        queryClient.invalidateQueries({ ...queryKeys.review.userReview(review._id) });
         openToast("리뷰가 삭제되었습니다.");
       },
     });
@@ -59,20 +65,24 @@ export const MyReviewCard = (props: MyReviewCardProps) => {
         </ReviewCardTitle>
         <ReviewActionWrapper>
           {/* 작업이 겹칠 것 같아 작업 하신 이후 로직 그대로 적용하겠습니다. */}
-          {/* <ActionButton>
-            <RamenroadText size={12} weight="r" onClick={handleEditReview}>
-              수정
-            </RamenroadText>
-          </ActionButton> */}
-          <ActionButton
-            onClick={() => {
-              openDeleteModal();
-            }}
-          >
-            <RamenroadText size={12} weight="r">
-              삭제
-            </RamenroadText>
-          </ActionButton>
+          {props.my && (
+            <>
+              <ActionButton onClick={handleEditReview}>
+                <RamenroadText size={12} weight="r">
+                  수정
+                </RamenroadText>
+              </ActionButton>
+              <ActionButton
+                onClick={() => {
+                  openDeleteModal();
+                }}
+              >
+                <RamenroadText size={12} weight="r">
+                  삭제
+                </RamenroadText>
+              </ActionButton>
+            </>
+          )}
         </ReviewActionWrapper>
       </ReviewCardHeader>
       <ReviewCardSubHeader>
@@ -83,18 +93,16 @@ export const MyReviewCard = (props: MyReviewCardProps) => {
             ))}
           </RatingWrapper>
           <RamenyaMenuListWrapper>
-            <RamenroadText size={12} weight="r">
-              {review.menus.map((menu, index) => {
-                return (
-                  <RamenyaMenuWrapper>
-                    <RamenroadText size={12} weight="r">
-                      {menu}
-                    </RamenroadText>
-                    {index !== review.menus.length - 1 && <MenuSeparator />}
-                  </RamenyaMenuWrapper>
-                );
-              })}
-            </RamenroadText>
+            {review.menus?.map((menu, index) => {
+              return (
+                <RamenyaMenuWrapper>
+                  <RamenroadText size={12} weight="r">
+                    {menu}
+                  </RamenroadText>
+                  {index !== review.menus.length - 1 && <MenuSeparator />}
+                </RamenyaMenuWrapper>
+              );
+            })}
           </RamenyaMenuListWrapper>
         </ReviewCardSubHeaderLeftSection>
         <ReviewCardSubHeaderRightSection>
@@ -192,10 +200,12 @@ const RatingWrapper = tw.section`
 
 const ReviewCardSubHeaderLeftSection = tw.section`
   flex flex-row gap-8 items-center
+  flex-1
 `;
 
 const RamenyaMenuListWrapper = tw.section`
   flex flex-row gap-4 items-center
+  flex-1
 `;
 
 const RamenyaMenuWrapper = tw.section`
