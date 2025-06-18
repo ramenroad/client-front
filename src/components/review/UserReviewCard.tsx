@@ -93,18 +93,16 @@ export const UserReviewCard = (props: MyReviewCardProps) => {
             ))}
           </RatingWrapper>
           <RamenyaMenuListWrapper>
-            <RamenroadText size={12} weight="r">
-              {review.menus.map((menu, index) => {
-                return (
-                  <RamenyaMenuWrapper>
-                    <RamenroadText size={12} weight="r">
-                      {menu}
-                    </RamenroadText>
-                    {index !== review.menus.length - 1 && <MenuSeparator />}
-                  </RamenyaMenuWrapper>
-                );
-              })}
-            </RamenroadText>
+            {review.menus?.map((menu, index) => {
+              return (
+                <RamenyaMenuWrapper>
+                  <RamenroadText size={12} weight="r">
+                    {menu}
+                  </RamenroadText>
+                  {index !== review.menus.length - 1 && <MenuSeparator />}
+                </RamenyaMenuWrapper>
+              );
+            })}
           </RamenyaMenuListWrapper>
         </ReviewCardSubHeaderLeftSection>
         <ReviewCardSubHeaderRightSection>
@@ -202,10 +200,12 @@ const RatingWrapper = tw.section`
 
 const ReviewCardSubHeaderLeftSection = tw.section`
   flex flex-row gap-8 items-center
+  flex-1
 `;
 
 const RamenyaMenuListWrapper = tw.section`
   flex flex-row gap-4 items-center
+  flex-1
 `;
 
 const RamenyaMenuWrapper = tw.section`

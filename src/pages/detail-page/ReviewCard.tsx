@@ -73,7 +73,9 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
           <ReviewNameBox>
             <ReviewerProfileImage src={defaultProfile} />
             <ReviewerInfoBox>
-              <ReviewerName>{review.userId.nickname}</ReviewerName>
+              <ReviewerName onClick={() => navigate(`/user-review/${review.userId._id}`)}>
+                {review.userId.nickname}
+              </ReviewerName>
               <ReviewerReviewInfo>
                 <ReviewerReviewRating>평균 별점 {review.userId.avgReviewRating?.toFixed(1)}</ReviewerReviewRating>
                 <ReviewerReviewCountDivider />
@@ -211,6 +213,7 @@ const ReviewerReviewCount = tw.div`
 
 const ReviewerName = tw.div`
     font-14-m text-black
+    cursor-pointer
 `;
 
 const ReviewScore = tw.div`

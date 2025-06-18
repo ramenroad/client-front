@@ -54,7 +54,7 @@ const UserReviewPage = () => {
     } else if (type === "more") {
       handleShareMore();
     }
-    setIsSharePopupOpen(false);
+    // setIsSharePopupOpen(false);
   };
   const handleCopyLink = async () => {
     try {
