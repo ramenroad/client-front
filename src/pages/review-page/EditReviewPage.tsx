@@ -18,14 +18,16 @@ import { useModal } from "../../hooks/common/useModal";
 import { correctImageOrientation } from "../../util/image";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
+import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 
 export const EditReviewPage = () => {
   const { id: reviewId } = useParams();
   const { mutate: editReview, isPending: isSubmitting } = useRamenyaReviewEditMutation(reviewId!);
 
   const { reviewDetailQuery } = useRamenyaReviewDetailQuery(reviewId!);
-
   const reviewDetail = reviewDetailQuery.data;
+
+  const { data: ramenyaDetail } = useRamenyaDetailQuery(reviewDetail?.ramenyaId?._id);
 
   const navigate = useNavigate();
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
@@ -75,16 +77,14 @@ export const EditReviewPage = () => {
     if (selectedMenus.includes(menu)) {
       setSelectedMenus(selectedMenus.filter((item) => item !== menu));
     } else {
-      if (selectedMenus.length < 2) {
-        setSelectedMenus([...selectedMenus, menu]);
-      }
+      setSelectedMenus([...selectedMenus, menu]);
     }
   };
 
   const handleAddCustomMenu = () => {
     if (customMenuInput.trim() !== "" && !menuList.includes(customMenuInput)) {
       setMenuList([...menuList, customMenuInput]);
-      if (selectedMenus.length < 2) {
+      if (selectedMenus.length < 1) {
         setSelectedMenus([...selectedMenus, customMenuInput]);
       }
       setCustomMenuInput("");
@@ -221,15 +221,10 @@ export const EditReviewPage = () => {
   }, [reviewId, navigate]);
 
   useEffect(() => {
-    if (reviewDetail?.menus) {
-      const reviewMenus = Array.isArray(reviewDetail?.menus)
-        ? reviewDetail.menus
-        : reviewDetail?.menus?.split(",") || [];
-
-      const combinedMenus = [...new Set([...reviewMenus])];
-      setMenuList(combinedMenus);
+    if (ramenyaDetail?.menus) {
+      setMenuList([...new Set([...(ramenyaDetail?.menus ?? []), ...(reviewDetail?.menus ?? [])])]);
     }
-  }, [reviewDetail?.menus]);
+  }, [reviewDetail?.menus, ramenyaDetail?.menus]);
 
   useEffect(() => {
     if (!reviewDetail) return;

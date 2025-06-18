@@ -1,4 +1,3 @@
-import { Review } from "../../types";
 import { UserReview } from "../../types/review";
 import { instanceWithNoVersioning } from "../index";
 

@@ -105,7 +105,7 @@ export interface Review {
   rating: number;
   review: string;
   menus: string;
-  reviewImages?: File[] | string[];
+  reviewImages?: (File | string)[];
 }
 
 export interface UserReview extends Review {

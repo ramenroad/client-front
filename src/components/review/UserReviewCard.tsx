@@ -67,8 +67,8 @@ export const UserReviewCard = (props: MyReviewCardProps) => {
           {/* 작업이 겹칠 것 같아 작업 하신 이후 로직 그대로 적용하겠습니다. */}
           {props.my && (
             <>
-              <ActionButton>
-                <RamenroadText size={12} weight="r" onClick={handleEditReview}>
+              <ActionButton onClick={handleEditReview}>
+                <RamenroadText size={12} weight="r">
                   수정
                 </RamenroadText>
               </ActionButton>

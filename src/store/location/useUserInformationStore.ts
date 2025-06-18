@@ -8,6 +8,7 @@ interface UserInformationStore {
 
 export const useUserInformationStore = create<UserInformationStore>()(
   persist(
+    // @ts-ignore
     (set) => ({
       userInformation: null,
     }),
