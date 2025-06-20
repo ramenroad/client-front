@@ -7,29 +7,31 @@ import storeImage from "../../assets/images/store.png";
 import { OpenStatus } from "../../constants";
 import CountUp from "react-countup";
 import { useEffect, useMemo } from "react";
-import {
-  setCurrentLocation,
-  useLocationStore,
-} from "../../store/location/useLocationStore.ts";
+import { setCurrentLocation, useLocationStore } from "../../store/location/useLocationStore.ts";
 import { calculateDistance } from "../../util/number.ts";
 import { IconStarSmall } from "../Icon";
+import { RamenroadText } from "./RamenroadText.tsx";
 
-interface RamenyaCardProps {
-  ramenya: Ramenya;
+interface RamenyaCardProps extends Partial<Ramenya> {
   isReview?: boolean;
 }
 
 const RamenyaCard = (props: RamenyaCardProps) => {
-  const { ramenya } = props;
+  const { _id, name, thumbnailUrl, reviewCount, rating, address, businessHours, genre, latitude, longitude } = props;
   const navigate = useNavigate();
   const { current } = useLocationStore();
 
   const currentDistance = useMemo(() => {
+    if (!latitude || !longitude) return "";
     return calculateDistance(current, {
-      latitude: ramenya.latitude,
-      longitude: ramenya.longitude,
+      latitude: latitude,
+      longitude: longitude,
     });
-  }, [ramenya, current]);
+  }, [latitude, longitude, current]);
+
+  const openStatus = useMemo(() => {
+    return checkBusinessStatus(businessHours || []).status;
+  }, [businessHours]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -52,41 +54,41 @@ const RamenyaCard = (props: RamenyaCardProps) => {
   }, []);
 
   return (
-    <Wrapper
-      key={ramenya._id}
-      onClick={() => navigate(`/detail/${ramenya._id}`)}
-    >
-      <Layout>
-        <RamenyaThumbnail
-          src={ramenya.thumbnailUrl || storeImage}
-          isImageExist={!!ramenya.thumbnailUrl}
-          alt={"Thumbnail"}
-        />
-        <RamenyaDescription>
+    <RamenyaCardWrapper key={_id} onClick={() => navigate(`/detail/${_id}`)}>
+      <RamenyaCardLayout>
+        {/* 카드 왼쪽 영역 */}
+        <RamenyaThumbnail src={thumbnailUrl || storeImage} isImageExist={!!thumbnailUrl} alt={"Thumbnail"} />
+
+        {/* 카드 오른쪽 영역 */}
+        <RamenyaInformationWrapper>
           <RamenyaDescriptionHeader>
-            <RamenyaTitle>{ramenya.name}</RamenyaTitle>
+            {/* 라멘야 이름 */}
+            <RamenyaName size={16} weight="sb">
+              {name}
+            </RamenyaName>
+
+            {/* 라멘야 별점 */}
             {props.isReview !== false && (
               <RamenyaReviewBox>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <IconStarSmall
                     key={star}
                     color={
-                      ramenya.reviewCount > 0 &&
-                        Math.round(ramenya.rating) >= star
-                        ? "#FFCC00"
-                        : "#E1E1E1"
+                      reviewCount && reviewCount > 0 && rating && Math.round(rating) >= star ? "#FFCC00" : "#E1E1E1"
                     }
                   />
                 ))}
-                <RamenyaScore>{ramenya.rating.toFixed(1)}</RamenyaScore>
-                <RamenyaReviewCount>({ramenya.reviewCount})</RamenyaReviewCount>
+                <RamenyaScore>{rating && rating.toFixed(1)}</RamenyaScore>
+                <RamenyaReviewCount>({reviewCount})</RamenyaReviewCount>
               </RamenyaReviewBox>
             )}
+
+            {/* 라멘야 주소 */}
             <RamenyaLocation>
               {current.latitude !== 0 && (
                 <>
                   <RamenyaDistance>
-                    <StyledCountUp
+                    <CountUp
                       start={0}
                       end={parseFloat(currentDistance.replace(/[^0-9.]/g, ""))}
                       duration={1}
@@ -98,68 +100,49 @@ const RamenyaCard = (props: RamenyaCardProps) => {
                 </>
               )}
 
-              <RamenyaAddress>{ramenya.address}</RamenyaAddress>
+              <RamenyaAddress>{address}</RamenyaAddress>
             </RamenyaLocation>
           </RamenyaDescriptionHeader>
+
+          {/* 카드 하단 영역 */}
           <RamenyaCardBottomSection>
             <RamenyaOpenStatusWrapper>
-              <RamenyaOpenStatus
-                status={checkBusinessStatus(ramenya.businessHours).status}
-              >
-                {checkBusinessStatus(ramenya.businessHours).status}
-              </RamenyaOpenStatus>
-              {checkBusinessStatus(ramenya.businessHours).todayHours
-                ?.operatingTime && (
-                  <>
-                    <span>·</span>
-                    <RamenyaOpenTime>
-                      {checkBusinessStatus(ramenya.businessHours).todayHours
-                        ?.operatingTime || ""}
-                    </RamenyaOpenTime>
-                  </>
-                )}
+              <RamenyaOpenStatus status={openStatus}>{openStatus}</RamenyaOpenStatus>
+              {openStatus === OpenStatus.OPEN && (
+                <>
+                  <span>·</span>
+                  <RamenyaOpenTime>
+                    {checkBusinessStatus(businessHours || []).todayHours?.operatingTime}
+                  </RamenyaOpenTime>
+                </>
+              )}
             </RamenyaOpenStatusWrapper>
             <RamenyaTagWrapper>
-              {ramenya.genre.map((genre, index) => (
-                <RamenyaTag key={index}>{genre}</RamenyaTag>
-              ))}
+              {genre?.map((genre, index) => <RamenyaTag key={index}>{genre}</RamenyaTag>)}
             </RamenyaTagWrapper>
           </RamenyaCardBottomSection>
-        </RamenyaDescription>
-      </Layout>
-      {/* 추후 한줄 리뷰 사용 논의 후 사용 */}
-      {/* <RamenyaOneLineReview>
-        <IconTalk />
-        <OneLineReviewText>
-          {ramenya.ramenroadReview.oneLineReview}
-        </OneLineReviewText>
-      </RamenyaOneLineReview> */}
-    </Wrapper>
+        </RamenyaInformationWrapper>
+      </RamenyaCardLayout>
+    </RamenyaCardWrapper>
   );
 };
 
-const StyledCountUp = tw(CountUp)`
-  text-gray-700
-`;
-
-const Wrapper = tw.section`
+const RamenyaCardWrapper = tw.section`
   w-full cursor-pointer
   box-border px-20 py-20
 `;
 
-const Layout = tw.section`
+const RamenyaCardLayout = tw.section`
   w-full flex gap-16 items-center
 `;
 
-const RamenyaThumbnail = styled.img(
-  ({ isImageExist }: { isImageExist: boolean }) => [
-    tw`w-100 h-100 object-cover rounded-lg flex-shrink-0
+const RamenyaThumbnail = styled.img(({ isImageExist }: { isImageExist: boolean }) => [
+  tw`w-100 h-100 object-cover rounded-lg flex-shrink-0
     border border-solid border-border`,
-    !isImageExist ? tw`object-contain` : tw`object-cover`,
-  ]
-);
+  !isImageExist ? tw`object-contain` : tw`object-cover`,
+]);
 
-const RamenyaDescription = tw.section`
+const RamenyaInformationWrapper = tw.section`
   flex flex-col h-full min-w-0 w-full justify-center gap-8
 `;
 
@@ -176,8 +159,8 @@ const RamenyaScore = tw.span`
   font-12-m text-black
 `;
 
-const RamenyaTitle = tw.span`
-  font-16-sb h-19
+const RamenyaName = tw(RamenroadText)`
+  text-black
 `;
 
 const RamenyaReviewCount = tw.span`
@@ -201,11 +184,7 @@ const RamenyaOpenStatusWrapper = tw.span`
 `;
 
 const RamenyaOpenStatus = styled.span(({ status }: { status: OpenStatus }) => [
-  status === OpenStatus.OPEN
-    ? tw`text-green`
-    : status === OpenStatus.BREAK
-      ? tw`text-orange`
-      : tw`text-red`,
+  status === OpenStatus.OPEN ? tw`text-green` : status === OpenStatus.BREAK ? tw`text-orange` : tw`text-red`,
 ]);
 
 const RamenyaOpenTime = tw.span`
@@ -217,7 +196,7 @@ const RamenyaTagWrapper = tw.section`
 `;
 
 const RamenyaTag = tw.span`
-  font-10-r text-gray-700 rounded-sm bg-border p-2 leading-10
+  font-10-r text-gray-700 rounded-sm bg-border p-3 leading-10
 `;
 
 const RamenyaDistance = tw.section`
@@ -227,14 +206,5 @@ const RamenyaDistance = tw.section`
 const RamenyaCardBottomSection = tw.section`
   flex flex-col gap-4
 `;
-
-// const RamenyaOneLineReview = tw.section`
-//   bg-border rounded-md my-20 h-34 flex items-center gap-8 text-gray-700 font-12-r px-10
-//   overflow-hidden
-// `;
-
-// const OneLineReviewText = tw.span`
-//   truncate min-w-0 flex-1
-// `;
 
 export default RamenyaCard;
