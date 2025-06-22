@@ -1,15 +1,9 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  useCallback,
-} from "react";
+import { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import { Popup } from "../Popup";
 import { PopupType } from "../../../types";
-import { PopupFilter, PopupFilterProps } from "./PopupFilter";
-import { PopupSort } from "./PopupSort";
-import { PopupSortProps } from "./PopupSort";
+import PopupFilter, { PopupFilterProps } from "./PopupFilter";
+import PopupSort, { PopupSortProps } from "./PopupSort";
+import PopupConfirm, { PopupConfirmProps } from "./PopupConfirm";
 
 interface PopupContextType {
   openPopup: (type: PopupType, options?: unknown) => void;
@@ -36,20 +30,20 @@ export const PopupProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   let popupContent: ReactNode = null;
+  let popupDirection: "center" | "bottom" = "center";
 
   switch (popupType) {
     case PopupType.FILTER:
-      popupContent = (
-        <PopupFilter
-          onClose={closePopup}
-          {...(popupOptions as PopupFilterProps)}
-        />
-      );
+      popupContent = <PopupFilter {...(popupOptions as PopupFilterProps)} onClose={closePopup} />;
+      popupDirection = "bottom";
       break;
     case PopupType.SORT:
-      popupContent = (
-        <PopupSort onClose={closePopup} {...(popupOptions as PopupSortProps)} />
-      );
+      popupContent = <PopupSort {...(popupOptions as PopupSortProps)} onClose={closePopup} />;
+      popupDirection = "bottom";
+      break;
+    case PopupType.CONFIRM:
+      popupContent = <PopupConfirm {...(popupOptions as PopupConfirmProps)} onClose={closePopup} />;
+      popupDirection = "center";
       break;
     default:
       popupContent = null;
@@ -59,7 +53,7 @@ export const PopupProvider = ({ children }: { children: ReactNode }) => {
     <PopupContext.Provider value={{ openPopup, closePopup }}>
       {children}
       {popupContent && (
-        <Popup isOpen={isOpen} onClose={closePopup}>
+        <Popup isOpen={isOpen} onClose={closePopup} direction={popupDirection}>
           {popupContent}
         </Popup>
       )}
@@ -69,7 +63,6 @@ export const PopupProvider = ({ children }: { children: ReactNode }) => {
 
 export const usePopupContext = () => {
   const ctx = useContext(PopupContext);
-  if (!ctx)
-    throw new Error("usePopupContext must be used within a PopupProvider");
+  if (!ctx) throw new Error("usePopupContext must be used within a PopupProvider");
   return ctx;
 };

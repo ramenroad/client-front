@@ -19,8 +19,6 @@ import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery
 import DetailIconTag from "./DetailIconTag";
 import styled from "@emotion/styled/macro";
 import { useState, useEffect } from "react";
-//import quoteStart from "../../assets/images/quotes-start.png";
-//import quoteEnd from "../../assets/images/quotes-end.png";
 import emptyThumbnail from "../../assets/images/store.png";
 import emptyImage from "../../assets/images/empty-images.png";
 import emptyReview from "../../assets/images/empty-review.png";
@@ -28,9 +26,7 @@ import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus } from "../../util";
 import { OpenStatus } from "../../constants";
 import { formatNumber } from "../../util/number";
-import { ReviewCard } from "./ReviewCard";
 import TopBar from "../../components/common/TopBar";
-import React from "react";
 import { useRamenyaReviewImagesQuery, useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { Modal } from "../../components/common/Modal";
@@ -38,7 +34,8 @@ import { useModal } from "../../hooks/common/useModal";
 import { useSignInStore } from "../../states/sign-in";
 import { ReviewImage } from "../../components/common/ReviewImage";
 import { ImagePopup } from "../../components/common/ImagePopup";
-import { UserReview } from "../../types";
+import { UserReviewCard } from "../../components/review/UserReviewCard";
+import { Line } from "../../components/common/Line";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -52,6 +49,7 @@ const dayMapping: { [key: string]: string } = {
 
 export const DetailPage = () => {
   const { id } = useParams();
+
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const ramenyaReviewQuery = useRamenyaReviewQuery(id!);
   const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
@@ -111,18 +109,36 @@ export const DetailPage = () => {
     window.location.href = url;
   };
 
+  // 맵 버튼 데이터 정의
+  const mapButtons = [
+    {
+      type: "naver" as const,
+      url: ramenyaDetailQuery.data?.naverMapUrl,
+      label: "네이버 지도 바로가기",
+    },
+    {
+      type: "kakao" as const,
+      url: ramenyaDetailQuery.data?.kakaoMapUrl,
+      label: "카카오맵 바로가기",
+    },
+    {
+      type: "google" as const,
+      url: ramenyaDetailQuery.data?.googleMapUrl,
+      label: "구글맵 바로가기",
+    },
+  ];
+
   // 컴포넌트가 마운트될 때 스크롤 위치를 최상단으로 이동
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  console.log(ramenyaReviewQuery.data?.reviews);
 
   return (
     <Wrapper>
       <Container>
         <HeaderBox>
           <TopBar title={ramenyaDetailQuery.data?.name ?? ""} />
+
           <ThumbnailContainer>
             {ramenyaDetailQuery.data?.thumbnailUrl ? (
               <MarketThumbnail src={ramenyaDetailQuery.data?.thumbnailUrl} />
@@ -131,6 +147,7 @@ export const DetailPage = () => {
             )}
           </ThumbnailContainer>
         </HeaderBox>
+
         <MarketDetailWrapper>
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
@@ -250,11 +267,9 @@ export const DetailPage = () => {
         <RecommendWrapper>
           <ReviewTitle>라멘로드 추천 메뉴</ReviewTitle>
           <RecommendBox>
-            <RecommendMenuTitle>추천 메뉴</RecommendMenuTitle>
             <RecommendMenuContainer>
               {ramenyaDetailQuery.data?.recommendedMenu.map((menu) => (
                 <RecommendMenuBox key={menu.name}>
-                  {/* <RecommendMenuImage src={menu.image} alt={menu.name} /> */}
                   <RecommendMenuInfo>
                     <RecommendMenuName>{menu.name}</RecommendMenuName>
                     <RecommendMenuPrice>{formatNumber(menu.price)}원</RecommendMenuPrice>
@@ -263,19 +278,6 @@ export const DetailPage = () => {
               ))}
             </RecommendMenuContainer>
           </RecommendBox>
-
-          {/* 추후 한줄 리뷰 사용 논의 후 사용 */}
-          {/* <RecommendTextContainer>
-            <QuoteStartImage src={quoteStart} />
-            <RecommendText>
-              <RecommendTitle>
-                {ramenyaDetailQuery.data?.ramenroadReview.oneLineReview}
-              </RecommendTitle>
-            </RecommendText>
-            <QuateEndBox>
-              <QuoteEndImage src={quoteEnd} />
-            </QuateEndBox>
-          </RecommendTextContainer> */}
         </RecommendWrapper>
         <Divider />
 
@@ -356,18 +358,17 @@ export const DetailPage = () => {
               <>
                 <ReviewCardContainer>
                   {ramenyaReviewQuery.data?.reviews
-                    ?.sort(
-                      (a: UserReview, b: UserReview) =>
-                        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-                    )
+                    ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                     .slice(0, 3)
-                    .map((review: UserReview) => (
-                      <React.Fragment key={review._id}>
-                        <ReviewCardBox>
-                          <ReviewCard review={review} />
-                        </ReviewCardBox>
-                        <ReviewDivider />
-                      </React.Fragment>
+                    .map((review) => (
+                      <>
+                        <UserReviewCard
+                          key={review._id}
+                          review={review}
+                          editable={userInformationQuery.data?._id === review.userId?._id}
+                        />
+                        <Line />
+                      </>
                     ))}
                 </ReviewCardContainer>
                 <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
@@ -387,46 +388,24 @@ export const DetailPage = () => {
             <KakaoMap latitude={ramenyaDetailQuery.data?.latitude} longitude={ramenyaDetailQuery.data?.longitude} />
           </LocationWrapper>
         )}
+
         <MapRedirectButtonContainer>
-          {ramenyaDetailQuery.data?.naverMapUrl && (
-            <MapRedirectButton
-              onClick={() => {
-                if (ramenyaDetailQuery.data?.naverMapUrl) {
-                  handleOpenMapURL(ramenyaDetailQuery.data?.naverMapUrl);
-                }
-              }}
-            >
-              <IconMap type={"naver"} />
-              <span>네이버 지도 바로가기</span>
-              <StyledIconArrowRight color="#888888" />
-            </MapRedirectButton>
-          )}
-          {ramenyaDetailQuery.data?.kakaoMapUrl && (
-            <MapRedirectButton
-              onClick={() => {
-                if (ramenyaDetailQuery.data?.kakaoMapUrl) {
-                  handleOpenMapURL(ramenyaDetailQuery.data?.kakaoMapUrl);
-                }
-              }}
-            >
-              <IconMap type={"kakao"} />
-              <span>카카오맵 바로가기</span>
-              <StyledIconArrowRight color="#888888" />
-            </MapRedirectButton>
-          )}
-          {ramenyaDetailQuery.data?.googleMapUrl && (
-            <MapRedirectButton
-              onClick={() => {
-                if (ramenyaDetailQuery.data?.googleMapUrl) {
-                  handleOpenMapURL(ramenyaDetailQuery.data?.googleMapUrl);
-                }
-              }}
-            >
-              <IconMap type={"google"} />
-              <span>구글맵 바로가기</span>
-              <StyledIconArrowRight color="#888888" />
-            </MapRedirectButton>
-          )}
+          {mapButtons
+            .filter((button) => button.url)
+            .map((button) => (
+              <MapRedirectButton
+                key={button.type}
+                onClick={() => {
+                  if (button.url) {
+                    handleOpenMapURL(button.url);
+                  }
+                }}
+              >
+                <IconMap type={button.type} />
+                <span>{button.label}</span>
+                <StyledIconArrowRight color="#888888" />
+              </MapRedirectButton>
+            ))}
         </MapRedirectButtonContainer>
       </Container>
 
@@ -578,10 +557,6 @@ const RecommendBox = tw.div`
   flex flex-col gap-8
 `;
 
-const RecommendMenuTitle = tw.div`
-  font-14-r text-gray-400
-`;
-
 const RecommendMenuContainer = tw.div`
   flex gap-16 mb-16
 `;
@@ -589,10 +564,6 @@ const RecommendMenuContainer = tw.div`
 const RecommendMenuBox = tw.div`
   flex flex-col gap-12
 `;
-
-// const RecommendMenuImage = tw.img`
-//   w-100 h-100 rounded-8
-// `;
 
 const RecommendMenuInfo = tw.div`
   flex flex-col
@@ -610,30 +581,6 @@ const RecommendWrapper = tw.div`
   flex flex-col gap-16 
   px-20 py-32
 `;
-
-// const RecommendTextContainer = tw.div`
-//   flex flex-col p-20 gap-4
-//   w-350 box-border
-//   bg-orange/[0.02] border-solid border-1 border-orange/30 rounded-8
-// `;
-
-// const RecommendText = tw.div`
-//   flex items-center justify-center
-// `;
-
-// const RecommendTitle = tw.div`
-//   font-16-sb text-center
-// `;
-
-// const QuoteStartImage = tw.img`
-//   w-30 h-22
-// `;
-
-// const QuateEndBox = tw.div`  flex justify-end
-// `;
-
-// const QuoteEndImage = tw.img`//   w-30 h-22
-// `;
 
 const ImageTitle = tw.div`
   font-18-sb
@@ -676,7 +623,7 @@ const ReviewerName = tw.span`
 
 const StarContainer = tw.div`
   flex gap-2 items-center
-  cursor-pointer
+  cursor-none
 `;
 
 const LargeStarContainer = tw.div`
@@ -700,7 +647,6 @@ const ReviewDivider = tw.div`
 
 const ReviewContent = tw.div`
   flex flex-col
-  gap-16
 `;
 
 const ReviewContentTitle = tw.div`
@@ -720,11 +666,12 @@ const EmptyReviewTitle = tw.div`
   font-16-r text-black pb-4
 `;
 
-const EmptyReviewText = tw.div`
-  font-14-r text-gray-700 pb-24
+const EmptyReviewText = tw.span`
+  font-14-r text-gray-700
 `;
 
 const CreateReviewButton = tw.div`
+  mt-16
   flex w-fit py-10 px-32
   box-border
   justify-center items-center
@@ -735,14 +682,11 @@ const CreateReviewButton = tw.div`
 `;
 
 const ReviewCardContainer = tw.div`
-  flex flex-col gap-20
-`;
-
-const ReviewCardBox = tw.div`
-  flex flex-col gap-16 px-20
+  flex flex-col
 `;
 
 const AllReviewButton = tw.div`
+  mt-10
   flex w-full py-10
   box-border
   justify-center items-center

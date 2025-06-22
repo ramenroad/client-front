@@ -11,11 +11,9 @@ import {
 } from "../../hooks/queries/useRamenyaReviewQuery.ts";
 import { useNavigate, useParams } from "react-router-dom";
 import { Modal } from "../../components/common/Modal";
-
 import { css } from "@emotion/react";
 import { useSignInStore } from "../../states/sign-in";
 import { useModal } from "../../hooks/common/useModal";
-import { correctImageOrientation } from "../../util/image";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
@@ -38,6 +36,8 @@ export const EditReviewPage = () => {
   const [menuList, setMenuList] = useState(reviewDetail?.menus?.map((menu) => menu) || []);
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [isImageUploading, setIsImageUploading] = useState(false);
+
   const fileInputRef = createRef<HTMLInputElement>();
 
   const {
@@ -110,19 +110,13 @@ export const EditReviewPage = () => {
     }
 
     const fileArray = Array.from(files);
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      fileArray.reverse();
-    }
 
     const newImages: File[] = [];
+    setIsImageUploading(true);
     for (const file of fileArray) {
       if (currentImages.length + newImages.length >= 5) break;
 
-      if (file.type.startsWith("image/")) {
-        const correctedFile = await correctImageOrientation(file);
-        newImages.push(correctedFile);
-      }
+      newImages.push(file);
     }
 
     setValue("reviewImages", [...currentImages, ...newImages], {
@@ -132,6 +126,7 @@ export const EditReviewPage = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    setIsImageUploading(false);
   };
 
   const handleImageClick = () => {
@@ -283,7 +278,7 @@ export const EditReviewPage = () => {
 
   return (
     <Wrapper>
-      {isSubmitting && (
+      {(isSubmitting || isImageUploading) && (
         <LoadingOverlay>
           <LottieWrapper>
             <Lottie animationData={loadingAnimation} loop={true} />

@@ -5,6 +5,7 @@ import { FilterOptions, SortType } from "../../types/filter";
 import { checkBusinessStatus } from "../../util";
 import { useLocationStore } from "../../store/location/useLocationStore";
 import { calculateDistanceValue } from "../../util/number";
+import { OpenStatus } from "../../constants";
 type QueryType = "region" | "genre";
 
 interface QueryParams {
@@ -23,6 +24,7 @@ export const useRamenyaListQuery = ({ type, value, filterOptions }: QueryParams)
       if (!filterOptions) return data;
 
       let filtered = data;
+
       if (filterOptions.isOpen) {
         filtered = filtered.filter((ramenya) => checkBusinessStatus(ramenya.businessHours).status === OpenStatus.OPEN);
       }

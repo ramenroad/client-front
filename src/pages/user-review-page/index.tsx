@@ -12,7 +12,7 @@ import { useUserMyPageQuery } from "../../hooks/queries/useUserMyPageQuery";
 import { useUserMyPageMutation } from "../../hooks/mutation/useUserMyPageMutation";
 import { queryClient } from "../../core/queryClient";
 import { queryKeys } from "../../hooks/queries/queryKeys";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IconClose, IconKakao, IconMore, IconShare } from "../../components/Icon";
 import { Modal } from "../../components/common/Modal";
 import { useToast } from "../../components/ToastProvider";
@@ -81,6 +81,10 @@ const UserReviewPage = () => {
     openToast("지원 예정인 기능입니다");
   };
 
+  useEffect(() => {
+    console.log("my", my);
+  }, [my]);
+
   return (
     <>
       <TopBar title="작성한 리뷰" icon={<IconShare />} onIconClick={() => setIsSharePopupOpen(true)} />
@@ -118,13 +122,18 @@ const UserReviewPage = () => {
           ? myReviewQuery.data?.pages.map((page) =>
               page.reviews.map((review) => (
                 <>
-                  <UserReviewCard key={review._id} review={review} my={my} />
+                  <UserReviewCard key={review._id} review={review} editable mypage />
                   <Line />
                 </>
               )),
             )
           : userReviewQuery.data?.pages.map((page) =>
-              page.reviews.map((review) => <UserReviewCard key={review._id} review={review} my={my} />),
+              page.reviews.map((review) => (
+                <>
+                  <UserReviewCard key={review._id} review={review} editable={false} mypage />
+                  <Line />
+                </>
+              )),
             )}
         <div ref={ref} />
       </PageWrapper>

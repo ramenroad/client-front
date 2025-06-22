@@ -28,6 +28,8 @@ export const RAMENYA_TYPES = [
   "츠케멘",
 ] as const;
 
+export type RamenyaType = (typeof RAMENYA_TYPES)[number];
+
 export enum OpenStatus {
   OPEN = "영업 중",
   CLOSED = "영업 종료",

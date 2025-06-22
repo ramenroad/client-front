@@ -148,7 +148,6 @@ const RamenyaInformationWrapper = tw.section`
 
 const RamenyaDescriptionHeader = tw.section`
   flex flex-col h-full justify-center
-  gap-2
 `;
 
 const RamenyaReviewBox = tw.section`

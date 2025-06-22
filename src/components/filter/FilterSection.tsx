@@ -1,5 +1,5 @@
 import { FilterOptions, SortType } from "../../types/filter";
-import { initialFilterOptions } from "../../constants";
+import { initialFilterOptions, RamenyaType } from "../../constants";
 import tw from "twin.macro";
 import { IconFilterWithTag } from "../Icon";
 import { usePopup } from "../../hooks/common/usePopup";
@@ -12,6 +12,7 @@ interface FilterSectionProps {
   sessionStorageKey: string;
   filterOptions: FilterOptions;
   onFilterChange: (filterOptions: FilterOptions) => void;
+  genre?: RamenyaType;
 }
 
 const FilterSection = (props: FilterSectionProps) => {
@@ -34,6 +35,7 @@ const FilterSection = (props: FilterSectionProps) => {
             openPopup(PopupType.FILTER, {
               initialFilterOptions: initialFilterOptions,
               currentFilterOptions: filterOptions,
+              pinned: props.genre,
               onChange: (filterOptions: FilterOptions | null) => {
                 if (filterOptions) {
                   onFilterChange(filterOptions);
@@ -94,7 +96,7 @@ const FilterSection = (props: FilterSectionProps) => {
 
 const FilterWrapper = tw.section`
   flex flex-nowrap items-center
-  box-border px-20 gap-8 w-full pt-11
+  box-border px-20 gap-8 w-full py-11
   overflow-x-auto scrollbar-hide
   whitespace-nowrap
   box-border

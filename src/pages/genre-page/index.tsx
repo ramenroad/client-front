@@ -7,7 +7,7 @@ import styled from "@emotion/styled";
 import TopBar from "../../components/common/TopBar.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 import { FilterOptions } from "../../types/filter/index.ts";
-import { initialFilterOptions } from "../../constants/index.ts";
+import { initialFilterOptions, RamenyaType } from "../../constants/index.ts";
 import { useSessionStorage } from "usehooks-ts";
 import FilterSection from "../../components/filter/FilterSection.tsx";
 
@@ -38,6 +38,7 @@ export const GenrePage = () => {
             sessionStorageKey="genrePageFilterOptions"
             filterOptions={filterOptions}
             onFilterChange={setFilterOptions}
+            genre={genre as RamenyaType}
           />
         </HeaderSection>
 

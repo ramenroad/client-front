@@ -1,3 +1,4 @@
+import styled from "@emotion/styled";
 import React from "react";
 import { createPortal } from "react-dom";
 import tw from "twin.macro";
@@ -6,29 +7,23 @@ interface PopupProps {
   isOpen: boolean;
   onClose: () => void;
   children?: React.ReactNode;
+  direction?: "center" | "bottom";
 }
 
-export const Popup: React.FC<PopupProps> = ({ isOpen, onClose, children }) => {
+export const Popup: React.FC<PopupProps> = ({ isOpen, onClose, direction = "center", children }) => {
   if (!isOpen) return null;
 
   return createPortal(
-    <Overlay onClick={onClose}>
-      <PopupWrapper onClick={(e) => e.stopPropagation()}>
-        {children}
-      </PopupWrapper>
+    <Overlay direction={direction} onClick={onClose}>
+      <PopupWrapper onClick={(e) => e.stopPropagation()}>{children}</PopupWrapper>
     </Overlay>,
-    document.body
+    document.body,
   );
 };
 
-const Overlay = tw.div`
-  fixed inset-0 z-100 bg-black/40 flex items-end justify-center
-`;
+const Overlay = styled.div<{ direction: "center" | "bottom" }>(({ direction }) => [
+  tw`fixed inset-0 z-100 bg-black/40 flex`,
+  direction === "bottom" ? tw`justify-center items-end` : tw`justify-center items-center`,
+]);
 
-const PopupWrapper = tw.div`
-  w-full max-w-390 min-w-0
-  rounded-t-24 bg-white shadow-lg
-  pt-32 px-20 pb-16
-  box-border
-  flex flex-col
-`;
+const PopupWrapper = tw.main``;
