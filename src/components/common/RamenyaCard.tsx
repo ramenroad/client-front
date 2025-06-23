@@ -145,6 +145,7 @@ const RamenyaDescriptionHeader = tw.section`
 
 const RamenyaReviewBox = tw.section`
   flex items-center gap-2
+  mt-2
 `;
 
 const RamenyaScore = tw.span`
@@ -161,6 +162,7 @@ const RamenyaReviewCount = tw.span`
 
 const RamenyaLocation = tw.section`
   flex gap-4 items-center
+  mt-2
 `;
 
 const VerticalLine = tw.span`

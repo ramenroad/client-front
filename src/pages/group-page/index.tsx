@@ -35,7 +35,6 @@ export const GroupPage = () => {
               <NoStoreBox />
             ) : (
               <>
-                <InformationHeader>가게 정보</InformationHeader>
                 <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
                   {ramenyaList?.map((ramenya, index) => (
                     <>
