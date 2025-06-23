@@ -85,9 +85,10 @@ const UserReviewPage = () => {
       content: {
         title: "라멘로드",
         description: `${userMyPageQuery.data?.nickname}`,
-        imageUrl: userMyPageQuery.data?.profileImageUrl
-          ? userMyPageQuery.data?.profileImageUrl
-          : "https://ramenroad.com/_favicon.svg",
+        // imageUrl:
+        //   userMyPageQuery.data?.profileImageUrl ??
+        //   userMyPageQuery.data?.profileImageUrl ??
+        //   "https://ramenroad.com/_favicon.svg",
         link: {
           mobileWebUrl: window.location.href,
           webUrl: window.location.href,
