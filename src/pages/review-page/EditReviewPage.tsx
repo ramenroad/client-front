@@ -18,6 +18,7 @@ import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 import heic2any from "heic2any";
+import { useToast } from "../../components/ToastProvider.tsx";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -207,7 +208,7 @@ const ImagePreviewItem = memo(
 export const EditReviewPage = () => {
   const { id: reviewId } = useParams();
   const { mutate: editReview, isPending: isSubmitting } = useRamenyaReviewEditMutation(reviewId!);
-
+  const { openToast } = useToast();
   const { reviewDetailQuery } = useRamenyaReviewDetailQuery(reviewId!);
   const reviewDetail = reviewDetailQuery.data;
 
@@ -285,7 +286,7 @@ export const EditReviewPage = () => {
       const currentImages = formValues.reviewImages || [];
 
       if (currentImages.length + files.length > 5) {
-        alert("이미지는 최대 5개까지 업로드 가능합니다.");
+        openToast("이미지는 최대 5개까지 업로드 가능합니다.");
         return;
       }
 
@@ -315,7 +316,7 @@ export const EditReviewPage = () => {
         });
       } catch (error) {
         console.error("이미지 변환 중 오류:", error);
-        alert("이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.");
+        openToast("이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.");
       } finally {
         setIsImageUploading(false);
       }
@@ -391,16 +392,17 @@ export const EditReviewPage = () => {
 
       await editReview(formData, {
         onSuccess: () => {
+          openToast("리뷰가 수정되었습니다.");
           navigate(-1);
         },
         onError: (error) => {
           console.error("리뷰 수정 중 에러 발생:", error);
-          alert("리뷰 수정에 실패했습니다.");
+          openToast("리뷰 수정에 실패했습니다.");
         },
       });
     } catch (error) {
       console.error("리뷰 수정 중 에러 발생:", error);
-      alert("리뷰 수정에 실패했습니다.");
+      openToast("리뷰 수정에 실패했습니다.");
     }
   };
 
@@ -440,10 +442,10 @@ export const EditReviewPage = () => {
 
   useEffect(() => {
     if (reviewDetailQuery.isError) {
-      alert("리뷰 정보를 불러오는데 실패했습니다.");
-      // navigate(-1);
+      openToast("리뷰 정보를 불러오는데 실패했습니다.");
+      navigate(-1);
     }
-  }, [reviewDetailQuery.isError, navigate]);
+  }, [reviewDetailQuery.isError, navigate, openToast]);
 
   useEffect(() => {
     if (ramenyaDetail?.menus) {

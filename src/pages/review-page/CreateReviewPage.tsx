@@ -280,7 +280,7 @@ export const CreateReviewPage = () => {
       const currentImages = formValues.reviewImages || [];
 
       if (currentImages.length + files.length > 5) {
-        alert("이미지는 최대 5개까지 업로드 가능합니다.");
+        openToast("이미지는 최대 5개까지 업로드 가능합니다.");
         return;
       }
 
@@ -310,7 +310,7 @@ export const CreateReviewPage = () => {
         });
       } catch (error) {
         console.error("이미지 변환 중 오류:", error);
-        alert("이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.");
+        openToast("이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.");
       } finally {
         setIsImageUploading(false);
       }
@@ -370,6 +370,7 @@ export const CreateReviewPage = () => {
 
       await createReview(formData, {
         onSuccess: () => {
+          openToast("리뷰가 등록되었습니다.");
           navigate(-1);
         },
         onError: (error) => {
@@ -379,7 +380,7 @@ export const CreateReviewPage = () => {
       });
     } catch (error) {
       console.error("리뷰 업로드 중 에러 발생:", error);
-      alert("리뷰 업로드에 실패했습니다.");
+      openToast("리뷰 업로드에 실패했습니다.");
     }
   };
 
@@ -419,7 +420,7 @@ export const CreateReviewPage = () => {
 
   useEffect(() => {
     if (isError) {
-      alert("라멘집 정보를 불러오는데 실패했습니다.");
+      openToast("라멘집 정보를 불러오는데 실패했습니다.");
       // navigate(-1);
     }
   }, [isError, navigate]);

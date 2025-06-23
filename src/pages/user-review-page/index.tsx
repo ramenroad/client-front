@@ -84,8 +84,8 @@ const UserReviewPage = () => {
       objectType: "feed",
       content: {
         title: "라멘로드",
-        description: `${userMyPageQuery.data?.nickname}님의 페이지를 확인해보세요!`,
-        imageUrl: userMyPageQuery.data?.profileImageUrl || "",
+        description: `${userMyPageQuery.data?.nickname}`,
+        imageUrl: userMyPageQuery.data?.profileImageUrl || "https://ramenroad.com/_favicon.svg",
         link: {
           mobileWebUrl: window.location.href,
           webUrl: window.location.href,
@@ -93,10 +93,6 @@ const UserReviewPage = () => {
       },
     });
   };
-
-  useEffect(() => {
-    console.log("my", my);
-  }, [my]);
 
   useEffect(() => {
     if (!Kakao.isInitialized()) {
