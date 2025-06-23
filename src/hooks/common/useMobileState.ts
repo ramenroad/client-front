@@ -4,9 +4,9 @@ export const useMobileState = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (window.innerWidth < 400) {
-      setIsMobile(true);
-    }
+    const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    const isMobile = regex.test(navigator.userAgent);
+    setIsMobile(isMobile);
   }, []);
 
   return {

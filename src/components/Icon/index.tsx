@@ -260,8 +260,8 @@ export const IconKakao = ({ color, ...rest }: IconProps) => (
     {...rest}
   >
     <path
-      fill-rule="evenodd"
-      clip-rule="evenodd"
+      fillRule="evenodd"
+      clipRule="evenodd"
       d="M9.5 15C14.7467 15 19 11.6421 19 7.5C19 3.35786 14.7467 0 9.5 0C4.25329 0 0 3.35786 0 7.5C0 9.96708 1.50885 12.156 3.83776 13.5228L3.79287 17.7491C3.79108 17.9181 3.98674 18.013 4.11835 17.9069L7.86348 14.8891C8.39513 14.962 8.94195 15 9.5 15Z"
       fill={color ?? "black"}
     />
@@ -461,7 +461,7 @@ export const IconUnSignInUser = () => (
 
 export const IconUnSignInUserProfile = () => (
   <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="32" cy="32" r="32" fill="#FF5E00" fill-opacity="0.1" />
+    <circle cx="32" cy="32" r="32" fill="#FF5E00" fillOpacity="0.1" />
     <path
       d="M29.5311 15.9914C30.8702 13.7401 34.1298 13.7401 35.4689 15.9914C36.3552 17.4815 38.2087 18.0837 39.8017 17.3992C42.2083 16.3649 44.8453 18.2809 44.6054 20.8893C44.4466 22.6158 45.5921 24.1925 47.2832 24.575C49.8381 25.1528 50.8454 28.2529 49.1181 30.2221C47.9748 31.5255 47.9748 33.4745 49.1181 34.7779C50.8454 36.7471 49.8381 39.8472 47.2832 40.425C45.5921 40.8075 44.4466 42.3842 44.6054 44.1107C44.8453 46.7191 42.2083 48.6351 39.8017 47.6008C38.2087 46.9163 36.3552 47.5185 35.4689 49.0086C34.1298 51.2599 30.8702 51.2599 29.5311 49.0086C28.6448 47.5185 26.7913 46.9163 25.1983 47.6008C22.7917 48.6351 20.1547 46.7191 20.3946 44.1107C20.5534 42.3842 19.4079 40.8075 17.7168 40.425C15.1619 39.8472 14.1546 36.7471 15.8819 34.7779C17.0252 33.4745 17.0252 31.5255 15.8819 30.2221C14.1546 28.2529 15.1619 25.1528 17.7168 24.575C19.4079 24.1925 20.5534 22.6158 20.3946 20.8893C20.1547 18.2809 22.7917 16.3649 25.1983 17.3992C26.7913 18.0837 28.6448 17.4815 29.5311 15.9914Z"
       fill="#FFC5A0"
@@ -495,8 +495,8 @@ export const IconNavLeft = () => (
       <path
         d="M16 25L4.70711 13.7071C4.31658 13.3166 4.31658 12.6834 4.70711 12.2929L16 1"
         stroke="white"
-        stroke-width="1.5"
-        stroke-linecap="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
     </g>
     <defs>
@@ -507,9 +507,9 @@ export const IconNavLeft = () => (
         width="21.0859"
         height="33.5"
         filterUnits="userSpaceOnUse"
-        color-interpolation-filters="sRGB"
+        colorInterpolationFilters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -533,8 +533,8 @@ export const IconNavRight = () => (
       <path
         d="M5 25L16.2929 13.7071C16.6834 13.3166 16.6834 12.6834 16.2929 12.2929L5 1"
         stroke="white"
-        stroke-width="1.5"
-        stroke-linecap="round"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
     </g>
     <defs>
@@ -545,9 +545,9 @@ export const IconNavRight = () => (
         width="21.0859"
         height="33.5"
         filterUnits="userSpaceOnUse"
-        color-interpolation-filters="sRGB"
+        colorInterpolationFilters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -669,8 +669,8 @@ export const IconShare = ({ color, ...rest }: IconProps) => (
     <path
       d="M17.5 6L8.10947 11.1221C7.41461 11.5011 7.41461 12.4989 8.10948 12.8779L17.5 18"
       stroke="#111111"
-      stroke-width="1.5"
-      stroke-linecap="round"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
     <circle cx="17.5" cy="6.5" r="2.5" fill={color || "#111111"} />
     <circle cx="17.5" cy="17.5" r="2.5" fill={color || "#111111"} />

@@ -17,6 +17,8 @@ import { IconClose, IconKakao, IconMore, IconShare } from "../../components/Icon
 import { Modal } from "../../components/common/Modal";
 import { useToast } from "../../components/ToastProvider";
 
+const { Kakao } = window as any;
+
 const UserReviewPage = () => {
   const { id: userId } = useParams();
   const { userInformationQuery } = useUserInformationQuery();
@@ -78,12 +80,29 @@ const UserReviewPage = () => {
   };
 
   const handleShareKakao = () => {
-    openToast("지원 예정인 기능입니다");
+    Kakao.Share.sendDefault({
+      objectType: "feed",
+      content: {
+        title: "라멘로드",
+        description: `${userMyPageQuery.data?.nickname}님의 페이지를 확인해보세요!`,
+        imageUrl: userMyPageQuery.data?.profileImageUrl || "",
+        link: {
+          mobileWebUrl: window.location.href,
+          webUrl: window.location.href,
+        },
+      },
+    });
   };
 
   useEffect(() => {
     console.log("my", my);
   }, [my]);
+
+  useEffect(() => {
+    if (!Kakao.isInitialized()) {
+      Kakao.init(import.meta.env.VITE_KAKAO_APP_KEY);
+    }
+  }, []);
 
   return (
     <>
@@ -182,7 +201,7 @@ const UserReviewPage = () => {
 };
 
 const ModalContent = tw.div`
-  flex flex-col gap-16 w-320 pt-20 pb-16
+  flex flex-col gap-24 w-320 pt-20 pb-16
   items-center
   justify-center
   bg-white

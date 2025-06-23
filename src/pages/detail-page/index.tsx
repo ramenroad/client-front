@@ -36,6 +36,7 @@ import { ReviewImage } from "../../components/common/ReviewImage";
 import { ImagePopup } from "../../components/common/ImagePopup";
 import { UserReviewCard } from "../../components/review/UserReviewCard";
 import { Line } from "../../components/common/Line";
+import { useMobileState } from "../../hooks/common/useMobileState";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -49,7 +50,7 @@ const dayMapping: { [key: string]: string } = {
 
 export const DetailPage = () => {
   const { id } = useParams();
-
+  const { isMobile } = useMobileState();
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
   const { ramenyaReviewQuery } = useRamenyaReviewQuery(id!);
   const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
@@ -106,7 +107,11 @@ export const DetailPage = () => {
   };
 
   const handleOpenMapURL = (url: string) => {
-    window.location.href = url;
+    if (isMobile) {
+      window.location.href = url;
+      return;
+    }
+    window.open(url, "_blank");
   };
 
   // 맵 버튼 데이터 정의

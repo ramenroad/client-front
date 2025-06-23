@@ -59,7 +59,6 @@ const MyPage = () => {
           <Button onClick={() => navigate("/login")}>로그인/회원가입</Button>
         </SignInWrapper>
       )}
-      {userInformationQuery.data && <LogoutText onClick={() => logout.mutate()}>로그아웃</LogoutText>}
     </Layout>
   );
 };
