@@ -2,7 +2,6 @@ import tw from "twin.macro";
 import TopBar from "../../components/common/TopBar";
 import { IconArrowRight, IconReview, IconUnSignInUser, IconUnSignInUserProfile } from "../../components/Icon";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
-import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/common/Button";
 import { RamenroadText } from "../../components/common/RamenroadText";
@@ -10,7 +9,6 @@ import { RamenroadText } from "../../components/common/RamenroadText";
 const MyPage = () => {
   const { userInformationQuery } = useUserInformationQuery();
 
-  const { logout } = useAuthMutation();
   const navigate = useNavigate();
 
   return (
@@ -96,14 +94,6 @@ const UserInfoWrapper = tw.section`
 
 const UserProfileImage = tw.img`
   w-64 h-64 rounded-full
-`;
-
-// Start of Selection
-const LogoutText = tw.span`
-  text-gray-500
-  font-14-m
-  text-center justify-self-end
-  cursor-pointer mb-40 mt-auto
 `;
 
 const SignInWrapper = tw.section`
