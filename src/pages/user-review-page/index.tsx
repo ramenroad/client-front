@@ -12,10 +12,12 @@ import { useUserMyPageQuery } from "../../hooks/queries/useUserMyPageQuery";
 import { useUserMyPageMutation } from "../../hooks/mutation/useUserMyPageMutation";
 import { queryClient } from "../../core/queryClient";
 import { queryKeys } from "../../hooks/queries/queryKeys";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IconClose, IconKakao, IconMore, IconShare } from "../../components/Icon";
 import { Modal } from "../../components/common/Modal";
 import { useToast } from "../../components/ToastProvider";
+
+const { Kakao } = window as any;
 
 const UserReviewPage = () => {
   const { id: userId } = useParams();
@@ -78,8 +80,25 @@ const UserReviewPage = () => {
   };
 
   const handleShareKakao = () => {
-    openToast("지원 예정인 기능입니다");
+    Kakao.Share.sendDefault({
+      objectType: "feed",
+      content: {
+        title: "라멘로드",
+        description: `${userMyPageQuery.data?.nickname}`,
+        imageUrl: userMyPageQuery.data?.profileImageUrl || "https://ramenroad.com/_favicon.svg",
+        link: {
+          mobileWebUrl: window.location.href,
+          webUrl: window.location.href,
+        },
+      },
+    });
   };
+
+  useEffect(() => {
+    if (!Kakao.isInitialized()) {
+      Kakao.init(import.meta.env.VITE_KAKAO_APP_KEY);
+    }
+  }, []);
 
   return (
     <>
@@ -118,13 +137,18 @@ const UserReviewPage = () => {
           ? myReviewQuery.data?.pages.map((page) =>
               page.reviews.map((review) => (
                 <>
-                  <UserReviewCard key={review._id} review={review} my={my} />
+                  <UserReviewCard key={review._id} review={review} editable mypage />
                   <Line />
                 </>
               )),
             )
           : userReviewQuery.data?.pages.map((page) =>
-              page.reviews.map((review) => <UserReviewCard key={review._id} review={review} my={my} />),
+              page.reviews.map((review) => (
+                <>
+                  <UserReviewCard key={review._id} review={review} editable={false} mypage />
+                  <Line />
+                </>
+              )),
             )}
         <div ref={ref} />
       </PageWrapper>
@@ -173,7 +197,7 @@ const UserReviewPage = () => {
 };
 
 const ModalContent = tw.div`
-  flex flex-col gap-16 w-320 pt-20 pb-16
+  flex flex-col gap-24 w-320 pt-20 pb-16
   items-center
   justify-center
   bg-white

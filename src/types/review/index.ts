@@ -1,11 +1,20 @@
-// 타입이 기존에 받아오던 리뷰와 다른 형식인 것 같아 분리하였습니다.
+export enum ReviewType {
+  MYPAGE = "MYPAGE",
+  USER = "USER",
+}
 
-export interface UserReview {
+export interface User {
   _id: string;
-  ramenyaId: {
-    _id: string;
-    name: string;
-  };
+  nickname: string;
+  profileImageUrl: string;
+  avgReviewRating: number;
+  reviewCount: number;
+}
+
+export interface UserReview<T extends ReviewType = ReviewType.USER> {
+  _id: string;
+  ramenyaId: T extends ReviewType.MYPAGE ? { _id: string; name: string } : string;
+  userId?: T extends ReviewType.MYPAGE ? undefined : User;
   rating: number;
   review: string;
   menus: string[];

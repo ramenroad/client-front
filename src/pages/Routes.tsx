@@ -59,6 +59,10 @@ const router = createBrowserRouter([
         path: "user-review/:id",
         element: <UserReviewPage />,
       },
+      {
+        path: "/review/list/:id",
+        element: <ReviewListPage />,
+      },
     ],
   },
   {
@@ -86,10 +90,6 @@ const router = createBrowserRouter([
   {
     path: "/review/edit/:id",
     element: <EditReviewPage />,
-  },
-  {
-    path: "/review/list/:id",
-    element: <ReviewListPage />,
   },
   {
     path: "/images/:id",

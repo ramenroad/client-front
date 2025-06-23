@@ -17,9 +17,7 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
   useEffect(() => {
     const loadKakaoMap = () => {
       // 이미 스크립트가 로드되어 있는지 확인
-      if (
-        document.querySelector('script[src*="dapi.kakao.com/v2/maps/sdk.js"]')
-      ) {
+      if (document.querySelector('script[src*="dapi.kakao.com/v2/maps/sdk.js"]')) {
         return;
       }
 
@@ -68,9 +66,7 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
     }
 
     return () => {
-      const script = document.querySelector(
-        'script[src*="dapi.kakao.com/v2/maps/sdk.js"]'
-      );
+      const script = document.querySelector('script[src*="dapi.kakao.com/v2/maps/sdk.js"]');
       if (script) {
         script.remove();
       }
@@ -81,7 +77,8 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
 };
 
 const Wrapper = tw.div`
-  w-full h-210
+  w-full h-210 rounded-8
+  border border-solid border-border
 `;
 
 export default KakaoMap;

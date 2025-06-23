@@ -1,4 +1,4 @@
-import { UserReview } from "../../types/review";
+import { ReviewType, UserReview } from "../../types/review";
 import { instanceWithNoVersioning } from "../index";
 
 export const postReview = async (data: FormData) => {
@@ -30,7 +30,7 @@ export const deleteReview = async (reviewId: string) => {
 };
 
 export interface UserReviewResponse {
-  reviews: UserReview[];
+  reviews: UserReview<ReviewType.MYPAGE>[];
   reviewCount: number;
   lastPage: number;
 }
@@ -60,12 +60,24 @@ export const getMyReviews = async (params: MyReviewParams) => {
   return response.data;
 };
 
-export const getReview = async (ramenyaId: string, page: number = 1, limit: number = 10) => {
-  const response = await instanceWithNoVersioning.get(`/review?ramenyaId=${ramenyaId}&page=${page}&limit=${limit}`);
+export interface RamenyaReviewResponse {
+  reviews: UserReview<ReviewType.USER>[];
+  reviewCount: number;
+  lastPage: number;
+}
+
+export const getRamenyaReview = async (ramenyaId: string, page: number = 1, limit: number = 10) => {
+  const response = await instanceWithNoVersioning.get<RamenyaReviewResponse>(`/review`, {
+    params: {
+      ramenyaId,
+      page,
+      limit,
+    },
+  });
   return response.data;
 };
 
 export const getReviewDetail = async (reviewId: string) => {
-  const response = await instanceWithNoVersioning.get<UserReview>(`/review/${reviewId}`);
+  const response = await instanceWithNoVersioning.get<UserReview<ReviewType.MYPAGE>>(`/review/${reviewId}`);
   return response.data;
 };

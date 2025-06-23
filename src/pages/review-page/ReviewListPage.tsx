@@ -1,55 +1,59 @@
-import TopBar from '../../components/common/TopBar'
-import { ReviewCard } from '../detail-page/ReviewCard'
-import tw from 'twin.macro'
-
-import { useParams } from 'react-router-dom'
-import { useRamenyaReviewQuery } from '../../hooks/queries/useRamenyaReviewQuery'
-import { UserReview } from '../../types'
+import TopBar from "../../components/common/TopBar";
+import tw from "twin.macro";
+import { useParams } from "react-router-dom";
+import { useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
+import { UserReviewCard } from "../../components/review/UserReviewCard";
+import { Line } from "../../components/common/Line";
+import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
+import { useIntersectionObserver } from "../../hooks/common/useIntersectionObserver";
 
 export const ReviewListPage = () => {
-    const { id } = useParams();
-    const ramenyaReviewQuery = useRamenyaReviewQuery(id!);
-    const reviews = ramenyaReviewQuery.data?.reviews;
-    return (
-        <Wrapper>
-            <TopBar
-                title="리뷰 목록"
-            />
-            <Container>
-                <ReviewListTitle>고객 리뷰</ReviewListTitle>
-                <ReviewListContainer>
-                    {reviews?.map((review: UserReview) => (
-                        <>
-                            <ReviewCard review={review} />
-                            <ReviewDivider />
-                        </>
-                    ))}
-                </ReviewListContainer>
-            </Container>
-        </Wrapper>
-    )
-}
+  const { id } = useParams();
+  const { ramenyaReviewQuery } = useRamenyaReviewQuery(id!);
+  const { userInformationQuery } = useUserInformationQuery();
+
+  const ref = useIntersectionObserver({
+    onIntersect: ramenyaReviewQuery.fetchNextPage,
+  });
+
+  const reviews = ramenyaReviewQuery.data?.pages.flatMap((page) => page.reviews) || [];
+
+  return (
+    <Wrapper>
+      <TopBar title="리뷰 목록" />
+      <Container>
+        <ReviewListTitle>고객 리뷰</ReviewListTitle>
+        <ReviewListContainer>
+          {reviews?.map((review) => (
+            <>
+              <UserReviewCard
+                review={review}
+                editable={review.userId?._id === userInformationQuery.data?._id}
+                mypage={false}
+              />
+              <Line />
+            </>
+          ))}
+        </ReviewListContainer>
+        <div ref={ref} />
+      </Container>
+    </Wrapper>
+  );
+};
 
 const Wrapper = tw.div`
-    flex flex-col pb-40 w-full
-
+  flex flex-col w-full pb-20
 `;
 
 const Container = tw.div`
-    flex flex-col px-20
+  flex flex-col
 `;
 
 const ReviewListTitle = tw.div`
     font-18-sb text-black
-    mt-20 mb-12
+    px-20 mt-20 mb-[-4]
 `;
 
 const ReviewListContainer = tw.div`
-    flex flex-col gap-20
+  flex flex-col
 `;
-
-const ReviewDivider = tw.div`
-    w-full h-1 bg-divider
-`;
-
-

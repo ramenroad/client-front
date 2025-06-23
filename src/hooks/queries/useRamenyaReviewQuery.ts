@@ -2,7 +2,7 @@ import {
   deleteReview,
   editReview,
   getMyReviews,
-  getReview,
+  getRamenyaReview,
   getReviewDetail,
   getReviewImages,
   getUserReview,
@@ -58,16 +58,19 @@ export const useRamenyaReviewDeleteMutation = () => {
   });
 };
 
-export const useRamenyaReviewQuery = (ramenyaId: string, page: number = 1, limit: number = 10) => {
-  return useQuery({
-    queryKey: ["ramenyaReview", ramenyaId, page, limit],
-    queryFn: () => getReview(ramenyaId, page, limit),
+export const useRamenyaReviewQuery = (ramenyaId: string) => {
+  const ramenyaReviewQuery = useInfiniteQuery({
+    ...queryKeys.review.ramenyaReview(ramenyaId),
+    queryFn: ({ pageParam = 1 }) => getRamenyaReview(ramenyaId, pageParam, 10),
+    getNextPageParam: (lastPage, allPages) => (lastPage.reviews.length === 10 ? allPages.length + 1 : undefined),
+    initialPageParam: 1,
   });
+  return { ramenyaReviewQuery };
 };
 
 export const useRamenyaReviewDetailQuery = (reviewId: string) => {
   const reviewDetailQuery = useQuery({
-    queryKey: ["ramenyaReviewDetail", reviewId],
+    ...queryKeys.review.detail(reviewId),
     queryFn: () => getReviewDetail(reviewId),
     enabled: !!reviewId,
   });

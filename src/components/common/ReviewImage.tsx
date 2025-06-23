@@ -1,18 +1,15 @@
-import tw from 'twin.macro'
+import tw from "twin.macro";
 
 interface ReviewImageProps {
-    image: string;
-    onClick?: () => void;
+  image: string;
+  onClick?: () => void;
 }
 
 export const ReviewImage = ({ image, onClick }: ReviewImageProps) => {
-    return (
-        <Image src={image} onClick={onClick} />
-    )
-}
+  return <Image src={image} onClick={onClick} />;
+};
 
 const Image = tw.img`
-    w-full h-full object-cover
-    cursor-pointer
+  w-full h-full object-cover
+  cursor-pointer
 `;
-

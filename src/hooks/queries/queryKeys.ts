@@ -16,7 +16,9 @@ export const queryKeys = createQueryKeyStore({
   },
   review: {
     userReview: (userId: string) => [userId],
+    ramenyaReview: (ramenyaId: string) => [ramenyaId],
     my: null,
+    detail: (reviewId: string) => [reviewId],
   },
   userMyPage: {
     user: (userId: string) => [userId],

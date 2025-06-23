@@ -1,7 +1,8 @@
 import tw from "twin.macro";
-import { UserReview } from "../../types/review";
+import { UserReview, User, ReviewType } from "../../types/review";
 import { RamenroadText } from "../common/RamenroadText";
 import { IconArrowRight, IconStarMedium } from "../Icon";
+import defaultProfile from "../../assets/images/profile-default.png";
 import dayjs from "dayjs";
 import { useState } from "react";
 import styled from "@emotion/styled";
@@ -13,26 +14,29 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../hooks/queries/queryKeys";
 import { useToast } from "../ToastProvider";
 import { useNavigate } from "react-router-dom";
+import { usePopup } from "../../hooks/common/usePopup";
+import { PopupType } from "../../types";
 
-interface MyReviewCardProps {
-  review: UserReview;
-  my: boolean;
+interface MyReviewCardProps<T extends boolean = false> {
+  review: UserReview<T extends true ? ReviewType.MYPAGE : ReviewType.USER>;
+  mypage?: T;
+  editable: boolean;
 }
 
 const MAX_REVIEW_LENGTH = 94;
 
-export const UserReviewCard = (props: MyReviewCardProps) => {
+export const UserReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
   const { review } = props;
 
   const navigate = useNavigate();
   const { openToast } = useToast();
+  const { openPopup, closePopup } = usePopup();
 
   const { mutate: deleteReview } = useRamenyaReviewDeleteMutation();
 
   const [isReviewExpanded, setIsReviewExpanded] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
-  const { isOpen: isDeleteModalOpen, open: openDeleteModal, close: closeDeleteModal } = useModal();
   const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
 
   const queryClient = useQueryClient();
@@ -45,45 +49,95 @@ export const UserReviewCard = (props: MyReviewCardProps) => {
     navigate(`/review/edit/${review._id}`);
   };
 
-  const handleDeleteReview = () => {
-    deleteReview(review._id, {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ ...queryKeys.review.userReview(review._id) });
-        openToast("리뷰가 삭제되었습니다.");
-      },
-    });
+  // 타입 가드 함수들
+  const isDetailedRamenya = (ramenyaId: unknown): ramenyaId is { _id: string; name: string } => {
+    return typeof ramenyaId === "object" && ramenyaId !== null && "_id" in ramenyaId;
+  };
+
+  const hasUserId = (review: UserReview<ReviewType>): review is UserReview<ReviewType> & { userId: User } => {
+    return review.userId !== undefined;
   };
 
   return (
     <ReviewCardWrapper>
       <ReviewCardHeader>
         <ReviewCardTitle>
-          <RamenroadText size={16} weight="sb" onClick={() => navigate(`/detail/${review.ramenyaId._id}`)}>
-            {review.ramenyaId.name}
-          </RamenroadText>
-          <IconArrowRight />
-        </ReviewCardTitle>
-        <ReviewActionWrapper>
-          {/* 작업이 겹칠 것 같아 작업 하신 이후 로직 그대로 적용하겠습니다. */}
-          {props.my && (
-            <>
-              <ActionButton onClick={handleEditReview}>
-                <RamenroadText size={12} weight="r">
-                  수정
-                </RamenroadText>
-              </ActionButton>
-              <ActionButton
-                onClick={() => {
-                  openDeleteModal();
-                }}
-              >
-                <RamenroadText size={12} weight="r">
-                  삭제
-                </RamenroadText>
-              </ActionButton>
-            </>
+          {props.mypage ? (
+            <div
+              onClick={() =>
+                navigate(`/detail/${isDetailedRamenya(review.ramenyaId) ? review.ramenyaId._id : review.ramenyaId}`)
+              }
+            >
+              <RamenroadText size={16} weight="sb">
+                {isDetailedRamenya(review.ramenyaId) ? review.ramenyaId.name : review.ramenyaId}
+              </RamenroadText>
+              <IconArrowRight />
+            </div>
+          ) : (
+            hasUserId(review) && (
+              <ReviewNameBox onClick={() => navigate(`/user-review/${review.userId._id}`)}>
+                <ReviewerProfileImage src={review.userId.profileImageUrl || defaultProfile} />
+                <ReviewerInfoBox>
+                  <RamenroadText size={14} weight="sb">
+                    {review.userId.nickname}
+                  </RamenroadText>
+
+                  <ReviewerReviewInfo>
+                    <RamenroadText size={12} weight="r">
+                      평균 별점 {review.userId.avgReviewRating?.toFixed(1)}
+                    </RamenroadText>
+                    <ReviewerReviewCountDivider />
+                    <RamenroadText size={12} weight="r">
+                      리뷰 {review.userId.reviewCount}
+                    </RamenroadText>
+                  </ReviewerReviewInfo>
+                </ReviewerInfoBox>
+              </ReviewNameBox>
+            )
           )}
-        </ReviewActionWrapper>
+        </ReviewCardTitle>
+
+        {/* 작성자 본인한테만 보이는 영역: 수정, 삭제 */}
+        {props.editable && (
+          <ReviewActionWrapper>
+            <ActionButton onClick={handleEditReview}>
+              <RamenroadText size={12} weight="r">
+                수정
+              </RamenroadText>
+            </ActionButton>
+            <ActionButton
+              onClick={() => {
+                openPopup(PopupType.CONFIRM, {
+                  content: (
+                    <>
+                      작성한 리뷰를 삭제할까요?
+                      <br />내 리뷰 목록에서도 삭제됩니다.
+                    </>
+                  ),
+                  onConfirm: () => {
+                    deleteReview(review._id, {
+                      onSuccess: () => {
+                        queryClient.invalidateQueries({ ...queryKeys.review.userReview(review._id) });
+                        queryClient.invalidateQueries({ ...queryKeys.review.my });
+                        queryClient.invalidateQueries({
+                          ...queryKeys.review.ramenyaReview(
+                            isDetailedRamenya(review.ramenyaId) ? review.ramenyaId._id : review.ramenyaId,
+                          ),
+                        });
+                        openToast("리뷰가 삭제되었습니다.");
+                        closePopup();
+                      },
+                    });
+                  },
+                });
+              }}
+            >
+              <RamenroadText size={12} weight="r">
+                삭제
+              </RamenroadText>
+            </ActionButton>
+          </ReviewActionWrapper>
+        )}
       </ReviewCardHeader>
       <ReviewCardSubHeader>
         <ReviewCardSubHeaderLeftSection>
@@ -146,23 +200,30 @@ export const UserReviewCard = (props: MyReviewCardProps) => {
           />
         )}
       </Modal>
-      {isDeleteModalOpen && (
-        <Modal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
-          <ModalContent>
-            <ModalTitle>
-              작성한 리뷰를 삭제할까요?
-              <br />내 리뷰 목록에서도 삭제됩니다.
-            </ModalTitle>
-            <ModalButtonBox>
-              <ModalCancelButton onClick={closeDeleteModal}>취소</ModalCancelButton>
-              <ModalConfirmButton onClick={handleDeleteReview}>삭제</ModalConfirmButton>
-            </ModalButtonBox>
-          </ModalContent>
-        </Modal>
-      )}
     </ReviewCardWrapper>
   );
 };
+
+const ReviewNameBox = tw.div`
+    flex gap-10 items-center
+`;
+
+const ReviewerProfileImage = tw.img`
+    w-36 h-36 rounded-full
+`;
+
+const ReviewerInfoBox = tw.div`
+  flex flex-col
+`;
+
+const ReviewerReviewInfo = tw.div`
+  flex flex-row gap-6 items-center
+  text-gray-70
+`;
+
+const ReviewerReviewCountDivider = tw.span`
+  w-1 h-10 bg-gray-100
+`;
 
 const ReviewCardWrapper = tw.section`
   p-20 flex flex-col
@@ -191,7 +252,7 @@ const ActionButton = tw.button`
 const ReviewCardSubHeader = tw.section`
   flex flex-row gap-2 items-center justify-between
   text-gray-500
-  mt-13
+  mt-10
 `;
 
 const RatingWrapper = tw.section`
@@ -248,35 +309,3 @@ const ReviewImage = styled.img<{ index: number; totalImages: number }>(({ totalI
     `,
   totalImages <= 3 ? tw`w-116 h-116` : tw`w-96 h-96`,
 ]);
-
-const ModalContent = tw.div`
-    flex flex-col gap-16 w-290 pt-32
-    items-center
-    justify-center
-    bg-white
-    rounded-12
-`;
-
-const ModalTitle = tw.div`
-    font-16-r text-gray-900
-    text-center
-`;
-
-const ModalButtonBox = tw.div`
-    flex h-60 w-full
-`;
-
-const ModalCancelButton = tw.button`
-    w-full
-    font-16-r text-black
-    cursor-pointer
-    border-none
-    bg-transparent
-`;
-
-const ModalConfirmButton = tw.button`
-    w-full
-    font-16-r text-orange
-    cursor-pointer
-    border-none
-    bg-transparent`;

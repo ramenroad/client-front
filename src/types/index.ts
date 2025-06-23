@@ -125,6 +125,7 @@ export interface UserReview extends Review {
 export enum PopupType {
   FILTER = "FILTER",
   SORT = "SORT",
+  CONFIRM = "CONFIRM",
 }
 
 export interface ModalProps {

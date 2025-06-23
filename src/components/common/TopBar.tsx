@@ -16,13 +16,15 @@ const TopBar = (props: TopBarProps) => {
   const handleBackClick = () => {
     if (props.onBackClick) {
       props.onBackClick();
-    } else {
-      if (props.navigate) {
-        navigate(props.navigate);
-      } else {
-        navigate(-1);
-      }
+      return;
     }
+
+    if (props.navigate) {
+      navigate(props.navigate);
+      return;
+    }
+
+    navigate(-1);
   };
 
   return (

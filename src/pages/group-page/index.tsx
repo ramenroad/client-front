@@ -39,11 +39,7 @@ export const GroupPage = () => {
                 <RamenyaListWrapper isEmpty={ramenyaList?.length === 0}>
                   {ramenyaList?.map((ramenya, index) => (
                     <>
-                      <RamenyaCard
-                        key={ramenya._id}
-                        ramenya={ramenya}
-                        isReview={false}
-                      />
+                      <RamenyaCard key={ramenya._id} {...ramenya} isReview={false} />
                       {index !== ramenyaList.length - 1 && <SubLine />}
                     </>
                   ))}
@@ -97,11 +93,9 @@ interface RamenyaListWrapperProps {
   isEmpty?: boolean;
 }
 
-const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(
-  ({ isEmpty }) => [
-    tw`flex flex-col items-center justify-center w-full`,
-    isEmpty && tw`h-full`,
-  ]
-);
+const RamenyaListWrapper = styled.div<RamenyaListWrapperProps>(({ isEmpty }) => [
+  tw`flex flex-col items-center justify-center w-full`,
+  isEmpty && tw`h-full`,
+]);
 
 export default GroupPage;
