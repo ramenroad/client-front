@@ -84,10 +84,6 @@ const InformationWrapper = tw.section`
   flex flex-col w-full h-full overflow-y-auto pt-10
 `;
 
-const InformationHeader = tw.span`
-  px-20 font-14-sb self-start
-`;
-
 interface RamenyaListWrapperProps {
   isEmpty?: boolean;
 }
