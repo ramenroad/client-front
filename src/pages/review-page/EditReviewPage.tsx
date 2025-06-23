@@ -2,7 +2,7 @@ import TopBar from "../../components/common/TopBar.tsx";
 import tw from "twin.macro";
 import { IconStarLarge, IconAdd, IconClose } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
-import { createRef, useState, useEffect } from "react";
+import { createRef, useState, useEffect, useCallback, memo, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Review } from "../../types";
 import {
@@ -17,6 +17,192 @@ import { useModal } from "../../hooks/common/useModal";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
+import heic2any from "heic2any";
+
+// 이미지 압축 및 리사이징 함수
+const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
+  return new Promise((resolve) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = () => {
+      // 비율 유지하면서 리사이징
+      const ratio = Math.min(maxWidth / img.width, maxWidth / img.height);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+
+      // 모바일에서 성능 향상을 위한 최적화 설정
+      if (ctx) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "medium";
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      }
+
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file);
+          }
+        },
+        "image/jpeg",
+        quality,
+      );
+    };
+
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+// HEIC 파일을 JPEG로 변환하는 함수
+const convertHeicToJpeg = async (file: File): Promise<File> => {
+  // HEIC 파일이 아닌 경우 그대로 반환
+  if (!file.type.includes("heic") && !file.name.toLowerCase().endsWith(".heic")) {
+    return file;
+  }
+
+  try {
+    // heic2any를 사용하여 HEIC를 JPEG로 변환
+    const convertedBlob = await heic2any({
+      blob: file,
+      toType: "image/jpeg",
+      quality: 0.9,
+    });
+
+    // 파일명에서 .heic 확장자를 .jpg로 변경
+    const fileName = file.name.replace(/\.heic$/i, ".jpg");
+
+    // Blob을 File로 변환
+    const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+    const convertedFile = new File([blob], fileName, {
+      type: "image/jpeg",
+      lastModified: Date.now(),
+    });
+
+    return convertedFile;
+  } catch (error) {
+    console.error("HEIC 변환 실패:", error);
+    throw new Error("HEIC 파일 변환에 실패했습니다.");
+  }
+};
+
+// 모바일 디바이스 감지 함수
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
+// 모바일 최적화된 Lottie 컴포넌트
+const OptimizedLottie = memo(() => {
+  const [shouldRender, setShouldRender] = useState(true);
+  const isMobile = useMemo(() => isMobileDevice(), []);
+
+  useEffect(() => {
+    if (isMobile) {
+      // 모바일에서는 3초 후 Lottie를 간단한 텍스트로 교체
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile]);
+
+  if (!shouldRender && isMobile) {
+    return <MobileLoadingText>처리중...</MobileLoadingText>;
+  }
+
+  return (
+    <LottieWrapper>
+      <Lottie animationData={loadingAnimation} loop={true} autoplay={true} />
+    </LottieWrapper>
+  );
+});
+
+// 이미지 미리보기 컴포넌트 - 간단하고 안정적인 버전
+const ImagePreviewItem = memo(
+  ({ file, index, onRemove }: { file: File | string; index: number; onRemove: (index: number) => void }) => {
+    const [imageUrl, setImageUrl] = useState<string>("");
+    const [hasError, setHasError] = useState(false);
+    const [isRemoving, setIsRemoving] = useState(false);
+
+    // 이미지 URL 생성 및 관리
+    useEffect(() => {
+      if (file instanceof File) {
+        try {
+          const url = URL.createObjectURL(file);
+          setImageUrl(url);
+
+          // cleanup 함수
+          return () => {
+            URL.revokeObjectURL(url);
+          };
+        } catch (error) {
+          console.error("URL 생성 실패:", error);
+          setHasError(true);
+        }
+      } else {
+        setImageUrl(file);
+      }
+    }, [file]);
+
+    const handleRemove = useCallback(() => {
+      if (isRemoving) return;
+
+      setIsRemoving(true);
+
+      // URL 즉시 정리
+      if (imageUrl && imageUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(imageUrl);
+      }
+
+      onRemove(index);
+    }, [index, onRemove, isRemoving, imageUrl]);
+
+    const handleImageError = useCallback(() => {
+      setHasError(true);
+    }, []);
+
+    const handleImageLoad = useCallback(() => {
+      setHasError(false);
+    }, []);
+
+    return (
+      <ImagePreviewContainer>
+        {imageUrl && !hasError ? (
+          <ImagePreview
+            src={imageUrl}
+            alt={`업로드 이미지 ${index + 1}`}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+          />
+        ) : (
+          <ErrorImagePlaceholder>
+            <div>이미지 로드 실패</div>
+            <div style={{ fontSize: "10px", marginTop: "4px" }}>삭제 가능</div>
+          </ErrorImagePlaceholder>
+        )}
+
+        <ImageRemoveButton
+          onClick={handleRemove}
+          type="button"
+          disabled={isRemoving}
+          style={{
+            backgroundColor: hasError ? "#ff5454" : "white",
+            color: hasError ? "white" : "#585858",
+          }}
+        >
+          <IconClose width={9} height={9} color={hasError ? "white" : "#585858"} />
+        </ImageRemoveButton>
+      </ImagePreviewContainer>
+    );
+  },
+);
 
 export const EditReviewPage = () => {
   const { id: reviewId } = useParams();
@@ -29,13 +215,13 @@ export const EditReviewPage = () => {
 
   const navigate = useNavigate();
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
+  const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
   const { isSignIn } = useSignInStore();
 
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [customMenuInput, setCustomMenuInput] = useState("");
   const [menuList, setMenuList] = useState(reviewDetail?.menus?.map((menu) => menu) || []);
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [isImageUploading, setIsImageUploading] = useState(false);
 
   const fileInputRef = createRef<HTMLInputElement>();
@@ -60,15 +246,6 @@ export const EditReviewPage = () => {
 
   const formValues = watch();
 
-  const isFormValid =
-    formValues.rating > 0 &&
-    (formValues.menus
-      ? Array.isArray(formValues.menus)
-        ? formValues.menus.filter(Boolean).length > 0
-        : formValues.menus.split(",").filter(Boolean).length > 0
-      : false) &&
-    formValues.review.trim().length >= 10;
-
   const handleStarClick = (index: number) => {
     setValue("rating", index, { shouldValidate: true });
   };
@@ -77,14 +254,16 @@ export const EditReviewPage = () => {
     if (selectedMenus.includes(menu)) {
       setSelectedMenus(selectedMenus.filter((item) => item !== menu));
     } else {
-      setSelectedMenus([...selectedMenus, menu]);
+      if (selectedMenus.length < 2) {
+        setSelectedMenus([...selectedMenus, menu]);
+      }
     }
   };
 
   const handleAddCustomMenu = () => {
     if (customMenuInput.trim() !== "" && !menuList.includes(customMenuInput)) {
       setMenuList([...menuList, customMenuInput]);
-      if (selectedMenus.length < 1) {
+      if (selectedMenus.length < 2) {
         setSelectedMenus([...selectedMenus, customMenuInput]);
       }
       setCustomMenuInput("");
@@ -98,36 +277,55 @@ export const EditReviewPage = () => {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
+  const handleImageUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files) return;
 
-    const currentImages = formValues.reviewImages || [];
+      const currentImages = formValues.reviewImages || [];
 
-    if (currentImages.length + files.length > 5) {
-      alert("이미지는 최대 5개까지 업로드 가능합니다.");
-      return;
-    }
+      if (currentImages.length + files.length > 5) {
+        alert("이미지는 최대 5개까지 업로드 가능합니다.");
+        return;
+      }
 
-    const fileArray = Array.from(files);
+      // 모바일 브라우저에서는 역순으로 업로드
+      const fileArray = Array.from(files);
+      const newImages: (File | string)[] = [];
 
-    const newImages: File[] = [];
-    setIsImageUploading(true);
-    for (const file of fileArray) {
-      if (currentImages.length + newImages.length >= 5) break;
+      try {
+        setIsImageUploading(true);
 
-      newImages.push(file);
-    }
+        for (const file of fileArray) {
+          if (currentImages.length + newImages.length >= 5) break;
 
-    setValue("reviewImages", [...currentImages, ...newImages], {
-      shouldValidate: true,
-    });
+          // HEIC 파일 변환
+          let convertedFile = await convertHeicToJpeg(file);
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-    setIsImageUploading(false);
-  };
+          // 모바일 최적화를 위한 이미지 압축 (1MB 이상일 때만)
+          if (convertedFile.size > 1024 * 1024) {
+            convertedFile = await compressImage(convertedFile, 800, 0.8);
+          }
+
+          newImages.push(convertedFile);
+        }
+
+        setValue("reviewImages", [...currentImages, ...newImages], {
+          shouldValidate: true,
+        });
+      } catch (error) {
+        console.error("이미지 변환 중 오류:", error);
+        alert("이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.");
+      } finally {
+        setIsImageUploading(false);
+      }
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    },
+    [formValues.reviewImages, setValue],
+  );
 
   const handleImageClick = () => {
     if ((formValues.reviewImages?.length ?? 0) < 5) {
@@ -135,15 +333,30 @@ export const EditReviewPage = () => {
     }
   };
 
-  const handleRemoveImage = (index: number) => {
-    const newImages = [...(formValues.reviewImages || [])];
-    newImages.splice(index, 1);
-    setValue("reviewImages", newImages, { shouldValidate: true });
-  };
+  const handleRemoveImage = useCallback(
+    (index: number) => {
+      // 현재 값을 안전하게 가져와서 업데이트
+      const currentImages = formValues.reviewImages || [];
+
+      // 유효성 검사
+      if (index < 0 || index >= currentImages.length) {
+        console.warn("잘못된 이미지 인덱스:", index);
+        return;
+      }
+
+      // 새로운 이미지 배열 생성
+      const newImages = [...currentImages];
+      newImages.splice(index, 1);
+
+      // react-hook-form에 업데이트
+      setValue("reviewImages", newImages, { shouldValidate: true });
+    },
+    [formValues.reviewImages, setValue],
+  );
 
   const onSubmit = async (values: Review) => {
     if (!isSignIn) {
-      navigate("/login");
+      openLoginModal();
       return;
     }
 
@@ -208,12 +421,29 @@ export const EditReviewPage = () => {
     closeBackModal();
   };
 
+  const handleLoginConfirm = () => {
+    closeLoginModal();
+    navigate("/login");
+  };
+
+  const isFormValid =
+    formValues.rating > 0 &&
+    (formValues.menus ? formValues.menus.split(",").filter(Boolean).length > 0 : false) &&
+    formValues.review.trim().length >= 10;
+
   useEffect(() => {
     if (!reviewId) {
       navigate(-1);
       return;
     }
   }, [reviewId, navigate]);
+
+  useEffect(() => {
+    if (reviewDetailQuery.isError) {
+      alert("리뷰 정보를 불러오는데 실패했습니다.");
+      // navigate(-1);
+    }
+  }, [reviewDetailQuery.isError, navigate]);
 
   useEffect(() => {
     if (ramenyaDetail?.menus) {
@@ -228,29 +458,11 @@ export const EditReviewPage = () => {
       isDirty ||
       (formValues.reviewImages?.length ?? 0) > 0 ||
       formValues.rating > 0 ||
-      (Array.isArray(formValues.menus) ? formValues.menus.length > 0 : false) ||
+      (formValues.menus ? formValues.menus.split(",").filter(Boolean).length > 0 : false) ||
       formValues.review.trim().length > 0;
 
     setIsFormDirty(hasChanges);
   }, [isDirty, formValues.reviewImages, formValues.rating, formValues.menus, formValues.review, reviewDetail]);
-
-  useEffect(() => {
-    const urls =
-      formValues.reviewImages?.map((image) => {
-        if (image instanceof File) {
-          return URL.createObjectURL(image);
-        }
-        return image;
-      }) || [];
-    setImageUrls(urls);
-    return () => {
-      urls.forEach((url) => {
-        if (url.startsWith("blob:")) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    };
-  }, [formValues.reviewImages]);
 
   useEffect(() => {
     setValue("menus", selectedMenus.join(","), { shouldValidate: true });
@@ -270,7 +482,6 @@ export const EditReviewPage = () => {
         reviewImages: reviewDetail.reviewImageUrls || [],
       });
       setSelectedMenus(reviewDetail.menus ?? []);
-      setImageUrls(reviewDetail.reviewImageUrls || []);
     }
   }, [reviewDetail, reset, reviewDetailQuery.isSuccess]);
 
@@ -280,9 +491,7 @@ export const EditReviewPage = () => {
     <Wrapper>
       {(isSubmitting || isImageUploading) && (
         <LoadingOverlay>
-          <LottieWrapper>
-            <Lottie animationData={loadingAnimation} loop={true} />
-          </LottieWrapper>
+          <OptimizedLottie />
         </LoadingOverlay>
       )}
       <Header>
@@ -360,7 +569,7 @@ export const EditReviewPage = () => {
                 <ImageUploadTitleBox>
                   <ImageUploadTitle>사진 첨부</ImageUploadTitle>
                   <ImageCountBox>
-                    <ImageAdded>{formValues.reviewImages?.length ?? 0}</ImageAdded>
+                    <ImageAdded>{formValues.reviewImages?.length}</ImageAdded>
                     <ImageAddedText>/</ImageAddedText>
                     <ImageMax>5</ImageMax>
                   </ImageCountBox>
@@ -370,13 +579,13 @@ export const EditReviewPage = () => {
 
               <ImageUploadContent>
                 <ImageUploadContentImage>
-                  {formValues.reviewImages?.map((_, index) => (
-                    <ImagePreviewContainer key={index}>
-                      <ImagePreview src={imageUrls[index]} alt={`업로드 이미지 ${index + 1}`} />
-                      <ImageRemoveButton onClick={() => handleRemoveImage(index)} type="button">
-                        <IconClose width={9} height={9} color="#585858" />
-                      </ImageRemoveButton>
-                    </ImagePreviewContainer>
+                  {formValues.reviewImages?.map((image, index) => (
+                    <ImagePreviewItem
+                      key={`${index}-${image instanceof File ? image.name : image}`}
+                      file={image}
+                      index={index}
+                      onRemove={handleRemoveImage}
+                    />
                   ))}
                   {(formValues.reviewImages?.length ?? 0) < 5 && (
                     <ImageAddButton onClick={handleImageClick} type="button">
@@ -408,6 +617,19 @@ export const EditReviewPage = () => {
           <ModalButtonBox>
             <ModalCancelButton onClick={handleCancelBack}>취소</ModalCancelButton>
             <ModalConfirmButton onClick={handleConfirmBack}>확인</ModalConfirmButton>
+          </ModalButtonBox>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isLoginModalOpen} onClose={closeLoginModal}>
+        <ModalContent>
+          <ModalTextBox>
+            <ModalTitle>로그인이 필요해요</ModalTitle>
+            <ModalText>로그인 하시겠습니까?</ModalText>
+          </ModalTextBox>
+          <ModalButtonBox>
+            <ModalCancelButton onClick={closeLoginModal}>취소</ModalCancelButton>
+            <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
           </ModalButtonBox>
         </ModalContent>
       </Modal>
@@ -633,6 +855,7 @@ const ImageUploadContent = tw.div`
 
 const ImageUploadContentImage = tw.div`
     flex flex-row flex-wrap gap-12
+    
 `;
 
 const ImagePreviewContainer = tw.div`
@@ -703,6 +926,15 @@ const ModalContent = tw.div`
     rounded-12
 `;
 
+const ModalTextBox = tw.div`
+    flex flex-col
+`;
+
+const ModalTitle = tw.div`
+    font-16-sb text-gray-900
+    text-center
+`;
+
 const ModalText = tw.div`
     font-16-r text-gray-900
     text-center
@@ -736,4 +968,19 @@ const LoadingWrapper = tw.div`
 
 const LoadingText = tw.div`
     font-16-m text-gray-400
+`;
+
+const MobileLoadingText = tw.div`
+    font-16-m text-white
+    text-center
+    py-4
+`;
+
+const ErrorImagePlaceholder = tw.div`
+    w-full h-full
+    bg-gray-100
+    rounded-8
+    flex items-center justify-center
+    font-12-r text-gray-400
+    text-center
 `;

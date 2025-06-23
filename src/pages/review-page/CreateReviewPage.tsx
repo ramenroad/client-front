@@ -15,6 +15,7 @@ import { useModal } from "../../hooks/common/useModal";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import heic2any from "heic2any";
+import { useToast } from "../../components/ToastProvider.tsx";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -209,6 +210,7 @@ export const CreateReviewPage = () => {
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
   const { isSignIn } = useSignInStore();
+  const { openToast } = useToast();
 
   const searchParams = new URLSearchParams(window.location.search);
   const initialRating = parseInt(searchParams.get("rating") || "0", 10);
@@ -372,7 +374,7 @@ export const CreateReviewPage = () => {
         },
         onError: (error) => {
           console.error("리뷰 업로드 중 에러 발생:", error);
-          alert("리뷰 업로드에 실패했습니다.");
+          openToast("리뷰 업로드에 실패했습니다.");
         },
       });
     } catch (error) {
@@ -522,10 +524,6 @@ export const CreateReviewPage = () => {
                   </ReviewTextAreaContainer>
                 )}
               />
-              {/* {errors.review && errors.review.type === 'required' &&
-                              <ErrorMessage>리뷰 내용을 입력해주세요</ErrorMessage>}
-                          {errors.review && errors.review.type === 'minLength' &&
-                              <ErrorMessage>최소 10자 이상 입력해주세요</ErrorMessage>} */}
             </ReviewDescriptionWrapper>
 
             <ImageUploadWrapper>

@@ -29,6 +29,7 @@ const PopupSort: React.FC<PopupSortProps> = (props) => {
           </RamenroadText>
           <CloseButton onClick={props.onClose} />
         </Header>
+
         <Section>
           {Object.values(SortType).map((sort) => (
             <Flex>
@@ -47,11 +48,13 @@ const PopupSort: React.FC<PopupSortProps> = (props) => {
 export default PopupSort;
 
 const Wrapper = tw.div`
-  w-full max-w-400 flex flex-col gap-20
+  w-350 max-w-350 flex flex-col gap-20
+  box-border
 `;
 
 const Header = tw.div`
   flex items-center justify-between
+  box-border
 `;
 
 const CloseButton = tw(IconClose)`
@@ -60,10 +63,12 @@ const CloseButton = tw(IconClose)`
 
 const Section = tw.div`
   flex flex-col gap-20 justify-between
+  box-border
 `;
 
 const Flex = tw.div`
   flex justify-between items-center
+  box-border
 `;
 
 const SectionTitle = styled.div(({ selected }: { selected?: boolean }) => [

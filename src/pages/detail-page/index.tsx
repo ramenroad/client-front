@@ -51,7 +51,7 @@ export const DetailPage = () => {
   const { id } = useParams();
 
   const ramenyaDetailQuery = useRamenyaDetailQuery(id!);
-  const ramenyaReviewQuery = useRamenyaReviewQuery(id!);
+  const { ramenyaReviewQuery } = useRamenyaReviewQuery(id!);
   const ramenyaReviewImagesQuery = useRamenyaReviewImagesQuery(id!);
   const { userInformationQuery } = useUserInformationQuery();
   const navigate = useNavigate();
@@ -347,7 +347,7 @@ export const DetailPage = () => {
 
           <ReviewContent>
             <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
-            {ramenyaReviewQuery.data?.reviews?.length === 0 ? (
+            {ramenyaReviewQuery.data?.pages.flatMap((page) => page.reviews)?.length === 0 ? (
               <EmptyReviewContainer>
                 <EmptyReviewImage src={emptyReview} />
                 <EmptyReviewTitle>등록된 리뷰가 없습니다.</EmptyReviewTitle>
@@ -357,7 +357,8 @@ export const DetailPage = () => {
             ) : (
               <>
                 <ReviewCardContainer>
-                  {ramenyaReviewQuery.data?.reviews
+                  {ramenyaReviewQuery.data?.pages
+                    .flatMap((page) => page.reviews)
                     ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
                     .slice(0, 3)
                     .map((review) => (
@@ -632,6 +633,7 @@ const LargeStarContainer = tw.div`
 `;
 
 const LoginButton = tw.div`
+  mt-16
   flex w-fit py-10 px-32
   box-border
   justify-center items-center

@@ -4,11 +4,19 @@ import { useParams } from "react-router-dom";
 import { useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { UserReviewCard } from "../../components/review/UserReviewCard";
 import { Line } from "../../components/common/Line";
+import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
+import { useIntersectionObserver } from "../../hooks/common/useIntersectionObserver";
 
 export const ReviewListPage = () => {
   const { id } = useParams();
-  const ramenyaReviewQuery = useRamenyaReviewQuery(id!);
-  const reviews = ramenyaReviewQuery.data?.reviews;
+  const { ramenyaReviewQuery } = useRamenyaReviewQuery(id!);
+  const { userInformationQuery } = useUserInformationQuery();
+
+  const ref = useIntersectionObserver({
+    onIntersect: ramenyaReviewQuery.fetchNextPage,
+  });
+
+  const reviews = ramenyaReviewQuery.data?.pages.flatMap((page) => page.reviews) || [];
 
   return (
     <Wrapper>
@@ -18,18 +26,23 @@ export const ReviewListPage = () => {
         <ReviewListContainer>
           {reviews?.map((review) => (
             <>
-              <UserReviewCard review={review} editable={false} />
+              <UserReviewCard
+                review={review}
+                editable={review.userId?._id === userInformationQuery.data?._id}
+                mypage={false}
+              />
               <Line />
             </>
           ))}
         </ReviewListContainer>
+        <div ref={ref} />
       </Container>
     </Wrapper>
   );
 };
 
 const Wrapper = tw.div`
-  flex flex-col pb-40 w-full
+  flex flex-col w-full pb-20
 `;
 
 const Container = tw.div`

@@ -30,7 +30,7 @@ export const UserReviewCard = <T extends boolean = false>(props: MyReviewCardPro
 
   const navigate = useNavigate();
   const { openToast } = useToast();
-  const { openPopup } = usePopup();
+  const { openPopup, closePopup } = usePopup();
 
   const { mutate: deleteReview } = useRamenyaReviewDeleteMutation();
 
@@ -118,7 +118,9 @@ export const UserReviewCard = <T extends boolean = false>(props: MyReviewCardPro
                     deleteReview(review._id, {
                       onSuccess: () => {
                         queryClient.invalidateQueries({ ...queryKeys.review.userReview(review._id) });
+                        queryClient.invalidateQueries({ ...queryKeys.review.my });
                         openToast("리뷰가 삭제되었습니다.");
+                        closePopup();
                       },
                     });
                   },

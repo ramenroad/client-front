@@ -66,14 +66,18 @@ export interface RamenyaReviewResponse {
   lastPage: number;
 }
 
-export const getReview = async (ramenyaId: string, page: number = 1, limit: number = 10) => {
-  const response = await instanceWithNoVersioning.get<RamenyaReviewResponse>(
-    `/review?ramenyaId=${ramenyaId}&page=${page}&limit=${limit}`,
-  );
+export const getRamenyaReview = async (ramenyaId: string, page: number = 1, limit: number = 10) => {
+  const response = await instanceWithNoVersioning.get<RamenyaReviewResponse>(`/review`, {
+    params: {
+      ramenyaId,
+      page,
+      limit,
+    },
+  });
   return response.data;
 };
 
 export const getReviewDetail = async (reviewId: string) => {
-  const response = await instanceWithNoVersioning.get<UserReview>(`/review/${reviewId}`);
+  const response = await instanceWithNoVersioning.get<UserReview<ReviewType.MYPAGE>>(`/review/${reviewId}`);
   return response.data;
 };
