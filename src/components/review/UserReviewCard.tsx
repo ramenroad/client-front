@@ -119,6 +119,11 @@ export const UserReviewCard = <T extends boolean = false>(props: MyReviewCardPro
                       onSuccess: () => {
                         queryClient.invalidateQueries({ ...queryKeys.review.userReview(review._id) });
                         queryClient.invalidateQueries({ ...queryKeys.review.my });
+                        queryClient.invalidateQueries({
+                          ...queryKeys.review.ramenyaReview(
+                            isDetailedRamenya(review.ramenyaId) ? review.ramenyaId._id : review.ramenyaId,
+                          ),
+                        });
                         openToast("리뷰가 삭제되었습니다.");
                         closePopup();
                       },

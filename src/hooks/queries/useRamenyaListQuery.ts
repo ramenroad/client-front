@@ -54,7 +54,7 @@ export const useRamenyaListQuery = ({ type, value, filterOptions }: QueryParams)
       }
 
       if (filterOptions.sort === SortType.RATING) {
-        return [...filtered].sort((a, b) => a.rating - b.rating);
+        return [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
       }
 
       return filtered;
