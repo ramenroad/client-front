@@ -70,14 +70,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
             {/* 라멘야 별점 */}
             {props.isReview !== false && (
               <RamenyaReviewBox>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <IconStarSmall
-                    key={star}
-                    color={
-                      reviewCount && reviewCount > 0 && rating && Math.round(rating) >= star ? "#FFCC00" : "#E1E1E1"
-                    }
-                  />
-                ))}
+                <IconStarSmall color={rating && rating > 0 ? "#FFCC00" : "#E1E1E1"} />
                 <RamenyaScore>{rating && rating.toFixed(1)}</RamenyaScore>
                 <RamenyaReviewCount>({reviewCount})</RamenyaReviewCount>
               </RamenyaReviewBox>
@@ -108,7 +101,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
           <RamenyaCardBottomSection>
             <RamenyaOpenStatusWrapper>
               <RamenyaOpenStatus status={openStatus}>{openStatus}</RamenyaOpenStatus>
-              {openStatus === OpenStatus.OPEN && (
+              {checkBusinessStatus(businessHours || []).todayHours?.operatingTime && (
                 <>
                   <span>·</span>
                   <RamenyaOpenTime>
@@ -183,7 +176,15 @@ const RamenyaOpenStatusWrapper = tw.span`
 `;
 
 const RamenyaOpenStatus = styled.span(({ status }: { status: OpenStatus }) => [
-  status === OpenStatus.OPEN ? tw`text-green` : status === OpenStatus.BREAK ? tw`text-orange` : tw`text-red`,
+  status === OpenStatus.OPEN
+    ? tw`text-green`
+    : status === OpenStatus.BREAK
+      ? tw`text-orange`
+      : status === OpenStatus.DAY_OFF
+        ? tw`text-red`
+        : status === OpenStatus.CLOSED
+          ? tw`text-red`
+          : tw`text-gray-700`,
 ]);
 
 const RamenyaOpenTime = tw.span`
