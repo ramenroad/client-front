@@ -4,7 +4,7 @@ import TopBar from "../../components/common/TopBar";
 import { useMyReviewQuery, useUserReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { Line } from "../../components/common/Line";
 import { UserReviewCard } from "../../components/review/UserReviewCard";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useIntersectionObserver } from "../../hooks/common/useIntersectionObserver";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { Toggle } from "../../components/common/Toggle";
@@ -13,14 +13,16 @@ import { useUserMyPageMutation } from "../../hooks/mutation/useUserMyPageMutatio
 import { queryClient } from "../../core/queryClient";
 import { queryKeys } from "../../hooks/queries/queryKeys";
 import { useEffect, useMemo, useState } from "react";
-import { IconClose, IconKakao, IconMore, IconShare } from "../../components/Icon";
+import { IconClose, IconKakao, IconLock, IconMore, IconShare } from "../../components/Icon";
 import { Modal } from "../../components/common/Modal";
 import { useToast } from "../../components/ToastProvider";
 
 const { Kakao } = window as any;
 
 const UserReviewPage = () => {
+  const navigate = useNavigate();
   const { id: userId } = useParams();
+
   const { userInformationQuery } = useUserInformationQuery();
   const { userReviewQuery } = useUserReviewQuery(userId);
   const { userMyPageQuery } = useUserMyPageQuery(userId);
@@ -124,7 +126,7 @@ const UserReviewPage = () => {
             </RamenroadText>
             <ReviewToggleWrapper>
               <ReviewToggleText size={12} weight="m">
-                리뷰 공개
+                리뷰 {userMyPageQuery.data?.isPublic ? "공개" : "비공개"}
               </ReviewToggleText>
               {my && (
                 <Toggle
@@ -138,23 +140,40 @@ const UserReviewPage = () => {
           </ReviewResultWrapperHeader>
         </ReviewResultWrapper>
         <Line />
-        {my
-          ? myReviewQuery.data?.pages.map((page) =>
-              page.reviews.map((review) => (
-                <>
-                  <UserReviewCard key={review._id} review={review} editable mypage />
-                  <Line />
-                </>
-              )),
-            )
-          : userReviewQuery.data?.pages.map((page) =>
-              page.reviews.map((review) => (
-                <>
-                  <UserReviewCard key={review._id} review={review} editable={false} mypage />
-                  <Line />
-                </>
-              )),
-            )}
+        {my ? (
+          myReviewQuery.data?.pages.map((page) =>
+            page.reviews.map((review) => (
+              <>
+                <UserReviewCard key={review._id} review={review} editable mypage />
+                <Line />
+              </>
+            )),
+          )
+        ) : userReviewQuery.isError ? (
+          <PrivateReviewWrapper>
+            <IconLock />
+            <PrivateReviewTitle size={16} weight="r">
+              비공개 리뷰입니다
+            </PrivateReviewTitle>
+            <PrivateReviewDescription size={14} weight="r">
+              다른 리뷰 보러 가보실래요?
+            </PrivateReviewDescription>
+            <PrivateReviewButton onClick={() => navigate("/")}>
+              <RamenroadText size={16} weight="m">
+                메인 화면으로 이동
+              </RamenroadText>
+            </PrivateReviewButton>
+          </PrivateReviewWrapper>
+        ) : (
+          userReviewQuery.data?.pages.map((page) =>
+            page.reviews.map((review) => (
+              <>
+                <UserReviewCard key={review._id} review={review} editable={false} mypage />
+                <Line />
+              </>
+            )),
+          )
+        )}
         <div ref={ref} />
       </PageWrapper>
       {isSharePopupOpen && (
@@ -190,7 +209,7 @@ const UserReviewPage = () => {
                   <IconMore color="#FFFFFF" />
                 </MoreBackground>
                 <ShareOptionText size={12} weight="r">
-                  다른 옵션
+                  더보기
                 </ShareOptionText>
               </ShareOption>
             </ModalShareContent>
@@ -379,3 +398,25 @@ const ReviewToggleWrapper = tw.section`
 `;
 
 export default UserReviewPage;
+
+const PrivateReviewTitle = tw(RamenroadText)`
+  text-black mt-8
+`;
+
+const PrivateReviewDescription = tw(RamenroadText)`
+  text-gray-70 mt-4
+`;
+
+const PrivateReviewWrapper = tw.section`
+  flex flex-col items-center justify-center
+  h-450
+`;
+
+const PrivateReviewButton = tw.button`
+  w-176 h-44
+  bg-brightOrange rounded-100
+  text-orange
+  border-none
+  cursor-pointer
+  mt-16
+`;

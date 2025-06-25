@@ -1,27 +1,60 @@
 import tw from "twin.macro";
 import { ramenroadEmail } from "../../constants";
+import { RamenroadText } from "./RamenroadText";
+import { Line } from "./Line";
 
 export const Footer = () => {
   return (
     <Wrapper>
-      <Title>팀 라멘로드</Title>
-      <ContactWrapper>
-        <span>제휴 및 협업 문의</span>
-        <Email href={`mailto:${ramenroadEmail}`}>{ramenroadEmail}</Email>
-      </ContactWrapper>
-      <Description>Copyright © 2025 라멘로드 All rights reserved.</Description>
+      <Contact>
+        <RamenroadText size={14} weight="sb">
+          팀 라멘로드
+        </RamenroadText>
+        <ContactWrapper>
+          <span>제휴 및 협업 문의</span>
+          <Email href={`mailto:${ramenroadEmail}`}>{ramenroadEmail}</Email>
+        </ContactWrapper>
+      </Contact>
+      <TermsAndConditions>
+        <Terms>
+          <Link
+            size={12}
+            weight="r"
+            onClick={() =>
+              // openPopup(PopupType.IFRAME, { url: "https://kim-junseo.notion.site/21649b91c9c580318d75e7941d6def9c" })
+              window.open("https://kim-junseo.notion.site/21649b91c9c580318d75e7941d6def9c", "_blank")
+            }
+          >
+            서비스 이용 약관
+          </Link>
+          <Divider vertical />
+          <Link
+            size={12}
+            weight="sb"
+            onClick={() =>
+              // openPopup(PopupType.IFRAME, { url: "https://www.notioniframe.com/notion/2mtbk9lo4fy" })
+              window.open("https://www.notioniframe.com/notion/2mtbk9lo4fy", "_blank")
+            }
+          >
+            개인정보 처리방침
+          </Link>
+        </Terms>
+        <RamenroadText size={12} weight="r">
+          Copyright © 2025 라멘로드 All rights reserved.
+        </RamenroadText>
+      </TermsAndConditions>
     </Wrapper>
   );
 };
 
 const Wrapper = tw.div`
-  w-full h-134 p-20 box-border
+  w-full h-156 p-20 box-border
   bg-footer text-gray-500 font-14-r
-  mt-auto
+  flex flex-col gap-24
 `;
 
-const Title = tw.div`
-  flex items-center h-27 font-14-sb mb-4
+const Contact = tw.div`
+  flex flex-col gap-4
 `;
 
 const Email = tw.a`
@@ -29,9 +62,21 @@ const Email = tw.a`
 `;
 
 const ContactWrapper = tw.div`
-  flex gap-8 mt-4 mb-24
+  flex gap-8
 `;
 
-const Description = tw.div`
-  font-12-r
+const Terms = tw.div`
+  flex gap-4 items-center
+`;
+
+const TermsAndConditions = tw.div`
+  flex flex-col gap-4
+`;
+
+const Link = tw(RamenroadText)`
+  cursor-pointer
+`;
+
+const Divider = tw(Line)`
+  h-10
 `;

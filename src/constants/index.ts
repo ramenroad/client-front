@@ -33,7 +33,7 @@ export type RamenyaType = (typeof RAMENYA_TYPES)[number];
 export enum OpenStatus {
   OPEN = "영업 중",
   CLOSED = "영업 종료",
-  BREAK = "쉬는 중",
+  BREAK = "준비시간",
   BEFORE_OPEN = "영업 전",
   DAY_OFF = "휴무일",
 }

@@ -105,7 +105,9 @@ const RamenyaCard = (props: RamenyaCardProps) => {
                 <>
                   <span>·</span>
                   <RamenyaOpenTime>
-                    {checkBusinessStatus(businessHours || []).todayHours?.operatingTime}
+                    {openStatus === OpenStatus.BREAK
+                      ? checkBusinessStatus(businessHours || []).todayHours?.breakTime
+                      : checkBusinessStatus(businessHours || []).todayHours?.operatingTime}
                   </RamenyaOpenTime>
                 </>
               )}
@@ -177,16 +179,18 @@ const RamenyaOpenStatusWrapper = tw.span`
   flex gap-2 items-center font-12-r h-14
 `;
 
-const RamenyaOpenStatus = styled.span(({ status }: { status: OpenStatus }) => [
-  status === OpenStatus.OPEN
-    ? tw`text-green`
-    : status === OpenStatus.BREAK
-      ? tw`text-orange`
-      : status === OpenStatus.DAY_OFF
-        ? tw`text-red`
-        : status === OpenStatus.CLOSED
+export const RamenyaOpenStatus = styled.span(({ status }: { status: OpenStatus }) => [
+  status === OpenStatus.BEFORE_OPEN
+    ? tw`text-gray-700`
+    : status === OpenStatus.OPEN
+      ? tw`text-green`
+      : status === OpenStatus.BREAK
+        ? tw`text-yellow`
+        : status === OpenStatus.DAY_OFF
           ? tw`text-red`
-          : tw`text-gray-700`,
+          : status === OpenStatus.CLOSED
+            ? tw`text-gray-700`
+            : tw``,
 ]);
 
 const RamenyaOpenTime = tw.span`

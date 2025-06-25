@@ -9,14 +9,7 @@ interface GroupListBoxProps {
   region: string;
 }
 
-export const GroupListBox = ({
-  title,
-  subTitle,
-  image,
-  onClick,
-  type,
-  region,
-}: GroupListBoxProps) => {
+export const GroupListBox = ({ title, subTitle, image, onClick, type, region }: GroupListBoxProps) => {
   switch (type) {
     case 1:
       return (
@@ -68,6 +61,7 @@ const GroupListLocation = tw.span`
 
 const GroupListImage = tw.img`
   w-160 h-160 rounded-8
+  border border-solid border-gray-100
 `;
 
 const GroupListRoundedImage = tw.img`

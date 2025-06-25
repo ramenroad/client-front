@@ -685,3 +685,12 @@ export const IconMore = ({ color, ...rest }: IconProps) => (
     <circle cx="23" cy="3" r="3" fill={color || "#111111"} />
   </svg>
 );
+
+export const IconLock = () => (
+  <svg width="80" height="62" viewBox="0 0 80 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="30" y="6" width="20" height="36" rx="10" stroke="#F4F4F5" strokeWidth="6" />
+    <rect x="18" y="25" width="44" height="33" rx="8" fill="#F4F4F5" />
+    <circle cx="40" cy="38" r="4" fill="#E4E4E4" />
+    <rect x="38" y="40" width="4" height="8" fill="#E4E4E4" />
+  </svg>
+);

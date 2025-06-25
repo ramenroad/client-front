@@ -46,7 +46,7 @@ export const Toast = ({ message, isOpen, onClose }: ToastProps) => {
 };
 
 const ToastContainer = tw.div`
-  fixed bottom-140 z-[150] w-full
+  fixed bottom-68 z-[150] w-full
   flex justify-center items-center
 `;
 

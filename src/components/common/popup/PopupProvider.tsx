@@ -4,6 +4,7 @@ import { PopupType } from "../../../types";
 import PopupFilter, { PopupFilterProps } from "./PopupFilter";
 import PopupSort, { PopupSortProps } from "./PopupSort";
 import PopupConfirm, { PopupConfirmProps } from "./PopupConfirm";
+import { PopupIframe, PopupIframeProps } from "./PopupIframe";
 
 interface PopupContextType {
   openPopup: (type: PopupType, options?: unknown) => void;
@@ -43,6 +44,10 @@ export const PopupProvider = ({ children }: { children: ReactNode }) => {
       break;
     case PopupType.CONFIRM:
       popupContent = <PopupConfirm {...(popupOptions as PopupConfirmProps)} onClose={closePopup} />;
+      popupDirection = "center";
+      break;
+    case PopupType.IFRAME:
+      popupContent = <PopupIframe {...(popupOptions as PopupIframeProps)} onClose={closePopup} />;
       popupDirection = "center";
       break;
     default:

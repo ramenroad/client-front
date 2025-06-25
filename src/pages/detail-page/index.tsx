@@ -37,6 +37,7 @@ import { ImagePopup } from "../../components/common/ImagePopup";
 import { UserReviewCard } from "../../components/review/UserReviewCard";
 import { Line } from "../../components/common/Line";
 import { useMobileState } from "../../hooks/common/useMobileState";
+import { RamenyaOpenStatus } from "../../components/common/RamenyaCard";
 
 const dayMapping: { [key: string]: string } = {
   mon: "월요일",
@@ -198,9 +199,9 @@ export const DetailPage = () => {
               <DetailIconTag icon={<IconTime />} text="운영시간" />
               <MarketDetailBoxContent>
                 <OperationgTimeTextContainer>
-                  <OpenStatusText status={checkBusinessStatus(ramenyaDetailQuery.data?.businessHours ?? []).status}>
+                  <RamenyaOpenStatus status={checkBusinessStatus(ramenyaDetailQuery.data?.businessHours ?? []).status}>
                     {checkBusinessStatus(ramenyaDetailQuery.data?.businessHours ?? []).status}
-                  </OpenStatusText>
+                  </RamenyaOpenStatus>
                   <TimeHeader>
                     {todayBusinessHour?.isOpen
                       ? `${dayMapping[todayBusinessHour.day.toLowerCase()]}: ${todayBusinessHour.operatingTime}`
