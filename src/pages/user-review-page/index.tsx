@@ -39,7 +39,15 @@ const UserReviewPage = () => {
   const { myReviewQuery } = useMyReviewQuery(my);
 
   const ref = useIntersectionObserver({
-    onIntersect: userReviewQuery.fetchNextPage,
+    onIntersect: () => {
+      if (my) {
+        myReviewQuery.fetchNextPage();
+      } else {
+        if (!userReviewQuery.isError) {
+          userReviewQuery.fetchNextPage();
+        }
+      }
+    },
   });
 
   const handleReviewToggle = (isPublic: boolean) => {
