@@ -519,15 +519,6 @@ const OperationgTimeTextContainer = tw.div`
   flex flex-col gap-4 items-start
 `;
 
-interface OpenStatusTextProps {
-  status: OpenStatus;
-}
-
-const OpenStatusText = styled.div<OpenStatusTextProps>(({ status }) => [
-  tw`font-14-r`,
-  status === OpenStatus.OPEN ? tw`text-green` : status === OpenStatus.BREAK ? tw`text-orange` : tw`text-red`,
-]);
-
 const TimeHeader = tw.div`
   flex gap-4 items-center 
 `;
