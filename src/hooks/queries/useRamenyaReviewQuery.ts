@@ -37,6 +37,7 @@ export const useUserReviewQuery = (userId?: string) => {
     getNextPageParam: (lastPage, allPages) => (lastPage.reviews.length === 10 ? allPages.length + 1 : undefined),
     initialPageParam: 1,
     enabled: !!userId,
+    retry: false,
   });
   return { userReviewQuery };
 };
