@@ -1,7 +1,7 @@
 import { OpenStatus } from "../constants";
 
 export type BusinessHour = {
-  day: string;
+  day: string; // "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun"
   operatingTime: string; // e.g., "09:00 – 18:00"
   breakTime: string; // e.g., "12:00 – 13:00"
   isOpen: boolean;
