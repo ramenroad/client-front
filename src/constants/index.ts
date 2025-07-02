@@ -100,3 +100,15 @@ export const initialFilterOptions: FilterOptions = {
   sort: SortType.DEFAULT,
   genre: [],
 };
+
+export const WEEKDAYS_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+
+export const DAY_MAP: Record<string, string> = {
+  mon: "월",
+  tue: "화",
+  wed: "수",
+  thu: "목",
+  fri: "금",
+  sat: "토",
+  sun: "일",
+} as const;

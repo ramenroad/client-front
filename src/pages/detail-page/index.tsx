@@ -22,7 +22,7 @@ import emptyThumbnail from "../../assets/images/store.png";
 import emptyImage from "../../assets/images/empty-images.png";
 import emptyReview from "../../assets/images/empty-review.png";
 import KakaoMap from "./KaKaoMap";
-import { checkBusinessStatus } from "../../util";
+import { checkBusinessStatus, checkBusinessStatusSpecial } from "../../util";
 import { formatNumber } from "../../util/number";
 import TopBar from "../../components/common/TopBar";
 import { useRamenyaReviewImagesQuery, useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
@@ -36,16 +36,8 @@ import { UserReviewCard } from "../../components/review/UserReviewCard";
 import { Line } from "../../components/common/Line";
 import { useMobileState } from "../../hooks/common/useMobileState";
 import { RamenyaOpenStatus } from "../../components/common/RamenyaCard";
-
-const dayMapping: { [key: string]: string } = {
-  mon: "월요일",
-  tue: "화요일",
-  wed: "수요일",
-  thu: "목요일",
-  fri: "금요일",
-  sat: "토요일",
-  sun: "일요일",
-};
+import { DAY_MAP, OpenStatus } from "../../constants";
+import styled from "@emotion/styled";
 
 export const DetailPage = () => {
   const { id } = useParams();
@@ -202,8 +194,8 @@ export const DetailPage = () => {
                   </RamenyaOpenStatus>
                   <TimeHeader>
                     {todayBusinessHour?.isOpen
-                      ? `${dayMapping[todayBusinessHour.day.toLowerCase()]}: ${todayBusinessHour.operatingTime}`
-                      : `매주 ${dayMapping[todayBusinessHour?.day.toLowerCase() ?? ""]} 휴무`}
+                      ? `${todayBusinessHour.operatingTime}`
+                      : checkBusinessStatusSpecial(ramenyaDetailQuery.data?.businessHours ?? []).closeInformation}
                     {isTimeExpanded ? (
                       <StyledIconDropDownSelected onClick={() => setIsTimeExpanded(false)} />
                     ) : (
@@ -211,30 +203,46 @@ export const DetailPage = () => {
                     )}
                   </TimeHeader>
                   {isTimeExpanded && (
-                    <>
-                      <TimeDetails>
-                        {todayBusinessHour?.isOpen &&
-                          `${dayMapping[todayBusinessHour?.day.toLowerCase() ?? ""]} 브레이크타임 ${todayBusinessHour?.breakTime}`}
-                      </TimeDetails>
-                      <TimeDetails>
-                        {ramenyaDetailQuery.data?.businessHours
-                          .filter((hour) => hour.day.toLowerCase() !== getCurrentDayIndex())
-                          .map((businessHour) => (
-                            <div key={businessHour.day}>
+                    <BusinessHoursWrapper>
+                      {checkBusinessStatusSpecial(ramenyaDetailQuery.data?.businessHours ?? []).daily.allSame ? (
+                        <BusinessHoursContainer today={true}>
+                          <BusinessHoursDay>매일</BusinessHoursDay>
+                          <BusinessHoursTime>
+                            <div>{`${checkBusinessStatusSpecial(ramenyaDetailQuery.data?.businessHours ?? []).daily.operatingTime}`}</div>
+                            {checkBusinessStatusSpecial(ramenyaDetailQuery.data?.businessHours ?? []).daily
+                              .breakTime && (
+                              <div>{`${checkBusinessStatusSpecial(ramenyaDetailQuery.data?.businessHours ?? []).daily.breakTime} ${OpenStatus.BREAK}`}</div>
+                            )}
+                          </BusinessHoursTime>
+                        </BusinessHoursContainer>
+                      ) : (
+                        ramenyaDetailQuery.data?.businessHours.map((businessHour) => (
+                          <BusinessHoursContainer
+                            key={businessHour.day}
+                            today={todayBusinessHour?.day === businessHour.day}
+                          >
+                            <BusinessHoursDay>{DAY_MAP[businessHour.day]}</BusinessHoursDay>
+                            <BusinessHoursTime>
                               {businessHour.isOpen ? (
-                                <TimeDetails>
-                                  <div>{`${dayMapping[businessHour.day.toLowerCase()]}: ${businessHour.operatingTime}`}</div>
+                                <div key={businessHour.day}>
+                                  <div>{`${businessHour.operatingTime}`}</div>
                                   {businessHour.breakTime && (
-                                    <div>{`${dayMapping[businessHour.day.toLowerCase()]} 브레이크타임 ${businessHour.breakTime}`}</div>
+                                    <div>{`${businessHour.breakTime} ${OpenStatus.BREAK}`}</div>
                                   )}
-                                </TimeDetails>
+                                </div>
                               ) : (
-                                `매주 ${dayMapping[businessHour.day.toLowerCase()]} 휴무`
+                                <div>{`매주 ${DAY_MAP[businessHour.day]}요일 휴무`}</div>
                               )}
-                            </div>
-                          ))}
-                      </TimeDetails>
-                    </>
+                            </BusinessHoursTime>
+                          </BusinessHoursContainer>
+                        ))
+                      )}
+                      {/* {!todayBusinessHour?.isOpen && (
+                        <div>
+                          {checkBusinessStatusSpecial(ramenyaDetailQuery.data?.businessHours ?? []).closeInformation}
+                        </div>
+                      )} */}
+                    </BusinessHoursWrapper>
                   )}
                 </OperationgTimeTextContainer>
               </MarketDetailBoxContent>
@@ -514,7 +522,7 @@ const MarketDetailBoxContent = tw.div`
 `;
 
 const OperationgTimeTextContainer = tw.div`
-  flex flex-col gap-4 items-start
+  flex flex-col gap-6 items-start
 `;
 
 const TimeHeader = tw.div`
@@ -529,7 +537,19 @@ const StyledIconDropDownSelected = tw(IconDropDownSelected)`
   cursor-pointer
 `;
 
-const TimeDetails = tw.div`
+const BusinessHoursWrapper = tw.div`
+  flex flex-col gap-8
+`;
+
+const BusinessHoursContainer = styled.div<{ today: boolean }>(({ today }) => [
+  tw`flex gap-7`,
+  today && tw`font-semibold`,
+]);
+
+const BusinessHoursDay = tw.span`  
+`;
+
+const BusinessHoursTime = tw.div`
   flex flex-col gap-4
 `;
 
@@ -554,7 +574,7 @@ const RecommendBox = tw.div`
 `;
 
 const RecommendMenuContainer = tw.div`
-  flex gap-16 mb-16
+  flex gap-16 mb-16 flex-wrap
 `;
 
 const RecommendMenuBox = tw.div`
