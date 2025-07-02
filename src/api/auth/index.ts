@@ -9,6 +9,7 @@ export interface oAuthLoginResponse {
 export const oAuthLogin = async (id: string, code: string) => {
   const response = await instanceWithNoVersioning.post<oAuthLoginResponse>(`/auth/signin/${id}`, {
     authorizationCode: code,
+    ...(id === "naver" ? { state: "ramenroad" } : {}),
   });
 
   return response.data;
