@@ -13,7 +13,7 @@ import { useUserMyPageMutation } from "../../hooks/mutation/useUserMyPageMutatio
 import { queryClient } from "../../core/queryClient";
 import { queryKeys } from "../../hooks/queries/queryKeys";
 import { useEffect, useMemo, useState } from "react";
-import { IconClose, IconKakao, IconLock, IconMore, IconShare } from "../../components/Icon";
+import { IconClose, IconEmptyReview, IconKakao, IconLock, IconMore, IconShare } from "../../components/Icon";
 import { Modal } from "../../components/common/Modal";
 import { useToast } from "../../components/ToastProvider";
 
@@ -149,6 +149,19 @@ const UserReviewPage = () => {
         </ReviewResultWrapper>
         <Line />
         {my ? (
+          myReviewQuery.data?.pages.length === 0 ? (
+            <EmptyReviewOverlay />
+          ) : (
+            myReviewQuery.data?.pages.map((page) =>
+              page.reviews.map((review) => (
+                <>
+                  <UserReviewCard key={review._id} review={review} editable mypage />
+                  <Line />
+                </>
+              )),
+            )
+          )
+        ) : userReviewQuery.isError ? (
           myReviewQuery.data?.pages.map((page) =>
             page.reviews.map((review) => (
               <>
@@ -158,7 +171,7 @@ const UserReviewPage = () => {
             )),
           )
         ) : userReviewQuery.isError ? (
-          <PrivateReviewWrapper>
+          <UnavailableReviewOverlay>
             <IconLock />
             <PrivateReviewTitle size={16} weight="r">
               비공개 리뷰입니다
@@ -166,12 +179,12 @@ const UserReviewPage = () => {
             <PrivateReviewDescription size={14} weight="r">
               다른 리뷰 보러 가보실래요?
             </PrivateReviewDescription>
-            <PrivateReviewButton onClick={() => navigate("/")}>
+            <RedirectButton onClick={() => navigate("/")}>
               <RamenroadText size={16} weight="m">
                 메인 화면으로 이동
               </RamenroadText>
-            </PrivateReviewButton>
-          </PrivateReviewWrapper>
+            </RedirectButton>
+          </UnavailableReviewOverlay>
         ) : (
           userReviewQuery.data?.pages.map((page) =>
             page.reviews.map((review) => (
@@ -276,6 +289,19 @@ const ShareOptionText = tw(RamenroadText)`
   text-14 text-gray-70
 `;
 
+const EmptyReviewOverlay = () => {
+  return (
+    <UnavailableReviewOverlay>
+      <IconEmptyReview />
+      <PrivateReviewTitle size={16} weight="r">
+        등록된 리뷰가 없습니다
+      </PrivateReviewTitle>
+      <PrivateReviewDescription size={14} weight="r">
+        방문하셨나요? 평가를 남겨보세요!
+      </PrivateReviewDescription>
+    </UnavailableReviewOverlay>
+  );
+};
 interface UserInformationCardProps {
   userName: string;
   profileImageUrl: string;
@@ -415,12 +441,12 @@ const PrivateReviewDescription = tw(RamenroadText)`
   text-gray-70 mt-4
 `;
 
-const PrivateReviewWrapper = tw.section`
+const UnavailableReviewOverlay = tw.section`
   flex flex-col items-center justify-center
   h-450
 `;
 
-const PrivateReviewButton = tw.button`
+const RedirectButton = tw.button`
   w-176 h-44
   bg-brightOrange rounded-100
   text-orange
