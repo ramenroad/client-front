@@ -694,3 +694,16 @@ export const IconLock = () => (
     <rect x="38" y="40" width="4" height="8" fill="#E4E4E4" />
   </svg>
 );
+
+export const IconEmptyReview = () => (
+  <svg width="80" height="62" viewBox="0 0 80 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M58 55.7929V45.5C58 45.2239 57.7761 45 57.5 45H47.2071C46.7617 45 46.5386 45.5386 46.8536 45.8536L57.1464 56.1464C57.4614 56.4614 58 56.2383 58 55.7929Z"
+      fill="#F4F4F5"
+    />
+    <rect x="13" y="8" width="54" height="40" rx="8" fill="#F4F4F5" />
+    <circle cx="29.5" cy="28.5" r="2.5" fill="white" />
+    <circle cx="40.5" cy="28.5" r="2.5" fill="white" />
+    <circle cx="51.5" cy="28.5" r="2.5" fill="white" />
+  </svg>
+);
