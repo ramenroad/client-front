@@ -3,13 +3,9 @@ import { QueryClient } from "@tanstack/react-query";
 import { useSignInStore } from "../states/sign-in";
 import { refreshToken } from "./auth";
 
-const isProduction = process.env.NODE_ENV === "production";
-
 export const createAxiosInstance = (queryClient: QueryClient, versioning: boolean = true) => {
   const instance = axios.create({
-    baseURL: isProduction
-      ? `https://ramenroad.com/api${versioning ? "/v1" : "/"}`
-      : `http://localhost:3000${versioning ? "/v1" : "/"}`,
+    baseURL: `${import.meta.env.VITE_API_URL}${versioning ? "/v1" : "/"}`,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
