@@ -39,16 +39,6 @@ import { RamenyaOpenStatus } from "../../components/common/RamenyaCard";
 import { DAY_MAP, OpenStatus } from "../../constants";
 import styled from "@emotion/styled";
 
-const dayMapping: { [key: string]: string } = {
-  mon: "월요일",
-  tue: "화요일",
-  wed: "수요일",
-  thu: "목요일",
-  fri: "금요일",
-  sat: "토요일",
-  sun: "일요일",
-};
-
 export const DetailPage = () => {
   const { id } = useParams();
   const { isMobile } = useMobileState();
