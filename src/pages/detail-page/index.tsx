@@ -11,7 +11,7 @@ import {
   IconTime,
   IconArrowRight,
   IconStarMedium,
-  IconMap,
+  IconMapAppBar,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -414,7 +414,7 @@ export const DetailPage = () => {
                   }
                 }}
               >
-                <IconMap type={button.type} />
+                <IconMapAppBar type={button.type} />
                 <span>{button.label}</span>
                 <StyledIconArrowRight color="#888888" />
               </MapRedirectButton>

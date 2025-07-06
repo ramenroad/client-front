@@ -6,6 +6,7 @@ import { checkBusinessStatus } from "../../util";
 import { useLocationStore } from "../../store/location/useLocationStore";
 import { calculateDistanceValue } from "../../util/number";
 import { OpenStatus } from "../../constants";
+import { getRamenyaListWithGeolocation, GetRamenyaListWithGeolocationParams } from "../../api/map";
 type QueryType = "region" | "genre";
 
 interface QueryParams {
@@ -69,5 +70,17 @@ export const useRegionsQuery = () => {
   return useQuery({
     ...queryKeys.ramenya.regions,
     queryFn: getRegions,
+  });
+};
+
+export const useRamenyaListWithGeolocationQuery = ({
+  latitude,
+  longitude,
+  radius,
+}: GetRamenyaListWithGeolocationParams) => {
+  return useQuery({
+    ...queryKeys.ramenya.listWithGeolocation({ latitude, longitude, radius }),
+    queryFn: () => getRamenyaListWithGeolocation({ latitude, longitude, radius }),
+    enabled: !!latitude && !!longitude && !!radius,
   });
 };
