@@ -14,10 +14,25 @@ import { RamenroadText } from "./RamenroadText.tsx";
 
 interface RamenyaCardProps extends Partial<Ramenya> {
   isReview?: boolean;
+  width?: number | string;
+  isMapCard?: boolean;
 }
 
 const RamenyaCard = (props: RamenyaCardProps) => {
-  const { _id, name, thumbnailUrl, reviewCount, rating, address, businessHours, genre, latitude, longitude } = props;
+  const {
+    _id,
+    name,
+    thumbnailUrl,
+    reviewCount,
+    rating,
+    address,
+    businessHours,
+    genre,
+    latitude,
+    longitude,
+    width,
+    isMapCard,
+  } = props;
   const navigate = useNavigate();
   const { current } = useLocationStore();
 
@@ -54,7 +69,12 @@ const RamenyaCard = (props: RamenyaCardProps) => {
   }, []);
 
   return (
-    <RamenyaCardWrapper key={_id} onClick={() => navigate(`/detail/${_id}`)}>
+    <RamenyaCardWrapper
+      isMapCard={isMapCard}
+      key={_id}
+      onClick={() => navigate(`/detail/${_id}`)}
+      style={{ ...(width ? { width: width } : {}) }}
+    >
       <RamenyaCardLayout>
         {/* 카드 왼쪽 영역 */}
         <RamenyaThumbnail src={thumbnailUrl || storeImage} isImageExist={!!thumbnailUrl} alt={"Thumbnail"} />
@@ -122,10 +142,12 @@ const RamenyaCard = (props: RamenyaCardProps) => {
   );
 };
 
-const RamenyaCardWrapper = tw.section`
-  w-full cursor-pointer
+const RamenyaCardWrapper = styled.section(({ isMapCard }: { isMapCard?: boolean }) => [
+  tw` w-full cursor-pointer
   box-border px-20 py-20
-`;
+  bg-white`,
+  isMapCard && tw`rounded-12 shadow-lg`,
+]);
 
 const RamenyaCardLayout = tw.section`
   w-full flex gap-16 items-center

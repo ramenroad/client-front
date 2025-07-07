@@ -5,6 +5,7 @@ import { useState } from "react";
 import { GetRamenyaListWithGeolocationParams } from "../../api/map";
 import { useRamenyaListWithGeolocationQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { Ramenya } from "../../types";
+import RamenyaCard from "../../components/common/RamenyaCard";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -14,8 +15,7 @@ const MapPage = () => {
   });
 
   const { data: ramenyaList } = useRamenyaListWithGeolocationQuery(currentGeolocation);
-
-  console.log(ramenyaList);
+  const [selectedMarker, setSelectedMarker] = useState<Ramenya | null>(null);
 
   return (
     <>
@@ -29,6 +29,32 @@ const MapPage = () => {
             },
             data: ramenya,
             title: ramenya.name,
+          }))}
+          selectedMarker={selectedMarker}
+          onMarkerClick={(marker) => {
+            setSelectedMarker(null);
+            setSelectedMarker(marker.data);
+          }}
+          resultList={ramenyaList?.ramenyas.map((ramenya) => ({
+            id: ramenya._id,
+            data: ramenya,
+            element: (
+              <RamenyaCard
+                key={ramenya._id}
+                isMapCard={true}
+                _id={ramenya._id}
+                name={ramenya.name}
+                rating={ramenya.rating}
+                latitude={ramenya.latitude}
+                longitude={ramenya.longitude}
+                address={ramenya.address}
+                businessHours={ramenya.businessHours}
+                genre={ramenya.genre}
+                reviewCount={ramenya.reviewCount}
+                thumbnailUrl={ramenya.thumbnailUrl}
+                width={"350px"}
+              />
+            ),
           }))}
         />
       </MapScreen>

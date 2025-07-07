@@ -3,8 +3,9 @@ import { Routes } from "./pages/Routes.tsx";
 import { queryClient } from "./core/queryClient";
 import tw from "twin.macro";
 import { ToastProvider } from "./components/ToastProvider.tsx";
-import "swiper/css";
 import { PopupProvider } from "./components/common/popup/PopupProvider.tsx";
+import "swiper/css";
+
 function App() {
   return (
     <PopupProvider>
