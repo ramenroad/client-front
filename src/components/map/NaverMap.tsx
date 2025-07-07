@@ -6,7 +6,7 @@ import tw from "twin.macro";
 import { IconRefresh } from "../Icon";
 import { RamenroadText } from "../common/RamenroadText";
 
-export interface NaverMapProps {
+export interface NaverMapProps<T = unknown> {
   onRefresh?: ({
     latitude,
     longitude,
@@ -18,10 +18,19 @@ export interface NaverMapProps {
     radius: number;
     zoom: number;
   }) => void;
+  markers?: {
+    position: {
+      lat: number;
+      lng: number;
+    };
+    data: T;
+    title?: string;
+  }[];
 }
 
-export const NaverMap = (props: NaverMapProps) => {
+export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
+
   // 첫 렌더링 때 위치 가져오기
   const { latitude, longitude } = useGeolocation({
     enableHighAccuracy: true,
@@ -51,7 +60,6 @@ export const NaverMap = (props: NaverMapProps) => {
             const marker = new naver.maps.Marker({
               position: new naver.maps.LatLng(latitude, longitude),
               map: map,
-              title: "현재 위치",
               icon: {
                 content:
                   '<div style="background: #4285f4; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
@@ -150,6 +158,65 @@ export const NaverMap = (props: NaverMapProps) => {
       return null;
     }
   };
+
+  useEffect(() => {
+    if (props.markers && mapInstance) {
+      props.markers.forEach((marker) => {
+        // 커스텀 마커 생성 (텍스트 포함)
+        new naver.maps.Marker({
+          map: mapInstance,
+          position: new naver.maps.LatLng(marker.position.lat, marker.position.lng),
+          icon: {
+            content: `
+              <div style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+              ">
+                <svg width="38" height="45" viewBox="0 0 38 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d_2082_2994)">
+<path d="M19 5.5C24.5287 5.5 28.988 9.73696 28.999 15.5078C28.9216 18.0186 27.5785 20.9563 25.7627 23.7744C23.965 26.5645 21.7963 29.0996 20.2539 30.7715C19.5637 31.5193 18.436 31.5202 17.7441 30.7725C16.1783 29.0799 13.9685 26.5077 12.1562 23.7041C10.32 20.8633 9 17.9468 9 15.5293C9.00001 9.74748 13.4644 5.5 19 5.5Z" fill="#FF5E00" stroke="white" stroke-width="2"/>
+<ellipse cx="19" cy="15.6693" rx="3" ry="3.04622" fill="white"/>
+</g>
+<defs>
+<filter id="filter0_d_2082_2994" x="-1" y="0" width="40" height="46" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="4"/>
+<feGaussianBlur stdDeviation="4"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2082_2994"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2082_2994" result="shape"/>
+</filter>
+</defs>
+</svg>
+                                  ${
+                                    marker.title
+                                      ? `
+                    <div style="
+                     font-size: 12px;
+                     font-weight: 600;
+                     color: #333;
+                     white-space: nowrap;
+                     margin-top: -10px;
+                     max-width: 120px;
+                     overflow: hidden;
+                     text-overflow: ellipsis;
+                     text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+                   ">${marker.title}</div>
+                 `
+                                      : ""
+                                  }
+              </div>
+            `,
+            anchor: new naver.maps.Point(12, 12),
+          },
+          clickable: true,
+        });
+      });
+    }
+  }, [mapInstance, props.markers]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>

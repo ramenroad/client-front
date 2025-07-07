@@ -4,6 +4,7 @@ import { NaverMap } from "../../components/map/NaverMap";
 import { useState } from "react";
 import { GetRamenyaListWithGeolocationParams } from "../../api/map";
 import { useRamenyaListWithGeolocationQuery } from "../../hooks/queries/useRamenyaListQuery";
+import { Ramenya } from "../../types";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -19,7 +20,17 @@ const MapPage = () => {
   return (
     <>
       <MapScreen>
-        <NaverMap onRefresh={(data) => setCurrentGeolocation(data)} />
+        <NaverMap<Ramenya>
+          onRefresh={(data) => setCurrentGeolocation(data)}
+          markers={ramenyaList?.ramenyas.map((ramenya) => ({
+            position: {
+              lat: ramenya.latitude,
+              lng: ramenya.longitude,
+            },
+            data: ramenya,
+            title: ramenya.name,
+          }))}
+        />
       </MapScreen>
       <AppBar />
     </>
