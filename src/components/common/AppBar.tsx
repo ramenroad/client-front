@@ -2,10 +2,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import tw from "twin.macro";
 import { IconHome, IconUser } from "../Icon";
 import styled from "@emotion/styled";
+import { useSignInStore } from "../../states/sign-in";
 
 const AppBar = () => {
   const navigate = useNavigate();
   const currentPath = useLocation().pathname;
+  const { isSignIn } = useSignInStore();
 
   return (
     <AppBarWrapper>
@@ -14,7 +16,15 @@ const AppBar = () => {
           <IconHome selected={currentPath === "/"} />
           <ItemText selected={currentPath === "/"}>홈</ItemText>
         </AppBarItem>
-        <AppBarItem onClick={() => navigate("/mypage")}>
+        <AppBarItem
+          onClick={() => {
+            if (isSignIn) {
+              navigate("/mypage");
+            } else {
+              navigate("/login");
+            }
+          }}
+        >
           <IconUser selected={currentPath === "/mypage"} />
           <ItemText selected={currentPath === "/mypage"}>마이</ItemText>
         </AppBarItem>
