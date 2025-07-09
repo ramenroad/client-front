@@ -103,6 +103,8 @@ export const initialFilterOptions: FilterOptions = {
 
 export const WEEKDAYS_ORDER = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
+export type WeekdaysOrderType = (typeof WEEKDAYS_ORDER)[number];
+
 export const DAY_MAP: Record<string, string> = {
   mon: "월",
   tue: "화",
