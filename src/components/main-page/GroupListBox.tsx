@@ -1,4 +1,5 @@
 import tw from "twin.macro";
+import { RamenyaTag } from "../common/tag";
 
 interface GroupListBoxProps {
   title: string;
@@ -17,7 +18,7 @@ export const GroupListBox = ({ title, subTitle, image, onClick, type, region }: 
           <GroupListImage src={image} />
           <TextBox>
             <GroupListTitle>{title}</GroupListTitle>
-            <GroupListSubTitle>{subTitle}</GroupListSubTitle>
+            <RamenyaTag>{subTitle}</RamenyaTag>
           </TextBox>
         </Wrapper>
       );
@@ -70,10 +71,6 @@ const GroupListRoundedImage = tw.img`
 
 const GroupListTitle = tw.span`
   font-16-m text-black
-`;
-
-const GroupListSubTitle = tw.span`
-  font-14-r text-gray-700
 `;
 
 const TextBox = tw.div`
