@@ -31,9 +31,9 @@ const MapPage = () => {
             title: ramenya.name,
           }))}
           selectedMarker={selectedMarker}
-          onMarkerClick={(marker) => {
+          onMarkerClick={(markerData) => {
             setSelectedMarker(null);
-            setSelectedMarker(marker.data);
+            setSelectedMarker(markerData);
           }}
           resultList={ramenyaList?.ramenyas.map((ramenya) => ({
             id: ramenya._id,

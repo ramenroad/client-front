@@ -29,13 +29,7 @@ export interface NaverMapProps<T = unknown> {
     data: T;
     title?: string;
   }[];
-  onMarkerClick?: (marker: {
-    position: {
-      lat: number;
-      lng: number;
-    };
-    data: T;
-  }) => void;
+  onMarkerClick?: (markerData: T) => void;
   selectedMarker?: T | null;
   resultList?: { element: ReactNode; data: T }[];
   onCurrentIndexChange?: (index: number) => void;
@@ -44,6 +38,7 @@ export interface NaverMapProps<T = unknown> {
 export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
   const swiperRef = useRef<SwiperCore>();
+  const dataRefetchRef = useRef(false);
 
   // 첫 렌더링 때 위치 가져오기
   const { latitude, longitude } = useGeolocation({
@@ -108,6 +103,13 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
     }
   }, [mapInstance, latitude, longitude]);
 
+  useEffect(() => {
+    if (dataRefetchRef.current && props.markers?.[0]?.position.lat && props.markers?.[0]?.position.lng) {
+      dataRefetchRef.current = false;
+      mapInstance?.panTo(new naver.maps.LatLng(props.markers?.[0]?.position.lat, props.markers?.[0]?.position.lng));
+    }
+  }, [mapInstance, props.markers]);
+
   // 현재 지도 중심 좌표 가져오기
   const getCurrentMapCenter = () => {
     if (mapInstance) {
@@ -148,6 +150,8 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
         distHalfHeight: Math.round(distHalfHeight),
         radiusInMeters,
       };
+
+      dataRefetchRef.current = true;
 
       props.onRefresh?.({
         latitude: centerInfo.latitude,
@@ -275,7 +279,7 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
         naver.maps.Event.addListener(markerInstance, "click", () => {
           // 해당 마커 위치로 지도 중심 이동
           mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
-          props.onMarkerClick?.(marker);
+          props.onMarkerClick?.(marker.data);
         });
 
         newMarkerInstances.push(markerInstance);
@@ -291,8 +295,9 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
 
     // resultList에서 selectedMarker에 해당하는 인덱스 찾기
     const idx = props.resultList.findIndex(
-      (item) => item.id === props.selectedMarker._id, // _id 등 고유값 비교
+      (item) => item.data === props.selectedMarker, // _id 등 고유값 비교
     );
+
     if (idx >= 0 && swiperRef.current) {
       swiperRef.current.slideToLoop
         ? swiperRef.current.slideToLoop(idx) // loop 모드면 slideToLoop 사용
@@ -323,13 +328,17 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
               }}
               key={props.resultList[0]?.toString()}
               onSlideChangeTransitionEnd={(swiper) => {
-                const currentData = props.resultList?.[swiper.realIndex];
-                console.log("currentData", currentData);
+                const currentData = props.resultList?.[swiper.realIndex]?.data;
+
+                if (!currentData) return;
+                props.onMarkerClick?.(currentData);
+
                 if (currentData && props.markers) {
                   // id로 해당 마커 데이터 찾기
-                  const marker = props.markers.find((m) => m.data === currentData.data);
+                  const marker = props.markers.find((m) => m.data === currentData);
                   if (marker && mapInstance) {
                     // 지도 중심 이동
+                    console.log("panTo", marker.position.lat, marker.position.lng);
                     mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
                   }
                 }
@@ -342,8 +351,8 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
                 minHeight: "120px",
               }}
             >
-              {props.resultList.map((result) => (
-                <SwiperSlide key={result.id}>{result.element}</SwiperSlide>
+              {props.resultList.map((result, index) => (
+                <SwiperSlide key={index}>{result.element}</SwiperSlide>
               ))}
             </Swiper>
           )}
