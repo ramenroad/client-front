@@ -14,13 +14,11 @@ export const Banner = () => {
 
   if (!bannerData?.length) return null;
 
-  const sortedBannerData = [...bannerData].sort(
-    (a, b) => a.priority - b.priority
-  );
+  const sortedBannerData = [...bannerData].sort((a, b) => a.priority - b.priority);
 
   return (
     <Wrapper>
-      <SwiperContainer>
+      <SwiperWrapper>
         <Swiper
           modules={[Autoplay]}
           spaceBetween={30}
@@ -34,6 +32,7 @@ export const Banner = () => {
           {sortedBannerData.map((banner, index) => (
             <SwiperSlide key={index}>
               <BannerImage
+                key={banner._id}
                 src={banner.bannerImageUrl}
                 alt="banner"
                 onClick={() => {
@@ -48,7 +47,7 @@ export const Banner = () => {
             </SwiperSlide>
           ))}
         </Swiper>
-      </SwiperContainer>
+      </SwiperWrapper>
       <BannerButtonWrapper onClick={() => navigate("/banner")}>
         <PresentNumber>{currentIndex + 1}</PresentNumber>
         <Divide>/</Divide>
@@ -62,7 +61,7 @@ const Wrapper = tw.div`
   flex flex-col w-full overflow-hidden
 `;
 
-const SwiperContainer = tw.div`
+const SwiperWrapper = tw.div`
   w-350 h-200 relative
 `;
 

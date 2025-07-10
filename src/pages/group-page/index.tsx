@@ -13,6 +13,7 @@ export const GroupPage = () => {
   useScrollToTop();
 
   const { data: ramenyaGroupList } = useRamenyaGroupQuery();
+
   const ramenyaGroup = ramenyaGroupList?.find((group) => group._id === id);
   const ramenyaList = ramenyaGroup?.ramenyas;
 

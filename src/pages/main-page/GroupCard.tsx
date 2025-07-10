@@ -1,7 +1,7 @@
 import tw from "twin.macro";
-import { RamenyaTag } from "../common/tag";
+import { RamenyaTag } from "../../components/common/tag";
 
-interface GroupListBoxProps {
+interface GroupCardProps {
   title: string;
   subTitle: string;
   image: string;
@@ -10,7 +10,7 @@ interface GroupListBoxProps {
   region: string;
 }
 
-export const GroupListBox = ({ title, subTitle, image, onClick, type, region }: GroupListBoxProps) => {
+export const GroupCard = ({ title, subTitle, image, onClick, type, region }: GroupCardProps) => {
   switch (type) {
     case 1:
       return (

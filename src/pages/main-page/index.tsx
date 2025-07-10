@@ -1,72 +1,77 @@
 import tw from "twin.macro";
-import { LocationPathBox } from "./LocationPathBox";
-import mainLogo from "../../assets/images/logo.png";
+import { LocationPathCard } from "./LocationPathCard";
 import { useNavigate } from "react-router-dom";
 import { genrePath } from "../../constants";
-import { IconArrowRight } from "../../components/Icon";
 import { Banner } from "../../components/common/Banner";
-import { GroupListBox } from "../../components/main-page/GroupListBox";
+import { GroupCard } from "./GroupCard";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 import { useRegionsQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { Swiper, SwiperSlide } from "swiper/react";
+import RamenroadLogo from "./RamenroadLogo";
+import Section from "./Section";
+import GenreCard from "./GenreCard";
+import { useMemo } from "react";
 
 const MainPage = () => {
   const navigate = useNavigate();
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
   const { data: regions } = useRegionsQuery();
-  const locationPath = regions?.map((region) => ({
-    location: region,
-  }));
-  return (
-    <Wrapper>
-      <MainLogoBox>
-        <MainLogo src={mainLogo} />
-      </MainLogoBox>
-      <MainImageContainer>
-        <Banner />
-      </MainImageContainer>
 
-      <GenreViewingWrapper>
-        <LocationViewingText>어떤 라멘을 찾으시나요?</LocationViewingText>
+  const locationPath = useMemo(
+    () =>
+      regions?.map((region) => ({
+        location: region,
+      })),
+    [regions],
+  );
+
+  return (
+    <Container>
+      {/* 로고 */}
+      <RamenroadLogoWrapper>
+        <RamenroadLogo />
+      </RamenroadLogoWrapper>
+
+      {/* 배너 */}
+      <BannerWrapper>
+        <Banner />
+      </BannerWrapper>
+
+      {/* 장르: 라멘 종류 */}
+      <Section title="어떤 라멘을 찾으시나요?">
         <GenrePathContainer>
-          {genrePath.map((genre, index) => (
-            <Genre onClick={() => navigate(`/genre/${genre.genre}`)}>
-              <GenreImage key={index} src={genre.image} alt={genre.genre} />
-              <GenreInfo>{genre.genre}</GenreInfo>
-            </Genre>
+          {genrePath.map((genre) => (
+            <GenreCard
+              key={genre.genre}
+              genreName={genre.genre}
+              genreIcon={genre.image}
+              onClick={() => navigate(`/genre/${genre.genre}`)}
+            />
           ))}
         </GenrePathContainer>
-      </GenreViewingWrapper>
+      </Section>
 
-      <LocationViewingWrapper>
-        <LocationViewingText>어디로 가시나요?</LocationViewingText>
+      {/* 지역: 라멘 매장이 있는 지역 선택 */}
+      <Section title="어디로 가시나요?">
         <LocationPathContainer>
-          {locationPath?.map((region, index) => (
-            <LocationPathBox key={index} location={region.location} />
-          ))}
+          {locationPath?.map((region, index) => <LocationPathCard key={index} location={region.location} />)}
         </LocationPathContainer>
-      </LocationViewingWrapper>
+      </Section>
 
+      {/* 그룹: 특정 컨셉 및 키워드에 대한 그룹 리스트 */}
       {ramenyaGroup?.map((group) => (
-        <GroupViewingWrapper key={group._id}>
-          <GroupInfoBox>
-            <GroupTitleBox>
-              <GroupTitleText>{group.name}</GroupTitleText>
-              <GroupTitleButtonBox
-                onClick={() => navigate(`/group/${group._id}`)}
-              >
-                <GroupTitleButtonText>더보기</GroupTitleButtonText>
-                <IconArrowRight color="#888888" />
-              </GroupTitleButtonBox>
-            </GroupTitleBox>
-            <GroupSubTitle>{group.description}</GroupSubTitle>
-          </GroupInfoBox>
+        <Section
+          title={group.name}
+          subTitle={group.description}
+          isAdditionalInformation
+          onClickAdditionalInformation={() => navigate(`/group/${group._id}`)}
+        >
           <SwiperContainer>
             <Swiper slidesPerView={2.1} spaceBetween={10} modules={[]}>
               {group.ramenyas.map((data) => (
                 <SwiperSlide key={data._id}>
-                  <GroupListBox
+                  <GroupCard
                     title={data.name}
                     subTitle={data.genre[0]}
                     image={data.thumbnailUrl ?? ""}
@@ -78,57 +83,28 @@ const MainPage = () => {
               ))}
             </Swiper>
           </SwiperContainer>
-        </GroupViewingWrapper>
+        </Section>
       ))}
-    </Wrapper>
+    </Container>
   );
 };
 
-const Wrapper = tw.div`
+const Container = tw.div`
   flex flex-col items-center justify-center
-  gap-20 p-20
+  gap-40 px-20 pt-20 pb-40
 `;
 
-const MainLogoBox = tw.div`
+const RamenroadLogoWrapper = tw.div`
   flex items-center justify-center
-  p-10
+  p-10 mb-[-20px]
 `;
 
-const MainLogo = tw.img`
-  flex w-98 h-24
-`;
-
-const MainImageContainer = tw.div`
-  flex relative mb-20
-`;
-
-const GenreImage = tw.img`
-  w-48 h-48
-`;
-
-const GenreViewingWrapper = tw.div`
-  flex flex-col gap-16 w-350 mb-20
-`;
-
-const LocationViewingWrapper = tw.div`
-  flex flex-col gap-16 w-350 mb-20
-`;
-
-const LocationViewingText = tw.div`
-  flex font-18-sb text-black
-`;
-
-const Genre = tw.div`
-  flex flex-col items-center gap-4 cursor-pointer
+const BannerWrapper = tw.div`
+  flex relative
 `;
 
 const GenrePathContainer = tw.div`
   grid grid-cols-5 gap-x-14 gap-y-12
-`;
-
-const GenreInfo = tw.span`
-  font-14-r
-  whitespace-nowrap
 `;
 
 const LocationPathContainer = tw.div`
@@ -136,36 +112,8 @@ const LocationPathContainer = tw.div`
   w-350
 `;
 
-const GroupViewingWrapper = tw.div`
-  flex flex-col w-350 mb-20 gap-16
-`;
-
-const GroupInfoBox = tw.div`
-  flex flex-col
-`;
-
-const GroupTitleBox = tw.div`
-  flex justify-between items-center
-`;
-
-const GroupTitleText = tw.span`
-  flex font-18-sb text-black
-`;
-
-const GroupTitleButtonBox = tw.div`
-  flex items-center gap-2 cursor-pointer
-`;
-
-const GroupTitleButtonText = tw.div`
-  flex font-12-r text-gray-700
-`;
-
-const GroupSubTitle = tw.span`
-  flex font-14-r text-gray-800
-`;
-
 const SwiperContainer = tw.div`
-  w-full
+  w-350
 `;
 
 export default MainPage;

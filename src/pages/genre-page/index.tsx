@@ -30,7 +30,7 @@ export const GenrePage = () => {
   return (
     <Layout>
       <Wrapper>
-        <HeaderSection>
+        <HeaderContainer>
           <TopBar title={genre || ""} />
 
           {/* 필터 영역 */}
@@ -40,7 +40,7 @@ export const GenrePage = () => {
             onFilterChange={setFilterOptions}
             genre={genre as RamenyaType}
           />
-        </HeaderSection>
+        </HeaderContainer>
 
         {/* 라멘야 리스트 영역 */}
         <InformationWrapper>
@@ -85,7 +85,7 @@ const Wrapper = tw.div`
   w-390 h-full
 `;
 
-export const HeaderSection = tw.section`
+export const HeaderContainer = tw.section`
   fixed w-390
   flex flex-col items-center
   font-16-sb
