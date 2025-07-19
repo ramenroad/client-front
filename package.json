@@ -15,6 +15,7 @@
     "@lukemorales/query-key-factory": "^1.3.4",
     "@tanstack/react-query": "^5.60.6",
     "@types/react-helmet": "^6.1.11",
+    "@use-gesture/react": "^10.3.1",
     "axios": "^1.7.7",
     "dayjs": "^1.11.13",
     "exif-js": "^2.3.0",

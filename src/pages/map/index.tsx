@@ -1,7 +1,7 @@
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import tw from "twin.macro";
 import AppBar from "../../components/app-bar";
 import { NaverMap } from "../../components/map/NaverMap";
-import { useCallback, useEffect, useRef, useState } from "react";
 import { GetRamenyaListWithGeolocationParams } from "../../api/map";
 import { useRamenyaListWithGeolocationQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { Ramenya } from "../../types";
@@ -12,6 +12,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import "swiper/css";
 import { OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
+import { useDrag } from "@use-gesture/react";
+import { useDebounce } from "../../hooks/common/useDebounce";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -290,113 +292,64 @@ const ResultCardOverlay = ({
 const ResultListOverlay = () => {
   const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.COLLAPSED);
   const [isDragging, setIsDragging] = useState(false);
-  const [startY, setStartY] = useState(0);
-  const [startHeight, setStartHeight] = useState(0);
+  const [tempHeight, setTempHeight] = useState<number>(OVERLAY_HEIGHTS.COLLAPSED);
 
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // 드래그 시작
-  const handleDragStart = useCallback(
-    (clientY: number) => {
+  // 디바운스된 높이 값 (드래그 중 부드러운 애니메이션을 위해)
+  const debouncedHeight = useDebounce(tempHeight, 50);
+
+  // 드래그 제스처 설정
+  const bind = useDrag(
+    ({ movement: [, my], canceled, last, memo = currentHeight }) => {
+      if (canceled) return;
+
       setIsDragging(true);
-      setStartY(clientY);
-      setStartHeight(currentHeight);
-    },
-    [currentHeight],
-  );
 
-  // 드래그 중 - 3단계 높이로만 제한
-  const handleDragMove = useCallback(
-    (clientY: number) => {
-      if (!isDragging) return;
-
-      const deltaY = startY - clientY; // 위로 드래그하면 양수
-      let newHeight = startHeight + deltaY;
+      // 드래그 방향에 따른 높이 계산 (위로 드래그하면 양수)
+      const deltaY = -my; // 위로 드래그하면 높이 증가
+      let newHeight = memo + deltaY;
 
       // 엄격한 높이 제한 적용
       newHeight = Math.max(OVERLAY_HEIGHTS.COLLAPSED, Math.min(OVERLAY_HEIGHTS.EXPANDED, newHeight));
 
-      // 실시간으로 높이 업데이트 (부드러운 드래그를 위해)
-      if (overlayRef.current) {
-        overlayRef.current.style.height = `${newHeight}px`;
+      setTempHeight(newHeight);
+
+      // 드래그 종료 시 스냅
+      if (last) {
+        setIsDragging(false);
+
+        // 3단계 높이 중 가장 가까운 것 찾기
+        const heights = [OVERLAY_HEIGHTS.COLLAPSED, OVERLAY_HEIGHTS.HALF, OVERLAY_HEIGHTS.EXPANDED];
+        const closestHeight = heights.reduce((prev, curr) =>
+          Math.abs(curr - newHeight) < Math.abs(prev - newHeight) ? curr : prev,
+        ) as OverlayHeightType;
+
+        setCurrentHeight(closestHeight);
+        setTempHeight(closestHeight);
       }
     },
-    [isDragging, startY, startHeight],
-  );
-
-  // 드래그 종료 - 가장 가까운 높이로 스냅
-  const handleDragEnd = useCallback(() => {
-    if (!isDragging) return;
-
-    setIsDragging(false);
-
-    if (!overlayRef.current) return;
-
-    const currentHeightValue = parseFloat(overlayRef.current.style.height) || currentHeight;
-
-    // 3단계 높이 중 가장 가까운 것 찾기
-    const heights = [OVERLAY_HEIGHTS.COLLAPSED, OVERLAY_HEIGHTS.HALF, OVERLAY_HEIGHTS.EXPANDED];
-    const closestHeight = heights.reduce((prev, curr) =>
-      Math.abs(curr - currentHeightValue) < Math.abs(prev - currentHeightValue) ? curr : prev,
-    ) as OverlayHeightType;
-
-    setCurrentHeight(closestHeight);
-  }, [isDragging, currentHeight]);
-
-  // 마우스 이벤트
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      handleDragStart(e.clientY);
+    {
+      axis: "y",
+      filterTaps: true,
+      bounds: { top: 0, bottom: 0 },
+      rubberband: true,
+      preventDefault: true,
     },
-    [handleDragStart],
   );
-
-  // 터치 이벤트
-  const handleTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      e.preventDefault();
-      handleDragStart(e.touches[0].clientY);
-    },
-    [handleDragStart],
-  );
-
-  // 전역 이벤트 리스너
-  useEffect(() => {
-    if (!isDragging) return;
-
-    const handleMouseMove = (e: MouseEvent) => handleDragMove(e.clientY);
-    const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault(); // 스크롤 방지
-      handleDragMove(e.touches[0].clientY);
-    };
-    const handleMouseUp = () => handleDragEnd();
-    const handleTouchEnd = () => handleDragEnd();
-
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("mouseup", handleMouseUp);
-    document.addEventListener("touchend", handleTouchEnd);
-
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("touchend", handleTouchEnd);
-    };
-  }, [isDragging, handleDragMove, handleDragEnd]);
 
   return (
-    <div
+    <ResultListOverlayContainer
       ref={overlayRef}
       className="absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden"
       style={{
-        height: `${currentHeight}px`,
+        height: isDragging ? `${debouncedHeight}px` : `${currentHeight}px`,
         transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
+      {...bind()}
     >
       {/* 드래그 핸들 */}
-      <DragHandle onMouseDown={handleMouseDown} onTouchStart={handleTouchStart}>
+      <DragHandle>
         <DragIndicator />
       </DragHandle>
 
@@ -405,12 +358,12 @@ const ResultListOverlay = () => {
         <div style={{ padding: "20px", textAlign: "center", color: "#666" }}>
           리스트 기능이 여기에 추가될 예정입니다.
           <br />
-          현재 높이: {currentHeight}px
+          현재 높이: {isDragging ? tempHeight : currentHeight}px
           <br />
           <small style={{ color: "#999" }}>드래그하여 높이를 조절하세요</small>
         </div>
       </ListContentArea>
-    </div>
+    </ResultListOverlayContainer>
   );
 };
 
@@ -463,6 +416,10 @@ const DragIndicator = tw.div`
 const ListContentArea = tw.div`
   flex-1 px-10 pb-20
   overflow-hidden
+`;
+
+const ResultListOverlayContainer = tw.div`
+  absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden
 `;
 
 export default MapPage;
