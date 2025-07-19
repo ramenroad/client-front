@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 import { IconArrowRight, IconReview, IconUnSignInUser, IconUnSignInUserProfile } from "../../components/Icon";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useNavigate } from "react-router-dom";

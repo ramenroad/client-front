@@ -2,7 +2,7 @@ import tw from "twin.macro";
 import { LocationPathCard } from "./LocationPathCard";
 import { useNavigate } from "react-router-dom";
 import { genrePath } from "../../constants";
-import { Banner } from "../../components/common/Banner";
+import { Banner } from "../../components/banner";
 import { GroupCard } from "./GroupCard";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 import { useRegionsQuery } from "../../hooks/queries/useRamenyaListQuery";
@@ -62,6 +62,7 @@ const MainPage = () => {
       {/* 그룹: 특정 컨셉 및 키워드에 대한 그룹 리스트 */}
       {ramenyaGroup?.map((group) => (
         <Section
+          key={group._id}
           title={group.name}
           subTitle={group.description}
           isAdditionalInformation

@@ -3,7 +3,7 @@ import { updateUserImage, updateUserNickname } from "../../api/auth";
 import { queryClient } from "../../core/queryClient";
 import { queryKeys } from "../queries/queryKeys";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../../components/ToastProvider";
+import { useToast } from "../../components/toast/ToastProvider";
 
 export const useUserInfoMutation = () => {
   const navigate = useNavigate();

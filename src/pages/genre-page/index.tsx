@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/queries/useRamenyaListQuery";
-import RamenyaCard from "../../components/common/RamenyaCard.tsx";
-import NoStoreBox from "../../components/common/NoStoreBox.tsx";
+import RamenyaCard from "../../components/ramenya-card/RamenyaCard.tsx";
+import NoStoreBox from "../../components/no-data/NoStoreBox.tsx";
 import styled from "@emotion/styled";
-import TopBar from "../../components/common/TopBar.tsx";
+import TopBar from "../../components/top-bar/index.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 import { FilterOptions } from "../../types/filter/index.ts";
 import { initialFilterOptions, RamenyaType } from "../../constants/index.ts";

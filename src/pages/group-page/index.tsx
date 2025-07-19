@@ -1,9 +1,9 @@
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
-import RamenyaCard from "../../components/common/RamenyaCard.tsx";
-import NoStoreBox from "../../components/common/NoStoreBox.tsx";
+import RamenyaCard from "../../components/ramenya-card/RamenyaCard.tsx";
+import NoStoreBox from "../../components/no-data/NoStoreBox.tsx";
 import styled from "@emotion/styled";
-import TopBar from "../../components/common/TopBar.tsx";
+import TopBar from "../../components/top-bar/index.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
 import { Helmet } from "react-helmet";

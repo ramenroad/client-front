@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import { ModalProps } from "../../../types";
+import { ModalProps } from "../../types";
 
 export interface PopupConfirmProps extends ModalProps {
   content: string | React.ReactNode;

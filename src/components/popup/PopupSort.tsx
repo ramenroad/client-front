@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import tw from "twin.macro";
-import { SortType } from "../../../types/filter";
+import { SortType } from "../../types/filter";
 import styled from "@emotion/styled";
-import { IconCheck, IconClose } from "../../Icon";
-import { ModalProps } from "../../../types";
-import { RamenroadText } from "../RamenroadText";
-import { BottomPopupLayout } from "./common";
+import { IconCheck, IconClose } from "../Icon";
+import { ModalProps } from "../../types";
+import { RamenroadText } from "../common/RamenroadText";
+import { BottomPopupLayout } from "./BottomPopupLayout";
 
 export interface PopupSortProps extends ModalProps {
   sortOption: SortType;

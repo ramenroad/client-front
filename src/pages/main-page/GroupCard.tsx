@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import { RamenyaTag } from "../../components/common/tag";
+import { RamenyaTag } from "../../components/tag";
 
 interface GroupCardProps {
   title: string;

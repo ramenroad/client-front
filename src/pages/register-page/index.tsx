@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 import { useEffect, useState } from "react";
 import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
 import styled from "@emotion/styled";
@@ -39,9 +39,7 @@ const RegisterPage = () => {
               </div>
             </>
           ) : (
-            <UpdateNicknameText>
-              새로운 닉네임을 입력해주세요
-            </UpdateNicknameText>
+            <UpdateNicknameText>새로운 닉네임을 입력해주세요</UpdateNicknameText>
           )}
         </DescriptionWrapper>
         <InputWrapper>
@@ -53,10 +51,7 @@ const RegisterPage = () => {
             maxLength={11}
           />
         </InputWrapper>
-        <Button
-          disabled={nickname.length < 2 || nickname.length > 10}
-          onClick={handleClick}
-        >
+        <Button disabled={nickname.length < 2 || nickname.length > 10} onClick={handleClick}>
           {params ? "변경 완료" : "완료"}
         </Button>
       </Wrapper>

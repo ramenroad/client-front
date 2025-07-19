@@ -1,4 +1,4 @@
-import { usePopupContext } from "../../components/common/popup/PopupProvider";
+import { usePopupContext } from "../../components/popup/PopupProvider";
 
 export function usePopup() {
   return usePopupContext();

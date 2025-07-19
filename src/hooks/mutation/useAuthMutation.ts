@@ -6,7 +6,7 @@ import { useSignInStore } from "../../states/sign-in";
 import { queryClient } from "../../core/queryClient";
 import { useNavigate } from "react-router-dom";
 import { queryKeys } from "../queries/queryKeys";
-import { useToast } from "../../components/ToastProvider";
+import { useToast } from "../../components/toast/ToastProvider";
 import { setUserInformation } from "../../store/location/useUserInformationStore";
 import { jwtDecode } from "jwt-decode";
 import { UserInformation } from "../../types/user";

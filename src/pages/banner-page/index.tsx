@@ -53,7 +53,7 @@ const StyledIconClose = tw(IconClose)`
 
 const BannerListContainer = tw.div`
   flex flex-col items-center justify-center
-  px-20 gap-20
+  px-20 pt-10 gap-20
 `;
 
 const BannerImage = tw.img`

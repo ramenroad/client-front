@@ -1,4 +1,4 @@
-import TopBar from "../../components/common/TopBar.tsx";
+import TopBar from "../../components/top-bar/index.tsx";
 import tw from "twin.macro";
 import { IconStarLarge, IconAdd, IconClose } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
@@ -18,7 +18,7 @@ import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 import heic2any from "heic2any";
-import { useToast } from "../../components/ToastProvider.tsx";
+import { useToast } from "../../components/toast/ToastProvider.tsx";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {

@@ -1,10 +1,10 @@
 import { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import { Popup } from "../Popup";
-import { PopupType } from "../../../types";
+import { PopupType } from "../../types";
 import PopupFilter, { PopupFilterProps } from "./PopupFilter";
 import PopupSort, { PopupSortProps } from "./PopupSort";
 import PopupConfirm, { PopupConfirmProps } from "./PopupConfirm";
 import { PopupIframe, PopupIframeProps } from "./PopupIframe";
+import { Popup } from "./Popup";
 
 interface PopupContextType {
   openPopup: (type: PopupType, options?: unknown) => void;

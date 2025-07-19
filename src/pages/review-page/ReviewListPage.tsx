@@ -1,8 +1,8 @@
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
 import { useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
-import { UserReviewCard } from "../../components/review/UserReviewCard";
+import ReviewCard from "../../components/review/ReviewCard";
 import { Line } from "../../components/common/Line";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useIntersectionObserver } from "../../hooks/common/useIntersectionObserver";
@@ -26,7 +26,7 @@ export const ReviewListPage = () => {
         <ReviewListContainer>
           {reviews?.map((review) => (
             <>
-              <UserReviewCard
+              <ReviewCard
                 review={review}
                 editable={review.userId?._id === userInformationQuery.data?._id}
                 mypage={false}
