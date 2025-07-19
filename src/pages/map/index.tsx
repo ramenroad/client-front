@@ -11,6 +11,8 @@ import { IconRefresh } from "../../components/Icon";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import "swiper/css";
+import { OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
+import styled from "@emotion/styled";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -162,7 +164,7 @@ const MapPage = () => {
           onMarkerClick={handleMarkerClick}
         />
 
-        {/* 하단 결과 리스트 */}
+        {/* 하단 드래그 가능한 결과 리스트 */}
         <ResultListOverlay
           ramenyaList={ramenyaList?.ramenyas || []}
           selectedMarker={selectedMarker}
@@ -205,7 +207,98 @@ const ResultListOverlay = ({
   onMarkerSelect,
   onMoveMapCenter,
 }: ResultListOverlayProps) => {
+  const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.COLLAPSED);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const [startHeight, setStartHeight] = useState(0);
+
+  const overlayRef = useRef<HTMLDivElement>(null);
   const swiperRef = useRef<SwiperCore>();
+
+  // 드래그 시작
+  const handleDragStart = useCallback(
+    (clientY: number) => {
+      setIsDragging(true);
+      setStartY(clientY);
+      setStartHeight(currentHeight);
+    },
+    [currentHeight],
+  );
+
+  // 드래그 중
+  const handleDragMove = useCallback(
+    (clientY: number) => {
+      if (!isDragging) return;
+
+      const deltaY = startY - clientY; // 위로 드래그하면 양수
+      const newHeight = Math.max(OVERLAY_HEIGHTS.COLLAPSED, Math.min(OVERLAY_HEIGHTS.EXPANDED, startHeight + deltaY));
+
+      // 실시간으로 높이 업데이트 (부드러운 드래그를 위해)
+      if (overlayRef.current) {
+        overlayRef.current.style.height = `${newHeight}px`;
+      }
+    },
+    [isDragging, startY, startHeight],
+  );
+
+  // 드래그 종료 - 가장 가까운 단계로 스냅
+  const handleDragEnd = useCallback(() => {
+    if (!isDragging) return;
+
+    setIsDragging(false);
+
+    if (!overlayRef.current) return;
+
+    const currentHeightValue = parseFloat(overlayRef.current.style.height) || currentHeight;
+
+    // 가장 가까운 높이 단계 찾기
+    const heights = Object.values(OVERLAY_HEIGHTS);
+    const closestHeight = heights.reduce((prev, curr) =>
+      Math.abs(curr - currentHeightValue) < Math.abs(prev - currentHeightValue) ? curr : prev,
+    ) as OverlayHeightType;
+
+    setCurrentHeight(closestHeight);
+  }, [isDragging, currentHeight]);
+
+  // 마우스 이벤트
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      handleDragStart(e.clientY);
+    },
+    [handleDragStart],
+  );
+
+  // 터치 이벤트
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      e.preventDefault();
+      handleDragStart(e.touches[0].clientY);
+    },
+    [handleDragStart],
+  );
+
+  // 전역 이벤트 리스너
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => handleDragMove(e.clientY);
+    const handleTouchMove = (e: TouchEvent) => handleDragMove(e.touches[0].clientY);
+    const handleMouseUp = () => handleDragEnd();
+    const handleTouchEnd = () => handleDragEnd();
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("mouseup", handleMouseUp);
+    document.addEventListener("touchend", handleTouchEnd);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   // Swiper 슬라이드 변경 시 지도 중심 이동
   const handleSwiperSlideChange = useCallback(
@@ -241,44 +334,52 @@ const ResultListOverlay = ({
   if (!ramenyaList.length) return null;
 
   return (
-    <ResultListContainer>
-      <SwiperWrapper>
-        <Swiper
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          key={ramenyaList[0]?._id}
-          onSlideChangeTransitionEnd={handleSwiperSlideChange}
-          slidesPerView={1.1}
-          loop
-          spaceBetween={10}
-          style={{
-            width: "100%",
-            minHeight: "120px",
-          }}
-        >
-          {ramenyaList.map((ramenya, index) => (
-            <SwiperSlide key={index}>
-              <RamenyaCard
-                key={ramenya._id}
-                isMapCard={true}
-                _id={ramenya._id}
-                name={ramenya.name}
-                rating={ramenya.rating}
-                latitude={ramenya.latitude}
-                longitude={ramenya.longitude}
-                address={ramenya.address}
-                businessHours={ramenya.businessHours}
-                genre={ramenya.genre}
-                reviewCount={ramenya.reviewCount}
-                thumbnailUrl={ramenya.thumbnailUrl}
-                width={"350px"}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </SwiperWrapper>
-    </ResultListContainer>
+    <OverlayContainer ref={overlayRef} height={currentHeight} isDragging={isDragging}>
+      {/* 드래그 핸들 */}
+      <DragHandle onMouseDown={handleMouseDown} onTouchStart={handleTouchStart}>
+        <DragIndicator />
+      </DragHandle>
+
+      {/* 콘텐츠 영역 */}
+      <ContentArea>
+        <SwiperWrapper>
+          <Swiper
+            onSwiper={(swiper) => {
+              swiperRef.current = swiper;
+            }}
+            key={ramenyaList[0]?._id}
+            onSlideChangeTransitionEnd={handleSwiperSlideChange}
+            slidesPerView={1.1}
+            loop
+            spaceBetween={10}
+            style={{
+              width: "100%",
+              minHeight: "120px",
+            }}
+          >
+            {ramenyaList.map((ramenya, index) => (
+              <SwiperSlide key={index}>
+                <RamenyaCard
+                  key={ramenya._id}
+                  isMapCard={true}
+                  _id={ramenya._id}
+                  name={ramenya.name}
+                  rating={ramenya.rating}
+                  latitude={ramenya.latitude}
+                  longitude={ramenya.longitude}
+                  address={ramenya.address}
+                  businessHours={ramenya.businessHours}
+                  genre={ramenya.genre}
+                  reviewCount={ramenya.reviewCount}
+                  thumbnailUrl={ramenya.thumbnailUrl}
+                  width={"350px"}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </SwiperWrapper>
+      </ContentArea>
+    </OverlayContainer>
   );
 };
 
@@ -305,14 +406,34 @@ const MapScreen = tw.main`
   w-full h-[calc(100vh-56px)] relative
 `;
 
-const ResultListContainer = tw.div`
-  absolute left-0 right-0 bottom-20 z-10
-  flex justify-center w-full pointer-events-none
-  pl-10
+const OverlayContainer = styled.div<{ height: OverlayHeightType; isDragging: boolean }>(({ height, isDragging }) => [
+  tw`absolute bottom-0 left-0 right-0 z-20
+       bg-white rounded-t-16
+       shadow-[0_-4px_20px_rgba(0,0,0,0.1)]
+       overflow-hidden`,
+  {
+    height: `${height}px`,
+    transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+  },
+]);
+
+const DragHandle = tw.div`
+  w-full h-20 flex items-center justify-center
+  cursor-grab active:cursor-grabbing
+  touch-none select-none
+`;
+
+const DragIndicator = tw.div`
+  w-36 h-4 bg-gray-300 rounded-full
+`;
+
+const ContentArea = tw.div`
+  flex-1 px-10 pb-20
+  overflow-hidden
 `;
 
 const SwiperWrapper = tw.div`
-  w-full max-w-md pointer-events-auto
+  w-full max-w-md mx-auto
 `;
 
 export default MapPage;

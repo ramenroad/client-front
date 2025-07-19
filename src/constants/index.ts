@@ -114,3 +114,19 @@ export const DAY_MAP: Record<string, string> = {
   sat: "토",
   sun: "일",
 } as const;
+
+export const MAP_MODE = {
+  LIST: "list",
+  CARD: "card",
+} as const;
+
+export type MapModeType = (typeof MAP_MODE)[keyof typeof MAP_MODE];
+
+// ResultListOverlay 높이 상수 (3단계)
+export const OVERLAY_HEIGHTS = {
+  COLLAPSED: 61, // 최소 높이
+  HALF: 278, // 중간 높이
+  EXPANDED: 665, // 최대 높이
+} as const;
+
+export type OverlayHeightType = (typeof OVERLAY_HEIGHTS)[keyof typeof OVERLAY_HEIGHTS];
