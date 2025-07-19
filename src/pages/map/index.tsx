@@ -354,7 +354,7 @@ const ResultListOverlay = ({ ramenyaList, filterOptions, setFilterOptions }: Res
   return (
     <ResultListOverlayContainer
       ref={overlayRef}
-      className="absolute bottom-0 left-0 right-0 z-100 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden"
+      className="absolute bottom-0 left-0 right-0 z-[9999] bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden"
       style={{
         height: isDragging ? `${tempHeight}px` : `${currentHeight}px`,
         transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -374,8 +374,9 @@ const ResultListOverlay = ({ ramenyaList, filterOptions, setFilterOptions }: Res
       {/* 콘텐츠 영역 */}
       <ListContentArea
         style={{
-          height: isDragging ? `${tempHeight - 10}px` : `${currentHeight - 10}px`,
+          height: isDragging ? `${tempHeight - 120}px` : `${currentHeight - 120}px`, // FilterSection 높이 고려
           overflowY: "auto",
+          paddingBottom: "20px", // 마지막 카드가 잘리지 않도록 패딩 추가
         }}
       >
         {ramenyaList?.map((ramenya) => <RamenyaCard key={ramenya._id} {...ramenya} />)}
@@ -405,6 +406,7 @@ const RefreshButtonText = tw(RamenroadText)`
 
 const MapScreen = tw.main`
   w-full h-[calc(100vh-56px)] relative
+  pb-56
 `;
 
 // ResultCardOverlay 스타일
