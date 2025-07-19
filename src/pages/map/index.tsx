@@ -133,15 +133,15 @@ const MapPage = () => {
   }, []);
 
   // 지도 중심을 특정 위치로 이동
-  // const handleMoveMapCenter = useCallback(
-  //   (latitude: number, longitude: number) => {
-  //     if (mapInstance) {
-  //       console.log("panTo", latitude, longitude);
-  //       mapInstance.panTo(new naver.maps.LatLng(latitude, longitude));
-  //     }
-  //   },
-  //   [mapInstance],
-  // );
+  const handleMoveMapCenter = useCallback(
+    (latitude: number, longitude: number) => {
+      if (mapInstance) {
+        console.log("panTo", latitude, longitude);
+        mapInstance.panTo(new naver.maps.LatLng(latitude, longitude));
+      }
+    },
+    [mapInstance],
+  );
 
   return (
     <>
@@ -173,7 +173,12 @@ const MapPage = () => {
         /> */}
 
         {/* 리스트 오버레이 (드래그 가능한 새로운 컴포넌트) */}
-        <ResultListOverlay />
+        <ResultListOverlay
+          ramenyaList={ramenyaList?.ramenyas || []}
+          selectedMarker={selectedMarker}
+          onMarkerSelect={setSelectedMarker}
+          onMoveMapCenter={handleMoveMapCenter}
+        />
       </MapScreen>
       <AppBar />
     </>
@@ -197,7 +202,7 @@ const RefreshOverlay = ({ onRefresh }: RefreshOverlayProps) => {
   );
 };
 
-interface ResultCardOverlayProps {
+interface ResultOverlayProps {
   ramenyaList: Ramenya[];
   selectedMarker: Ramenya | null;
   onMarkerSelect: (marker: Ramenya) => void;
@@ -205,12 +210,7 @@ interface ResultCardOverlayProps {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ResultCardOverlay = ({
-  ramenyaList,
-  selectedMarker,
-  onMarkerSelect,
-  onMoveMapCenter,
-}: ResultCardOverlayProps) => {
+const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
   const swiperRef = useRef<SwiperCore>();
 
   // Swiper 슬라이드 변경 시 지도 중심 이동
@@ -288,7 +288,7 @@ const ResultCardOverlay = ({
   );
 };
 
-const ResultListOverlay = () => {
+const ResultListOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
   const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.COLLAPSED);
   const [isDragging, setIsDragging] = useState(false);
   const [tempHeight, setTempHeight] = useState<number>(OVERLAY_HEIGHTS.COLLAPSED);
@@ -350,15 +350,14 @@ const ResultListOverlay = () => {
         <DragIndicator />
       </DragHandle>
 
-      {/* 콘텐츠 영역 - 나중에 기능 추가 예정 */}
-      <ListContentArea>
-        <div style={{ padding: "20px", textAlign: "center", color: "#666" }}>
-          리스트 기능이 여기에 추가될 예정입니다.
-          <br />
-          현재 높이: {isDragging ? tempHeight : currentHeight}px
-          <br />
-          <small style={{ color: "#999" }}>드래그하여 높이를 조절하세요</small>
-        </div>
+      {/* 콘텐츠 영역 */}
+      <ListContentArea
+        style={{
+          height: isDragging ? `${tempHeight - 80}px` : `${currentHeight - 80}px`, // 드래그 핸들 높이(80px) 제외
+          overflowY: "auto",
+        }}
+      >
+        {ramenyaList?.map((ramenya) => <RamenyaCard key={ramenya._id} {...ramenya} />)}
       </ListContentArea>
     </ResultListOverlayContainer>
   );
@@ -413,7 +412,6 @@ const DragIndicator = tw.div`
 
 const ListContentArea = tw.div`
   flex-1 px-10 pb-20
-  overflow-hidden
 `;
 
 const ResultListOverlayContainer = tw.div`
