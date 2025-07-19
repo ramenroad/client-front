@@ -12,7 +12,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import "swiper/css";
 import { OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
-import styled from "@emotion/styled";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -296,9 +295,6 @@ const ResultListOverlay = () => {
 
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // 드래그 임계값 (px) - 이 거리 이상 드래그해야 다음 단계로 이동
-  const DRAG_THRESHOLD = 30;
-
   // 드래그 시작
   const handleDragStart = useCallback(
     (clientY: number) => {
@@ -328,7 +324,7 @@ const ResultListOverlay = () => {
     [isDragging, startY, startHeight],
   );
 
-  // 개선된 드래그 종료 로직 - 방향과 거리를 고려한 스마트 스냅
+  // 드래그 종료 - 가장 가까운 높이로 스냅
   const handleDragEnd = useCallback(() => {
     if (!isDragging) return;
 
@@ -337,37 +333,15 @@ const ResultListOverlay = () => {
     if (!overlayRef.current) return;
 
     const currentHeightValue = parseFloat(overlayRef.current.style.height) || currentHeight;
-    const deltaY = startY - (startY - (currentHeightValue - startHeight)); // 실제 드래그 거리
-    const dragDistance = Math.abs(deltaY);
-    const isDragUp = deltaY > 0; // 위로 드래그했는지
 
-    let targetHeight = currentHeight; // 기본값은 현재 높이 유지
+    // 3단계 높이 중 가장 가까운 것 찾기
+    const heights = [OVERLAY_HEIGHTS.COLLAPSED, OVERLAY_HEIGHTS.HALF, OVERLAY_HEIGHTS.EXPANDED];
+    const closestHeight = heights.reduce((prev, curr) =>
+      Math.abs(curr - currentHeightValue) < Math.abs(prev - currentHeightValue) ? curr : prev,
+    ) as OverlayHeightType;
 
-    // 임계값 이상 드래그한 경우만 단계 변경
-    if (dragDistance >= DRAG_THRESHOLD) {
-      if (currentHeight === OVERLAY_HEIGHTS.COLLAPSED) {
-        // COLLAPSED에서 위로 드래그 시에만 HALF로
-        if (isDragUp) {
-          targetHeight = OVERLAY_HEIGHTS.HALF;
-        }
-      } else if (currentHeight === OVERLAY_HEIGHTS.HALF) {
-        // HALF에서 위로 드래그하면 EXPANDED, 아래로 드래그하면 COLLAPSED
-        if (isDragUp) {
-          targetHeight = OVERLAY_HEIGHTS.EXPANDED;
-        } else {
-          targetHeight = OVERLAY_HEIGHTS.COLLAPSED;
-        }
-      } else if (currentHeight === OVERLAY_HEIGHTS.EXPANDED) {
-        // EXPANDED에서 아래로 드래그 시에만 HALF로
-        if (!isDragUp) {
-          targetHeight = OVERLAY_HEIGHTS.HALF;
-        }
-      }
-    }
-
-    // 임계값에 미달하거나 잘못된 방향으로 드래그한 경우, 현재 단계 유지
-    setCurrentHeight(targetHeight);
-  }, [isDragging, currentHeight, startY, startHeight]);
+    setCurrentHeight(closestHeight);
+  }, [isDragging, currentHeight]);
 
   // 마우스 이벤트
   const handleMouseDown = useCallback(
@@ -413,7 +387,14 @@ const ResultListOverlay = () => {
   }, [isDragging, handleDragMove, handleDragEnd]);
 
   return (
-    <ListOverlayContainer ref={overlayRef} height={currentHeight} isDragging={isDragging}>
+    <div
+      ref={overlayRef}
+      className="absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden"
+      style={{
+        height: `${currentHeight}px`,
+        transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+      }}
+    >
       {/* 드래그 핸들 */}
       <DragHandle onMouseDown={handleMouseDown} onTouchStart={handleTouchStart}>
         <DragIndicator />
@@ -426,14 +407,10 @@ const ResultListOverlay = () => {
           <br />
           현재 높이: {currentHeight}px
           <br />
-          <small style={{ color: "#999" }}>
-            {currentHeight === OVERLAY_HEIGHTS.COLLAPSED && "위로 30px 이상 드래그하여 확장"}
-            {currentHeight === OVERLAY_HEIGHTS.HALF && "위/아래로 30px 이상 드래그하여 크기 조절"}
-            {currentHeight === OVERLAY_HEIGHTS.EXPANDED && "아래로 30px 이상 드래그하여 축소"}
-          </small>
+          <small style={{ color: "#999" }}>드래그하여 높이를 조절하세요</small>
         </div>
       </ListContentArea>
-    </ListOverlayContainer>
+    </div>
   );
 };
 
@@ -471,19 +448,7 @@ const SwiperWrapper = tw.div`
   w-full max-w-md pointer-events-auto
 `;
 
-// ResultListOverlay 스타일
-const ListOverlayContainer = styled.div<{ height: OverlayHeightType; isDragging: boolean }>(
-  ({ height, isDragging }) => [
-    tw`absolute bottom-0 left-0 right-0 z-30
-       bg-white rounded-t-16
-       shadow-[0_-4px_20px_rgba(0,0,0,0.15)]
-       overflow-hidden`,
-    {
-      height: `${height}px`,
-      transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    },
-  ],
-);
+// ResultListOverlay는 인라인 스타일로 구현
 
 const DragHandle = tw.div`
   w-full h-20 flex items-center justify-center
