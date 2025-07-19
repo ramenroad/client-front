@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 
 export const DetailReviewPage = () => {
   return (

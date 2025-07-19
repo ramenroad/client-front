@@ -3,24 +3,11 @@
 import { ReactNode, useEffect, useState, useRef } from "react";
 import { useGeolocation } from "../../hooks/common/useGeolocation";
 import tw from "twin.macro";
-import { IconRefresh } from "../Icon";
-import { RamenroadText } from "../common/RamenroadText";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import "swiper/css";
 
 export interface NaverMapProps<T = unknown> {
-  onRefresh?: ({
-    latitude,
-    longitude,
-    radius,
-    zoom,
-  }: {
-    latitude: number;
-    longitude: number;
-    radius: number;
-    zoom: number;
-  }) => void;
   markers?: {
     position: {
       lat: number;
@@ -32,20 +19,20 @@ export interface NaverMapProps<T = unknown> {
   onMarkerClick?: (markerData: T) => void;
   selectedMarker?: T | null;
   resultList?: { element: ReactNode; data: T }[];
-  onCurrentIndexChange?: (index: number) => void;
+  onMapReady?: (map: naver.maps.Map) => void;
+  onMapCenterChange?: (map: naver.maps.Map) => void;
 }
 
 export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
   const swiperRef = useRef<SwiperCore>();
-  const dataRefetchRef = useRef(false);
 
   // 첫 렌더링 때 위치 가져오기
   const { latitude, longitude } = useGeolocation({
     enableHighAccuracy: true,
     timeout: 10000,
     maximumAge: 600000,
-    autoFetch: true, // 첫 렌더링 때 자동으로 위치 가져오기
+    autoFetch: true,
   });
 
   useEffect(() => {
@@ -79,19 +66,23 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
             console.log("사용자 위치 마커 생성:", marker);
           }
 
+          // 지도 중심 변경 이벤트 리스너 추가
+          naver.maps.Event.addListener(map, "center_changed", () => {
+            props.onMapCenterChange?.(map);
+          });
+
           setMapInstance(map);
+          props.onMapReady?.(map);
           console.log("지도 생성 완료:", map);
         } catch (error) {
           console.error("지도 생성 실패:", error);
         }
       } else {
         console.log("네이버 지도 API 로드 대기 중...");
-        // 100ms 후 재시도
         setTimeout(initMap, 100);
       }
     };
 
-    // 초기 로드 시도
     initMap();
   }, [latitude, longitude]);
 
@@ -102,80 +93,6 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
       mapInstance.setCenter(newCenter);
     }
   }, [mapInstance, latitude, longitude]);
-
-  useEffect(() => {
-    if (dataRefetchRef.current && props.markers?.[0]?.position.lat && props.markers?.[0]?.position.lng) {
-      dataRefetchRef.current = false;
-      mapInstance?.panTo(new naver.maps.LatLng(props.markers?.[0]?.position.lat, props.markers?.[0]?.position.lng));
-    }
-  }, [mapInstance, props.markers]);
-
-  // 현재 지도 중심 좌표 가져오기
-  const getCurrentMapCenter = () => {
-    if (mapInstance) {
-      const currentCenter = mapInstance.getCenter() as naver.maps.LatLng;
-      const zoom = mapInstance.getZoom();
-      const latitude = currentCenter.lat();
-      const longitude = currentCenter.lng();
-
-      // 네이버 포럼에서 제공하는 정확한 픽셀당 거리 계산 방법
-      const projection = mapInstance.getProjection();
-
-      // 현재 디바이스의 세로 길이 픽셀 가져오기
-      const deviceHeight = window.innerHeight;
-      const halfDeviceHeight = Math.round(deviceHeight / 2);
-
-      // 중심점에서 1px, 디바이스 세로 길이의 절반만큼 떨어진 지점의 실제 거리 계산
-      const p1 = new naver.maps.Point(0, 0);
-      const p2 = new naver.maps.Point(1, 0); // 1px
-      const p3 = new naver.maps.Point(halfDeviceHeight, 0); // 디바이스 세로 길이의 절반
-
-      const c1 = projection.fromOffsetToCoord(p1);
-      const c2 = projection.fromOffsetToCoord(p2);
-      const c3 = projection.fromOffsetToCoord(p3);
-
-      const dist1px = projection.getDistance(c1, c2);
-      const distHalfHeight = projection.getDistance(c1, c3);
-
-      // 화면 중심에서 가장자리까지의 거리 (반경)
-      const radiusInMeters = Math.round(distHalfHeight);
-
-      const centerInfo = {
-        latitude,
-        longitude,
-        zoom,
-        deviceHeight,
-        halfDeviceHeight,
-        dist1px: dist1px.toFixed(4),
-        distHalfHeight: Math.round(distHalfHeight),
-        radiusInMeters,
-      };
-
-      dataRefetchRef.current = true;
-
-      props.onRefresh?.({
-        latitude: centerInfo.latitude,
-        longitude: centerInfo.longitude,
-        radius: centerInfo.radiusInMeters,
-        zoom: centerInfo.zoom,
-      });
-
-      console.log("현재 지도 중심 좌표:", centerInfo);
-      console.log(`줌 레벨 ${zoom}`);
-      console.log(`- 디바이스 세로 길이: ${deviceHeight}px`);
-      console.log(`- 계산 기준 (세로 절반): ${halfDeviceHeight}px`);
-      console.log(`- 1px당 거리: ${dist1px.toFixed(4)}m`);
-      console.log(`- ${halfDeviceHeight}px 거리: ${Math.round(distHalfHeight)}m`);
-      console.log(
-        `- 화면 반경: ${radiusInMeters >= 1000 ? (radiusInMeters / 1000).toFixed(1) + "km" : radiusInMeters + "m"}`,
-      );
-
-      return centerInfo;
-    } else {
-      console.log("지도가 아직 로드되지 않았습니다.");
-      return null;
-    }
-  };
 
   // 마커 인스턴스들을 저장할 배열
   const [markerInstances, setMarkerInstances] = useState<naver.maps.Marker[]>([]);
@@ -288,36 +205,26 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
       // 새로운 마커 인스턴스들 저장
       setMarkerInstances(newMarkerInstances);
     }
-  }, [mapInstance, props.markers]);
+  }, [mapInstance, props.markers, props.selectedMarker]);
 
   useEffect(() => {
     if (!props.selectedMarker || !props.resultList) return;
 
     // resultList에서 selectedMarker에 해당하는 인덱스 찾기
-    const idx = props.resultList.findIndex(
-      (item) => item.data === props.selectedMarker, // _id 등 고유값 비교
-    );
+    const idx = props.resultList.findIndex((item) => item.data === props.selectedMarker);
 
     if (idx >= 0 && swiperRef.current) {
-      swiperRef.current.slideToLoop
-        ? swiperRef.current.slideToLoop(idx) // loop 모드면 slideToLoop 사용
-        : swiperRef.current.slideTo(idx);
+      if (swiperRef.current.slideToLoop) {
+        swiperRef.current.slideToLoop(idx);
+      } else {
+        swiperRef.current.slideTo(idx);
+      }
     }
   }, [props.selectedMarker, props.resultList]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
-      <div id="map" style={{ width: "100%", height: "100%" }}></div>
-
-      {/* 상단 현재 위치 재검색 버튼 */}
-      <RefreshButtonContainer onClick={getCurrentMapCenter}>
-        <RefreshButton>
-          <IconRefresh />
-          <RefreshButtonText size={12} weight="m">
-            현재 위치 재검색
-          </RefreshButtonText>
-        </RefreshButton>
-      </RefreshButtonContainer>
+    <MapWrapper>
+      <NaverMapComponent id="map" />
 
       <ResultListContainer>
         <SwiperWrapper>
@@ -333,10 +240,10 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
                 if (!currentData) return;
                 props.onMarkerClick?.(currentData);
 
-                if (currentData && props.markers) {
+                if (currentData && props.markers && mapInstance) {
                   // id로 해당 마커 데이터 찾기
                   const marker = props.markers.find((m) => m.data === currentData);
-                  if (marker && mapInstance) {
+                  if (marker) {
                     // 지도 중심 이동
                     console.log("panTo", marker.position.lat, marker.position.lng);
                     mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
@@ -358,9 +265,17 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
           )}
         </SwiperWrapper>
       </ResultListContainer>
-    </div>
+    </MapWrapper>
   );
 };
+
+const MapWrapper = tw.article`
+  w-full h-full overflow-hidden
+`;
+
+const NaverMapComponent = tw.div`
+  w-full h-full
+`;
 
 const ResultListContainer = tw.div`
   absolute left-0 right-0 bottom-20 z-10
@@ -370,23 +285,4 @@ const ResultListContainer = tw.div`
 
 const SwiperWrapper = tw.div`
   w-full max-w-md pointer-events-auto
-`;
-
-const RefreshButtonContainer = tw.div`
-  absolute top-20 z-10 absolute-center-x
-`;
-
-const RefreshButton = tw.button`
-  w-125 h-34 px-15 py-8
-  flex gap-4 items-center
-  bg-white border-none rounded-50
-  shadow-none
-  outline-none
-  cursor-pointer
-  z-10
-`;
-
-const RefreshButtonText = tw(RamenroadText)`
-  text-gray-700
-  whitespace-nowrap
 `;

@@ -8,14 +8,14 @@ import { useState } from "react";
 import styled from "@emotion/styled";
 import { useModal } from "../../hooks/common/useModal";
 import { Modal } from "../common/Modal";
-import { ImagePopup } from "../common/ImagePopup";
 import { useRamenyaReviewDeleteMutation } from "../../hooks/queries/useRamenyaReviewQuery";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "../../hooks/queries/queryKeys";
-import { useToast } from "../ToastProvider";
 import { useNavigate } from "react-router-dom";
 import { usePopup } from "../../hooks/common/usePopup";
 import { PopupType } from "../../types";
+import { useToast } from "../toast/ToastProvider";
+import { ImagePopup } from "../popup/ImagePopup";
 
 interface MyReviewCardProps<T extends boolean = false> {
   review: UserReview<T extends true ? ReviewType.MYPAGE : ReviewType.USER>;
@@ -25,7 +25,7 @@ interface MyReviewCardProps<T extends boolean = false> {
 
 const MAX_REVIEW_LENGTH = 94;
 
-export const UserReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
+const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
   const { review } = props;
 
   const navigate = useNavigate();
@@ -203,6 +203,8 @@ export const UserReviewCard = <T extends boolean = false>(props: MyReviewCardPro
     </ReviewCardWrapper>
   );
 };
+
+export default ReviewCard;
 
 const ReviewNameBox = tw.div`
     flex gap-10 items-center

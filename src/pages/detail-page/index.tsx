@@ -24,19 +24,19 @@ import emptyReview from "../../assets/images/empty-review.png";
 import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus, checkBusinessStatusSpecial } from "../../util";
 import { formatNumber } from "../../util/number";
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 import { useRamenyaReviewImagesQuery, useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { Modal } from "../../components/common/Modal";
 import { useModal } from "../../hooks/common/useModal";
 import { useSignInStore } from "../../states/sign-in";
-import { ReviewImage } from "../../components/common/ReviewImage";
-import { ImagePopup } from "../../components/common/ImagePopup";
-import { UserReviewCard } from "../../components/review/UserReviewCard";
+import { ReviewImage } from "../../components/review/ReviewImage";
+import { ImagePopup } from "../../components/popup/ImagePopup";
+import ReviewCard from "../../components/review/ReviewCard";
 import { Line } from "../../components/common/Line";
 import { useMobileState } from "../../hooks/common/useMobileState";
-import { RamenyaOpenStatus } from "../../components/common/RamenyaCard";
-import { DAY_MAP, OpenStatus } from "../../constants";
+import { RamenyaOpenStatus } from "../../components/ramenya-card/RamenyaCard";
+import { DAY_MAP, OpenStatus, WEEKDAYS_ORDER, WeekdaysOrderType } from "../../constants";
 import styled from "@emotion/styled";
 
 export const DetailPage = () => {
@@ -57,8 +57,28 @@ export const DetailPage = () => {
 
   // 오늘 요일 구하기
   const getCurrentDayIndex = () => {
-    const days = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-    return days[new Date().getDay()];
+    // JavaScript getDay(): 0=일요일, 1=월요일, 2=화요일, 3=수요일, 4=목요일, 5=금요일, 6=토요일
+    const dayIndex = new Date().getDay();
+    const dayMapping = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+    return dayMapping[dayIndex];
+  };
+
+  // 오늘을 기준으로 한 주의 순서로 정렬하는 함수
+  const sortBusinessHoursByCurrentDay = (
+    businessHours: { day: string; isOpen: boolean; operatingTime: string; breakTime?: string }[],
+  ) => {
+    const today = getCurrentDayIndex();
+
+    const todayIndex = WEEKDAYS_ORDER.indexOf(today as WeekdaysOrderType);
+
+    // 오늘부터 시작하는 새로운 순서 배열 생성
+    const reorderedDays = [...WEEKDAYS_ORDER.slice(todayIndex), ...WEEKDAYS_ORDER.slice(0, todayIndex)];
+
+    return businessHours.sort((a, b) => {
+      const aIndex = reorderedDays.indexOf(a.day as WeekdaysOrderType);
+      const bIndex = reorderedDays.indexOf(b.day as WeekdaysOrderType);
+      return aIndex - bIndex;
+    });
   };
 
   // 오늘 영업 시간 찾기
@@ -216,26 +236,31 @@ export const DetailPage = () => {
                           </BusinessHoursTime>
                         </BusinessHoursContainer>
                       ) : (
-                        ramenyaDetailQuery.data?.businessHours.map((businessHour) => (
-                          <BusinessHoursContainer
-                            key={businessHour.day}
-                            today={todayBusinessHour?.day === businessHour.day}
-                          >
-                            <BusinessHoursDay>{DAY_MAP[businessHour.day]}</BusinessHoursDay>
-                            <BusinessHoursTime>
-                              {businessHour.isOpen ? (
-                                <div key={businessHour.day}>
-                                  <div>{`${businessHour.operatingTime}`}</div>
-                                  {businessHour.breakTime && (
-                                    <div>{`${businessHour.breakTime} ${OpenStatus.BREAK}`}</div>
-                                  )}
-                                </div>
-                              ) : (
-                                <div>{`매주 ${DAY_MAP[businessHour.day]}요일 휴무`}</div>
-                              )}
-                            </BusinessHoursTime>
-                          </BusinessHoursContainer>
-                        ))
+                        sortBusinessHoursByCurrentDay(ramenyaDetailQuery.data?.businessHours || []).map(
+                          (businessHour) => (
+                            <BusinessHoursContainer
+                              key={businessHour.day}
+                              today={todayBusinessHour?.day === businessHour.day}
+                            >
+                              <BusinessHoursDay>{DAY_MAP[businessHour.day]}</BusinessHoursDay>
+                              <BusinessHoursTime>
+                                {businessHour.isOpen ? (
+                                  <div key={businessHour.day}>
+                                    <div>{`${businessHour.operatingTime}`}</div>
+                                    {businessHour.breakTime && (
+                                      <BreakTimeText>
+                                        <span>{businessHour.breakTime}</span>
+                                        <span>{OpenStatus.BREAK}</span>
+                                      </BreakTimeText>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <div>{`매주 휴무`}</div>
+                                )}
+                              </BusinessHoursTime>
+                            </BusinessHoursContainer>
+                          ),
+                        )
                       )}
                       {/* {!todayBusinessHour?.isOpen && (
                         <div>
@@ -308,7 +333,7 @@ export const DetailPage = () => {
                 .map((image: string, index: number) => (
                   <ImageBox key={index}>
                     <ReviewImage
-                      image={image}
+                      src={image}
                       onClick={() =>
                         handleOpenImagePopup(
                           index,
@@ -375,7 +400,7 @@ export const DetailPage = () => {
                     .slice(0, 3)
                     .map((review) => (
                       <>
-                        <UserReviewCard
+                        <ReviewCard
                           key={review._id}
                           review={review}
                           editable={userInformationQuery.data?._id === review.userId?._id}
@@ -551,6 +576,10 @@ const BusinessHoursDay = tw.span`
 
 const BusinessHoursTime = tw.div`
   flex flex-col gap-4
+`;
+
+const BreakTimeText = tw.div`
+  flex gap-4 items-center
 `;
 
 const PhoneNumberText = tw.div`
