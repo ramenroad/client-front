@@ -332,8 +332,6 @@ const ResultListOverlay = () => {
     {
       axis: "y",
       filterTaps: true,
-      bounds: { top: 0, bottom: 0 },
-      rubberband: true,
       preventDefault: true,
     },
   );
@@ -346,10 +344,9 @@ const ResultListOverlay = () => {
         height: isDragging ? `${debouncedHeight}px` : `${currentHeight}px`,
         transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
-      {...bind()}
     >
       {/* 드래그 핸들 */}
-      <DragHandle>
+      <DragHandle {...bind()}>
         <DragIndicator />
       </DragHandle>
 
@@ -407,6 +404,7 @@ const DragHandle = tw.div`
   w-full h-20 flex items-center justify-center
   cursor-grab active:cursor-grabbing
   touch-none select-none
+  touch-action-none
 `;
 
 const DragIndicator = tw.div`
