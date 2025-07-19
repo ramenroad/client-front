@@ -133,15 +133,15 @@ const MapPage = () => {
   }, []);
 
   // 지도 중심을 특정 위치로 이동
-  const handleMoveMapCenter = useCallback(
-    (latitude: number, longitude: number) => {
-      if (mapInstance) {
-        console.log("panTo", latitude, longitude);
-        mapInstance.panTo(new naver.maps.LatLng(latitude, longitude));
-      }
-    },
-    [mapInstance],
-  );
+  // const handleMoveMapCenter = useCallback(
+  //   (latitude: number, longitude: number) => {
+  //     if (mapInstance) {
+  //       console.log("panTo", latitude, longitude);
+  //       mapInstance.panTo(new naver.maps.LatLng(latitude, longitude));
+  //     }
+  //   },
+  //   [mapInstance],
+  // );
 
   return (
     <>
@@ -165,12 +165,12 @@ const MapPage = () => {
         />
 
         {/* 카드 오버레이 (기존 기능) */}
-        <ResultCardOverlay
+        {/* <ResultCardOverlay
           ramenyaList={ramenyaList?.ramenyas || []}
           selectedMarker={selectedMarker}
           onMarkerSelect={setSelectedMarker}
           onMoveMapCenter={handleMoveMapCenter}
-        />
+        /> */}
 
         {/* 리스트 오버레이 (드래그 가능한 새로운 컴포넌트) */}
         <ResultListOverlay />
@@ -204,6 +204,7 @@ interface ResultCardOverlayProps {
   onMoveMapCenter: (latitude: number, longitude: number) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ResultCardOverlay = ({
   ramenyaList,
   selectedMarker,
@@ -295,6 +296,9 @@ const ResultListOverlay = () => {
 
   const overlayRef = useRef<HTMLDivElement>(null);
 
+  // 드래그 임계값 (px) - 이 거리 이상 드래그해야 다음 단계로 이동
+  const DRAG_THRESHOLD = 30;
+
   // 드래그 시작
   const handleDragStart = useCallback(
     (clientY: number) => {
@@ -324,7 +328,7 @@ const ResultListOverlay = () => {
     [isDragging, startY, startHeight],
   );
 
-  // 드래그 종료 - 가장 가까운 3단계 중 하나로 스냅
+  // 개선된 드래그 종료 로직 - 방향과 거리를 고려한 스마트 스냅
   const handleDragEnd = useCallback(() => {
     if (!isDragging) return;
 
@@ -333,15 +337,37 @@ const ResultListOverlay = () => {
     if (!overlayRef.current) return;
 
     const currentHeightValue = parseFloat(overlayRef.current.style.height) || currentHeight;
+    const deltaY = startY - (startY - (currentHeightValue - startHeight)); // 실제 드래그 거리
+    const dragDistance = Math.abs(deltaY);
+    const isDragUp = deltaY > 0; // 위로 드래그했는지
 
-    // 3단계 높이 중 가장 가까운 것 찾기
-    const heights = [OVERLAY_HEIGHTS.COLLAPSED, OVERLAY_HEIGHTS.HALF, OVERLAY_HEIGHTS.EXPANDED];
-    const closestHeight = heights.reduce((prev, curr) =>
-      Math.abs(curr - currentHeightValue) < Math.abs(prev - currentHeightValue) ? curr : prev,
-    ) as OverlayHeightType;
+    let targetHeight = currentHeight; // 기본값은 현재 높이 유지
 
-    setCurrentHeight(closestHeight);
-  }, [isDragging, currentHeight]);
+    // 임계값 이상 드래그한 경우만 단계 변경
+    if (dragDistance >= DRAG_THRESHOLD) {
+      if (currentHeight === OVERLAY_HEIGHTS.COLLAPSED) {
+        // COLLAPSED에서 위로 드래그 시에만 HALF로
+        if (isDragUp) {
+          targetHeight = OVERLAY_HEIGHTS.HALF;
+        }
+      } else if (currentHeight === OVERLAY_HEIGHTS.HALF) {
+        // HALF에서 위로 드래그하면 EXPANDED, 아래로 드래그하면 COLLAPSED
+        if (isDragUp) {
+          targetHeight = OVERLAY_HEIGHTS.EXPANDED;
+        } else {
+          targetHeight = OVERLAY_HEIGHTS.COLLAPSED;
+        }
+      } else if (currentHeight === OVERLAY_HEIGHTS.EXPANDED) {
+        // EXPANDED에서 아래로 드래그 시에만 HALF로
+        if (!isDragUp) {
+          targetHeight = OVERLAY_HEIGHTS.HALF;
+        }
+      }
+    }
+
+    // 임계값에 미달하거나 잘못된 방향으로 드래그한 경우, 현재 단계 유지
+    setCurrentHeight(targetHeight);
+  }, [isDragging, currentHeight, startY, startHeight]);
 
   // 마우스 이벤트
   const handleMouseDown = useCallback(
@@ -399,6 +425,12 @@ const ResultListOverlay = () => {
           리스트 기능이 여기에 추가될 예정입니다.
           <br />
           현재 높이: {currentHeight}px
+          <br />
+          <small style={{ color: "#999" }}>
+            {currentHeight === OVERLAY_HEIGHTS.COLLAPSED && "위로 30px 이상 드래그하여 확장"}
+            {currentHeight === OVERLAY_HEIGHTS.HALF && "위/아래로 30px 이상 드래그하여 크기 조절"}
+            {currentHeight === OVERLAY_HEIGHTS.EXPANDED && "아래로 30px 이상 드래그하여 축소"}
+          </small>
         </div>
       </ListContentArea>
     </ListOverlayContainer>
