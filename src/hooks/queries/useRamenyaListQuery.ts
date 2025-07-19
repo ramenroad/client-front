@@ -7,6 +7,7 @@ import { useLocationStore } from "../../store/location/useLocationStore";
 import { calculateDistanceValue } from "../../util/number";
 import { OpenStatus } from "../../constants";
 import { getRamenyaListWithGeolocation, GetRamenyaListWithGeolocationParams } from "../../api/map";
+
 type QueryType = "region" | "genre";
 
 interface QueryParams {
@@ -77,10 +78,59 @@ export const useRamenyaListWithGeolocationQuery = ({
   latitude,
   longitude,
   radius,
-}: GetRamenyaListWithGeolocationParams) => {
+  filterOptions,
+}: GetRamenyaListWithGeolocationParams & { filterOptions?: FilterOptions }) => {
   return useQuery({
     ...queryKeys.ramenya.listWithGeolocation({ latitude, longitude, radius }),
     queryFn: () => getRamenyaListWithGeolocation({ latitude, longitude, radius }),
+    select: (data) => {
+      // 항상 Ramenya[]를 반환하도록 수정
+      let filtered = data.ramenyas;
+
+      if (!filterOptions) return filtered;
+
+      if (filterOptions.isOpen) {
+        filtered = filtered.filter((ramenya) => checkBusinessStatus(ramenya.businessHours).status === OpenStatus.OPEN);
+      }
+
+      if (filterOptions.genre.length > 0) {
+        filtered = filtered.filter((ramenya) =>
+          filterOptions.genre.every((selectedGenre) => ramenya.genre.includes(selectedGenre)),
+        );
+      }
+
+      if (filterOptions.sort === SortType.DISTANCE) {
+        return [...filtered].sort(
+          (a, b) =>
+            calculateDistanceValue(
+              {
+                latitude,
+                longitude,
+              },
+              {
+                latitude: a.latitude,
+                longitude: a.longitude,
+              },
+            ) -
+            calculateDistanceValue(
+              {
+                latitude,
+                longitude,
+              },
+              {
+                latitude: b.latitude,
+                longitude: b.longitude,
+              },
+            ),
+        );
+      }
+
+      if (filterOptions.sort === SortType.RATING) {
+        return [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      }
+
+      return filtered ?? [];
+    },
     enabled: !!latitude && !!longitude && !!radius,
   });
 };

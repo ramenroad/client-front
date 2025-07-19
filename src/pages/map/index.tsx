@@ -11,8 +11,11 @@ import { IconRefresh } from "../../components/Icon";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import "swiper/css";
-import { OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
+import { initialFilterOptions, OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
 import { useDrag } from "@use-gesture/react";
+import FilterSection from "../../components/filter/FilterSection";
+import { useSessionStorage } from "usehooks-ts";
+import { FilterOptions } from "../../types/filter";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -21,7 +24,15 @@ const MapPage = () => {
     radius: 0,
   });
 
-  const { data: ramenyaList } = useRamenyaListWithGeolocationQuery(currentGeolocation);
+  const [filterOptions, setFilterOptions] = useSessionStorage<FilterOptions>(
+    "mapPageFilterOptions",
+    initialFilterOptions,
+  );
+
+  const { data: ramenyaList } = useRamenyaListWithGeolocationQuery({
+    ...currentGeolocation,
+    filterOptions: filterOptions,
+  });
   const [selectedMarker, setSelectedMarker] = useState<Ramenya | null>(null);
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
 
@@ -152,7 +163,7 @@ const MapPage = () => {
         <NaverMap<Ramenya>
           onMapReady={handleMapReady}
           onMapCenterChange={handleMapCenterChange}
-          markers={ramenyaList?.ramenyas.map((ramenya) => ({
+          markers={ramenyaList?.map((ramenya) => ({
             position: {
               lat: ramenya.latitude,
               lng: ramenya.longitude,
@@ -174,10 +185,12 @@ const MapPage = () => {
 
         {/* 리스트 오버레이 (드래그 가능한 새로운 컴포넌트) */}
         <ResultListOverlay
-          ramenyaList={ramenyaList?.ramenyas || []}
+          ramenyaList={ramenyaList || []}
           selectedMarker={selectedMarker}
           onMarkerSelect={setSelectedMarker}
           onMoveMapCenter={handleMoveMapCenter}
+          filterOptions={filterOptions}
+          setFilterOptions={setFilterOptions}
         />
       </MapScreen>
       <AppBar />
@@ -207,6 +220,8 @@ interface ResultOverlayProps {
   selectedMarker: Ramenya | null;
   onMarkerSelect: (marker: Ramenya) => void;
   onMoveMapCenter: (latitude: number, longitude: number) => void;
+  filterOptions: FilterOptions;
+  setFilterOptions: (filterOptions: FilterOptions) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -288,7 +303,7 @@ const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMove
   );
 };
 
-const ResultListOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
+const ResultListOverlay = ({ ramenyaList, filterOptions, setFilterOptions }: ResultOverlayProps) => {
   const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.COLLAPSED);
   const [isDragging, setIsDragging] = useState(false);
   const [tempHeight, setTempHeight] = useState<number>(OVERLAY_HEIGHTS.COLLAPSED);
@@ -339,7 +354,7 @@ const ResultListOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMove
   return (
     <ResultListOverlayContainer
       ref={overlayRef}
-      className="absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden"
+      className="absolute bottom-0 left-0 right-0 z-100 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden"
       style={{
         height: isDragging ? `${tempHeight}px` : `${currentHeight}px`,
         transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -350,10 +365,16 @@ const ResultListOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMove
         <DragIndicator />
       </DragHandle>
 
+      <FilterSection
+        sessionStorageKey="mapPageFilterOptions"
+        filterOptions={filterOptions}
+        onFilterChange={setFilterOptions}
+      />
+
       {/* 콘텐츠 영역 */}
       <ListContentArea
         style={{
-          height: isDragging ? `${tempHeight - 80}px` : `${currentHeight - 80}px`, // 드래그 핸들 높이(80px) 제외
+          height: isDragging ? `${tempHeight - 10}px` : `${currentHeight - 10}px`,
           overflowY: "auto",
         }}
       >
@@ -411,7 +432,7 @@ const DragIndicator = tw.div`
 `;
 
 const ListContentArea = tw.div`
-  flex-1 px-10 pb-20
+  flex-1
 `;
 
 const ResultListOverlayContainer = tw.div`
