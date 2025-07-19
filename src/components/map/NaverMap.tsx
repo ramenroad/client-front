@@ -1,11 +1,8 @@
 /// <reference types="navermaps" />
 
-import { ReactNode, useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useGeolocation } from "../../hooks/common/useGeolocation";
 import tw from "twin.macro";
-import { Swiper, SwiperSlide } from "swiper/react";
-import SwiperCore from "swiper";
-import "swiper/css";
 
 export interface NaverMapProps<T = unknown> {
   markers?: {
@@ -18,14 +15,12 @@ export interface NaverMapProps<T = unknown> {
   }[];
   onMarkerClick?: (markerData: T) => void;
   selectedMarker?: T | null;
-  resultList?: { element: ReactNode; data: T }[];
   onMapReady?: (map: naver.maps.Map) => void;
   onMapCenterChange?: (map: naver.maps.Map) => void;
 }
 
 export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
-  const swiperRef = useRef<SwiperCore>();
 
   // 첫 렌더링 때 위치 가져오기
   const { latitude, longitude } = useGeolocation({
@@ -207,64 +202,9 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
     }
   }, [mapInstance, props.markers, props.selectedMarker]);
 
-  useEffect(() => {
-    if (!props.selectedMarker || !props.resultList) return;
-
-    // resultList에서 selectedMarker에 해당하는 인덱스 찾기
-    const idx = props.resultList.findIndex((item) => item.data === props.selectedMarker);
-
-    if (idx >= 0 && swiperRef.current) {
-      if (swiperRef.current.slideToLoop) {
-        swiperRef.current.slideToLoop(idx);
-      } else {
-        swiperRef.current.slideTo(idx);
-      }
-    }
-  }, [props.selectedMarker, props.resultList]);
-
   return (
     <MapWrapper>
       <NaverMapComponent id="map" />
-
-      <ResultListContainer>
-        <SwiperWrapper>
-          {props.resultList && props.resultList.length > 0 && (
-            <Swiper
-              onSwiper={(swiper) => {
-                swiperRef.current = swiper;
-              }}
-              key={props.resultList[0]?.toString()}
-              onSlideChangeTransitionEnd={(swiper) => {
-                const currentData = props.resultList?.[swiper.realIndex]?.data;
-
-                if (!currentData) return;
-                props.onMarkerClick?.(currentData);
-
-                if (currentData && props.markers && mapInstance) {
-                  // id로 해당 마커 데이터 찾기
-                  const marker = props.markers.find((m) => m.data === currentData);
-                  if (marker) {
-                    // 지도 중심 이동
-                    console.log("panTo", marker.position.lat, marker.position.lng);
-                    mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
-                  }
-                }
-              }}
-              slidesPerView={1.1}
-              loop
-              spaceBetween={10}
-              style={{
-                width: "100%",
-                minHeight: "120px",
-              }}
-            >
-              {props.resultList.map((result, index) => (
-                <SwiperSlide key={index}>{result.element}</SwiperSlide>
-              ))}
-            </Swiper>
-          )}
-        </SwiperWrapper>
-      </ResultListContainer>
     </MapWrapper>
   );
 };
@@ -275,14 +215,4 @@ const MapWrapper = tw.article`
 
 const NaverMapComponent = tw.div`
   w-full h-full
-`;
-
-const ResultListContainer = tw.div`
-  absolute left-0 right-0 bottom-20 z-10
-  flex justify-center w-full pointer-events-none
-  pl-10
-`;
-
-const SwiperWrapper = tw.div`
-  w-full max-w-md pointer-events-auto
 `;

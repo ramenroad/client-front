@@ -1,13 +1,16 @@
 import tw from "twin.macro";
 import AppBar from "../../components/app-bar";
 import { NaverMap } from "../../components/map/NaverMap";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { GetRamenyaListWithGeolocationParams } from "../../api/map";
 import { useRamenyaListWithGeolocationQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { Ramenya } from "../../types";
 import RamenyaCard from "../../components/ramenya-card/RamenyaCard";
 import { RamenroadText } from "../../components/common/RamenroadText";
 import { IconRefresh } from "../../components/Icon";
+import { Swiper, SwiperSlide } from "swiper/react";
+import SwiperCore from "swiper";
+import "swiper/css";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -22,6 +25,8 @@ const MapPage = () => {
 
   // throttling을 위한 ref
   const throttleRef = useRef<NodeJS.Timeout | null>(null);
+  // Swiper 인스턴스 ref
+  const swiperRef = useRef<SwiperCore>();
 
   // 지도 중심 좌표 계산 함수
   const calculateMapCenter = useCallback((map: naver.maps.Map) => {
@@ -124,9 +129,40 @@ const MapPage = () => {
   );
 
   const handleMarkerClick = useCallback((markerData: Ramenya) => {
-    setSelectedMarker(null);
     setSelectedMarker(markerData);
   }, []);
+
+  // Swiper 슬라이드 변경 시 지도 중심 이동
+  const handleSwiperSlideChange = useCallback(
+    (swiper: SwiperCore) => {
+      const currentData = ramenyaList?.ramenyas[swiper.realIndex];
+
+      if (!currentData || !mapInstance) return;
+
+      // 선택된 마커 업데이트
+      setSelectedMarker(currentData);
+
+      // 지도 중심을 해당 마커로 이동
+      console.log("panTo", currentData.latitude, currentData.longitude);
+      mapInstance.panTo(new naver.maps.LatLng(currentData.latitude, currentData.longitude));
+    },
+    [ramenyaList?.ramenyas, mapInstance],
+  );
+
+  // 선택된 마커가 변경될 때마다 Swiper 동기화
+  useEffect(() => {
+    if (!selectedMarker || !ramenyaList?.ramenyas || !swiperRef.current) return;
+
+    const idx = ramenyaList.ramenyas.findIndex((ramenya) => ramenya._id === selectedMarker._id);
+
+    if (idx >= 0) {
+      if (swiperRef.current.slideToLoop) {
+        swiperRef.current.slideToLoop(idx);
+      } else {
+        swiperRef.current.slideTo(idx);
+      }
+    }
+  }, [selectedMarker, ramenyaList?.ramenyas]);
 
   return (
     <>
@@ -147,28 +183,49 @@ const MapPage = () => {
           }))}
           selectedMarker={selectedMarker}
           onMarkerClick={handleMarkerClick}
-          resultList={ramenyaList?.ramenyas.map((ramenya) => ({
-            id: ramenya._id,
-            data: ramenya,
-            element: (
-              <RamenyaCard
-                key={ramenya._id}
-                isMapCard={true}
-                _id={ramenya._id}
-                name={ramenya.name}
-                rating={ramenya.rating}
-                latitude={ramenya.latitude}
-                longitude={ramenya.longitude}
-                address={ramenya.address}
-                businessHours={ramenya.businessHours}
-                genre={ramenya.genre}
-                reviewCount={ramenya.reviewCount}
-                thumbnailUrl={ramenya.thumbnailUrl}
-                width={"350px"}
-              />
-            ),
-          }))}
         />
+
+        {/* 하단 결과 리스트 */}
+        <ResultListContainer>
+          <SwiperWrapper>
+            {ramenyaList?.ramenyas && ramenyaList.ramenyas.length > 0 && (
+              <Swiper
+                onSwiper={(swiper) => {
+                  swiperRef.current = swiper;
+                }}
+                key={ramenyaList.ramenyas[0]?._id}
+                onSlideChangeTransitionEnd={handleSwiperSlideChange}
+                slidesPerView={1.1}
+                loop
+                spaceBetween={10}
+                style={{
+                  width: "100%",
+                  minHeight: "120px",
+                }}
+              >
+                {ramenyaList.ramenyas.map((ramenya, index) => (
+                  <SwiperSlide key={index}>
+                    <RamenyaCard
+                      key={ramenya._id}
+                      isMapCard={true}
+                      _id={ramenya._id}
+                      name={ramenya.name}
+                      rating={ramenya.rating}
+                      latitude={ramenya.latitude}
+                      longitude={ramenya.longitude}
+                      address={ramenya.address}
+                      businessHours={ramenya.businessHours}
+                      genre={ramenya.genre}
+                      reviewCount={ramenya.reviewCount}
+                      thumbnailUrl={ramenya.thumbnailUrl}
+                      width={"350px"}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            )}
+          </SwiperWrapper>
+        </ResultListContainer>
       </MapScreen>
       <AppBar />
     </>
@@ -213,6 +270,16 @@ const RefreshButtonText = tw(RamenroadText)`
 
 const MapScreen = tw.main`
   w-full h-[calc(100vh-56px)] relative
+`;
+
+const ResultListContainer = tw.div`
+  absolute left-0 right-0 bottom-20 z-10
+  flex justify-center w-full pointer-events-none
+  pl-10
+`;
+
+const SwiperWrapper = tw.div`
+  w-full max-w-md pointer-events-auto
 `;
 
 export default MapPage;
