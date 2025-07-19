@@ -13,7 +13,6 @@ import SwiperCore from "swiper";
 import "swiper/css";
 import { OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
 import { useDrag } from "@use-gesture/react";
-import { useDebounce } from "../../hooks/common/useDebounce";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -296,8 +295,7 @@ const ResultListOverlay = () => {
 
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // 디바운스된 높이 값 (드래그 중 부드러운 애니메이션을 위해)
-  const debouncedHeight = useDebounce(tempHeight, 50);
+  // 드래그 중 실시간 높이 변화를 위해 tempHeight 사용
 
   // 드래그 제스처 설정
   const bind = useDrag(
@@ -333,6 +331,8 @@ const ResultListOverlay = () => {
       axis: "y",
       filterTaps: true,
       preventDefault: true,
+      // 실시간 반응을 위한 설정
+      from: () => [0, currentHeight],
     },
   );
 
@@ -341,7 +341,7 @@ const ResultListOverlay = () => {
       ref={overlayRef}
       className="absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden"
       style={{
-        height: isDragging ? `${debouncedHeight}px` : `${currentHeight}px`,
+        height: isDragging ? `${tempHeight}px` : `${currentHeight}px`,
         transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
@@ -404,7 +404,7 @@ const DragHandle = tw.div`
   w-full h-20 flex items-center justify-center
   cursor-grab active:cursor-grabbing
   touch-none select-none
-  touch-action-none
+  touch-none
 `;
 
 const DragIndicator = tw.div`
