@@ -790,3 +790,21 @@ export const IconMarker = () => (
     </defs>
   </svg>
 );
+
+export const IconSearch = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16.625 17.375L13.2445 13.9945" stroke="#414141" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="8.5" cy="9.5" r="5.75" stroke="#414141" strokeWidth="1.5" />
+  </svg>
+);
+
+// export const IconLocate = () => (
+//   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+//     <rect width="16" height="16" fill="white" />
+//     <path
+//       d="M14 6.76136C14 9.94328 10.6667 13.0795 8 15C6 13.7197 2 9.94328 2 6.76136C2 3.57945 4.68629 1 8 1C11.3137 1 14 3.57945 14 6.76136Z"
+//       fill="#A0A0A0"
+//     />
+//     <circle cx="8" cy="7" r="1" fill="white" />
+//   </svg>
+// );

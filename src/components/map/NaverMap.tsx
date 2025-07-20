@@ -1,7 +1,6 @@
 /// <reference types="navermaps" />
 
-import { useEffect, useState } from "react";
-import { useGeolocation } from "../../hooks/common/useGeolocation";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import tw from "twin.macro";
 
 export interface NaverMapProps<T = unknown> {
@@ -19,105 +18,9 @@ export interface NaverMapProps<T = unknown> {
   onMapCenterChange?: (map: naver.maps.Map) => void;
 }
 
-export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
-  const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
-
-  // 첫 렌더링 때 위치 가져오기
-  const { latitude, longitude } = useGeolocation({
-    enableHighAccuracy: true,
-    timeout: 10000,
-    maximumAge: 600000,
-    autoFetch: true,
-  });
-
-  useEffect(() => {
-    const initMap = () => {
-      if (typeof naver !== "undefined" && naver.maps) {
-        console.log("네이버 지도 API 로드 완료:", naver);
-        try {
-          // 사용자 위치가 있으면 해당 위치로, 없으면 서울 시청으로 기본 설정
-          const center =
-            latitude && longitude
-              ? new naver.maps.LatLng(latitude, longitude)
-              : new naver.maps.LatLng(37.566826, 126.9786567);
-
-          const map = new naver.maps.Map("map", {
-            center: center,
-            zoom: 15,
-          });
-
-          // 사용자 위치에 마커 추가
-          if (latitude && longitude) {
-            const marker = new naver.maps.Marker({
-              position: new naver.maps.LatLng(latitude, longitude),
-              map: map,
-              icon: {
-                content:
-                  '<div style="background: #4285f4; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>',
-                anchor: new naver.maps.Point(6, 6),
-              },
-            });
-
-            console.log("사용자 위치 마커 생성:", marker);
-          }
-
-          // 지도 중심 변경 이벤트 리스너 추가
-          naver.maps.Event.addListener(map, "center_changed", () => {
-            props.onMapCenterChange?.(map);
-          });
-
-          setMapInstance(map);
-          props.onMapReady?.(map);
-          console.log("지도 생성 완료:", map);
-        } catch (error) {
-          console.error("지도 생성 실패:", error);
-        }
-      } else {
-        console.log("네이버 지도 API 로드 대기 중...");
-        setTimeout(initMap, 100);
-      }
-    };
-
-    initMap();
-  }, [latitude, longitude]);
-
-  // 위치가 업데이트되면 지도 중심점 변경
-  useEffect(() => {
-    if (mapInstance && latitude && longitude) {
-      const newCenter = new naver.maps.LatLng(latitude, longitude);
-      mapInstance.setCenter(newCenter);
-    }
-  }, [mapInstance, latitude, longitude]);
-
-  // 마커 인스턴스들을 저장할 배열
-  const [markerInstances, setMarkerInstances] = useState<naver.maps.Marker[]>([]);
-
-  useEffect(() => {
-    if (props.markers && mapInstance) {
-      // 기존 마커들 제거
-      markerInstances.forEach((marker) => {
-        marker.setMap(null);
-      });
-
-      // 새로운 마커들 생성
-      const newMarkerInstances: naver.maps.Marker[] = [];
-
-      props.markers.forEach((marker) => {
-        // 커스텀 마커 생성 (텍스트 포함)
-        const markerInstance = new naver.maps.Marker({
-          map: mapInstance,
-          position: new naver.maps.LatLng(marker.position.lat, marker.position.lng),
-          icon: {
-            content: `
-              <div style="
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-              ">
-              ${
-                props.selectedMarker !== marker.data
-                  ? `
-                <svg width="38" height="45" viewBox="0 0 38 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+// 마커 아이콘 SVG를 상수로 분리
+const NORMAL_MARKER_SVG = `
+<svg width="38" height="45" viewBox="0 0 38 45" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_d_2082_2994)">
 <path d="M19 5.5C24.5287 5.5 28.988 9.73696 28.999 15.5078C28.9216 18.0186 27.5785 20.9563 25.7627 23.7744C23.965 26.5645 21.7963 29.0996 20.2539 30.7715C19.5637 31.5193 18.436 31.5202 17.7441 30.7725C16.1783 29.0799 13.9685 26.5077 12.1562 23.7041C10.32 20.8633 9 17.9468 9 15.5293C9.00001 9.74748 13.4644 5.5 19 5.5Z" fill="#FF5E00" stroke="white" stroke-width="2"/>
 <ellipse cx="19" cy="15.6693" rx="3" ry="3.04622" fill="white"/>
@@ -134,9 +37,10 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2082_2994" result="shape"/>
 </filter>
 </defs>
-</svg>
-`
-                  : `<svg width="56" height="67" viewBox="0 0 56 67" fill="none" xmlns="http://www.w3.org/2000/svg">
+</svg>`;
+
+const SELECTED_MARKER_SVG = `
+<svg width="56" height="67" viewBox="0 0 56 67" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g filter="url(#filter0_d_2082_3501)">
 <path d="M28 5.25C38.372 5.25 46.7419 13.1815 46.749 23.9531C46.5918 28.9374 43.7778 34.7253 40.1855 40.0918C36.6176 45.422 32.4158 50.1436 29.7549 52.9453C28.7822 53.9692 27.2179 53.9702 26.2422 52.9453C23.5431 50.1094 19.2629 45.3141 15.665 39.9561C12.0315 34.5448 9.25 28.7835 9.25 23.9668C9.25004 13.1882 17.6236 5.25 28 5.25Z" fill="#FF5E00" stroke="white" stroke-width="2.5"/>
 <mask id="path-3-inside-1_2082_3501" fill="white">
@@ -160,47 +64,277 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2082_3501" result="shape"/>
 </filter>
 </defs>
-</svg>
-`
-              }
-                                  ${
-                                    marker.title
-                                      ? `
-                    <div style="
-                     font-size: 12px;
-                     font-weight: 600;
-                     color: #333;
-                     white-space: nowrap;
-                     margin-top: -10px;
-                     max-width: 120px;
-                     overflow: hidden;
-                     text-overflow: ellipsis;
-                     text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
-                   ">${marker.title}</div>
-                 `
-                                      : ""
-                                  }
-              </div>
-            `,
-            anchor: new naver.maps.Point(12, 12),
-          },
-          clickable: true,
-        });
+</svg>`;
 
-        // 마커 클릭 이벤트 리스너 추가
-        naver.maps.Event.addListener(markerInstance, "click", () => {
-          // 해당 마커 위치로 지도 중심 이동
-          mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
-          props.onMarkerClick?.(marker.data);
-        });
+const USER_POSITION_MARKER = `
+<div style="position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                  <!-- 애니메이션 원들 -->
+                  <div style="
+                    position: absolute;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: rgba(66, 133, 244, 0.3);
+                    animation: pulse 2s infinite;
+                  "></div>
+                  <div style="
+                    position: absolute;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: rgba(66, 133, 244, 0.2);
+                    animation: pulse 2s infinite 0.5s;
+                  "></div>
+                  <div style="
+                    position: absolute;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    background: rgba(66, 133, 244, 0.1);
+                    animation: pulse 2s infinite 1s;
+                  "></div>
+                  <!-- 메인 마커 -->
+                  <div style="
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    background: #4285f4;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    z-index: 1;
+                  "></div>
+                </div>
+                <style>
+                  @keyframes pulse {
+                    0% {
+                      transform: scale(0.8);
+                      opacity: 1;
+                    }
+                    100% {
+                      transform: scale(1.2);
+                      opacity: 0;
+                    }
+                  }
+                </style>
+`;
 
-        newMarkerInstances.push(markerInstance);
+export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
+  const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // 마커 인스턴스들과 데이터 매핑을 위한 Map 사용
+  const markersMapRef = useRef<Map<string, { instance: naver.maps.Marker; data: T }>>(new Map());
+
+  // 위치 권한 요청과 위치 가져오기 함수들
+  const requestLocationPermission = useCallback(async (): Promise<boolean> => {
+    try {
+      if (!navigator.geolocation) {
+        return false;
+      }
+
+      if ("permissions" in navigator) {
+        const permission = await navigator.permissions.query({ name: "geolocation" });
+        if (permission.state === "denied") return false;
+        if (permission.state === "granted") return true;
+      }
+
+      // 권한 확인을 위해 위치 요청 시도
+      return new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          () => resolve(true),
+          () => resolve(false),
+          { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 },
+        );
+      });
+    } catch (error) {
+      console.error("위치 권한 확인 실패:", error);
+      return false;
+    }
+  }, []);
+
+  const getUserPosition = useCallback(async (): Promise<{ latitude: number; longitude: number } | null> => {
+    if (!navigator.geolocation) {
+      return null;
+    }
+
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 600000,
+        });
       });
 
-      // 새로운 마커 인스턴스들 저장
-      setMarkerInstances(newMarkerInstances);
+      return {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+      };
+    } catch (_error) {
+      console.error("위치 가져오기 실패:", _error);
+      return null;
     }
-  }, [mapInstance, props.markers, props.selectedMarker]);
+  }, []);
+
+  // 마커 아이콘 생성 함수 메모화
+  const createMarkerIcon = useCallback((isSelected: boolean, title?: string) => {
+    const markerSvg = isSelected ? SELECTED_MARKER_SVG : NORMAL_MARKER_SVG;
+
+    return {
+      content: `
+        <div style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        ">
+          ${markerSvg}
+          ${
+            title
+              ? `
+            <div style="
+              font-size: 12px;
+              font-weight: 600;
+              color: #333;
+              white-space: nowrap;
+              margin-top: -10px;
+              max-width: 120px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+            ">${title}</div>
+          `
+              : ""
+          }
+        </div>
+      `,
+      anchor: new naver.maps.Point(12, 12),
+    };
+  }, []);
+
+  // 지도 초기화 (한번만 실행)
+  useEffect(() => {
+    if (isInitialized) return;
+
+    const initMap = async () => {
+      if (typeof naver === "undefined" || !naver.maps) {
+        setTimeout(initMap, 100);
+        return;
+      }
+
+      try {
+        // 위치 권한 요청
+        const granted = await requestLocationPermission();
+        let userPosition = null;
+
+        if (granted) {
+          userPosition = await getUserPosition();
+        }
+
+        // 지도 중심 설정 (사용자 위치 or 서울 시청)
+        const center =
+          userPosition && userPosition.latitude && userPosition.longitude
+            ? new naver.maps.LatLng(userPosition.latitude, userPosition.longitude)
+            : new naver.maps.LatLng(37.566826, 126.9786567);
+
+        const map = new naver.maps.Map("map", {
+          center: center,
+          zoom: 14,
+        });
+
+        // 사용자 위치 마커 추가 (권한 허용된 경우만)
+        if (userPosition && userPosition.latitude && userPosition.longitude) {
+          new naver.maps.Marker({
+            position: new naver.maps.LatLng(userPosition.latitude, userPosition.longitude),
+            map: map,
+            icon: {
+              content: USER_POSITION_MARKER,
+              anchor: new naver.maps.Point(20, 20),
+            },
+          });
+        }
+
+        // 지도 중심 변경 이벤트 리스너 (디바운스 적용)
+        let centerChangeTimeout: NodeJS.Timeout;
+        naver.maps.Event.addListener(map, "center_changed", () => {
+          clearTimeout(centerChangeTimeout);
+          centerChangeTimeout = setTimeout(() => {
+            props.onMapCenterChange?.(map);
+          }, 300);
+        });
+
+        setMapInstance(map);
+        setIsInitialized(true);
+        props.onMapReady?.(map);
+        console.log("지도 초기화 완료");
+      } catch (error) {
+        console.error("지도 초기화 실패:", error);
+      }
+    };
+
+    initMap();
+  }, [isInitialized]);
+
+  // 마커 목록 변경 시에만 마커 생성/삭제 (selectedMarker 제외)
+  const markersKey = useMemo(() => {
+    return props.markers?.map((m) => `${m.position.lat}-${m.position.lng}-${JSON.stringify(m.data)}`).join(",") || "";
+  }, [props.markers]);
+
+  useEffect(() => {
+    if (!mapInstance || !props.markers) return;
+
+    console.log("마커 업데이트 시작");
+
+    // 기존 마커들 정리
+    markersMapRef.current.forEach((marker) => {
+      marker.instance.setMap(null);
+    });
+    markersMapRef.current.clear();
+
+    // 새로운 마커들 생성
+    props.markers.forEach((marker, index) => {
+      const isSelected = props.selectedMarker === marker.data;
+      const markerKey = `marker-${index}`;
+
+      const markerInstance = new naver.maps.Marker({
+        map: mapInstance,
+        position: new naver.maps.LatLng(marker.position.lat, marker.position.lng),
+        icon: createMarkerIcon(isSelected, marker.title),
+        clickable: true,
+      });
+
+      // 마커 클릭 이벤트
+      naver.maps.Event.addListener(markerInstance, "click", () => {
+        mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
+        props.onMarkerClick?.(marker.data);
+      });
+
+      // 마커 저장
+      markersMapRef.current.set(markerKey, {
+        instance: markerInstance,
+        data: marker.data,
+      });
+    });
+
+    console.log(`${props.markers.length}개 마커 생성 완료`);
+  }, [mapInstance, markersKey, createMarkerIcon]);
+
+  // selectedMarker 변경 시에만 마커 아이콘 업데이트 (마커를 다시 생성하지 않음)
+  useEffect(() => {
+    if (!mapInstance || !props.markers) return;
+
+    console.log("선택된 마커 업데이트");
+
+    props.markers.forEach((marker, index) => {
+      const markerKey = `marker-${index}`;
+      const markerInfo = markersMapRef.current.get(markerKey);
+
+      if (markerInfo) {
+        const isSelected = props.selectedMarker === marker.data;
+        const newIcon = createMarkerIcon(isSelected, marker.title);
+        markerInfo.instance.setIcon(newIcon);
+      }
+    });
+  }, [props.selectedMarker, props.markers, createMarkerIcon]);
 
   return (
     <MapWrapper>

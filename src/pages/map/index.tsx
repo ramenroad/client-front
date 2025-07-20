@@ -1,21 +1,29 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, useMemo, ComponentProps } from "react";
 import tw from "twin.macro";
 import AppBar from "../../components/app-bar";
 import { NaverMap } from "../../components/map/NaverMap";
-import { GetRamenyaListWithGeolocationParams } from "../../api/map";
-import { useRamenyaListWithGeolocationQuery } from "../../hooks/queries/useRamenyaListQuery";
+import { GetRamenyaListWithGeolocationParams, getRamenyaListWithSearch } from "../../api/map";
+import {
+  useRamenyaListWithGeolocationQuery,
+  useRamenyaSearchAutoCompleteQuery,
+} from "../../hooks/queries/useRamenyaListQuery";
 import { Ramenya } from "../../types";
 import RamenyaCard from "../../components/ramenya-card/RamenyaCard";
 import { RamenroadText } from "../../components/common/RamenroadText";
-import { IconRefresh } from "../../components/Icon";
+import { IconBack, IconClose, IconLocate, IconRefresh, IconSearch } from "../../components/Icon";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import "swiper/css";
-import { initialFilterOptions, OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
+import { initialFilterOptions, MAP_MODE, MapModeType, OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
 import { useDrag } from "@use-gesture/react";
 import FilterSection from "../../components/filter/FilterSection";
 import { useSessionStorage } from "usehooks-ts";
 import { FilterOptions } from "../../types/filter";
+import { Line } from "../../components/common/Line";
+import { getTextMatch } from "../../util";
+import { useSearchHistoryQuery } from "../../hooks/queries/useSearchQuery";
+import NoStoreBox from "../../components/no-data/NoStoreBox";
+import { useRemoveSearchHistoryMutation } from "../../hooks/mutation/useSearchHistoryMutation";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -29,73 +37,57 @@ const MapPage = () => {
     initialFilterOptions,
   );
 
-  const { data: ramenyaList } = useRamenyaListWithGeolocationQuery({
+  // 위치 기반 라면야 목록 쿼리
+  const { ramenyaListWithGeolocationQuery } = useRamenyaListWithGeolocationQuery({
     ...currentGeolocation,
     filterOptions: filterOptions,
   });
+
+  const [ramenyaList, setRamenyaList] = useState<Ramenya[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<Ramenya | null>(null);
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
+  const [searchValue, setSearchValue] = useState("");
 
-  // throttling을 위한 ref
-  const throttleRef = useRef<NodeJS.Timeout | null>(null);
+  // 초기화 완료 플래그
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // 지도 중심 좌표 계산 함수
+  const mapMode = useMemo<MapModeType>(() => {
+    if (selectedMarker) return MAP_MODE.CARD;
+    return MAP_MODE.LIST;
+  }, [selectedMarker]);
+
+  // 지도 중심 좌표 계산 함수 메모화
   const calculateMapCenter = useCallback((map: naver.maps.Map) => {
     const currentCenter = map.getCenter() as naver.maps.LatLng;
-    const zoom = map.getZoom();
     const latitude = currentCenter.lat();
     const longitude = currentCenter.lng();
 
     // 네이버 포럼에서 제공하는 정확한 픽셀당 거리 계산 방법
     const projection = map.getProjection();
-
-    // 현재 디바이스의 세로 길이 픽셀 가져오기
     const deviceHeight = window.innerHeight;
     const halfDeviceHeight = Math.round(deviceHeight / 2);
 
-    // 중심점에서 1px, 디바이스 세로 길이의 절반만큼 떨어진 지점의 실제 거리 계산
     const p1 = new naver.maps.Point(0, 0);
-    const p2 = new naver.maps.Point(1, 0); // 1px
-    const p3 = new naver.maps.Point(halfDeviceHeight, 0); // 디바이스 세로 길이의 절반
+    const p3 = new naver.maps.Point(halfDeviceHeight, 0);
 
     const c1 = projection.fromOffsetToCoord(p1);
-    const c2 = projection.fromOffsetToCoord(p2);
     const c3 = projection.fromOffsetToCoord(p3);
 
-    const dist1px = projection.getDistance(c1, c2);
     const distHalfHeight = projection.getDistance(c1, c3);
-
-    // 화면 중심에서 가장자리까지의 거리 (반경)
     const radiusInMeters = Math.round(distHalfHeight);
 
-    const centerInfo = {
+    return {
       latitude,
       longitude,
-      zoom,
-      deviceHeight,
-      halfDeviceHeight,
-      dist1px: dist1px.toFixed(4),
-      distHalfHeight: Math.round(distHalfHeight),
       radiusInMeters,
     };
-
-    console.log("현재 지도 중심 좌표:", centerInfo);
-    console.log(`줌 레벨 ${zoom}`);
-    console.log(`- 디바이스 세로 길이: ${deviceHeight}px`);
-    console.log(`- 계산 기준 (세로 절반): ${halfDeviceHeight}px`);
-    console.log(`- 1px당 거리: ${dist1px.toFixed(4)}m`);
-    console.log(`- ${halfDeviceHeight}px 거리: ${Math.round(distHalfHeight)}m`);
-    console.log(
-      `- 화면 반경: ${radiusInMeters >= 1000 ? (radiusInMeters / 1000).toFixed(1) + "km" : radiusInMeters + "m"}`,
-    );
-
-    return centerInfo;
   }, []);
 
-  // 위치 데이터 업데이트 함수
+  // 위치 데이터 업데이트 함수 - 메모화
   const updateLocationData = useCallback(
     (map: naver.maps.Map) => {
       const centerInfo = calculateMapCenter(map);
+
       setCurrentGeolocation({
         latitude: centerInfo.latitude,
         longitude: centerInfo.longitude,
@@ -105,98 +97,455 @@ const MapPage = () => {
     [calculateMapCenter],
   );
 
-  // 현재 지도 중심 좌표 가져오기 및 데이터 refetch (수동)
-  const handleRefreshLocation = useCallback(() => {
-    if (mapInstance) {
-      updateLocationData(mapInstance);
-    } else {
-      console.log("지도가 아직 로드되지 않았습니다.");
-    }
-  }, [mapInstance, updateLocationData]);
-
-  // 지도 중심이 변경될 때 호출되는 함수 (자동 refetch with throttling)
-  const handleMapCenterChange = useCallback(
-    (map: naver.maps.Map) => {
-      // 기존 throttle이 있으면 취소
-      if (throttleRef.current) {
-        clearTimeout(throttleRef.current);
-      }
-
-      // 1초 후에 데이터 업데이트 (throttling)
-      throttleRef.current = setTimeout(() => {
-        updateLocationData(map);
-      }, 1000);
-    },
-    [updateLocationData],
-  );
-
+  // 지도 준비 완료 핸들러
   const handleMapReady = useCallback(
     (map: naver.maps.Map) => {
       setMapInstance(map);
-      // 지도가 준비되면 초기 위치 데이터 가져오기
-      updateLocationData(map);
+      // 지도가 준비되면 초기 위치 데이터 가져오기 (한 번만)
+      if (!isInitialized) {
+        updateLocationData(map);
+        setIsInitialized(true);
+      }
     },
-    [updateLocationData],
+    [updateLocationData, isInitialized],
   );
 
-  const handleMarkerClick = useCallback((markerData: Ramenya) => {
-    setSelectedMarker(markerData);
-  }, []);
+  // 현재 지도 중심 좌표 가져오기 및 데이터 refetch (수동 새로고침)
+  const handleRefreshLocation = useCallback(async () => {
+    if (!mapInstance) {
+      console.log("지도가 아직 로드되지 않았습니다.");
+      return;
+    }
+
+    updateLocationData(mapInstance);
+    setSelectedMarker(null);
+
+    if (searchValue === "") {
+      ramenyaListWithGeolocationQuery.refetch();
+      return;
+    }
+
+    // 검색어가 있는 경우 검색 API 호출
+    try {
+      const searchResults = await getRamenyaListWithSearch({
+        query: searchValue,
+        ...currentGeolocation,
+        inLocation: true,
+      });
+      if (searchResults) {
+        setRamenyaList(searchResults);
+      }
+    } catch (error) {
+      console.error("검색 실패:", error);
+    }
+  }, [mapInstance, updateLocationData, searchValue, currentGeolocation, ramenyaListWithGeolocationQuery]);
+
+  // 마커 클릭 핸들러 메모화
+  const handleMarkerClick = useCallback(
+    (markerData: Ramenya) => {
+      if (selectedMarker?._id === markerData._id) {
+        setSelectedMarker(null);
+      } else {
+        setSelectedMarker(markerData);
+      }
+    },
+    [selectedMarker],
+  );
 
   // 지도 중심을 특정 위치로 이동
   const handleMoveMapCenter = useCallback(
     (latitude: number, longitude: number) => {
       if (mapInstance) {
-        console.log("panTo", latitude, longitude);
-        mapInstance.panTo(new naver.maps.LatLng(latitude, longitude));
+        mapInstance.panTo(new naver.maps.LatLng(latitude - 0.005, longitude));
+        mapInstance.setZoom(14);
       }
     },
     [mapInstance],
   );
 
+  // 키워드 선택 핸들러
+  const handleSelectKeyword = useCallback(
+    async (keyword: { id: string; name: string; type: "keyword" | "ramenya" }) => {
+      try {
+        let ramenyaList: Ramenya[] = [];
+        if (keyword.type === "keyword") {
+          ramenyaList = await getRamenyaListWithSearch({ query: keyword.name, ...currentGeolocation });
+        } else {
+          ramenyaList = await getRamenyaListWithSearch({ query: keyword.name });
+        }
+
+        if (ramenyaList?.length > 0) {
+          handleMoveMapCenter(ramenyaList[0].latitude, ramenyaList[0].longitude);
+          setRamenyaList(ramenyaList);
+        } else {
+          setRamenyaList([]);
+        }
+      } catch (error) {
+        console.error("키워드 검색 실패:", error);
+        setRamenyaList([]);
+      }
+    },
+    [handleMoveMapCenter, currentGeolocation],
+  );
+
+  // 위치 기반 쿼리 결과 처리 (초기화 완료 후에만)
+  useEffect(() => {
+    if (
+      isInitialized &&
+      !ramenyaListWithGeolocationQuery.isLoading &&
+      ramenyaListWithGeolocationQuery.data &&
+      searchValue === ""
+    ) {
+      setRamenyaList(ramenyaListWithGeolocationQuery.data || []);
+    }
+  }, [ramenyaListWithGeolocationQuery.data, ramenyaListWithGeolocationQuery.isLoading, isInitialized, searchValue]);
+
+  // 마커 데이터 메모화 - ramenyaList가 변경될 때만 새로 생성
+  const markerData = useMemo(() => {
+    return (
+      ramenyaList?.map((ramenya) => ({
+        position: {
+          lat: ramenya.latitude,
+          lng: ramenya.longitude,
+        },
+        data: ramenya,
+        title: ramenya.name,
+      })) || []
+    );
+  }, [ramenyaList]);
+
   return (
     <>
       <MapScreen>
+        <SearchOverlay
+          onSelectKeyword={handleSelectKeyword}
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+        />
+
         {/* 상단 현재 위치 재검색 버튼 */}
         <RefreshOverlay onRefresh={handleRefreshLocation} />
 
         <NaverMap<Ramenya>
           onMapReady={handleMapReady}
-          onMapCenterChange={handleMapCenterChange}
-          markers={ramenyaList?.map((ramenya) => ({
-            position: {
-              lat: ramenya.latitude,
-              lng: ramenya.longitude,
-            },
-            data: ramenya,
-            title: ramenya.name,
-          }))}
+          onMapCenterChange={updateLocationData}
+          markers={markerData}
           selectedMarker={selectedMarker}
           onMarkerClick={handleMarkerClick}
         />
 
         {/* 카드 오버레이 (기존 기능) */}
-        {/* <ResultCardOverlay
-          ramenyaList={ramenyaList?.ramenyas || []}
-          selectedMarker={selectedMarker}
-          onMarkerSelect={setSelectedMarker}
-          onMoveMapCenter={handleMoveMapCenter}
-        /> */}
+        {mapMode === MAP_MODE.CARD && (
+          <ResultCardOverlay
+            ramenyaList={ramenyaList || []}
+            selectedMarker={selectedMarker}
+            onMarkerSelect={setSelectedMarker}
+            onMoveMapCenter={handleMoveMapCenter}
+          />
+        )}
 
         {/* 리스트 오버레이 (드래그 가능한 새로운 컴포넌트) */}
-        <ResultListOverlay
-          ramenyaList={ramenyaList || []}
-          selectedMarker={selectedMarker}
-          onMarkerSelect={setSelectedMarker}
-          onMoveMapCenter={handleMoveMapCenter}
-          filterOptions={filterOptions}
-          setFilterOptions={setFilterOptions}
-        />
+        {mapMode === MAP_MODE.LIST && (
+          <ResultListOverlay
+            ramenyaList={ramenyaList || []}
+            selectedMarker={selectedMarker}
+            onMarkerSelect={setSelectedMarker}
+            onMoveMapCenter={handleMoveMapCenter}
+            filterOptions={filterOptions}
+            setFilterOptions={setFilterOptions}
+          />
+        )}
       </MapScreen>
       <AppBar />
     </>
   );
 };
+
+interface SearchOverlayProps extends ComponentProps<"input"> {
+  isSearching?: boolean;
+  onSelectKeyword?: (keyword: { id: string; name: string; type: "keyword" | "ramenya" }) => void;
+  searchValue: string;
+  setSearchValue: (value: string) => void;
+}
+
+const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }: SearchOverlayProps) => {
+  const [isFocused, setIsFocused] = useState(false);
+
+  const { searchHistoryQuery } = useSearchHistoryQuery();
+  const { remove: removeSearchHistory } = useRemoveSearchHistoryMutation();
+  const { ramenyaSearchAutoCompleteQuery } = useRamenyaSearchAutoCompleteQuery({ query: searchValue });
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFocus = () => {
+    setIsFocused(true);
+  };
+
+  const handleBlur = () => {
+    setIsFocused(false);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // 한글 입력 시 중복 타이핑 방지
+    if (e.nativeEvent.isComposing) return;
+
+    if (e.key === "Enter") {
+      onSelectKeyword?.({ id: searchValue, name: searchValue, type: "keyword" });
+      handleBlur();
+      inputRef.current?.blur();
+    }
+  };
+
+  return (
+    <>
+      <SearchOverlayContainer>
+        {isFocused && <FocusResetIcon onClick={handleBlur} />}
+        <SearchBox>
+          {!isFocused && (
+            <IconWrapper>
+              <IconSearch />
+            </IconWrapper>
+          )}
+          <SearchInput
+            ref={inputRef}
+            {...rest}
+            type="search"
+            value={searchValue}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            placeholder="장르 또는 매장으로 검색해 보세요"
+          />
+        </SearchBox>
+      </SearchOverlayContainer>
+
+      {isFocused && (
+        <FullScreenSearchOverlay>
+          {ramenyaSearchAutoCompleteQuery.data &&
+          (ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.length !== 0 ||
+            ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.length !== 0) ? (
+            <AutoCompleteContainer>
+              {ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.map((keyword) => (
+                <KeywardWrapper
+                  key={keyword._id}
+                  onClick={() => {
+                    onSelectKeyword?.({ id: keyword._id, name: keyword.name, type: "keyword" });
+                    setIsFocused(false);
+                  }}
+                >
+                  <IconLocate />
+                  <span>
+                    <MatchedText size={16} weight="sb">
+                      {getTextMatch({ query: searchValue, target: keyword.name }).matchedText}
+                    </MatchedText>
+                    <UnMatchedText size={16} weight="sb">
+                      {getTextMatch({ query: searchValue, target: keyword.name }).unMatchedText}
+                    </UnMatchedText>
+                  </span>
+                </KeywardWrapper>
+              ))}
+              {ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.map((ramenya) => (
+                <KeywardWrapper
+                  key={ramenya._id}
+                  onClick={() => {
+                    onSelectKeyword?.({ id: ramenya._id, name: ramenya.name, type: "ramenya" });
+                    setSearchValue(ramenya.name);
+                    setIsFocused(false);
+                  }}
+                >
+                  <IconLocate color={"#A0A0A0"} />
+                  <span>
+                    <MatchedText size={16} weight="sb">
+                      {getTextMatch({ query: searchValue, target: ramenya.name }).matchedText}
+                    </MatchedText>
+                    <UnMatchedText size={16} weight="sb">
+                      {getTextMatch({ query: searchValue, target: ramenya.name }).unMatchedText}
+                    </UnMatchedText>
+                  </span>
+                </KeywardWrapper>
+              ))}
+            </AutoCompleteContainer>
+          ) : (
+            <>
+              <HistoryContainer>
+                <HistoryHeader>
+                  <RamenroadText size={16} weight="sb">
+                    최근 검색어
+                  </RamenroadText>
+                  <RemoveText
+                    size={12}
+                    weight="r"
+                    onClick={() =>
+                      removeSearchHistory.mutate(
+                        searchHistoryQuery.data?.searchKeywords?.map((keyword) => keyword._id) || [],
+                      )
+                    }
+                  >
+                    전체 삭제
+                  </RemoveText>
+                </HistoryHeader>
+                <HistoryTagWrapper>
+                  {searchHistoryQuery.data?.searchKeywords?.map((keyword) => (
+                    <KeywordHistoryTag
+                      key={keyword._id}
+                      onClick={() => {
+                        onSelectKeyword?.({ id: keyword._id, name: keyword.keyword, type: "keyword" });
+                        setSearchValue(keyword.keyword);
+                        setIsFocused(false);
+                      }}
+                    >
+                      <RamenroadText size={14} weight="r">
+                        {keyword.keyword}
+                      </RamenroadText>
+                      <XIcon
+                        color="#A0A0A0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeSearchHistory.mutate([keyword._id]);
+                        }}
+                      />
+                    </KeywordHistoryTag>
+                  ))}
+                </HistoryTagWrapper>
+              </HistoryContainer>
+              <HistoryContainer>
+                <HistoryHeader>
+                  <RamenroadText size={16} weight="sb">
+                    검색한 매장
+                  </RamenroadText>
+                  <RemoveText
+                    size={12}
+                    weight="r"
+                    onClick={() =>
+                      removeSearchHistory.mutate(
+                        searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => ramenya._id) || [],
+                      )
+                    }
+                  >
+                    전체 삭제
+                  </RemoveText>
+                </HistoryHeader>
+                <RamenyaHistoryWrapper>
+                  {searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => (
+                    <KeywardWrapper
+                      key={ramenya._id}
+                      onClick={() => {
+                        onSelectKeyword?.({ id: ramenya._id, name: ramenya.keyword, type: "ramenya" });
+                        setSearchValue(ramenya.keyword);
+                        setIsFocused(false);
+                      }}
+                    >
+                      <IconLocate color={"#A0A0A0"} />
+                      <RamenroadText size={16} weight="r">
+                        {ramenya.keyword}
+                      </RamenroadText>
+                      <RamenyaXIcon
+                        color="#A0A0A0"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeSearchHistory.mutate([ramenya._id]);
+                        }}
+                      />
+                    </KeywardWrapper>
+                  ))}
+                </RamenyaHistoryWrapper>
+              </HistoryContainer>
+            </>
+          )}
+        </FullScreenSearchOverlay>
+      )}
+    </>
+  );
+};
+
+const AutoCompleteContainer = tw.div`
+  flex flex-col
+`;
+
+const KeywardWrapper = tw.div`
+  flex items-center gap-8
+  h-36
+  cursor-pointer
+`;
+
+const MatchedText = tw(RamenroadText)`
+  text-orange
+`;
+
+const UnMatchedText = tw(RamenroadText)`
+`;
+
+const SearchOverlayContainer = tw.figure`
+  absolute top-16 left-0 right-0 z-[200]
+  m-0 px-20
+  h-48
+  box-border
+  flex gap-12 items-center
+`;
+
+const SearchBox = tw.div`
+  flex items-center gap-8
+  w-full h-full rounded-8
+  box-border border border-solid border-divider
+  bg-white px-16 py-12
+`;
+
+const IconWrapper = tw.div`
+  w-24 h-24
+`;
+
+const FocusResetIcon = tw(IconBack)`
+  cursor-pointer
+`;
+
+const SearchInput = tw.input`
+  w-full h-24
+  bg-white border-none
+  font-16-r text-black leading-24
+  focus:outline-none
+`;
+
+// 전체 화면 검색 오버레이 스타일
+const FullScreenSearchOverlay = tw.main`
+  absolute w-full h-full inset-0 bg-white z-[150]
+  flex flex-col gap-32
+  box-border px-16 py-20 pt-84
+`;
+
+const HistoryContainer = tw.div`
+  flex flex-col gap-16
+`;
+
+const HistoryHeader = tw.div`
+  flex justify-between items-center
+  w-full
+`;
+
+const RemoveText = tw(RamenroadText)`
+  text-gray-400 cursor-pointer
+`;
+
+const HistoryTagWrapper = tw.div`
+  flex flex-wrap gap-8
+`;
+
+const KeywordHistoryTag = tw.div`
+  flex items-center gap-8
+  box-border h-33
+  py-6 px-12
+  cursor-pointer
+  border border-solid border-gray-200 rounded-50
+  font-14-r text-gray-900
+`;
+
+const RamenyaHistoryWrapper = tw.div`
+  flex flex-col
+`;
 
 interface RefreshOverlayProps {
   onRefresh: () => void;
@@ -215,96 +564,41 @@ const RefreshOverlay = ({ onRefresh }: RefreshOverlayProps) => {
   );
 };
 
+const RefreshButtonContainer = tw.div`
+  absolute top-80 z-10 absolute-center-x
+`;
+
+const RefreshButton = tw.button`
+  w-125 h-34 px-15 py-8
+  flex gap-4 items-center
+  bg-white border-none rounded-50
+  shadow-none
+  outline-none
+  cursor-pointer
+  z-10
+`;
+
+const RefreshButtonText = tw(RamenroadText)`
+  text-gray-700
+  whitespace-nowrap
+`;
+
 interface ResultOverlayProps {
   ramenyaList: Ramenya[];
   selectedMarker: Ramenya | null;
   onMarkerSelect: (marker: Ramenya) => void;
   onMoveMapCenter: (latitude: number, longitude: number) => void;
-  filterOptions: FilterOptions;
-  setFilterOptions: (filterOptions: FilterOptions) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
-  const swiperRef = useRef<SwiperCore>();
-
-  // Swiper 슬라이드 변경 시 지도 중심 이동
-  const handleSwiperSlideChange = useCallback(
-    (swiper: SwiperCore) => {
-      const currentData = ramenyaList[swiper.realIndex];
-
-      if (!currentData) return;
-
-      // 선택된 마커 업데이트
-      onMarkerSelect(currentData);
-
-      // 지도 중심을 해당 마커로 이동
-      onMoveMapCenter(currentData.latitude, currentData.longitude);
-    },
-    [ramenyaList, onMarkerSelect, onMoveMapCenter],
-  );
-
-  // 선택된 마커가 변경될 때마다 Swiper 동기화
-  useEffect(() => {
-    if (!selectedMarker || !ramenyaList.length || !swiperRef.current) return;
-
-    const idx = ramenyaList.findIndex((ramenya) => ramenya._id === selectedMarker._id);
-
-    if (idx >= 0) {
-      if (swiperRef.current.slideToLoop) {
-        swiperRef.current.slideToLoop(idx);
-      } else {
-        swiperRef.current.slideTo(idx);
-      }
-    }
-  }, [selectedMarker, ramenyaList]);
-
-  if (!ramenyaList.length) return null;
-
-  return (
-    <ResultCardContainer>
-      <SwiperWrapper>
-        <Swiper
-          onSwiper={(swiper) => {
-            swiperRef.current = swiper;
-          }}
-          key={ramenyaList[0]?._id}
-          onSlideChangeTransitionEnd={handleSwiperSlideChange}
-          slidesPerView={1.1}
-          loop
-          spaceBetween={10}
-          style={{
-            width: "100%",
-            minHeight: "120px",
-          }}
-        >
-          {ramenyaList.map((ramenya, index) => (
-            <SwiperSlide key={index}>
-              <RamenyaCard
-                key={ramenya._id}
-                isMapCard={true}
-                _id={ramenya._id}
-                name={ramenya.name}
-                rating={ramenya.rating}
-                latitude={ramenya.latitude}
-                longitude={ramenya.longitude}
-                address={ramenya.address}
-                businessHours={ramenya.businessHours}
-                genre={ramenya.genre}
-                reviewCount={ramenya.reviewCount}
-                thumbnailUrl={ramenya.thumbnailUrl}
-                width={"350px"}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </SwiperWrapper>
-    </ResultCardContainer>
-  );
-};
-
-const ResultListOverlay = ({ ramenyaList, filterOptions, setFilterOptions }: ResultOverlayProps) => {
-  const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.COLLAPSED);
+const ResultListOverlay = ({
+  ramenyaList,
+  filterOptions,
+  setFilterOptions,
+}: ResultOverlayProps & {
+  filterOptions: FilterOptions;
+  setFilterOptions: (filterOptions: FilterOptions) => void;
+}) => {
+  const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.HALF);
   const [isDragging, setIsDragging] = useState(false);
   const [tempHeight, setTempHeight] = useState<number>(OVERLAY_HEIGHTS.COLLAPSED);
 
@@ -354,7 +648,6 @@ const ResultListOverlay = ({ ramenyaList, filterOptions, setFilterOptions }: Res
   return (
     <ResultListOverlayContainer
       ref={overlayRef}
-      className="absolute bottom-0 left-0 right-0 z-[9999] bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden"
       style={{
         height: isDragging ? `${tempHeight}px` : `${currentHeight}px`,
         transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -374,35 +667,104 @@ const ResultListOverlay = ({ ramenyaList, filterOptions, setFilterOptions }: Res
       {/* 콘텐츠 영역 */}
       <ListContentArea
         style={{
-          height: isDragging ? `${tempHeight - 120}px` : `${currentHeight - 120}px`, // FilterSection 높이 고려
+          height: isDragging ? `${tempHeight - 10}px` : `${currentHeight - 10}px`, // FilterSection 높이 고려
           overflowY: "auto",
-          paddingBottom: "20px", // 마지막 카드가 잘리지 않도록 패딩 추가
         }}
       >
-        {ramenyaList?.map((ramenya) => <RamenyaCard key={ramenya._id} {...ramenya} />)}
+        {ramenyaList?.map((ramenya) => (
+          <>
+            <RamenyaCard key={ramenya._id} {...ramenya} />
+            <LineWrapper>
+              <Line />
+            </LineWrapper>
+          </>
+        ))}
+
+        {ramenyaList.length === 0 && <NoStoreBox />}
       </ListContentArea>
     </ResultListOverlayContainer>
   );
 };
 
-const RefreshButtonContainer = tw.div`
-  absolute top-20 z-10 absolute-center-x
-`;
+const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
+  const swiperRef = useRef<SwiperCore>();
 
-const RefreshButton = tw.button`
-  w-125 h-34 px-15 py-8
-  flex gap-4 items-center
-  bg-white border-none rounded-50
-  shadow-none
-  outline-none
-  cursor-pointer
-  z-10
-`;
+  // Swiper 슬라이드 변경 시 지도 중심 이동
+  const handleSwiperSlideChange = useCallback(
+    (swiper: SwiperCore) => {
+      const currentData = ramenyaList[swiper.realIndex];
 
-const RefreshButtonText = tw(RamenroadText)`
-  text-gray-700
-  whitespace-nowrap
-`;
+      if (!currentData) return;
+
+      // 선택된 마커 업데이트
+      onMarkerSelect(currentData);
+
+      // 지도 중심을 해당 마커로 이동
+      onMoveMapCenter(currentData.latitude, currentData.longitude);
+    },
+    [ramenyaList, onMarkerSelect, onMoveMapCenter],
+  );
+
+  // 선택된 마커가 변경될 때마다 Swiper 동기화
+  useEffect(() => {
+    if (!selectedMarker || !ramenyaList.length || !swiperRef.current) return;
+
+    const idx = ramenyaList.findIndex((ramenya) => ramenya._id === selectedMarker._id);
+
+    if (idx >= 0) {
+      if (swiperRef.current.slideToLoop) {
+        swiperRef.current.slideToLoop(idx);
+      } else {
+        swiperRef.current.slideTo(idx);
+      }
+    }
+  }, [selectedMarker, ramenyaList]);
+
+  if (!ramenyaList.length) return null;
+
+  return (
+    <ResultCardContainer>
+      <SwiperWrapper>
+        <Swiper
+          onSwiper={(swiper) => {
+            swiperRef.current = swiper;
+          }}
+          key={ramenyaList[0]?._id}
+          onSlideChangeTransitionEnd={handleSwiperSlideChange}
+          slidesPerView={1.1}
+          loop={true}
+          centeredSlides={true}
+          spaceBetween={10}
+          style={{
+            width: "100%",
+            minHeight: "120px",
+            maxWidth: "400px",
+          }}
+        >
+          {ramenyaList.map((ramenya, index) => (
+            <SwiperSlide key={index}>
+              <RamenyaCard
+                key={ramenya._id}
+                isMapCard={true}
+                _id={ramenya._id}
+                name={ramenya.name}
+                rating={ramenya.rating}
+                latitude={ramenya.latitude}
+                longitude={ramenya.longitude}
+                address={ramenya.address}
+                businessHours={ramenya.businessHours}
+                genre={ramenya.genre}
+                reviewCount={ramenya.reviewCount}
+                thumbnailUrl={ramenya.thumbnailUrl}
+                width={"350px"}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </SwiperWrapper>
+    </ResultCardContainer>
+  );
+};
 
 const MapScreen = tw.main`
   w-full h-[calc(100vh-56px)] relative
@@ -411,13 +773,14 @@ const MapScreen = tw.main`
 
 // ResultCardOverlay 스타일
 const ResultCardContainer = tw.div`
-  absolute left-0 right-0 bottom-20 z-10
+  absolute left-0 right-0 bottom-70 z-10
   flex justify-center w-full pointer-events-none
-  pl-10
+  box-border
 `;
 
 const SwiperWrapper = tw.div`
-  w-full max-w-md pointer-events-auto
+  w-full pointer-events-auto
+  flex justify-center
 `;
 
 // ResultListOverlay는 인라인 스타일로 구현
@@ -434,11 +797,27 @@ const DragIndicator = tw.div`
 `;
 
 const ListContentArea = tw.div`
-  flex-1
+  flex-1 overflow-y-auto
+`;
+
+const LineWrapper = tw.div`
+  px-20
 `;
 
 const ResultListOverlayContainer = tw.div`
-  absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden
+  absolute bottom-56 left-0 right-0 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col
+  z-[110] [transform:translateZ(0)] [will-change:transform] [isolation:isolate]
+`;
+
+const RamenyaXIcon = tw(IconClose)`
+  ml-auto
+  w-9 h-9
+  cursor-pointer
+`;
+
+const XIcon = tw(IconClose)`
+  w-9 h-9
+  cursor-pointer
 `;
 
 export default MapPage;

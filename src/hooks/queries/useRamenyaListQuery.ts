@@ -6,7 +6,12 @@ import { checkBusinessStatus } from "../../util";
 import { useLocationStore } from "../../store/location/useLocationStore";
 import { calculateDistanceValue } from "../../util/number";
 import { OpenStatus } from "../../constants";
-import { getRamenyaListWithGeolocation, GetRamenyaListWithGeolocationParams } from "../../api/map";
+import {
+  getRamenyaListWithGeolocation,
+  GetRamenyaListWithGeolocationParams,
+  getRamenyaSearchAutoComplete,
+} from "../../api/map";
+import { useDebounce } from "../common/useDebounce";
 
 type QueryType = "region" | "genre";
 
@@ -80,8 +85,8 @@ export const useRamenyaListWithGeolocationQuery = ({
   radius,
   filterOptions,
 }: GetRamenyaListWithGeolocationParams & { filterOptions?: FilterOptions }) => {
-  return useQuery({
-    ...queryKeys.ramenya.listWithGeolocation({ latitude, longitude, radius }),
+  const ramenyaListWithGeolocationQuery = useQuery({
+    ...queryKeys.ramenya.listWithGeolocation,
     queryFn: () => getRamenyaListWithGeolocation({ latitude, longitude, radius }),
     select: (data) => {
       // 항상 Ramenya[]를 반환하도록 수정
@@ -133,4 +138,18 @@ export const useRamenyaListWithGeolocationQuery = ({
     },
     enabled: !!latitude && !!longitude && !!radius,
   });
+
+  return { ramenyaListWithGeolocationQuery };
+};
+
+export const useRamenyaSearchAutoCompleteQuery = ({ query }: { query?: string }) => {
+  const debouncedQuery = useDebounce(query, 300); // 300ms debounce
+
+  const ramenyaSearchAutoCompleteQuery = useQuery({
+    ...queryKeys.ramenya.searchAutoComplete(debouncedQuery ?? ""),
+    queryFn: () => getRamenyaSearchAutoComplete({ query: debouncedQuery! }),
+    enabled: !!debouncedQuery && debouncedQuery.length > 0,
+  });
+
+  return { ramenyaSearchAutoCompleteQuery };
 };
