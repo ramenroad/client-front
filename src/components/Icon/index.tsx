@@ -798,13 +798,11 @@ export const IconSearch = () => (
   </svg>
 );
 
-// export const IconLocate = () => (
-//   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-//     <rect width="16" height="16" fill="white" />
-//     <path
-//       d="M14 6.76136C14 9.94328 10.6667 13.0795 8 15C6 13.7197 2 9.94328 2 6.76136C2 3.57945 4.68629 1 8 1C11.3137 1 14 3.57945 14 6.76136Z"
-//       fill="#A0A0A0"
-//     />
-//     <circle cx="8" cy="7" r="1" fill="white" />
-//   </svg>
-// );
+export const IconComment = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="11" fill="#F6F6F6" />
+    <circle cx="12" cy="16" r="1" fill="#CFCFCF" />
+    <circle cx="16" cy="16" r="1" fill="#CFCFCF" />
+    <circle cx="20" cy="16" r="1" fill="#CFCFCF" />
+  </svg>
+);

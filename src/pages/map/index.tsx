@@ -10,7 +10,7 @@ import {
 import { Ramenya } from "../../types";
 import RamenyaCard from "../../components/ramenya-card/RamenyaCard";
 import { RamenroadText } from "../../components/common/RamenroadText";
-import { IconBack, IconClose, IconLocate, IconRefresh, IconSearch } from "../../components/Icon";
+import { IconBack, IconClose, IconComment, IconLocate, IconRefresh, IconSearch } from "../../components/Icon";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import "swiper/css";
@@ -24,6 +24,10 @@ import { getTextMatch } from "../../util";
 import { useSearchHistoryQuery } from "../../hooks/queries/useSearchQuery";
 import NoStoreBox from "../../components/no-data/NoStoreBox";
 import { useRemoveSearchHistoryMutation } from "../../hooks/mutation/useSearchHistoryMutation";
+import { useDebounce } from "../../hooks/common/useDebounce";
+import NoResultBox from "../../components/no-data/NoResultBox";
+import { queryClient } from "../../core/queryClient";
+import { queryKeys } from "../../hooks/queries/queryKeys";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -174,6 +178,8 @@ const MapPage = () => {
           ramenyaList = await getRamenyaListWithSearch({ query: keyword.name });
         }
 
+        queryClient.invalidateQueries({ ...queryKeys.search.history });
+
         if (ramenyaList?.length > 0) {
           handleMoveMapCenter(ramenyaList[0].latitude, ramenyaList[0].longitude);
           setRamenyaList(ramenyaList);
@@ -271,9 +277,28 @@ interface SearchOverlayProps extends ComponentProps<"input"> {
 const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }: SearchOverlayProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
+  const { value: debouncedSearchValue, isDebouncing } = useDebounce<string>(searchValue, 300);
+
   const { searchHistoryQuery } = useSearchHistoryQuery();
   const { remove: removeSearchHistory } = useRemoveSearchHistoryMutation();
-  const { ramenyaSearchAutoCompleteQuery } = useRamenyaSearchAutoCompleteQuery({ query: searchValue });
+  const { ramenyaSearchAutoCompleteQuery } = useRamenyaSearchAutoCompleteQuery({ query: debouncedSearchValue });
+
+  const isTyping = useMemo(() => searchValue.length > 0, [searchValue]);
+
+  const isAutoCompleteResultExist = useMemo(() => {
+    return (
+      ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.length !== 0 ||
+      ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.length !== 0
+    );
+  }, [ramenyaSearchAutoCompleteQuery.data]);
+
+  const isKeywordHistoryExist = useMemo(() => {
+    return searchHistoryQuery.data?.searchKeywords?.length !== 0;
+  }, [searchHistoryQuery.data]);
+
+  const isRamenyaHistoryExist = useMemo(() => {
+    return searchHistoryQuery.data?.ramenyaNames?.length !== 0;
+  }, [searchHistoryQuery.data]);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -326,50 +351,54 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
 
       {isFocused && (
         <FullScreenSearchOverlay>
-          {ramenyaSearchAutoCompleteQuery.data &&
-          (ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.length !== 0 ||
-            ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.length !== 0) ? (
-            <AutoCompleteContainer>
-              {ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.map((keyword) => (
-                <KeywardWrapper
-                  key={keyword._id}
-                  onClick={() => {
-                    onSelectKeyword?.({ id: keyword._id, name: keyword.name, type: "keyword" });
-                    setIsFocused(false);
-                  }}
-                >
-                  <IconLocate />
-                  <span>
-                    <MatchedText size={16} weight="sb">
-                      {getTextMatch({ query: searchValue, target: keyword.name }).matchedText}
-                    </MatchedText>
-                    <UnMatchedText size={16} weight="sb">
-                      {getTextMatch({ query: searchValue, target: keyword.name }).unMatchedText}
-                    </UnMatchedText>
-                  </span>
-                </KeywardWrapper>
-              ))}
-              {ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.map((ramenya) => (
-                <KeywardWrapper
-                  key={ramenya._id}
-                  onClick={() => {
-                    onSelectKeyword?.({ id: ramenya._id, name: ramenya.name, type: "ramenya" });
-                    setSearchValue(ramenya.name);
-                    setIsFocused(false);
-                  }}
-                >
-                  <IconLocate color={"#A0A0A0"} />
-                  <span>
-                    <MatchedText size={16} weight="sb">
-                      {getTextMatch({ query: searchValue, target: ramenya.name }).matchedText}
-                    </MatchedText>
-                    <UnMatchedText size={16} weight="sb">
-                      {getTextMatch({ query: searchValue, target: ramenya.name }).unMatchedText}
-                    </UnMatchedText>
-                  </span>
-                </KeywardWrapper>
-              ))}
-            </AutoCompleteContainer>
+          {isTyping ? (
+            isAutoCompleteResultExist ? (
+              <AutoCompleteContainer>
+                {ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.map((keyword) => (
+                  <KeywardWrapper
+                    key={keyword._id}
+                    onClick={() => {
+                      onSelectKeyword?.({ id: keyword._id, name: keyword.name, type: "keyword" });
+                      setIsFocused(false);
+                    }}
+                  >
+                    <IconLocate />
+                    <span>
+                      <MatchedText size={16} weight="sb">
+                        {getTextMatch({ query: searchValue, target: keyword.name }).matchedText}
+                      </MatchedText>
+                      <UnMatchedText size={16} weight="sb">
+                        {getTextMatch({ query: searchValue, target: keyword.name }).unMatchedText}
+                      </UnMatchedText>
+                    </span>
+                  </KeywardWrapper>
+                ))}
+                {ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.map((ramenya) => (
+                  <KeywardWrapper
+                    key={ramenya._id}
+                    onClick={() => {
+                      onSelectKeyword?.({ id: ramenya._id, name: ramenya.name, type: "ramenya" });
+                      setSearchValue(ramenya.name);
+                      setIsFocused(false);
+                    }}
+                  >
+                    <IconLocate color={"#A0A0A0"} />
+                    <span>
+                      <MatchedText size={16} weight="sb">
+                        {getTextMatch({ query: searchValue, target: ramenya.name }).matchedText}
+                      </MatchedText>
+                      <UnMatchedText size={16} weight="sb">
+                        {getTextMatch({ query: searchValue, target: ramenya.name }).unMatchedText}
+                      </UnMatchedText>
+                    </span>
+                  </KeywardWrapper>
+                ))}
+              </AutoCompleteContainer>
+            ) : (
+              <>
+                <NoResultBox actionButton={<SubmitButton>제보하기</SubmitButton>} />
+              </>
+            )
           ) : (
             <>
               <HistoryContainer>
@@ -389,29 +418,38 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                     전체 삭제
                   </RemoveText>
                 </HistoryHeader>
-                <HistoryTagWrapper>
-                  {searchHistoryQuery.data?.searchKeywords?.map((keyword) => (
-                    <KeywordHistoryTag
-                      key={keyword._id}
-                      onClick={() => {
-                        onSelectKeyword?.({ id: keyword._id, name: keyword.keyword, type: "keyword" });
-                        setSearchValue(keyword.keyword);
-                        setIsFocused(false);
-                      }}
-                    >
-                      <RamenroadText size={14} weight="r">
-                        {keyword.keyword}
-                      </RamenroadText>
-                      <XIcon
-                        color="#A0A0A0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeSearchHistory.mutate([keyword._id]);
+                {isKeywordHistoryExist ? (
+                  <HistoryTagWrapper>
+                    {searchHistoryQuery.data?.searchKeywords?.map((keyword) => (
+                      <KeywordHistoryTag
+                        key={keyword._id}
+                        onClick={() => {
+                          onSelectKeyword?.({ id: keyword._id, name: keyword.keyword, type: "keyword" });
+                          setSearchValue(keyword.keyword);
+                          setIsFocused(false);
                         }}
-                      />
-                    </KeywordHistoryTag>
-                  ))}
-                </HistoryTagWrapper>
+                      >
+                        <RamenroadText size={14} weight="r">
+                          {keyword.keyword}
+                        </RamenroadText>
+                        <XIcon
+                          color="#A0A0A0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeSearchHistory.mutate([keyword._id]);
+                          }}
+                        />
+                      </KeywordHistoryTag>
+                    ))}
+                  </HistoryTagWrapper>
+                ) : (
+                  <NoHistoryWrapper>
+                    <IconComment />
+                    <NoHistoryText size={16} weight="r">
+                      최근 검색어가 없어요
+                    </NoHistoryText>
+                  </NoHistoryWrapper>
+                )}
               </HistoryContainer>
               <HistoryContainer>
                 <HistoryHeader>
@@ -431,28 +469,37 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                   </RemoveText>
                 </HistoryHeader>
                 <RamenyaHistoryWrapper>
-                  {searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => (
-                    <KeywardWrapper
-                      key={ramenya._id}
-                      onClick={() => {
-                        onSelectKeyword?.({ id: ramenya._id, name: ramenya.keyword, type: "ramenya" });
-                        setSearchValue(ramenya.keyword);
-                        setIsFocused(false);
-                      }}
-                    >
-                      <IconLocate color={"#A0A0A0"} />
-                      <RamenroadText size={16} weight="r">
-                        {ramenya.keyword}
-                      </RamenroadText>
-                      <RamenyaXIcon
-                        color="#A0A0A0"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeSearchHistory.mutate([ramenya._id]);
+                  {isRamenyaHistoryExist ? (
+                    searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => (
+                      <KeywardWrapper
+                        key={ramenya._id}
+                        onClick={() => {
+                          onSelectKeyword?.({ id: ramenya._id, name: ramenya.keyword, type: "ramenya" });
+                          setSearchValue(ramenya.keyword);
+                          setIsFocused(false);
                         }}
-                      />
-                    </KeywardWrapper>
-                  ))}
+                      >
+                        <IconLocate color={"#A0A0A0"} />
+                        <RamenroadText size={16} weight="r">
+                          {ramenya.keyword}
+                        </RamenroadText>
+                        <RamenyaXIcon
+                          color="#A0A0A0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeSearchHistory.mutate([ramenya._id]);
+                          }}
+                        />
+                      </KeywardWrapper>
+                    ))
+                  ) : (
+                    <NoHistoryWrapper>
+                      <IconComment />
+                      <NoHistoryText size={16} weight="r">
+                        검색한 매장이 없어요
+                      </NoHistoryText>
+                    </NoHistoryWrapper>
+                  )}
                 </RamenyaHistoryWrapper>
               </HistoryContainer>
             </>
@@ -465,6 +512,15 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
 
 const AutoCompleteContainer = tw.div`
   flex flex-col
+`;
+
+const SubmitButton = tw.button`
+  text-orange bg-[#FFE4CE]
+  font-16-m
+  px-32 py-10
+  rounded-100
+  outline-none border-none
+  cursor-pointer
 `;
 
 const KeywardWrapper = tw.div`
@@ -545,6 +601,17 @@ const KeywordHistoryTag = tw.div`
 
 const RamenyaHistoryWrapper = tw.div`
   flex flex-col
+`;
+
+const NoHistoryWrapper = tw.div`
+  flex flex-col
+  items-center gap-8
+  cursor-pointer
+  mt-12
+`;
+
+const NoHistoryText = tw(RamenroadText)`
+  text-gray-400
 `;
 
 interface RefreshOverlayProps {
@@ -680,7 +747,7 @@ const ResultListOverlay = ({
           </>
         ))}
 
-        {ramenyaList.length === 0 && <NoStoreBox />}
+        {ramenyaList.length === 0 && <NoStoreBox type="map" />}
       </ListContentArea>
     </ResultListOverlayContainer>
   );
@@ -805,8 +872,9 @@ const LineWrapper = tw.div`
 `;
 
 const ResultListOverlayContainer = tw.div`
-  absolute bottom-56 left-0 right-0 bg-white rounded-t-16 shadow-[0_-4px_20px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col
+  absolute bottom-56 left-0 right-0 bg-white rounded-t-16 overflow-hidden flex flex-col
   z-[110] [transform:translateZ(0)] [will-change:transform] [isolation:isolate]
+  border border-solid border-divider/20
 `;
 
 const RamenyaXIcon = tw(IconClose)`

@@ -68,54 +68,54 @@ const SELECTED_MARKER_SVG = `
 
 const USER_POSITION_MARKER = `
 <div style="position: relative; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                  <!-- 애니메이션 원들 -->
-                  <div style="
-                    position: absolute;
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    background: rgba(66, 133, 244, 0.3);
-                    animation: pulse 2s infinite;
-                  "></div>
-                  <div style="
-                    position: absolute;
-                    width: 32px;
-                    height: 32px;
-                    border-radius: 50%;
-                    background: rgba(66, 133, 244, 0.2);
-                    animation: pulse 2s infinite 0.5s;
-                  "></div>
-                  <div style="
-                    position: absolute;
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    background: rgba(66, 133, 244, 0.1);
-                    animation: pulse 2s infinite 1s;
-                  "></div>
-                  <!-- 메인 마커 -->
-                  <div style="
-                    width: 12px;
-                    height: 12px;
-                    border-radius: 50%;
-                    background: #4285f4;
-                    border: 2px solid white;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                    z-index: 1;
-                  "></div>
-                </div>
-                <style>
-                  @keyframes pulse {
-                    0% {
-                      transform: scale(0.8);
-                      opacity: 1;
-                    }
-                    100% {
-                      transform: scale(1.2);
-                      opacity: 0;
-                    }
-                  }
-                </style>
+  <!-- 애니메이션 원들 -->
+  <div style="
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(66, 133, 244, 0.3);
+    animation: pulse 2s infinite;
+  "></div>
+  <div style="
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(66, 133, 244, 0.2);
+    animation: pulse 2s infinite 0.5s;
+  "></div>
+  <div style="
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(66, 133, 244, 0.1);
+    animation: pulse 2s infinite 1s;
+  "></div>
+  <!-- 메인 마커 -->
+  <div style="
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4285f4;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 1;
+  "></div>
+</div>
+<style>
+  @keyframes pulse {
+    0% {
+      transform: scale(0.8);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+  }
+</style>
 `;
 
 export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {

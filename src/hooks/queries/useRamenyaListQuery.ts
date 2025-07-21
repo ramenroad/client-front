@@ -143,12 +143,10 @@ export const useRamenyaListWithGeolocationQuery = ({
 };
 
 export const useRamenyaSearchAutoCompleteQuery = ({ query }: { query?: string }) => {
-  const debouncedQuery = useDebounce(query, 300); // 300ms debounce
-
   const ramenyaSearchAutoCompleteQuery = useQuery({
-    ...queryKeys.ramenya.searchAutoComplete(debouncedQuery ?? ""),
-    queryFn: () => getRamenyaSearchAutoComplete({ query: debouncedQuery! }),
-    enabled: !!debouncedQuery && debouncedQuery.length > 0,
+    ...queryKeys.ramenya.searchAutoComplete(query ?? ""),
+    queryFn: () => getRamenyaSearchAutoComplete({ query: query! }),
+    enabled: !!query && query.length > 0,
   });
 
   return { ramenyaSearchAutoCompleteQuery };
