@@ -11,7 +11,6 @@ import {
   GetRamenyaListWithGeolocationParams,
   getRamenyaSearchAutoComplete,
 } from "../../api/map";
-import { useDebounce } from "../common/useDebounce";
 
 type QueryType = "region" | "genre";
 

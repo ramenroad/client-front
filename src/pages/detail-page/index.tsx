@@ -11,7 +11,7 @@ import {
   IconTime,
   IconArrowRight,
   IconStarMedium,
-  IconMapAppBar,
+  IconMap,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -346,7 +346,7 @@ export const DetailPage = () => {
               {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
                 <MoreImageWrapper onClick={handleNavigateImagesPage}>
                   <ImageBox>
-                    <ReviewImage image={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
+                    <ReviewImage src={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
                   </ImageBox>
                   <MoreOverlay>
                     <MoreText>더보기</MoreText>
@@ -439,7 +439,7 @@ export const DetailPage = () => {
                   }
                 }}
               >
-                <IconMapAppBar type={button.type} />
+                <IconMap type={button.type} />
                 <span>{button.label}</span>
                 <StyledIconArrowRight color="#888888" />
               </MapRedirectButton>

@@ -17,7 +17,7 @@ import "swiper/css";
 import { initialFilterOptions, MAP_MODE, MapModeType, OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
 import { useDrag } from "@use-gesture/react";
 import FilterSection from "../../components/filter/FilterSection";
-import { useSessionStorage } from "usehooks-ts";
+import { useLocalStorage, useSessionStorage } from "usehooks-ts";
 import { FilterOptions } from "../../types/filter";
 import { Line } from "../../components/common/Line";
 import { getTextMatch } from "../../util";
@@ -28,6 +28,7 @@ import { useDebounce } from "../../hooks/common/useDebounce";
 import NoResultBox from "../../components/no-data/NoResultBox";
 import { queryClient } from "../../core/queryClient";
 import { queryKeys } from "../../hooks/queries/queryKeys";
+import { useSignInStore } from "../../states/sign-in";
 
 const MapPage = () => {
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
@@ -117,11 +118,11 @@ const MapPage = () => {
   // 현재 지도 중심 좌표 가져오기 및 데이터 refetch (수동 새로고침)
   const handleRefreshLocation = useCallback(async () => {
     if (!mapInstance) {
-      console.log("지도가 아직 로드되지 않았습니다.");
       return;
     }
 
     updateLocationData(mapInstance);
+    console.log("handleRefreshLocation");
     setSelectedMarker(null);
 
     if (searchValue === "") {
@@ -147,13 +148,17 @@ const MapPage = () => {
   // 마커 클릭 핸들러 메모화
   const handleMarkerClick = useCallback(
     (markerData: Ramenya) => {
-      if (selectedMarker?._id === markerData._id) {
-        setSelectedMarker(null);
-      } else {
-        setSelectedMarker(markerData);
-      }
+      console.log("handleMarkerClick", markerData);
+      setSelectedMarker((prevSelected) => {
+        if (prevSelected?._id === markerData._id) {
+          return null;
+        } else {
+          mapInstance?.setZoom(15);
+          return markerData;
+        }
+      });
     },
-    [selectedMarker?._id],
+    [mapInstance],
   );
 
   // 지도 중심을 특정 위치로 이동
@@ -161,7 +166,6 @@ const MapPage = () => {
     (latitude: number, longitude: number) => {
       if (mapInstance) {
         mapInstance.panTo(new naver.maps.LatLng(latitude - 0.005, longitude));
-        mapInstance.setZoom(14);
       }
     },
     [mapInstance],
@@ -220,6 +224,10 @@ const MapPage = () => {
     );
   }, [ramenyaList]);
 
+  useEffect(() => {
+    console.log("useEffect selectedMarker", selectedMarker);
+  }, [selectedMarker]);
+
   return (
     <>
       <MapScreen>
@@ -277,14 +285,70 @@ interface SearchOverlayProps extends ComponentProps<"input"> {
 const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }: SearchOverlayProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
-  const { value: debouncedSearchValue, isDebouncing } = useDebounce<string>(searchValue, 300);
+  const { value: debouncedSearchValue } = useDebounce<string>(searchValue, 300);
 
   const { searchHistoryQuery } = useSearchHistoryQuery();
   const { remove: removeSearchHistory } = useRemoveSearchHistoryMutation();
   const { ramenyaSearchAutoCompleteQuery } = useRamenyaSearchAutoCompleteQuery({ query: debouncedSearchValue });
 
-  const isTyping = useMemo(() => searchValue.length > 0, [searchValue]);
+  const { isSignIn } = useSignInStore((state) => state);
 
+  // localStorage 기반 히스토리 (비회원용)
+  const [signOutKeywordHistory, setSignOutKeywordHistory] = useLocalStorage<string[]>("signOutKeywordHistory", []);
+  const [signOutRamenyaHistory, setSignOutRamenyaHistory] = useLocalStorage<{ _id: string; name: string }[]>(
+    "signOutRamenyaHistory",
+    [],
+  );
+
+  // 히스토리 getter
+  const getKeywordHistory = () => {
+    if (isSignIn) {
+      return searchHistoryQuery.data?.searchKeywords || [];
+    } else {
+      return signOutKeywordHistory.map((keyword, idx) => ({ _id: String(idx), keyword }));
+    }
+  };
+  const getRamenyaHistory = () => {
+    if (isSignIn) {
+      return searchHistoryQuery.data?.ramenyaNames || [];
+    } else {
+      return signOutRamenyaHistory.map((r) => ({ _id: r._id, keyword: r.name }));
+    }
+  };
+
+  // 히스토리 추가/삭제
+  const addKeywordHistory = (keyword: string) => {
+    if (!isSignIn) {
+      setSignOutKeywordHistory((prev) => [keyword, ...prev.filter((k) => k !== keyword)]);
+    }
+  };
+  const removeKeywordHistory = (keyword: string) => {
+    if (!isSignIn) {
+      setSignOutKeywordHistory((prev) => prev.filter((k) => k !== keyword));
+    }
+  };
+  const clearKeywordHistory = () => {
+    if (!isSignIn) {
+      setSignOutKeywordHistory([]);
+    }
+  };
+  const addRamenyaHistory = (ramenya: { _id: string; name: string }) => {
+    if (!isSignIn) {
+      setSignOutRamenyaHistory((prev) => [ramenya, ...prev.filter((r) => r._id !== ramenya._id)]);
+    }
+  };
+  const removeRamenyaHistory = (ramenya: { _id: string }) => {
+    if (!isSignIn) {
+      setSignOutRamenyaHistory((prev) => prev.filter((r) => r._id !== ramenya._id));
+    }
+  };
+  const clearRamenyaHistory = () => {
+    if (!isSignIn) {
+      setSignOutRamenyaHistory([]);
+    }
+  };
+
+  const isTyping = useMemo(() => searchValue.length > 0, [searchValue]);
   const isAutoCompleteResultExist = useMemo(() => {
     return (
       ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.length !== 0 ||
@@ -292,35 +356,21 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
     );
   }, [ramenyaSearchAutoCompleteQuery.data]);
 
-  const isKeywordHistoryExist = useMemo(() => {
-    return searchHistoryQuery.data?.searchKeywords?.length !== 0;
-  }, [searchHistoryQuery.data]);
-
-  const isRamenyaHistoryExist = useMemo(() => {
-    return searchHistoryQuery.data?.ramenyaNames?.length !== 0;
-  }, [searchHistoryQuery.data]);
+  const keywordHistory = getKeywordHistory();
+  const ramenyaHistory = getRamenyaHistory();
+  const isKeywordHistoryExist = keywordHistory.length > 0;
+  const isRamenyaHistoryExist = ramenyaHistory.length > 0;
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchValue(value);
-  };
-
+  const handleFocus = () => setIsFocused(true);
+  const handleBlur = () => setIsFocused(false);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // 한글 입력 시 중복 타이핑 방지
     if (e.nativeEvent.isComposing) return;
-
     if (e.key === "Enter") {
       onSelectKeyword?.({ id: searchValue, name: searchValue, type: "keyword" });
+      addKeywordHistory(searchValue);
       handleBlur();
       inputRef.current?.blur();
     }
@@ -359,6 +409,7 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                     key={keyword._id}
                     onClick={() => {
                       onSelectKeyword?.({ id: keyword._id, name: keyword.name, type: "keyword" });
+                      addKeywordHistory(keyword.name);
                       setIsFocused(false);
                     }}
                   >
@@ -379,6 +430,7 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                     onClick={() => {
                       onSelectKeyword?.({ id: ramenya._id, name: ramenya.name, type: "ramenya" });
                       setSearchValue(ramenya.name);
+                      addRamenyaHistory({ _id: ramenya._id, name: ramenya.name });
                       setIsFocused(false);
                     }}
                   >
@@ -395,9 +447,7 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                 ))}
               </AutoCompleteContainer>
             ) : (
-              <>
-                <NoResultBox actionButton={<SubmitButton>제보하기</SubmitButton>} />
-              </>
+              <NoResultBox actionButton={<SubmitButton>제보하기</SubmitButton>} />
             )
           ) : (
             <>
@@ -410,11 +460,15 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                     size={12}
                     weight="r"
                     onClick={() => {
-                      if (searchHistoryQuery.data?.searchKeywords?.length === 0) return;
-
-                      removeSearchHistory.mutate(
-                        searchHistoryQuery.data?.searchKeywords?.map((keyword) => keyword._id) || [],
-                      );
+                      if (isSignIn) {
+                        if (searchHistoryQuery.data?.searchKeywords?.length === 0) return;
+                        removeSearchHistory.mutate(
+                          searchHistoryQuery.data?.searchKeywords?.map((keyword) => keyword._id) || [],
+                        );
+                      } else {
+                        if (signOutKeywordHistory.length === 0) return;
+                        clearKeywordHistory();
+                      }
                     }}
                   >
                     전체 삭제
@@ -422,11 +476,12 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                 </HistoryHeader>
                 {isKeywordHistoryExist ? (
                   <HistoryTagWrapper>
-                    {searchHistoryQuery.data?.searchKeywords?.map((keyword) => (
+                    {keywordHistory.map((keyword) => (
                       <KeywordHistoryTag
                         key={keyword._id}
                         onClick={() => {
                           onSelectKeyword?.({ id: keyword._id, name: keyword.keyword, type: "keyword" });
+                          addKeywordHistory(keyword.keyword);
                           setSearchValue(keyword.keyword);
                           setIsFocused(false);
                         }}
@@ -438,7 +493,11 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                           color="#A0A0A0"
                           onClick={(e) => {
                             e.stopPropagation();
-                            removeSearchHistory.mutate([keyword._id]);
+                            if (isSignIn) {
+                              removeSearchHistory.mutate([keyword._id]);
+                            } else {
+                              removeKeywordHistory(keyword.keyword);
+                            }
                           }}
                         />
                       </KeywordHistoryTag>
@@ -462,11 +521,15 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                     size={12}
                     weight="r"
                     onClick={() => {
-                      if (searchHistoryQuery.data?.ramenyaNames?.length === 0) return;
-
-                      removeSearchHistory.mutate(
-                        searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => ramenya._id) || [],
-                      );
+                      if (isSignIn) {
+                        if (searchHistoryQuery.data?.ramenyaNames?.length === 0) return;
+                        removeSearchHistory.mutate(
+                          searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => ramenya._id) || [],
+                        );
+                      } else {
+                        if (signOutRamenyaHistory.length === 0) return;
+                        clearRamenyaHistory();
+                      }
                     }}
                   >
                     전체 삭제
@@ -474,12 +537,13 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                 </HistoryHeader>
                 <RamenyaHistoryWrapper>
                   {isRamenyaHistoryExist ? (
-                    searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => (
+                    ramenyaHistory.map((ramenya) => (
                       <KeywardWrapper
                         key={ramenya._id}
                         onClick={() => {
                           onSelectKeyword?.({ id: ramenya._id, name: ramenya.keyword, type: "ramenya" });
                           setSearchValue(ramenya.keyword);
+                          addRamenyaHistory({ _id: ramenya._id, name: ramenya.keyword });
                           setIsFocused(false);
                         }}
                       >
@@ -491,7 +555,11 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                           color="#A0A0A0"
                           onClick={(e) => {
                             e.stopPropagation();
-                            removeSearchHistory.mutate([ramenya._id]);
+                            if (isSignIn) {
+                              removeSearchHistory.mutate([ramenya._id]);
+                            } else {
+                              removeRamenyaHistory({ _id: ramenya._id });
+                            }
                           }}
                         />
                       </KeywardWrapper>
@@ -760,20 +828,26 @@ const ResultListOverlay = ({
 const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
   const swiperRef = useRef<SwiperCore>();
 
-  // Swiper 슬라이드 변경 시 지도 중심 이동
+  // Swiper 슬라이드 변경 시 지도 중심 이동 (디바운싱 적용)
+  const swiperSlideChangeTimeout = useRef<NodeJS.Timeout | null>(null);
   const handleSwiperSlideChange = useCallback(
     (swiper: SwiperCore) => {
-      const currentData = ramenyaList[swiper.realIndex];
+      if (!selectedMarker) return;
 
-      if (!currentData) return;
+      if (swiperSlideChangeTimeout.current) {
+        clearTimeout(swiperSlideChangeTimeout.current);
+      }
 
-      // 선택된 마커 업데이트
-      onMarkerSelect(currentData);
-
-      // 지도 중심을 해당 마커로 이동
-      onMoveMapCenter(currentData.latitude, currentData.longitude);
+      swiperSlideChangeTimeout.current = setTimeout(() => {
+        const currentData = ramenyaList[swiper.realIndex];
+        if (!currentData) return;
+        // 선택된 마커 업데이트
+        onMarkerSelect(currentData);
+        // 지도 중심을 해당 마커로 이동
+        onMoveMapCenter(currentData.latitude, currentData.longitude);
+      }, 200); // 200ms 디바운스
     },
-    [ramenyaList, onMarkerSelect, onMoveMapCenter],
+    [selectedMarker, ramenyaList, onMarkerSelect, onMoveMapCenter],
   );
 
   // 선택된 마커가 변경될 때마다 Swiper 동기화

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import tw from "twin.macro";
+import { useToast } from "../toast/ToastProvider";
 
 export interface NaverMapProps<T = unknown> {
   markers?: {
@@ -119,6 +120,8 @@ const USER_POSITION_MARKER = `
 `;
 
 export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
+  const { openToast } = useToast();
+
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -165,6 +168,8 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
           maximumAge: 600000,
         });
       });
+
+      openToast("성공적으로 현재 위치를 불러왔습니다.");
 
       return {
         latitude: position.coords.latitude,
@@ -314,15 +319,11 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
         data: marker.data,
       });
     });
-
-    console.log(`${props.markers.length}개 마커 생성 완료`);
   }, [mapInstance, markersKey, createMarkerIcon]);
 
   // selectedMarker 변경 시에만 마커 아이콘 업데이트 (마커를 다시 생성하지 않음)
   useEffect(() => {
     if (!mapInstance || !props.markers) return;
-
-    console.log("선택된 마커 업데이트");
 
     props.markers.forEach((marker, index) => {
       const markerKey = `marker-${index}`;
