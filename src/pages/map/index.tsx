@@ -153,7 +153,7 @@ const MapPage = () => {
         setSelectedMarker(markerData);
       }
     },
-    [selectedMarker],
+    [selectedMarker?._id],
   );
 
   // 지도 중심을 특정 위치로 이동
@@ -409,11 +409,13 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                   <RemoveText
                     size={12}
                     weight="r"
-                    onClick={() =>
+                    onClick={() => {
+                      if (searchHistoryQuery.data?.searchKeywords?.length === 0) return;
+
                       removeSearchHistory.mutate(
                         searchHistoryQuery.data?.searchKeywords?.map((keyword) => keyword._id) || [],
-                      )
-                    }
+                      );
+                    }}
                   >
                     전체 삭제
                   </RemoveText>
@@ -459,11 +461,13 @@ const SearchOverlay = ({ onSelectKeyword, searchValue, setSearchValue, ...rest }
                   <RemoveText
                     size={12}
                     weight="r"
-                    onClick={() =>
+                    onClick={() => {
+                      if (searchHistoryQuery.data?.ramenyaNames?.length === 0) return;
+
                       removeSearchHistory.mutate(
                         searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => ramenya._id) || [],
-                      )
-                    }
+                      );
+                    }}
                   >
                     전체 삭제
                   </RemoveText>
@@ -797,7 +801,7 @@ const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMove
             swiperRef.current = swiper;
           }}
           key={ramenyaList[0]?._id}
-          onSlideChangeTransitionEnd={handleSwiperSlideChange}
+          onSlideChange={handleSwiperSlideChange}
           slidesPerView={1.1}
           loop={true}
           centeredSlides={true}
