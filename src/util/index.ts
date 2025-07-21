@@ -1,5 +1,6 @@
 import { BusinessHour, BusinessStatus } from "../types";
 import { DAY_MAP, OpenStatus, WEEKDAYS_ORDER } from "../constants";
+import { disassemble } from "es-hangul";
 
 export const checkBusinessStatus = (businessHours: BusinessHour[]): BusinessStatus => {
   const currentDay = new Date().toLocaleString("en-us", { weekday: "short" }).toLowerCase();
@@ -142,3 +143,84 @@ export function checkBusinessStatusSpecial(businessHours: BusinessHour[]): {
     },
   };
 }
+
+export const getTextMatch = ({
+  query,
+  target,
+}: {
+  query: string;
+  target: string;
+}): {
+  matchedText: string;
+  unMatchedText: string;
+} => {
+  // 한글 자모 분해
+  const queryDisassembled = disassemble(query);
+  const targetDisassembled = disassemble(target);
+
+  // 대소문자 구분 없이 비교하기 위해 소문자로 변환
+  const queryLower = query.toLowerCase();
+  const targetLower = target.toLowerCase();
+
+  // 1. 완전한 한글 매칭 (자모 분해 후 비교)
+  if (targetDisassembled.startsWith(queryDisassembled)) {
+    const matchedText = target.substring(0, query.length);
+    const unMatchedText = target.substring(query.length);
+
+    return {
+      matchedText,
+      unMatchedText,
+    };
+  }
+
+  // 2. 일반 문자열 매칭 (대소문자 구분 없음)
+  if (targetLower.startsWith(queryLower)) {
+    const matchedText = target.substring(0, query.length);
+    const unMatchedText = target.substring(query.length);
+
+    return {
+      matchedText,
+      unMatchedText,
+    };
+  }
+
+  // 3. 부분 매칭 (자모 분해 기준)
+  const index = targetDisassembled.indexOf(queryDisassembled);
+  if (index !== -1) {
+    // 자모 분해된 인덱스를 원본 문자열 인덱스로 변환
+    let originalIndex = 0;
+    let disassembledIndex = 0;
+
+    for (let i = 0; i < target.length; i++) {
+      if (disassembledIndex >= index) break;
+      disassembledIndex += disassemble(target[i]).length;
+      originalIndex = i + 1;
+    }
+
+    const matchedText = target.substring(originalIndex, originalIndex + query.length);
+    const unMatchedText = target.substring(0, originalIndex) + target.substring(originalIndex + query.length);
+
+    return {
+      matchedText,
+      unMatchedText,
+    };
+  }
+
+  // 4. 일반 부분 매칭
+  const normalIndex = targetLower.indexOf(queryLower);
+  if (normalIndex !== -1) {
+    const matchedText = target.substring(normalIndex, normalIndex + query.length);
+    const unMatchedText = target.substring(0, normalIndex) + target.substring(normalIndex + query.length);
+
+    return {
+      matchedText,
+      unMatchedText,
+    };
+  }
+
+  // 매칭되는 부분이 없는 경우
+  return {
+    matchedText: "",
+    unMatchedText: target,
+  };
+};

@@ -24,18 +24,18 @@ import emptyReview from "../../assets/images/empty-review.png";
 import KakaoMap from "./KaKaoMap";
 import { checkBusinessStatus, checkBusinessStatusSpecial } from "../../util";
 import { formatNumber } from "../../util/number";
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 import { useRamenyaReviewImagesQuery, useRamenyaReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { Modal } from "../../components/common/Modal";
 import { useModal } from "../../hooks/common/useModal";
 import { useSignInStore } from "../../states/sign-in";
-import { ReviewImage } from "../../components/common/ReviewImage";
-import { ImagePopup } from "../../components/common/ImagePopup";
-import { UserReviewCard } from "../../components/review/UserReviewCard";
+import { ReviewImage } from "../../components/review/ReviewImage";
+import { ImagePopup } from "../../components/popup/ImagePopup";
+import ReviewCard from "../../components/review/ReviewCard";
 import { Line } from "../../components/common/Line";
 import { useMobileState } from "../../hooks/common/useMobileState";
-import { RamenyaOpenStatus } from "../../components/common/RamenyaCard";
+import { RamenyaOpenStatus } from "../../components/ramenya-card/RamenyaCard";
 import { DAY_MAP, OpenStatus, WEEKDAYS_ORDER, WeekdaysOrderType } from "../../constants";
 import styled from "@emotion/styled";
 
@@ -333,7 +333,7 @@ export const DetailPage = () => {
                 .map((image: string, index: number) => (
                   <ImageBox key={index}>
                     <ReviewImage
-                      image={image}
+                      src={image}
                       onClick={() =>
                         handleOpenImagePopup(
                           index,
@@ -346,7 +346,7 @@ export const DetailPage = () => {
               {ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.length > 5 && (
                 <MoreImageWrapper onClick={handleNavigateImagesPage}>
                   <ImageBox>
-                    <ReviewImage image={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
+                    <ReviewImage src={ramenyaReviewImagesQuery.data?.ramenyaReviewImagesUrls?.[5]} />
                   </ImageBox>
                   <MoreOverlay>
                     <MoreText>더보기</MoreText>
@@ -400,7 +400,7 @@ export const DetailPage = () => {
                     .slice(0, 3)
                     .map((review) => (
                       <>
-                        <UserReviewCard
+                        <ReviewCard
                           key={review._id}
                           review={review}
                           editable={userInformationQuery.data?._id === review.userId?._id}

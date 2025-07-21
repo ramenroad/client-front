@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
 import tw from "twin.macro";
 import { useRamenyaListQuery } from "../../hooks/queries/useRamenyaListQuery";
-import RamenyaCard from "../../components/common/RamenyaCard.tsx";
-import NoStoreBox from "../../components/common/NoStoreBox.tsx";
+import RamenyaCard from "../../components/ramenya-card/RamenyaCard.tsx";
+import NoStoreBox from "../../components/no-data/NoStoreBox.tsx";
 import styled from "@emotion/styled";
-import TopBar from "../../components/common/TopBar.tsx";
+import TopBar from "../../components/top-bar/index.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 import { FilterOptions } from "../../types/filter/index.ts";
 import { initialFilterOptions, RamenyaType } from "../../constants/index.ts";
@@ -30,7 +30,7 @@ export const GenrePage = () => {
   return (
     <Layout>
       <Wrapper>
-        <HeaderSection>
+        <HeaderContainer>
           <TopBar title={genre || ""} />
 
           {/* 필터 영역 */}
@@ -40,7 +40,7 @@ export const GenrePage = () => {
             onFilterChange={setFilterOptions}
             genre={genre as RamenyaType}
           />
-        </HeaderSection>
+        </HeaderContainer>
 
         {/* 라멘야 리스트 영역 */}
         <InformationWrapper>
@@ -85,7 +85,7 @@ const Wrapper = tw.div`
   w-390 h-full
 `;
 
-export const HeaderSection = tw.section`
+export const HeaderContainer = tw.section`
   fixed w-390
   flex flex-col items-center
   font-16-sb

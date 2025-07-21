@@ -17,6 +17,7 @@ import { ReviewListPage } from "./review-page/ReviewListPage";
 import { ImagesPage } from "./detail-page/images-page";
 import UserReviewPage from "./user-review-page";
 import { EditReviewPage } from "./review-page/EditReviewPage";
+import MapPage from "./map";
 
 const router = createBrowserRouter([
   {
@@ -70,10 +71,6 @@ const router = createBrowserRouter([
     element: <WithoutAppBarLayout />,
     children: [
       {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
         path: "register",
         element: <RegisterPage />,
       },
@@ -82,6 +79,14 @@ const router = createBrowserRouter([
         element: <LoginCallbackPage />,
       },
     ],
+  },
+  {
+    path: "login",
+    element: <LoginPage />,
+  },
+  {
+    path: "map",
+    element: <MapPage />,
   },
   {
     path: "/review/create/:id",

@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from "react";
 import tw from "twin.macro";
-import { FilterOptions, SortType } from "../../../types/filter";
-import { Toggle } from "../Toggle";
-import { RAMENYA_TYPES } from "../../../constants";
+import { FilterOptions, SortType } from "../../types/filter";
+import { Toggle } from "../common/Toggle";
+import { RAMENYA_TYPES } from "../../constants";
 import styled from "@emotion/styled";
-import { IconClose, IconPinned } from "../../Icon";
-import { Button } from "../Button";
-import { ModalProps } from "../../../types";
-import { BottomPopupLayout } from "./common";
+import { IconClose, IconPinned } from "../Icon";
+import { Button } from "../common/Button";
+import { ModalProps } from "../../types";
+import { BottomPopupLayout } from "./BottomPopupLayout";
 
 export interface PopupFilterProps extends ModalProps {
   initialFilterOptions: FilterOptions;

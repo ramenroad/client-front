@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { patchMyPagePublic } from "../../api/user-my-page";
-import { useToast } from "../../components/ToastProvider";
+import { useToast } from "../../components/toast/ToastProvider";
 
 export const useUserMyPageMutation = () => {
   const { openToast } = useToast();

@@ -22,7 +22,7 @@ export const Popup: React.FC<PopupProps> = ({ isOpen, onClose, direction = "cent
 };
 
 const Overlay = styled.div<{ direction: "center" | "bottom" }>(({ direction }) => [
-  tw`fixed inset-0 z-100 bg-black/40 flex`,
+  tw`fixed inset-0 z-[200] bg-black/40 flex`,
   direction === "bottom" ? tw`justify-center items-end` : tw`justify-center items-center`,
 ]);
 

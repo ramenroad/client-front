@@ -1,9 +1,9 @@
 import tw from "twin.macro";
 import { RamenroadText } from "../../components/common/RamenroadText";
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 import { useMyReviewQuery, useUserReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { Line } from "../../components/common/Line";
-import { UserReviewCard } from "../../components/review/UserReviewCard";
+import ReviewCard from "../../components/review/ReviewCard";
 import { useNavigate, useParams } from "react-router-dom";
 import { useIntersectionObserver } from "../../hooks/common/useIntersectionObserver";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
@@ -15,7 +15,7 @@ import { queryKeys } from "../../hooks/queries/queryKeys";
 import { useEffect, useMemo, useState } from "react";
 import { IconClose, IconEmptyReview, IconKakao, IconLock, IconMore, IconShare } from "../../components/Icon";
 import { Modal } from "../../components/common/Modal";
-import { useToast } from "../../components/ToastProvider";
+import { useToast } from "../../components/toast/ToastProvider";
 
 const { Kakao } = window as any;
 
@@ -155,7 +155,7 @@ const UserReviewPage = () => {
             myReviewQuery.data?.pages.map((page) =>
               page.reviews.map((review) => (
                 <>
-                  <UserReviewCard key={review._id} review={review} editable mypage />
+                  <ReviewCard key={review._id} review={review} editable mypage />
                   <Line />
                 </>
               )),
@@ -165,7 +165,7 @@ const UserReviewPage = () => {
           myReviewQuery.data?.pages.map((page) =>
             page.reviews.map((review) => (
               <>
-                <UserReviewCard key={review._id} review={review} editable mypage />
+                <ReviewCard key={review._id} review={review} editable mypage />
                 <Line />
               </>
             )),
@@ -189,7 +189,7 @@ const UserReviewPage = () => {
           userReviewQuery.data?.pages.map((page) =>
             page.reviews.map((review) => (
               <>
-                <UserReviewCard key={review._id} review={review} editable={false} mypage />
+                <ReviewCard key={review._id} review={review} editable={false} mypage />
                 <Line />
               </>
             )),

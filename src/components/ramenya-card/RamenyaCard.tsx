@@ -1,23 +1,40 @@
-import { Ramenya } from "../../types";
-import { checkBusinessStatus } from "../../util";
+import { Ramenya } from "../../types/index.ts";
+import { checkBusinessStatus } from "../../util/index.ts";
 import tw from "twin.macro";
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import storeImage from "../../assets/images/store.png";
-import { OpenStatus } from "../../constants";
+import { OpenStatus } from "../../constants/index.ts";
 import CountUp from "react-countup";
 import { useEffect, useMemo } from "react";
 import { setCurrentLocation, useLocationStore } from "../../store/location/useLocationStore.ts";
 import { calculateDistance } from "../../util/number.ts";
-import { IconStarSmall } from "../Icon";
-import { RamenroadText } from "./RamenroadText.tsx";
+import { IconStarSmall } from "../Icon/index.tsx";
+import { RamenroadText } from "../common/RamenroadText.tsx";
 
 interface RamenyaCardProps extends Partial<Ramenya> {
   isReview?: boolean;
+  width?: number | string;
+  isMapCard?: boolean;
 }
 
 const RamenyaCard = (props: RamenyaCardProps) => {
-  const { _id, name, thumbnailUrl, reviewCount, rating, address, businessHours, genre, latitude, longitude } = props;
+  const {
+    _id,
+    name,
+    thumbnailUrl,
+    reviewCount,
+    rating,
+    address,
+    businessHours,
+    genre,
+    latitude,
+    longitude,
+    isReview,
+    isMapCard,
+    width,
+  } = props;
+
   const navigate = useNavigate();
   const { current } = useLocationStore();
 
@@ -54,7 +71,12 @@ const RamenyaCard = (props: RamenyaCardProps) => {
   }, []);
 
   return (
-    <RamenyaCardWrapper key={_id} onClick={() => navigate(`/detail/${_id}`)}>
+    <RamenyaCardWrapper
+      isMapCard={isMapCard}
+      key={_id}
+      onClick={() => navigate(`/detail/${_id}`)}
+      style={{ ...(width ? { width: width } : {}) }}
+    >
       <RamenyaCardLayout>
         {/* 카드 왼쪽 영역 */}
         <RamenyaThumbnail src={thumbnailUrl || storeImage} isImageExist={!!thumbnailUrl} alt={"Thumbnail"} />
@@ -68,7 +90,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
             </RamenyaName>
 
             {/* 라멘야 별점 */}
-            {props.isReview !== false && (
+            {isReview !== false && (
               <RamenyaReviewBox>
                 <IconStarSmall color={rating && rating > 0 ? "#FFCC00" : "#E1E1E1"} />
                 <RamenyaScore>{rating && rating.toFixed(1)}</RamenyaScore>
@@ -122,10 +144,12 @@ const RamenyaCard = (props: RamenyaCardProps) => {
   );
 };
 
-const RamenyaCardWrapper = tw.section`
-  w-full cursor-pointer
+const RamenyaCardWrapper = styled.section(({ isMapCard }: { isMapCard?: boolean }) => [
+  tw` w-full cursor-pointer
   box-border px-20 py-20
-`;
+  bg-white`,
+  isMapCard && tw`rounded-12 shadow-lg`,
+]);
 
 const RamenyaCardLayout = tw.section`
   w-full flex gap-16 items-center

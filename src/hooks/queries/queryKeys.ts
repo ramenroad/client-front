@@ -10,6 +10,8 @@ export const queryKeys = createQueryKeyStore({
     group: null,
     regions: null,
     list: (params: { type: "region" | "genre"; value: string }) => [params.type, params.value] as const,
+    listWithGeolocation: null,
+    searchAutoComplete: (query: string) => [query],
   },
   user: {
     information: null,
@@ -22,5 +24,8 @@ export const queryKeys = createQueryKeyStore({
   },
   userMyPage: {
     user: (userId: string) => [userId],
+  },
+  search: {
+    history: null,
   },
 });

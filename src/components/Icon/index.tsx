@@ -707,3 +707,102 @@ export const IconEmptyReview = () => (
     <circle cx="51.5" cy="28.5" r="2.5" fill="white" />
   </svg>
 );
+
+export const IconMapAppBar = ({ selected }: { selected: boolean }) => {
+  if (selected) {
+    return (
+      <svg width="26" height="27" viewBox="0 0 26 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M21 9.48675C20.8633 14.0615 15.5695 19.8858 13.6699 21.8327C13.2981 22.2136 12.7025 22.214 12.3305 21.8333C10.4068 19.8643 5 13.9346 5 9.48675C5 4.89081 8.58172 1.5 13 1.5C17.4183 1.5 21 4.89081 21 9.48675Z"
+          fill="#292929"
+        />
+        <circle cx="13" cy="9.5" r="3" fill="white" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg width="26" height="27" viewBox="0 0 26 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M21 9.48675C20.8633 14.0615 15.5695 19.8858 13.6699 21.8327C13.2981 22.2136 12.7025 22.214 12.3305 21.8333C10.4068 19.8643 5 13.9346 5 9.48675C5 4.89081 8.58172 1.5 13 1.5C17.4183 1.5 21 4.89081 21 9.48675Z"
+        fill="#CFCFCF"
+      />
+      <circle cx="13" cy="9.5" r="3" fill="white" />
+    </svg>
+  );
+};
+
+export const IconRefresh = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M9.35394 2.88676C7.00919 1.56535 3.9809 2.39908 2.59006 4.74895C1.19922 7.09882 1.97252 10.075 4.31726 11.3964C6.66201 12.7178 9.6903 11.8841 11.0811 9.53419C11.4875 8.84759 11.7092 8.10751 11.7608 7.37087"
+      stroke="#585858"
+      strokeWidth="1.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M10.2853 3.15511L7.57976 3.87623C7.25957 3.96158 7.06998 4.29012 7.15631 4.61004C7.24263 4.92997 7.57218 5.12014 7.89238 5.0348L10.5979 4.31367C10.9181 4.22833 11.1077 3.89979 11.0214 3.57986C10.935 3.25994 10.6055 3.06977 10.2853 3.15511Z"
+      fill="#585858"
+    />
+    <path
+      d="M11.0431 3.58339L10.3152 0.87966C10.229 0.559684 9.89965 0.369623 9.57951 0.455145C9.25936 0.540668 9.06967 0.869389 9.15582 1.18936L9.88376 3.89309C9.9699 4.21307 10.2993 4.40313 10.6194 4.3176C10.9396 4.23208 11.1293 3.90336 11.0431 3.58339Z"
+      fill="#585858"
+    />
+  </svg>
+);
+
+export const IconMarker = () => (
+  <svg width="38" height="45" viewBox="0 0 38 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#filter0_d_2082_2994)">
+      <path
+        d="M19 5.5C24.5287 5.5 28.988 9.73696 28.999 15.5078C28.9216 18.0186 27.5785 20.9563 25.7627 23.7744C23.965 26.5645 21.7963 29.0996 20.2539 30.7715C19.5637 31.5193 18.436 31.5202 17.7441 30.7725C16.1783 29.0799 13.9685 26.5077 12.1562 23.7041C10.32 20.8633 9 17.9468 9 15.5293C9.00001 9.74748 13.4644 5.5 19 5.5Z"
+        fill="#FF5E00"
+        stroke="white"
+        strokeWidth="2"
+      />
+      <ellipse cx="19" cy="15.6693" rx="3" ry="3.04622" fill="white" />
+    </g>
+    <defs>
+      <filter
+        id="filter0_d_2082_2994"
+        x="-1"
+        y="0"
+        width="40"
+        height="46"
+        filterUnits="userSpaceOnUse"
+        colorInterpolationFilters="sRGB"
+      >
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
+        <feColorMatrix
+          in="SourceAlpha"
+          type="matrix"
+          values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+          result="hardAlpha"
+        />
+        <feOffset dy="4" />
+        <feGaussianBlur stdDeviation="4" />
+        <feComposite in2="hardAlpha" operator="out" />
+        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0" />
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2082_2994" />
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2082_2994" result="shape" />
+      </filter>
+    </defs>
+  </svg>
+);
+
+export const IconSearch = () => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16.625 17.375L13.2445 13.9945" stroke="#414141" strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="8.5" cy="9.5" r="5.75" stroke="#414141" strokeWidth="1.5" />
+  </svg>
+);
+
+export const IconComment = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="11" fill="#F6F6F6" />
+    <circle cx="12" cy="16" r="1" fill="#CFCFCF" />
+    <circle cx="16" cy="16" r="1" fill="#CFCFCF" />
+    <circle cx="20" cy="16" r="1" fill="#CFCFCF" />
+  </svg>
+);

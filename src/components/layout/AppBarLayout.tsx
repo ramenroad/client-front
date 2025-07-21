@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
-import AppBar from "../common/AppBar";
 import tw from "twin.macro";
 import { Footer } from "../common/Footer";
+import AppBar from "../app-bar";
 
 const AppBarLayout = () => {
   return (

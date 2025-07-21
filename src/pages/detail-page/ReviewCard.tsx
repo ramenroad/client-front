@@ -10,7 +10,7 @@ import { Modal } from "../../components/common/Modal";
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useRamenyaReviewDeleteMutation } from "../../hooks/queries/useRamenyaReviewQuery";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery";
-import { ImagePopup } from "../../components/common/ImagePopup";
+import { ImagePopup } from "../../components/popup/ImagePopup";
 
 export const ReviewCard = ({ review }: { review: UserReview }) => {
   const navigate = useNavigate();

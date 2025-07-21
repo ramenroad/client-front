@@ -1,4 +1,4 @@
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 import RamenroadMainLogo from "../../assets/images/ramenroad-main-logo.png";
 import tw from "twin.macro";
 import { Line } from "../../components/common/Line";

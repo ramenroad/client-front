@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import tw from "twin.macro";
-import { IconHome, IconUser } from "../Icon";
+import { IconHome, IconMapAppBar, IconUser } from "../Icon";
 import styled from "@emotion/styled";
 import { useSignInStore } from "../../states/sign-in";
 
@@ -15,6 +15,11 @@ const AppBar = () => {
         <AppBarItem onClick={() => navigate("/")}>
           <IconHome selected={currentPath === "/"} />
           <ItemText selected={currentPath === "/"}>홈</ItemText>
+        </AppBarItem>
+
+        <AppBarItem onClick={() => navigate("/map")}>
+          <IconMapAppBar selected={currentPath === "/map"} />
+          <ItemText selected={currentPath === "/map"}>지도</ItemText>
         </AppBarItem>
         <AppBarItem
           onClick={() => {

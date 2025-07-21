@@ -2,21 +2,21 @@ import { useNavigate } from "react-router-dom";
 import tw from "twin.macro";
 import { useMobileState } from "../../hooks/common/useMobileState.ts";
 import styled from "@emotion/styled/macro";
+import { RamenroadText } from "../../components/common/RamenroadText.tsx";
 
-interface LocationPathBoxProps {
+interface LocationPathCardProps {
   location: string;
 }
 
-export const LocationPathBox = ({ location }: LocationPathBoxProps) => {
+export const LocationPathCard = ({ location }: LocationPathCardProps) => {
   const navigate = useNavigate();
   const { isMobile } = useMobileState();
 
   return (
-    <Wrapper
-      isMobile={isMobile}
-      onClick={() => navigate(`/location/${location}`)}
-    >
-      <LocationPathText>{location}</LocationPathText>
+    <Wrapper isMobile={isMobile} onClick={() => navigate(`/location/${location}`)}>
+      <LocationPathText size={14} weight="r">
+        {location}
+      </LocationPathText>
     </Wrapper>
   );
 };
@@ -30,6 +30,6 @@ const Wrapper = styled.div(({ isMobile }: { isMobile: boolean }) => [
   !isMobile && tw`hover:(bg-orange text-white) active:(bg-orange text-white)`,
 ]);
 
-const LocationPathText = tw.div`
-  flex font-14-r 
+const LocationPathText = tw(RamenroadText)`
+  flex
 `;

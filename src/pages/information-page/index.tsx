@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import TopBar from "../../components/common/TopBar";
+import TopBar from "../../components/top-bar";
 import styled from "@emotion/styled";
 import { IconCamera, IconArrowRight, IconUnSignInUserProfile } from "../../components/Icon";
 import { useNavigate } from "react-router-dom";
