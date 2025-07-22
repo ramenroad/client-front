@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo, ComponentProps } from "react";
 import tw from "twin.macro";
-import AppBar from "../../components/app-bar";
 import { NaverMap } from "../../components/map/NaverMap";
 import { GetRamenyaListWithGeolocationParams, getRamenyaListWithSearch } from "../../api/map";
 import {
@@ -230,47 +229,40 @@ const MapPage = () => {
 
   return (
     <>
-      <MapScreen>
-        <SearchOverlay
-          onSelectKeyword={handleSelectKeyword}
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-        />
+      <SearchOverlay onSelectKeyword={handleSelectKeyword} searchValue={searchValue} setSearchValue={setSearchValue} />
 
-        {/* 상단 현재 위치 재검색 버튼 */}
-        <RefreshOverlay onRefresh={handleRefreshLocation} />
+      {/* 상단 현재 위치 재검색 버튼 */}
+      <RefreshOverlay onRefresh={handleRefreshLocation} />
 
-        <NaverMap<Ramenya>
-          onMapReady={handleMapReady}
-          onMapCenterChange={updateLocationData}
-          markers={markerData}
+      <NaverMap<Ramenya>
+        onMapReady={handleMapReady}
+        onMapCenterChange={updateLocationData}
+        markers={markerData}
+        selectedMarker={selectedMarker}
+        onMarkerClick={handleMarkerClick}
+      />
+
+      {/* 카드 오버레이 (기존 기능) */}
+      {mapMode === MAP_MODE.CARD && (
+        <ResultCardOverlay
+          ramenyaList={ramenyaList || []}
           selectedMarker={selectedMarker}
-          onMarkerClick={handleMarkerClick}
+          onMarkerSelect={setSelectedMarker}
+          onMoveMapCenter={handleMoveMapCenter}
         />
+      )}
 
-        {/* 카드 오버레이 (기존 기능) */}
-        {mapMode === MAP_MODE.CARD && (
-          <ResultCardOverlay
-            ramenyaList={ramenyaList || []}
-            selectedMarker={selectedMarker}
-            onMarkerSelect={setSelectedMarker}
-            onMoveMapCenter={handleMoveMapCenter}
-          />
-        )}
-
-        {/* 리스트 오버레이 (드래그 가능한 새로운 컴포넌트) */}
-        {mapMode === MAP_MODE.LIST && (
-          <ResultListOverlay
-            ramenyaList={ramenyaList || []}
-            selectedMarker={selectedMarker}
-            onMarkerSelect={setSelectedMarker}
-            onMoveMapCenter={handleMoveMapCenter}
-            filterOptions={filterOptions}
-            setFilterOptions={setFilterOptions}
-          />
-        )}
-      </MapScreen>
-      <AppBar />
+      {/* 리스트 오버레이 (드래그 가능한 새로운 컴포넌트) */}
+      {mapMode === MAP_MODE.LIST && (
+        <ResultListOverlay
+          ramenyaList={ramenyaList || []}
+          selectedMarker={selectedMarker}
+          onMarkerSelect={setSelectedMarker}
+          onMoveMapCenter={handleMoveMapCenter}
+          filterOptions={filterOptions}
+          setFilterOptions={setFilterOptions}
+        />
+      )}
     </>
   );
 };
@@ -910,11 +902,6 @@ const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMove
     </ResultCardContainer>
   );
 };
-
-const MapScreen = tw.main`
-  w-full h-[calc(100vh-56px)] relative
-  pb-56
-`;
 
 // ResultCardOverlay 스타일
 const ResultCardContainer = tw.div`

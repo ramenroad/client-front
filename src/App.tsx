@@ -23,12 +23,12 @@ function App() {
 }
 
 const Screen = tw.section`
-  flex justify-center min-h-screen overflow-hidden box-border
+  flex justify-center min-h-[100dvh] overflow-hidden box-border
 `;
 
 const View = tw.main`
   relative flex flex-col items-center box-border
-  w-390 min-h-screen
+  w-390 min-h-[100dvh]
   border-0 border-x border-border border-solid
 `;
 

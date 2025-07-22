@@ -18,6 +18,7 @@ import { ImagesPage } from "./detail-page/images-page";
 import UserReviewPage from "./user-review-page";
 import { EditReviewPage } from "./review-page/EditReviewPage";
 import MapPage from "./map";
+import MapLayout from "../components/layout/MapLayout";
 
 const router = createBrowserRouter([
   {
@@ -81,12 +82,18 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "login",
-    element: <LoginPage />,
+    path: "map",
+    element: <MapLayout />,
+    children: [
+      {
+        path: "",
+        element: <MapPage />,
+      },
+    ],
   },
   {
-    path: "map",
-    element: <MapPage />,
+    path: "login",
+    element: <LoginPage />,
   },
   {
     path: "/review/create/:id",
