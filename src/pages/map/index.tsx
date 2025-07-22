@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo, ComponentProps } from "react";
 import tw from "twin.macro";
-import AppBar from "../../components/app-bar";
 import { NaverMap } from "../../components/map/NaverMap";
 import { GetRamenyaListWithGeolocationParams, getRamenyaListWithSearch } from "../../api/map";
 import {
