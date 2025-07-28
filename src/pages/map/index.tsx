@@ -28,8 +28,28 @@ import NoResultBox from "../../components/no-data/NoResultBox";
 import { queryClient } from "../../core/queryClient";
 import { queryKeys } from "../../hooks/queries/queryKeys";
 import { useSignInStore } from "../../states/sign-in";
+import { useSearchParams } from "react-router-dom";
 
 const MapPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const {
+    keywordName,
+    keywordId,
+    latitude: keywordLatitude,
+    longitude: keywordLongitude,
+    radius: keywordRadius,
+  } = useMemo(
+    () => ({
+      keywordName: searchParams.get("keywordName") ?? null,
+      keywordId: searchParams.get("keywordId") ?? null,
+      latitude: Number(searchParams.get("latitude")) ?? null,
+      longitude: Number(searchParams.get("longitude")) ?? null,
+      radius: Number(searchParams.get("radius")) ?? null,
+    }),
+    [searchParams],
+  );
+
   const [currentGeolocation, setCurrentGeolocation] = useState<GetRamenyaListWithGeolocationParams>({
     latitude: 0,
     longitude: 0,
@@ -106,12 +126,12 @@ const MapPage = () => {
     (map: naver.maps.Map) => {
       setMapInstance(map);
       // 지도가 준비되면 초기 위치 데이터 가져오기 (한 번만)
-      if (!isInitialized) {
+      if (!isInitialized && ramenyaList.length === 0) {
         updateLocationData(map);
         setIsInitialized(true);
       }
     },
-    [updateLocationData, isInitialized],
+    [isInitialized, ramenyaList.length, updateLocationData],
   );
 
   // 현재 지도 중심 좌표 가져오기 및 데이터 refetch (수동 새로고침)
@@ -147,7 +167,6 @@ const MapPage = () => {
   // 마커 클릭 핸들러 메모화
   const handleMarkerClick = useCallback(
     (markerData: Ramenya) => {
-      console.log("handleMarkerClick", markerData);
       setSelectedMarker((prevSelected) => {
         if (prevSelected?._id === markerData._id) {
           return null;
@@ -171,12 +190,17 @@ const MapPage = () => {
   );
 
   // 키워드 선택 핸들러
-  const handleSelectKeyword = useCallback(
-    async (keyword: { id: string; name: string; type: "keyword" | "ramenya" }) => {
+  const handleSearchWithKeyword = useCallback(
+    async (
+      keyword: { id?: string; name: string; type: "keyword" | "ramenya" },
+      geolocation?: GetRamenyaListWithGeolocationParams,
+    ) => {
       try {
         let ramenyaList: Ramenya[] = [];
+        const searchGeolocation = geolocation || currentGeolocation;
+
         if (keyword.type === "keyword") {
-          ramenyaList = await getRamenyaListWithSearch({ query: keyword.name, ...currentGeolocation });
+          ramenyaList = await getRamenyaListWithSearch({ query: keyword.name, ...searchGeolocation });
         } else {
           ramenyaList = await getRamenyaListWithSearch({ query: keyword.name });
         }
@@ -184,6 +208,7 @@ const MapPage = () => {
         queryClient.invalidateQueries({ ...queryKeys.search.history });
 
         if (ramenyaList?.length > 0) {
+          console.log("ramenyaList", ramenyaList);
           handleMoveMapCenter(ramenyaList[0].latitude, ramenyaList[0].longitude);
           setRamenyaList(ramenyaList);
         } else {
@@ -194,7 +219,21 @@ const MapPage = () => {
         setRamenyaList([]);
       }
     },
-    [handleMoveMapCenter, currentGeolocation],
+    [handleMoveMapCenter],
+  );
+
+  const handleKeywordClick = useCallback(
+    (keyword: { id: string; name: string; type: "keyword" | "ramenya" }) => {
+      setSearchParams((prev) => {
+        prev.set("keywordName", keyword.name);
+        prev.set("keywordId", keyword.id);
+        prev.set("latitude", currentGeolocation.latitude.toString());
+        prev.set("longitude", currentGeolocation.longitude.toString());
+        prev.set("radius", currentGeolocation.radius.toString());
+        return prev;
+      });
+    },
+    [currentGeolocation.latitude, currentGeolocation.longitude, currentGeolocation.radius, setSearchParams],
   );
 
   // 위치 기반 쿼리 결과 처리 (초기화 완료 후에만)
@@ -208,6 +247,36 @@ const MapPage = () => {
       setRamenyaList(ramenyaListWithGeolocationQuery.data || []);
     }
   }, [ramenyaListWithGeolocationQuery.data, ramenyaListWithGeolocationQuery.isLoading, isInitialized, searchValue]);
+
+  // 파라미터 수정 시 처리
+  useEffect(() => {
+    setRamenyaList([]);
+
+    if (!keywordName || !mapInstance) {
+      return;
+    }
+
+    if (!keywordId) {
+      handleSearchWithKeyword({ name: keywordName, type: "keyword" });
+      return;
+    }
+
+    const targetGeolocation =
+      keywordLatitude && keywordLongitude && keywordRadius
+        ? {
+            latitude: keywordLatitude,
+            longitude: keywordLongitude,
+            radius: keywordRadius,
+          }
+        : currentGeolocation;
+
+    // 위치 정보가 URL에 있으면 상태도 업데이트
+    if (keywordLatitude && keywordLongitude && keywordRadius) {
+      setCurrentGeolocation(targetGeolocation);
+    }
+
+    handleSearchWithKeyword({ id: keywordId, name: keywordName, type: "ramenya" }, targetGeolocation);
+  }, [keywordId, keywordName, keywordLatitude, keywordLongitude, keywordRadius, mapInstance]);
 
   // 마커 데이터 메모화 - ramenyaList가 변경될 때만 새로 생성
   const markerData = useMemo(() => {
@@ -223,13 +292,9 @@ const MapPage = () => {
     );
   }, [ramenyaList]);
 
-  useEffect(() => {
-    console.log("useEffect selectedMarker", selectedMarker);
-  }, [selectedMarker]);
-
   return (
     <>
-      <SearchOverlay onSelectKeyword={handleSelectKeyword} searchValue={searchValue} setSearchValue={setSearchValue} />
+      <SearchOverlay onSelectKeyword={handleKeywordClick} searchValue={searchValue} setSearchValue={setSearchValue} />
 
       {/* 상단 현재 위치 재검색 버튼 */}
       <RefreshOverlay onRefresh={handleRefreshLocation} />
