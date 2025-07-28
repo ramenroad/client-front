@@ -10,13 +10,18 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import RamenroadLogo from "./RamenroadLogo";
 import Section from "./Section";
 import GenreCard from "./GenreCard";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { SearchOverlay } from "../../components/map/SearchOverlay";
+import { IconSearch } from "../../components/Icon";
 
 const MainPage = () => {
   const navigate = useNavigate();
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
   const { data: regions } = useRegionsQuery();
+
+  const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   const locationPath = useMemo(
     () =>
@@ -32,6 +37,25 @@ const MainPage = () => {
       <RamenroadLogoWrapper>
         <RamenroadLogo />
       </RamenroadLogoWrapper>
+
+      {/* 검색 */}
+      <SearchInputWrapper onClick={() => setIsSearchOverlayOpen(true)}>
+        <IconSearch color="#FF5200" />
+        <SearchInput placeholder="무슨 라멘 먹을까?" readOnly />
+      </SearchInputWrapper>
+
+      <SearchOverlay
+        isExternal={true}
+        isSearchOverlayOpen={isSearchOverlayOpen}
+        setIsSearchOverlayOpen={setIsSearchOverlayOpen}
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
+        onSelectKeyword={(data) => {
+          const mapString = new URLSearchParams();
+          mapString.append("keywordName", data.name);
+          navigate(`/map?${mapString}`);
+        }}
+      />
 
       {/* 배너 */}
       <BannerWrapper>
@@ -105,7 +129,7 @@ const BannerWrapper = tw.div`
 `;
 
 const GenrePathContainer = tw.div`
-  grid grid-cols-5 gap-x-14 gap-y-12
+  grid grid-cols-4 gap-x-14 gap-y-12
 `;
 
 const LocationPathContainer = tw.div`
@@ -115,6 +139,25 @@ const LocationPathContainer = tw.div`
 
 const SwiperContainer = tw.div`
   w-350
+`;
+
+const SearchInputWrapper = tw.div`
+  box-border
+  rounded-40
+  w-350 h-48 px-16 py-12
+  bg-white
+  outline-none border border-orange border-solid border-[1.2px]
+  cursor-pointer
+  w-350
+  flex gap-4
+`;
+
+const SearchInput = tw.input`
+  w-full h-full
+  outline-none border-none
+  bg-transparent
+  text-black
+  placeholder:text-gray-400 font-16-r
 `;
 
 export default MainPage;

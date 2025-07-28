@@ -40,17 +40,26 @@ export enum OpenStatus {
 
 export const genrePath = [
   {
-    genre: "돈코츠",
-    image: pig,
+    genre: "쇼유",
+    image: soy,
   },
   {
     genre: "시오",
     image: sio,
   },
   {
-    genre: "쇼유",
-    image: soy,
+    genre: "미소",
+    image: miso,
   },
+  {
+    genre: "돈코츠",
+    image: pig,
+  },
+  {
+    genre: "츠케멘",
+    image: tsukemen,
+  },
+
   {
     genre: "이에케",
     image: iekei,
@@ -67,21 +76,13 @@ export const genrePath = [
     genre: "니보시",
     image: niboshi,
   },
-  {
-    genre: "아사리",
-    image: asari,
-  },
+  // {
+  //   genre: "아사리",
+  //   image: asari,
+  // },
   {
     genre: "아부라소바",
     image: aburasoba,
-  },
-  {
-    genre: "츠케멘",
-    image: tsukemen,
-  },
-  {
-    genre: "미소",
-    image: miso,
   },
   {
     genre: "탄탄멘",

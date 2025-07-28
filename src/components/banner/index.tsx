@@ -62,7 +62,7 @@ const Wrapper = tw.div`
 `;
 
 const SwiperWrapper = tw.div`
-  w-350 h-200 relative
+  w-350 h-140 relative
 `;
 
 const BannerImage = tw.img`

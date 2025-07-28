@@ -1,15 +1,17 @@
 import { getRamenyaListByRegion, getRamenyaListByGenre, getRegions } from "../../api/list-page";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { queryKeys } from "./queryKeys";
 import { FilterOptions, SortType } from "../../types/filter";
 import { checkBusinessStatus } from "../../util";
 import { useLocationStore } from "../../store/location/useLocationStore";
 import { calculateDistanceValue } from "../../util/number";
 import { OpenStatus } from "../../constants";
+import { Ramenya } from "../../types";
 import {
   getRamenyaListWithGeolocation,
   GetRamenyaListWithGeolocationParams,
   getRamenyaSearchAutoComplete,
+  GetRamenyaListWithGeolocationResponse,
 } from "../../api/map";
 
 type QueryType = "region" | "genre";
@@ -83,7 +85,11 @@ export const useRamenyaListWithGeolocationQuery = ({
   longitude,
   radius,
   filterOptions,
-}: GetRamenyaListWithGeolocationParams & { filterOptions?: FilterOptions }) => {
+  queryOptions,
+}: GetRamenyaListWithGeolocationParams & {
+  filterOptions?: FilterOptions;
+  queryOptions?: Partial<UseQueryOptions<GetRamenyaListWithGeolocationResponse, Error, Ramenya[]>>;
+}) => {
   const ramenyaListWithGeolocationQuery = useQuery({
     ...queryKeys.ramenya.listWithGeolocation,
     queryFn: () => getRamenyaListWithGeolocation({ latitude, longitude, radius }),
@@ -136,6 +142,7 @@ export const useRamenyaListWithGeolocationQuery = ({
       return filtered ?? [];
     },
     enabled: !!latitude && !!longitude && !!radius,
+    ...queryOptions,
   });
 
   return { ramenyaListWithGeolocationQuery };
