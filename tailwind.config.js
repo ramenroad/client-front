@@ -206,6 +206,11 @@ module.exports = {
           lineHeight: "15px",
           fontWeight: 600,
         },
+        ".font-10-b": {
+          fontSize: "10px",
+          lineHeight: "15px",
+          fontWeight: 700,
+        },
         ".font-12-r": {
           fontSize: "12px",
           lineHeight: "18px",
@@ -220,6 +225,11 @@ module.exports = {
           fontSize: "12px",
           lineHeight: "18px",
           fontWeight: 600,
+        },
+        ".font-12-b": {
+          fontSize: "12px",
+          lineHeight: "18px",
+          fontWeight: 700,
         },
         ".font-14-r": {
           fontSize: "14px",
@@ -236,6 +246,11 @@ module.exports = {
           lineHeight: "21px",
           fontWeight: 600,
         },
+        ".font-14-b": {
+          fontSize: "14px",
+          lineHeight: "21px",
+          fontWeight: 700,
+        },
         ".font-16-r": {
           fontSize: "16px",
           lineHeight: "24px",
@@ -250,6 +265,11 @@ module.exports = {
           fontSize: "16px",
           lineHeight: "24px",
           fontWeight: 600,
+        },
+        ".font-16-b": {
+          fontSize: "16px",
+          lineHeight: "24px",
+          fontWeight: 700,
         },
         ".font-18-r": {
           fontSize: "18px",
@@ -266,6 +286,11 @@ module.exports = {
           lineHeight: "27px",
           fontWeight: 600,
         },
+        ".font-18-b": {
+          fontSize: "18px",
+          lineHeight: "27px",
+          fontWeight: 700,
+        },
         ".font-20-r": {
           fontSize: "20px",
           lineHeight: "30px",
@@ -281,6 +306,11 @@ module.exports = {
           lineHeight: "30px",
           fontWeight: 600,
         },
+        ".font-20-b": {
+          fontSize: "20px",
+          lineHeight: "30px",
+          fontWeight: 700,
+        },
         ".font-22-r": {
           fontSize: "22px",
           lineHeight: "33px",
@@ -295,6 +325,11 @@ module.exports = {
           fontSize: "22px",
           lineHeight: "33px",
           fontWeight: 600,
+        },
+        ".font-22-b": {
+          fontSize: "22px",
+          lineHeight: "33px",
+          fontWeight: 700,
         },
       });
 
