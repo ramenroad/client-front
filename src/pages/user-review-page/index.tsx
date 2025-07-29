@@ -113,11 +113,6 @@ const UserReviewPage = () => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log("my", my);
-    console.log("userReviewQuery.isError", userReviewQuery.isError);
-  }, [my, userReviewQuery.isError]);
-
   //
 
   return (
