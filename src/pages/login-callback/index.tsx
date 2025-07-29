@@ -14,7 +14,7 @@ const LoginCallbackPage = () => {
 
   const navigate = useNavigate();
 
-  const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(true);
+  const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
 
   useEffect(() => {
