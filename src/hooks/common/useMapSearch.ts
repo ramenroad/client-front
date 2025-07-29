@@ -141,17 +141,26 @@ export const useMapSearch = ({ currentGeolocation, isLocationInitialized, moveMa
         prev.set("longitude", locationToUse.longitude.toString());
         prev.set("radius", locationToUse.radius.toString());
 
-        // 기존 키워드 정보는 유지
-        if (searchParamsKeyword.keywordName) {
-          prev.set("keywordName", searchParamsKeyword.keywordName);
-        } else {
+        // searchValueToUse가 빈 문자열이면 keywordName 삭제
+        if (searchValueToUse === "" || !searchValueToUse) {
           prev.delete("keywordName");
-        }
-
-        if (searchParamsKeyword.keywordId) {
-          prev.set("keywordId", searchParamsKeyword.keywordId);
-        } else {
           prev.delete("keywordId");
+        } else {
+          // 기존 키워드 정보는 유지
+          const currentKeywordName = prev.get("keywordName");
+          const currentKeywordId = prev.get("keywordId");
+
+          if (currentKeywordName) {
+            prev.set("keywordName", currentKeywordName);
+          } else {
+            prev.delete("keywordName");
+          }
+
+          if (currentKeywordId) {
+            prev.set("keywordId", currentKeywordId);
+          } else {
+            prev.delete("keywordId");
+          }
         }
 
         return prev;

@@ -145,6 +145,7 @@ const SearchInputWrapper = tw.div`
   box-border
   rounded-40
   w-350 h-48 px-16 py-12
+  mb-[-20px]
   bg-white
   outline-none border border-orange border-solid border-[1.2px]
   cursor-pointer

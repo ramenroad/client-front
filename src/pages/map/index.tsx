@@ -92,6 +92,18 @@ const MapPage = () => {
   const handleRefreshLocation = useCallback(async () => {
     if (!mapInstance) return;
 
+    setSearchParams((prev) => {
+      const newSearchParams = new URLSearchParams(prev);
+
+      if (searchValue === "" || searchValue.trim() === "") {
+        newSearchParams.delete("keywordName");
+      } else {
+        newSearchParams.set("keywordName", searchValue);
+      }
+
+      return newSearchParams;
+    });
+
     // 현재 지도 중심 좌표를 가져와서 상태와 URL 모두 업데이트
     const newLocation = updateLocationData(mapInstance);
     setSelectedMarker(null);
@@ -248,27 +260,39 @@ const ResultListOverlay = ({
 }) => {
   const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.HALF);
   const [isDragging, setIsDragging] = useState(false);
-  const [tempHeight, setTempHeight] = useState<number>(OVERLAY_HEIGHTS.COLLAPSED);
+  const [tempHeight, setTempHeight] = useState<string>(OVERLAY_HEIGHTS.COLLAPSED);
 
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // 드래그 중 실시간 높이 변화를 위해 tempHeight 사용
+  // vh 값을 픽셀로 변환하는 함수
+  const vhToPx = (vh: string) => {
+    const vhValue = parseFloat(vh.replace("vh", ""));
+    return (vhValue / 100) * window.innerHeight;
+  };
+
+  // 픽셀 값을 vh로 변환하는 함수
+  const pxToVh = (px: number) => {
+    return `${(px / window.innerHeight) * 100}vh`;
+  };
 
   // 드래그 제스처 설정
   const bind = useDrag(
-    ({ movement: [, my], canceled, last, memo = currentHeight }) => {
+    ({ movement: [, my], canceled, last, memo = vhToPx(currentHeight) }) => {
       if (canceled) return;
 
       setIsDragging(true);
 
       // 드래그 방향에 따른 높이 계산 (위로 드래그하면 양수)
       const deltaY = -my; // 위로 드래그하면 높이 증가
-      let newHeight = memo + deltaY;
+      let newHeightPx = memo + deltaY;
 
-      // 엄격한 높이 제한 적용
-      newHeight = Math.max(OVERLAY_HEIGHTS.COLLAPSED, Math.min(OVERLAY_HEIGHTS.EXPANDED, newHeight));
+      // 엄격한 높이 제한 적용 (vh를 픽셀로 변환하여 비교)
+      const minHeightPx = vhToPx(OVERLAY_HEIGHTS.COLLAPSED);
+      const maxHeightPx = vhToPx(OVERLAY_HEIGHTS.EXPANDED);
+      newHeightPx = Math.max(minHeightPx, Math.min(maxHeightPx, newHeightPx));
 
-      setTempHeight(newHeight);
+      // 픽셀을 vh로 변환하여 tempHeight 설정
+      setTempHeight(pxToVh(newHeightPx));
 
       // 드래그 종료 시 스냅
       if (last) {
@@ -276,10 +300,14 @@ const ResultListOverlay = ({
 
         // 3단계 높이 중 가장 가까운 것 찾기
         const heights = [OVERLAY_HEIGHTS.COLLAPSED, OVERLAY_HEIGHTS.HALF, OVERLAY_HEIGHTS.EXPANDED];
-        const closestHeight = heights.reduce((prev, curr) =>
-          Math.abs(curr - newHeight) < Math.abs(prev - newHeight) ? curr : prev,
-        ) as OverlayHeightType;
+        const heightPixels = heights.map((vh) => vhToPx(vh));
+        const closestHeightIndex = heightPixels.reduce(
+          (prev, curr, index) =>
+            Math.abs(curr - newHeightPx) < Math.abs(heightPixels[prev] - newHeightPx) ? index : prev,
+          0,
+        );
 
+        const closestHeight = heights[closestHeightIndex] as OverlayHeightType;
         setCurrentHeight(closestHeight);
         setTempHeight(closestHeight);
       }
@@ -289,7 +317,7 @@ const ResultListOverlay = ({
       filterTaps: true,
       preventDefault: true,
       // 실시간 반응을 위한 설정
-      from: () => [0, currentHeight],
+      from: () => [0, vhToPx(currentHeight)],
     },
   );
 
@@ -297,7 +325,7 @@ const ResultListOverlay = ({
     <ResultListOverlayContainer
       ref={overlayRef}
       style={{
-        height: isDragging ? `${tempHeight}px` : `${currentHeight}px`,
+        height: isDragging ? tempHeight : currentHeight,
         transition: isDragging ? "none" : "height 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
       }}
     >
@@ -315,7 +343,7 @@ const ResultListOverlay = ({
       {/* 콘텐츠 영역 */}
       <ListContentArea
         style={{
-          height: isDragging ? `${tempHeight - 10}px` : `${currentHeight - 10}px`, // FilterSection 높이 고려
+          height: isDragging ? `calc(${tempHeight} - 10px)` : `calc(${currentHeight} - 10px)`, // FilterSection 높이 고려
           overflowY: "auto",
         }}
       >
