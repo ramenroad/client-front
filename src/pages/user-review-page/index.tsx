@@ -162,15 +162,6 @@ const UserReviewPage = () => {
             )
           )
         ) : userReviewQuery.isError ? (
-          myReviewQuery.data?.pages.map((page) =>
-            page.reviews.map((review) => (
-              <>
-                <ReviewCard key={review._id} review={review} editable mypage />
-                <Line />
-              </>
-            )),
-          )
-        ) : userReviewQuery.isError ? (
           <UnavailableReviewOverlay>
             <IconLock />
             <PrivateReviewTitle size={16} weight="r">
