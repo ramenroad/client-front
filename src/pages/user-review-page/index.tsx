@@ -113,6 +113,11 @@ const UserReviewPage = () => {
     }
   }, []);
 
+  useEffect(() => {
+    console.log("my", my);
+    console.log("userReviewQuery.isError", userReviewQuery.isError);
+  }, [my, userReviewQuery.isError]);
+
   //
 
   return (
@@ -160,15 +165,6 @@ const UserReviewPage = () => {
                 </>
               )),
             )
-          )
-        ) : userReviewQuery.isError ? (
-          myReviewQuery.data?.pages.map((page) =>
-            page.reviews.map((review) => (
-              <>
-                <ReviewCard key={review._id} review={review} editable mypage />
-                <Line />
-              </>
-            )),
           )
         ) : userReviewQuery.isError ? (
           <UnavailableReviewOverlay>
