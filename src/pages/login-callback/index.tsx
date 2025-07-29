@@ -14,7 +14,7 @@ const LoginCallbackPage = () => {
 
   const navigate = useNavigate();
 
-  const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(false);
+  const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(true);
   const [loginEmail, setLoginEmail] = useState("");
 
   useEffect(() => {
@@ -81,7 +81,7 @@ const LoginCallbackPage = () => {
           <LoginButtonText loginType="naver">네이버 계정으로 로그인</LoginButtonText>
         </LoginButton>
         <BackButton>
-          <RamenroadText size={16} weight="m" onClick={() => navigate("/main")}>
+          <RamenroadText size={14} weight="m" onClick={() => navigate("/")}>
             이전 화면으로 돌아가기
           </RamenroadText>
         </BackButton>
@@ -123,7 +123,6 @@ const LoginButtonWrapper = tw.div`
 const LoginButton = styled.button(({ loginType }: { loginType: "kakao" | "naver" }) => [
   tw`
     flex items-center justify-center gap-8
-    py-11
     w-310 h-46
     rounded-50
     shadow-none
@@ -155,7 +154,7 @@ const BackButton = tw.button`
 
 const LoginButtonText = styled.span(({ loginType }: { loginType: "kakao" | "naver" }) => [
   tw`
-    font-16-m
+    font-14-m
   `,
   loginType === "kakao" && tw`text-black/85`,
   loginType === "naver" && tw`text-white`,
