@@ -14,8 +14,8 @@ const LoginCallbackPage = () => {
 
   const navigate = useNavigate();
 
-  const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(true);
-  const [loginEmail, setLoginEmail] = useState("test@test.com");
+  const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(false);
+  const [loginEmail, setLoginEmail] = useState("");
 
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("code");
@@ -25,6 +25,7 @@ const LoginCallbackPage = () => {
         { id: id!, code: code },
         {
           onError: (error) => {
+            console.error(error);
             if (error instanceof AxiosError) {
               if (error.response?.data.statusCode === 406) {
                 // 이메일이 이미 가입된 경우 처리
