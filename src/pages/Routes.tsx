@@ -75,10 +75,6 @@ const router = createBrowserRouter([
         path: "register",
         element: <RegisterPage />,
       },
-      {
-        path: "oauth/:id",
-        element: <LoginCallbackPage />,
-      },
     ],
   },
   {
@@ -94,6 +90,10 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: <LoginPage />,
+  },
+  {
+    path: "oauth/:id",
+    element: <LoginCallbackPage />,
   },
   {
     path: "/review/create/:id",

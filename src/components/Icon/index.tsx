@@ -806,3 +806,34 @@ export const IconComment = () => (
     <circle cx="20" cy="16" r="1" fill="#CFCFCF" />
   </svg>
 );
+
+export const IconEmail = () => (
+  <svg width="110" height="82" viewBox="0 0 110 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <mask id="mask0_2339_4369" maskUnits="userSpaceOnUse" x="14" y="9" width="82" height="60">
+      <path
+        d="M14 15.8799C14 12.0803 17.0649 9 20.8457 9H89.1543C92.9351 9 96 12.0803 96 15.8799V62.1201C96 65.9197 92.9351 69 89.1543 69H20.8457C17.0649 69 14 65.9198 14 62.1201V15.8799Z"
+        fill="#2C958F"
+      />
+    </mask>
+    <g mask="url(#mask0_2339_4369)">
+      <path d="M21.0825 69.0155H87.95L14 9.12283V61.8976C14 65.8287 17.1709 69.0155 21.0825 69.0155Z" fill="#FFDAAF" />
+      <path
+        d="M89.1325 69.0155H22.265L96.215 9.12283V61.8976C96.215 65.8287 93.0441 69.0155 89.1325 69.0155Z"
+        fill="#FFDAAF"
+      />
+      <path
+        d="M87.6344 69.0528H21.9048L51.0311 41.399C53.1431 39.3937 56.4457 39.395 58.5561 41.4019L87.6344 69.0528Z"
+        fill="#FFD19D"
+      />
+      <path d="M96 9H14L49.879 44.5708C52.6289 47.2971 57.0453 47.3061 59.8062 44.5912L96 9Z" fill="#FFE8CE" />
+    </g>
+    <circle cx="90.5" cy="61.5" r="15.5" fill="#5FCBA7" />
+    <path
+      d="M84 62.1538L88.1364 66L97 58"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
