@@ -5,7 +5,6 @@ import iekei from "../assets/images/ramen/iekei.png";
 import jiro from "../assets/images/ramen/jiro.png";
 import toripaitan from "../assets/images/ramen/toripaitan.png";
 import niboshi from "../assets/images/ramen/niboshi.png";
-import asari from "../assets/images/ramen/asari.png";
 import aburasoba from "../assets/images/ramen/aburasoba.png";
 import tsukemen from "../assets/images/ramen/tsukemen.png";
 import miso from "../assets/images/ramen/miso.png";
@@ -40,17 +39,26 @@ export enum OpenStatus {
 
 export const genrePath = [
   {
-    genre: "돈코츠",
-    image: pig,
+    genre: "쇼유",
+    image: soy,
   },
   {
     genre: "시오",
     image: sio,
   },
   {
-    genre: "쇼유",
-    image: soy,
+    genre: "미소",
+    image: miso,
   },
+  {
+    genre: "돈코츠",
+    image: pig,
+  },
+  {
+    genre: "츠케멘",
+    image: tsukemen,
+  },
+
   {
     genre: "이에케",
     image: iekei,
@@ -67,21 +75,13 @@ export const genrePath = [
     genre: "니보시",
     image: niboshi,
   },
-  {
-    genre: "아사리",
-    image: asari,
-  },
+  // {
+  //   genre: "아사리",
+  //   image: asari,
+  // },
   {
     genre: "아부라소바",
     image: aburasoba,
-  },
-  {
-    genre: "츠케멘",
-    image: tsukemen,
-  },
-  {
-    genre: "미소",
-    image: miso,
   },
   {
     genre: "탄탄멘",
@@ -122,11 +122,11 @@ export const MAP_MODE = {
 
 export type MapModeType = (typeof MAP_MODE)[keyof typeof MAP_MODE];
 
-// ResultListOverlay 높이 상수 (3단계)
+// ResultListOverlay 높이 상수 (3단계) - vh 기반
 export const OVERLAY_HEIGHTS = {
-  COLLAPSED: 61, // 최소 높이
-  HALF: 278, // 중간 높이
-  EXPANDED: 665, // 최대 높이
+  COLLAPSED: "8vh", // 최소 높이
+  HALF: "35vh", // 중간 높이
+  EXPANDED: "80vh", // 최대 높이
 } as const;
 
 export type OverlayHeightType = (typeof OVERLAY_HEIGHTS)[keyof typeof OVERLAY_HEIGHTS];

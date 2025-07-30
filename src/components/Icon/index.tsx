@@ -791,10 +791,10 @@ export const IconMarker = () => (
   </svg>
 );
 
-export const IconSearch = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M16.625 17.375L13.2445 13.9945" stroke="#414141" strokeWidth="1.5" strokeLinecap="round" />
-    <circle cx="8.5" cy="9.5" r="5.75" stroke="#414141" strokeWidth="1.5" />
+export const IconSearch = ({ color, ...rest }: IconProps) => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+    <path d="M16.625 17.375L13.2445 13.9945" stroke={color || "#414141"} strokeWidth="1.5" strokeLinecap="round" />
+    <circle cx="8.5" cy="9.5" r="5.75" stroke={color || "#414141"} strokeWidth="1.5" />
   </svg>
 );
 

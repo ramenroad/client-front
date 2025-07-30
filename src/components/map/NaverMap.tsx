@@ -17,6 +17,10 @@ export interface NaverMapProps<T = unknown> {
   selectedMarker?: T | null;
   onMapReady?: (map: naver.maps.Map) => void;
   onMapCenterChange?: (map: naver.maps.Map) => void;
+  initialCenter?: {
+    lat: number;
+    lng: number;
+  };
 }
 
 // 마커 아이콘 SVG를 상수로 분리
@@ -227,27 +231,34 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
       }
 
       try {
-        // 위치 권한 요청
-        const granted = await requestLocationPermission();
+        // 지도 중심 설정 우선순위: initialCenter > 사용자 위치 > 서울 시청
+        let center: naver.maps.LatLng;
         let userPosition = null;
 
-        if (granted) {
-          userPosition = await getUserPosition();
-        }
+        if (props.initialCenter) {
+          // props로 전달된 초기 중심 좌표 사용 (위치 권한 요청 안 함)
+          center = new naver.maps.LatLng(props.initialCenter.lat, props.initialCenter.lng);
+        } else {
+          // 기존 로직: 위치 권한 요청 후 사용자 위치 또는 서울 시청
+          const granted = await requestLocationPermission();
 
-        // 지도 중심 설정 (사용자 위치 or 서울 시청)
-        const center =
-          userPosition && userPosition.latitude && userPosition.longitude
-            ? new naver.maps.LatLng(userPosition.latitude, userPosition.longitude)
-            : new naver.maps.LatLng(37.566826, 126.9786567);
+          if (granted) {
+            userPosition = await getUserPosition();
+          }
+
+          center =
+            userPosition && userPosition.latitude && userPosition.longitude
+              ? new naver.maps.LatLng(userPosition.latitude, userPosition.longitude)
+              : new naver.maps.LatLng(37.566826, 126.9786567);
+        }
 
         const map = new naver.maps.Map("map", {
           center: center,
           zoom: 14,
         });
 
-        // 사용자 위치 마커 추가 (권한 허용된 경우만)
-        if (userPosition && userPosition.latitude && userPosition.longitude) {
+        // 사용자 위치 마커 추가 (initialCenter가 없고 권한 허용된 경우만)
+        if (!props.initialCenter && userPosition && userPosition.latitude && userPosition.longitude) {
           new naver.maps.Marker({
             position: new naver.maps.LatLng(userPosition.latitude, userPosition.longitude),
             map: map,
@@ -279,6 +290,22 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
     initMap();
   }, [isInitialized]);
 
+  // initialCenter가 변경되면 지도 중심 이동 (초기화 이후에만)
+  const prevInitialCenterRef = useRef<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    if (mapInstance && props.initialCenter && isInitialized) {
+      const prev = prevInitialCenterRef.current;
+      const current = props.initialCenter;
+
+      // 이전 값과 다를 때만 지도 중심 이동
+      if (!prev || prev.lat !== current.lat || prev.lng !== current.lng) {
+        mapInstance.setCenter(new naver.maps.LatLng(props.initialCenter.lat, props.initialCenter.lng));
+        prevInitialCenterRef.current = props.initialCenter;
+      }
+    }
+  }, [mapInstance, props.initialCenter, isInitialized]);
+
   // 마커 목록 변경 시에만 마커 생성/삭제 (selectedMarker 제외)
   const markersKey = useMemo(() => {
     return props.markers?.map((m) => `${m.position.lat}-${m.position.lng}-${JSON.stringify(m.data)}`).join(",") || "";
@@ -286,8 +313,6 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
 
   useEffect(() => {
     if (!mapInstance || !props.markers) return;
-
-    console.log("마커 업데이트 시작");
 
     // 기존 마커들 정리
     markersMapRef.current.forEach((marker) => {
