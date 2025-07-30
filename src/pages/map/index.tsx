@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import tw from "twin.macro";
 import { NaverMap } from "../../components/map/NaverMap";
 import { useRamenyaListWithGeolocationQuery } from "../../hooks/queries/useRamenyaListQuery";

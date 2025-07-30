@@ -5,7 +5,6 @@ import iekei from "../assets/images/ramen/iekei.png";
 import jiro from "../assets/images/ramen/jiro.png";
 import toripaitan from "../assets/images/ramen/toripaitan.png";
 import niboshi from "../assets/images/ramen/niboshi.png";
-import asari from "../assets/images/ramen/asari.png";
 import aburasoba from "../assets/images/ramen/aburasoba.png";
 import tsukemen from "../assets/images/ramen/tsukemen.png";
 import miso from "../assets/images/ramen/miso.png";
