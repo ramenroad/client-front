@@ -27,6 +27,51 @@ export const RAMENYA_TYPES = [
   "츠케멘",
 ] as const;
 
+export const RAMENYA_LOCATION_LIST = [
+  {
+    name: "연남동 / 홍대",
+    location: {
+      latitude: 37.5541984,
+      longitude: 126.9211314,
+    },
+  },
+  {
+    name: "합정 / 망원",
+    location: {
+      latitude: 37.547525,
+      longitude: 126.9113693,
+    },
+  },
+  {
+    name: "강남",
+    location: {
+      latitude: 37.5009345,
+      longitude: 127.0320245,
+    },
+  },
+  {
+    name: "시청 / 서울역",
+    location: {
+      latitude: 37.5542324,
+      longitude: 126.982672,
+    },
+  },
+  {
+    name: "부산",
+    location: {
+      latitude: 35.1222105,
+      longitude: 129.1187966,
+    },
+  },
+  {
+    name: "판교",
+    location: {
+      latitude: 37.3852154,
+      longitude: 127.1151282,
+    },
+  },
+] as const;
+
 export type RamenyaType = (typeof RAMENYA_TYPES)[number];
 
 export enum OpenStatus {
