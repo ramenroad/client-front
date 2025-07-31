@@ -191,6 +191,12 @@ module.exports = {
           WebkitTextFillColor: "transparent",
         },
 
+        ".hide-scrollbar": {
+          "&::-webkit-scrollbar": {
+            display: "none",
+          },
+        },
+
         ".font-10-r": {
           fontSize: "10px",
           lineHeight: "15px",
