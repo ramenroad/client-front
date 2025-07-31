@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import tw from "twin.macro";
-import { useToast } from "../toast/ToastProvider";
+import { requestLocationPermission } from "../../util";
+import { useUserLocation } from "../../hooks/common/useUserLocation";
 
 export interface NaverMapProps<T = unknown> {
   markers?: {
@@ -124,66 +125,15 @@ const USER_POSITION_MARKER = `
 `;
 
 export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
-  const { openToast } = useToast();
-
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+
+  const { getUserPosition } = useUserLocation();
 
   // 마커 인스턴스들과 데이터 매핑을 위한 Map 사용
   const markersMapRef = useRef<Map<string, { instance: naver.maps.Marker; data: T }>>(new Map());
 
   // 위치 권한 요청과 위치 가져오기 함수들
-  const requestLocationPermission = useCallback(async (): Promise<boolean> => {
-    try {
-      if (!navigator.geolocation) {
-        return false;
-      }
-
-      if ("permissions" in navigator) {
-        const permission = await navigator.permissions.query({ name: "geolocation" });
-        if (permission.state === "denied") return false;
-        if (permission.state === "granted") return true;
-      }
-
-      // 권한 확인을 위해 위치 요청 시도
-      return new Promise((resolve) => {
-        navigator.geolocation.getCurrentPosition(
-          () => resolve(true),
-          () => resolve(false),
-          { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 },
-        );
-      });
-    } catch (error) {
-      console.error("위치 권한 확인 실패:", error);
-      return false;
-    }
-  }, []);
-
-  const getUserPosition = useCallback(async (): Promise<{ latitude: number; longitude: number } | null> => {
-    if (!navigator.geolocation) {
-      return null;
-    }
-
-    try {
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 600000,
-        });
-      });
-
-      openToast("성공적으로 현재 위치를 불러왔습니다.");
-
-      return {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      };
-    } catch (_error) {
-      console.error("위치 가져오기 실패:", _error);
-      return null;
-    }
-  }, []);
 
   // 마커 아이콘 생성 함수 메모화
   const createMarkerIcon = useCallback((isSelected: boolean, title?: string) => {
@@ -274,6 +224,7 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
         naver.maps.Event.addListener(map, "center_changed", () => {
           clearTimeout(centerChangeTimeout);
           centerChangeTimeout = setTimeout(() => {
+            console.log("current location", map.getCenter());
             props.onMapCenterChange?.(map);
           }, 300);
         });
