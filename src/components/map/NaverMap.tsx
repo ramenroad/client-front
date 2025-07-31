@@ -313,7 +313,6 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
         map: mapInstance,
         position: new naver.maps.LatLng(marker.position.lat, marker.position.lng),
         icon: createMarkerIcon(isSelected, marker.title),
-        caption: marker.title,
         clickable: true,
       });
 
