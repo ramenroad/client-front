@@ -69,7 +69,11 @@ export const useMapLocation = ({ mapInstance }: UseMapLocationProps) => {
   const moveMapCenter = useCallback(
     (latitude: number, longitude: number) => {
       if (mapInstance) {
-        mapInstance.panTo(new naver.maps.LatLng(latitude - 0.005, longitude));
+        if (mapInstance.getZoom() < 15) {
+          mapInstance.panTo(new naver.maps.LatLng(latitude - 0.005, longitude));
+        } else {
+          mapInstance.panTo(new naver.maps.LatLng(latitude, longitude));
+        }
       }
     },
     [mapInstance],

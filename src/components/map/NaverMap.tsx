@@ -26,7 +26,7 @@ export interface NaverMapProps<T = unknown> {
 
 // 마커 아이콘 SVG를 상수로 분리
 const NORMAL_MARKER_SVG = `
-<svg width="38" height="45" viewBox="0 0 38 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="38" height="45" viewBox="0 0 38 45" fill="none" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px;">
 <g filter="url(#filter0_d_2082_2994)">
 <path d="M19 5.5C24.5287 5.5 28.988 9.73696 28.999 15.5078C28.9216 18.0186 27.5785 20.9563 25.7627 23.7744C23.965 26.5645 21.7963 29.0996 20.2539 30.7715C19.5637 31.5193 18.436 31.5202 17.7441 30.7725C16.1783 29.0799 13.9685 26.5077 12.1562 23.7041C10.32 20.8633 9 17.9468 9 15.5293C9.00001 9.74748 13.4644 5.5 19 5.5Z" fill="#FF5E00" stroke="white" stroke-width="2"/>
 <ellipse cx="19" cy="15.6693" rx="3" ry="3.04622" fill="white"/>
@@ -46,7 +46,7 @@ const NORMAL_MARKER_SVG = `
 </svg>`;
 
 const SELECTED_MARKER_SVG = `
-<svg width="56" height="67" viewBox="0 0 56 67" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="56" height="67" viewBox="0 0 56 67" fill="none" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px;">
 <g filter="url(#filter0_d_2082_3501)">
 <path d="M28 5.25C38.372 5.25 46.7419 13.1815 46.749 23.9531C46.5918 28.9374 43.7778 34.7253 40.1855 40.0918C36.6176 45.422 32.4158 50.1436 29.7549 52.9453C28.7822 53.9692 27.2179 53.9702 26.2422 52.9453C23.5431 50.1094 19.2629 45.3141 15.665 39.9561C12.0315 34.5448 9.25 28.7835 9.25 23.9668C9.25004 13.1882 17.6236 5.25 28 5.25Z" fill="#FF5E00" stroke="white" stroke-width="2.5"/>
 <mask id="path-3-inside-1_2082_3501" fill="white">
@@ -139,34 +139,67 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
   const createMarkerIcon = useCallback((isSelected: boolean, title?: string) => {
     const markerSvg = isSelected ? SELECTED_MARKER_SVG : NORMAL_MARKER_SVG;
 
+    // return {
+    //   content: `
+    //     <div style="
+    //       position: relative;
+    //       top: ${isSelected ? "-18px" : "22px"};
+    //       left: ${isSelected ? "22px" : "33px"};
+    //     ">
+    //       ${markerSvg}
+    //       ${
+    //         title
+    //           ? `
+    //         <div style="
+    //           position: absolute;
+    //           top: ${isSelected ? "52px" : "32px"};
+    //           left: ${isSelected ? "calc(50% + 24px)" : "calc(50% + 16px)"};
+    //           transform: translateX(-50%);
+    //           text-align: center;
+    //           font-size: 12px;
+    //           font-weight: 600;
+    //           color: #333;
+    //           white-space: nowrap;
+    //           max-width: 120px;
+    //           text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+    //         ">${title}</div>
+    //       `
+    //           : ""
+    //       }
+    //     </div>
+    //   `,
     return {
       content: `
         <div style="
-          display: flex;
-          flex-direction: column;
-          align-items: center;
+          position: relative;
+          width: ${isSelected ? "56px" : "38px"};
+          height: ${isSelected ? "79px" : "57px"};
+          top: ${isSelected ? "-67px" : "-45px"};
+          left: ${isSelected ? "-28px" : "-19px"};
         ">
           ${markerSvg}
           ${
             title
               ? `
-            <div style="
-              font-size: 12px;
-              font-weight: 600;
-              color: #333;
-              white-space: nowrap;
-              margin-top: -10px;
-              max-width: 120px;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
-            ">${title}</div>
-          `
+                    <div style="
+                      position: absolute;
+                      bottom: 0px;
+                      left: 50%;
+                      transform: translateX(-50%);
+                      text-align: center;
+                      font-size: 12px;
+                      font-weight: 600;
+                      color: #333;
+                      white-space: nowrap;
+                      max-width: 120px;
+                      text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
+                    ">${title}</div>
+                  `
               : ""
           }
         </div>
       `,
-      anchor: new naver.maps.Point(12, 12),
+      anchor: new naver.maps.Point(0, 0),
     };
   }, []);
 
@@ -214,7 +247,7 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
             map: map,
             icon: {
               content: USER_POSITION_MARKER,
-              anchor: new naver.maps.Point(20, 20),
+              anchor: new naver.maps.Point(0, 0),
             },
           });
         }
@@ -285,7 +318,11 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
 
       // 마커 클릭 이벤트
       naver.maps.Event.addListener(markerInstance, "click", () => {
-        mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
+        if (mapInstance.getZoom() < 15) {
+          mapInstance.panTo(new naver.maps.LatLng(marker.position.lat - 0.005, marker.position.lng));
+        } else {
+          mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
+        }
         props.onMarkerClick?.(marker.data);
       });
 
