@@ -224,3 +224,34 @@ export const getTextMatch = ({
     unMatchedText: target,
   };
 };
+
+/**
+ * 위치 권한을 요청하고 확인하는 함수
+ * @returns Promise<boolean> - 위치 권한 허용 여부
+ */
+
+export const requestLocationPermission = async (): Promise<boolean> => {
+  try {
+    if (!navigator.geolocation) {
+      return false;
+    }
+
+    if ("permissions" in navigator) {
+      const permission = await navigator.permissions.query({ name: "geolocation" });
+      if (permission.state === "denied") return false;
+      if (permission.state === "granted") return true;
+    }
+
+    // 권한 확인을 위해 위치 요청 시도
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        () => resolve(true),
+        () => resolve(false),
+        { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 },
+      );
+    });
+  } catch (error) {
+    console.error("위치 권한 확인 실패:", error);
+    return false;
+  }
+};

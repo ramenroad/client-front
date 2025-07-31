@@ -1,35 +1,96 @@
 import tw from "twin.macro";
-import { LocationPathCard } from "./LocationPathCard";
 import { useNavigate } from "react-router-dom";
-import { genrePath } from "../../constants";
+import { genrePath, RAMENYA_LOCATION_LIST } from "../../constants";
 import { Banner } from "../../components/banner";
 import { GroupCard } from "./GroupCard";
 import { useRamenyaGroupQuery } from "../../hooks/queries/useRamenyaGroupQuery";
-import { useRegionsQuery } from "../../hooks/queries/useRamenyaListQuery";
 import { Swiper, SwiperSlide } from "swiper/react";
 import RamenroadLogo from "./RamenroadLogo";
 import Section from "./Section";
 import GenreCard from "./GenreCard";
-import { useMemo, useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { SearchOverlay } from "../../components/map/SearchOverlay";
-import { IconSearch } from "../../components/Icon";
+import { IconCoordinate, IconSearch } from "../../components/Icon";
+import { requestLocationPermission } from "../../util";
+import { useToast } from "../../components/toast/ToastProvider";
+import { useUserLocation } from "../../hooks/common/useUserLocation";
+import styled from "@emotion/styled";
 
 const MainPage = () => {
   const navigate = useNavigate();
+  const locationContainerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   const { data: ramenyaGroup } = useRamenyaGroupQuery();
-  const { data: regions } = useRegionsQuery();
+
+  const { openToast } = useToast();
+  const { getUserPosition } = useUserLocation();
 
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
-  const locationPath = useMemo(
-    () =>
-      regions?.map((region) => ({
-        location: region,
-      })),
-    [regions],
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!locationContainerRef.current) return;
+
+    setIsDragging(true);
+    setStartX(e.pageX - locationContainerRef.current.offsetLeft);
+    setScrollLeft(locationContainerRef.current.scrollLeft);
+  }, []);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      if (!isDragging || !locationContainerRef.current) return;
+
+      e.preventDefault();
+      const x = e.pageX - locationContainerRef.current.offsetLeft;
+      const walk = (x - startX) * 2;
+      locationContainerRef.current.scrollLeft = scrollLeft - walk;
+    },
+    [isDragging, startX, scrollLeft],
   );
+
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleMouseLeave = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleClickLocationBadge = async (location: { longitude: number; latitude: number } | null) => {
+    if (!location) {
+      const permission = await requestLocationPermission();
+      if (!permission) {
+        openToast("위치 권한을 허용해주세요.");
+        return;
+      }
+
+      const position = await getUserPosition();
+      if (!position) {
+        openToast("위치 정보를 불러오는데 실패했습니다.");
+        return;
+      }
+
+      const mapString = new URLSearchParams();
+      mapString.append("longitude", position.longitude.toString());
+      mapString.append("latitude", position.latitude.toString());
+      navigate(`/map?${mapString}`);
+
+      return;
+    }
+
+    const mapString = new URLSearchParams();
+    mapString.append("longitude", location.longitude.toString());
+    mapString.append("latitude", location.latitude.toString());
+    navigate(`/map?${mapString}`);
+  };
 
   return (
     <Container>
@@ -78,9 +139,30 @@ const MainPage = () => {
 
       {/* 지역: 라멘 매장이 있는 지역 선택 */}
       <Section title="어디로 가시나요?">
-        <LocationPathContainer>
-          {locationPath?.map((region, index) => <LocationPathCard key={index} location={region.location} />)}
-        </LocationPathContainer>
+        <LocationSwiperContainer
+          ref={locationContainerRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
+          $isDragging={isDragging}
+        >
+          <MyLocationBadge onClick={() => handleClickLocationBadge(null)}>
+            <IconCoordinate />
+            <span>내 주변</span>
+          </MyLocationBadge>
+
+          {RAMENYA_LOCATION_LIST.map((location) => (
+            <LocationPathBadge
+              key={location.name.join(",")}
+              onClick={() => handleClickLocationBadge(location.location)}
+            >
+              {location.name.map((name) => (
+                <span key={name}>{name}</span>
+              ))}
+            </LocationPathBadge>
+          ))}
+        </LocationSwiperContainer>
       </Section>
 
       {/* 그룹: 특정 컨셉 및 키워드에 대한 그룹 리스트 */}
@@ -92,7 +174,7 @@ const MainPage = () => {
           isAdditionalInformation
           onClickAdditionalInformation={() => navigate(`/group/${group._id}`)}
         >
-          <SwiperContainer>
+          <GroupSwiperContainer>
             <Swiper slidesPerView={2.1} spaceBetween={10} modules={[]}>
               {group.ramenyas.map((data) => (
                 <SwiperSlide key={data._id}>
@@ -107,7 +189,7 @@ const MainPage = () => {
                 </SwiperSlide>
               ))}
             </Swiper>
-          </SwiperContainer>
+          </GroupSwiperContainer>
         </Section>
       ))}
     </Container>
@@ -132,12 +214,38 @@ const GenrePathContainer = tw.div`
   grid grid-cols-4 gap-x-14 gap-y-12
 `;
 
-const LocationPathContainer = tw.div`
-  grid grid-cols-3 gap-10
-  w-350
+const LocationPathBadge = tw.div`
+  flex flex-col items-center justify-center
+  min-w-52 w-52 h-71
+  rounded-50
+  bg-[#F8F8F8]
+  border border-solid border-[#F1F1F1]
+  cursor-pointer
 `;
 
-const SwiperContainer = tw.div`
+const MyLocationBadge = tw.div`
+  min-w-71 w-71 h-71
+  flex flex-col items-center justify-center
+  rounded-50
+  bg-[#FFF4EE]
+  border border-solid border-[#FFE4D4]
+  text-orange
+  cursor-pointer
+`;
+
+const LocationSwiperContainer = styled.div<{ $isDragging: boolean }>`
+  ${tw`
+    w-350
+    flex items-center gap-5 overflow-x-auto
+    font-14-r
+    select-none
+    whitespace-nowrap
+    hide-scrollbar
+  `}
+  ${({ $isDragging }) => ($isDragging ? tw`cursor-grabbing` : tw`cursor-grab`)}
+`;
+
+const GroupSwiperContainer = tw.div`
   w-350
 `;
 

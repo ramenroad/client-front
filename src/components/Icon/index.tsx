@@ -837,3 +837,14 @@ export const IconEmail = () => (
     />
   </svg>
 );
+
+export const IconCoordinate = () => (
+  <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="10.5" cy="10" r="5.5" stroke="#FF5E00" />
+    <circle cx="10.5" cy="10" r="2.5" fill="#FF5E00" />
+    <rect x="10" y="2" width="1" height="3" rx="0.5" fill="#FF5E00" />
+    <rect x="2.5" y="10.5" width="1" height="3" rx="0.5" transform="rotate(-90 2.5 10.5)" fill="#FF5E00" />
+    <rect width="1" height="3" rx="0.5" transform="matrix(1 0 0 -1 10 18)" fill="#FF5E00" />
+    <rect width="1" height="3" rx="0.5" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 18.5 10.5)" fill="#FF5E00" />
+  </svg>
+);
