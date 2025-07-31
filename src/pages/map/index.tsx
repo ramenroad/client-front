@@ -76,7 +76,6 @@ const MapPage = () => {
         if (prevSelected?._id === markerData._id) {
           return null;
         } else {
-          mapInstance?.setZoom(15);
           setSearchParams((prev) => {
             prev.set("selectedMarkerId", markerData._id);
             return prev;
