@@ -96,6 +96,7 @@ const MapPage = () => {
 
       if (searchValue === "" || searchValue.trim() === "") {
         newSearchParams.delete("keywordName");
+        newSearchParams.delete("selectedMarkerId");
       } else {
         newSearchParams.set("keywordName", searchValue);
       }
@@ -363,12 +364,20 @@ const ResultListOverlay = ({
 
 const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
   const swiperRef = useRef<SwiperCore>();
+  const [_, setSearchParams] = useSearchParams();
 
   // Swiper 슬라이드 변경 시 지도 중심 이동 (디바운싱 적용)
   const swiperSlideChangeTimeout = useRef<NodeJS.Timeout | null>(null);
   const handleSwiperSlideChange = useCallback(
     (swiper: SwiperCore) => {
-      if (!selectedMarker) return;
+      if (!selectedMarker || swiper.clickedIndex) return;
+
+      setSearchParams((prev) => {
+        prev.set("selectedMarkerId", selectedMarker._id);
+        prev.set("latitude", selectedMarker.latitude.toString());
+        prev.set("longitude", selectedMarker.longitude.toString());
+        return prev;
+      });
 
       if (swiperSlideChangeTimeout.current) {
         clearTimeout(swiperSlideChangeTimeout.current);
@@ -380,7 +389,7 @@ const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMove
         // 선택된 마커 업데이트
         onMarkerSelect(currentData);
         // 지도 중심을 해당 마커로 이동
-        onMoveMapCenter(currentData.latitude, currentData.longitude);
+        // onMoveMapCenter(currentData.latitude, currentData.longitude);
       }, 200); // 200ms 디바운스
     },
     [selectedMarker, ramenyaList, onMarkerSelect, onMoveMapCenter],

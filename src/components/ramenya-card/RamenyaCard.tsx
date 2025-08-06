@@ -74,7 +74,9 @@ const RamenyaCard = (props: RamenyaCardProps) => {
     <RamenyaCardWrapper
       isMapCard={isMapCard}
       key={_id}
-      onClick={() => navigate(`/detail/${_id}`)}
+      onClick={() => {
+        navigate(`/detail/${_id}`);
+      }}
       style={{ ...(width ? { width: width } : {}) }}
     >
       <RamenyaCardLayout>
