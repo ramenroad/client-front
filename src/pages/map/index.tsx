@@ -364,7 +364,7 @@ const ResultListOverlay = ({
 
 const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
   const swiperRef = useRef<SwiperCore>();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [_, setSearchParams] = useSearchParams();
 
   // Swiper 슬라이드 변경 시 지도 중심 이동 (디바운싱 적용)
   const swiperSlideChangeTimeout = useRef<NodeJS.Timeout | null>(null);

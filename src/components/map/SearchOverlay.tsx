@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, ComponentProps, useEffect } from "react";
 import tw from "twin.macro";
 import { RamenroadText } from "../common/RamenroadText";
-import { IconBack, IconClose, IconComment, IconLocate, IconSearch } from "../Icon";
+import { IconBack, IconClose, IconComment, IconDeleteSearchValue, IconLocate, IconSearch } from "../Icon";
 import { useDebounce } from "../../hooks/common/useDebounce";
 import { useSearchHistoryQuery } from "../../hooks/queries/useSearchQuery";
 import { useRemoveSearchHistoryMutation } from "../../hooks/mutation/useSearchHistoryMutation";
@@ -10,6 +10,7 @@ import { useSignInStore } from "../../states/sign-in";
 import { useLocalStorage } from "usehooks-ts";
 import { getTextMatch } from "../../util";
 import NoResultBox from "../no-data/NoResultBox";
+import { useSearchParams } from "react-router-dom";
 
 interface SearchOverlayProps extends ComponentProps<"input"> {
   isSearching?: boolean;
@@ -31,6 +32,8 @@ export const SearchOverlay = ({
   ...rest
 }: SearchOverlayProps) => {
   const [isFocused, setIsFocused] = useState(false);
+
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const { value: debouncedSearchValue } = useDebounce<string>(searchValue, 300);
 
@@ -155,6 +158,19 @@ export const SearchOverlay = ({
               onFocus={handleFocus}
               placeholder="장르 또는 매장으로 검색해 보세요"
             />
+            <SearchDeleteIconWrapper
+              onClick={() => {
+                setSearchParams((prev) => {
+                  prev.delete("selectedMarkerId");
+                  prev.delete("keywordId");
+                  prev.delete("keywordName");
+                  return prev;
+                });
+                setSearchValue("");
+              }}
+            >
+              {searchValue && searchValue.trim() !== "" && <IconDeleteSearchValue />}
+            </SearchDeleteIconWrapper>
           </SearchBox>
         </SearchOverlayContainer>
       )}
@@ -458,4 +474,9 @@ const RamenyaXIcon = tw(IconClose)`
 const XIcon = tw(IconClose)`
   w-9 h-9
   cursor-pointer
+`;
+
+const SearchDeleteIconWrapper = tw.div`
+  cursor-pointer
+  flex h-full items-center
 `;
