@@ -305,13 +305,16 @@ export const DetailPage = () => {
           <ReviewTitle>라멘로드 추천 메뉴</ReviewTitle>
           <RecommendBox>
             <RecommendMenuContainer>
-              {ramenyaDetailQuery.data?.recommendedMenu.map((menu) => (
-                <RecommendMenuBox key={menu.name}>
-                  <RecommendMenuInfo>
-                    <RecommendMenuName>{menu.name}</RecommendMenuName>
-                    <RecommendMenuPrice>{formatNumber(menu.price)}원</RecommendMenuPrice>
-                  </RecommendMenuInfo>
-                </RecommendMenuBox>
+              {ramenyaDetailQuery.data?.recommendedMenu.map((menu, index) => (
+                <>
+                  <RecommendMenuBox key={menu.name}>
+                    <RecommendMenuInfo>
+                      <RecommendMenuName>{menu.name}</RecommendMenuName>
+                      <RecommendMenuPrice>{formatNumber(menu.price)}원</RecommendMenuPrice>
+                    </RecommendMenuInfo>
+                  </RecommendMenuBox>
+                  {index !== ramenyaDetailQuery.data?.recommendedMenu.length - 1 && <Line />}
+                </>
               ))}
             </RecommendMenuContainer>
           </RecommendBox>
@@ -603,7 +606,7 @@ const RecommendBox = tw.div`
 `;
 
 const RecommendMenuContainer = tw.div`
-  flex gap-16 mb-16 flex-wrap
+  flex flex-col gap-14
 `;
 
 const RecommendMenuBox = tw.div`
