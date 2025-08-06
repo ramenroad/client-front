@@ -33,7 +33,7 @@ export const SearchOverlay = ({
 }: SearchOverlayProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [_, setSearchParams] = useSearchParams();
 
   const { value: debouncedSearchValue } = useDebounce<string>(searchValue, 300);
 
