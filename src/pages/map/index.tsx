@@ -50,16 +50,19 @@ const MapPage = () => {
       latitude: searchParams.get("latitude") ? Number(searchParams.get("latitude")) : undefined,
       longitude: searchParams.get("longitude") ? Number(searchParams.get("longitude")) : undefined,
       radius: searchParams.get("radius") ? Number(searchParams.get("radius")) : undefined,
+      level: searchParams.get("level") ? Number(searchParams.get("level")) : undefined,
     };
   }, [searchParams]);
   const [geolocationForSearch, setGeolocationForSearch] = useState<{
     latitude?: number;
     longitude?: number;
     radius?: number;
+    level?: number;
   }>({
     latitude: undefined,
     longitude: undefined,
     radius: undefined,
+    level: undefined,
   });
 
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
@@ -209,14 +212,19 @@ const MapPage = () => {
   const handleClickGPSButton = useCallback(async () => {
     const currentLocation = await getUserPosition();
     if (currentLocation) {
-      moveMapCenter(currentLocation.latitude, currentLocation.longitude);
+      moveMapCenter(
+        currentLocation.latitude,
+        currentLocation.longitude,
+        mapSearchParams.level && mapSearchParams.level < 14 ? 14 : mapSearchParams.level,
+      );
       setGeolocationForSearch({
         latitude: currentLocation.latitude,
         longitude: currentLocation.longitude,
         radius: mapSearchParams.radius,
+        level: mapSearchParams.level,
       });
     }
-  }, [getUserPosition, mapSearchParams.radius, moveMapCenter]);
+  }, [getUserPosition, mapSearchParams.radius, mapSearchParams.level, moveMapCenter]);
 
   useEffect(() => {
     // 첫 좌표 세팅
@@ -287,7 +295,6 @@ const MapPage = () => {
         onSelectKeyword={(keyword, isNearBy) => {
           setSearchMode(SEARCH_MODE.KEYWORD);
           setSearchParams((prev) => {
-            console.log("isNearBy", isNearBy);
             if (isNearBy) {
               prev.set("nearBy", "true");
             } else {

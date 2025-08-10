@@ -239,8 +239,7 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
         naver.maps.Event.addListener(map, "center_changed", () => {
           clearTimeout(centerChangeTimeout);
           centerChangeTimeout = setTimeout(() => {
-            console.log("center_changed");
-            if (props.isMovingRef?.current) return;
+            if (props.isMovingRef?.current || window.location.pathname !== "/map") return;
             updateLocationDataSafe(map);
           }, 300);
         });

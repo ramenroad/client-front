@@ -104,8 +104,6 @@ export const useMapLocation = ({ mapInstance }: UseMapLocationProps) => {
 
       setCurrentGeolocation(newLocation);
 
-      console.log("newLocation", newLocation);
-
       // ref를 통해 최신 setSearchParams 함수 사용
       setSearchParamsRef.current((prev) => {
         prev.set("latitude", newLocation.latitude.toString());
