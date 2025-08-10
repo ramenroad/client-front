@@ -325,7 +325,7 @@ export const SearchOverlay = ({
                       <KeywardWrapper
                         key={ramenya._id}
                         onClick={() => {
-                          onSelectKeyword?.({ id: ramenya._id, name: ramenya.keyword });
+                          onSelectKeyword?.(ramenya.keyword);
                           setKeyword(ramenya.keyword);
                           addRamenyaHistory({ _id: ramenya._id, name: ramenya.keyword });
                           setIsFocused(false);

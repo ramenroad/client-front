@@ -1,17 +1,15 @@
 import { getRamenyaListByRegion, getRamenyaListByGenre, getRegions } from "../../api/list-page";
-import { useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "./queryKeys";
 import { FilterOptions, SortType } from "../../types/filter";
 import { checkBusinessStatus } from "../../util";
 import { useLocationStore } from "../../store/location/useLocationStore";
 import { calculateDistanceValue } from "../../util/number";
 import { OpenStatus } from "../../constants";
-import { Ramenya } from "../../types";
 import {
   getRamenyaListWithGeolocation,
   GetRamenyaListWithGeolocationParams,
   getRamenyaSearchAutoComplete,
-  GetRamenyaListWithGeolocationResponse,
   getRamenyaListWithSearch,
   GetRamenyaListWithSearchParams,
 } from "../../api/map";
