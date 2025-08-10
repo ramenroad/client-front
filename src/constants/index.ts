@@ -181,3 +181,10 @@ export const OVERLAY_HEIGHTS = {
 } as const;
 
 export type OverlayHeightType = (typeof OVERLAY_HEIGHTS)[keyof typeof OVERLAY_HEIGHTS];
+
+export const SEARCH_MODE = {
+  KEYWORD: "keyword",
+  NEARBY: "nearby",
+} as const;
+
+export type SearchModeType = (typeof SEARCH_MODE)[keyof typeof SEARCH_MODE];

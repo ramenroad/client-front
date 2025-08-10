@@ -1,15 +1,26 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import tw from "twin.macro";
 import { NaverMap } from "../../components/map/NaverMap";
-import { useRamenyaListWithGeolocationQuery } from "../../hooks/queries/useRamenyaListQuery";
+import {
+  useRamenyaListWithGeolocationQuery,
+  useRamenyaListWithSearchQuery,
+} from "../../hooks/queries/useRamenyaListQuery";
 import { Ramenya } from "../../types";
 import RamenyaCard from "../../components/ramenya-card/RamenyaCard";
 import { RamenroadText } from "../../components/common/RamenroadText";
-import { IconRefresh } from "../../components/Icon";
+import { IconGPS, IconRefresh } from "../../components/Icon";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import "swiper/css";
-import { initialFilterOptions, MAP_MODE, MapModeType, OVERLAY_HEIGHTS, OverlayHeightType } from "../../constants";
+import {
+  initialFilterOptions,
+  MAP_MODE,
+  MapModeType,
+  OVERLAY_HEIGHTS,
+  OverlayHeightType,
+  SEARCH_MODE,
+  SearchModeType,
+} from "../../constants";
 import { useDrag } from "@use-gesture/react";
 import FilterSection from "../../components/filter/FilterSection";
 import { useSessionStorage } from "usehooks-ts";
@@ -20,131 +31,166 @@ import { useMapLocation } from "../../hooks/common/useMapLocation";
 import { useMapSearch } from "../../hooks/common/useMapSearch";
 import { SearchOverlay } from "../../components/map/SearchOverlay";
 import { useSearchParams } from "react-router-dom";
+import { useUserLocation } from "../../hooks/common/useUserLocation";
 
 const MapPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  // setSearchParams 함수를 ref로 안정화
+  const setSearchParamsRef = useRef(setSearchParams);
+
+  const isMovingRef = useRef(false);
+
+  // ref를 최신으로 업데이트
+  useEffect(() => {
+    setSearchParamsRef.current = setSearchParams;
+  }, [setSearchParams]);
+
+  const mapSearchParams = useMemo(() => {
+    return {
+      latitude: searchParams.get("latitude") ? Number(searchParams.get("latitude")) : undefined,
+      longitude: searchParams.get("longitude") ? Number(searchParams.get("longitude")) : undefined,
+      radius: searchParams.get("radius") ? Number(searchParams.get("radius")) : undefined,
+    };
+  }, [searchParams]);
+  const [geolocationForSearch, setGeolocationForSearch] = useState<{
+    latitude?: number;
+    longitude?: number;
+    radius?: number;
+  }>({
+    latitude: undefined,
+    longitude: undefined,
+    radius: undefined,
+  });
+
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
+
   const [selectedMarker, setSelectedMarker] = useState<Ramenya | null>(null);
+  const selectedMarkerRef = useRef<Ramenya | null>(null);
+
+  useEffect(() => {
+    selectedMarkerRef.current = selectedMarker;
+  }, [selectedMarker]);
+
+  const [searchMode, setSearchMode] = useState<SearchModeType>(SEARCH_MODE.NEARBY);
+
+  const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.HALF);
+
+  const GPSButtonHeight = useMemo(() => {
+    // dvh 값을 픽셀로 변환하는 함수
+    const dvhToPx = (dvh: string) => {
+      const dvhValue = parseFloat(dvh.replace("dvh", ""));
+      return (dvhValue / 100) * (window.visualViewport?.height || window.innerHeight);
+    };
+
+    switch (currentHeight) {
+      case OVERLAY_HEIGHTS.COLLAPSED:
+        return dvhToPx(OVERLAY_HEIGHTS.COLLAPSED);
+      case OVERLAY_HEIGHTS.HALF:
+        return dvhToPx(OVERLAY_HEIGHTS.HALF);
+      case OVERLAY_HEIGHTS.EXPANDED:
+        return dvhToPx(OVERLAY_HEIGHTS.EXPANDED);
+    }
+  }, [currentHeight]);
 
   const [filterOptions, setFilterOptions] = useSessionStorage<FilterOptions>(
     "mapPageFilterOptions",
     initialFilterOptions,
   );
 
+  const { getUserPosition } = useUserLocation();
+
   // 위치 관리 커스텀 훅
-  const { currentGeolocation, isLocationInitialized, searchParamsLocation, updateLocationData, moveMapCenter } =
-    useMapLocation({
-      mapInstance,
-    });
+  const { moveMapCenter } = useMapLocation({
+    mapInstance,
+  });
 
   // 검색 관리 커스텀 훅
-  const {
-    ramenyaList,
-    setRamenyaList,
-    searchValue,
-    setSearchValue,
-    searchParamsKeyword,
-    handleKeywordClick,
-    refreshCurrentLocation,
-  } = useMapSearch({
-    currentGeolocation,
-    isLocationInitialized,
-    moveMapCenter,
-  });
+  const { keyword, setKeyword, searchParamsKeyword, handleKeywordClick } = useMapSearch();
 
   // 위치 기반 라면야 목록 쿼리
   const { ramenyaListWithGeolocationQuery } = useRamenyaListWithGeolocationQuery({
-    ...currentGeolocation,
+    ...geolocationForSearch,
     filterOptions: filterOptions,
   });
 
+  const { ramenyaListWithSearchQuery } = useRamenyaListWithSearchQuery({
+    keyword: searchParamsKeyword.keyword ?? undefined,
+    ...geolocationForSearch,
+    filterOptions: filterOptions,
+    nearby: searchParams.get("nearBy") === "true",
+  });
+
+  const ramenyaList = useMemo(() => {
+    if (searchMode === SEARCH_MODE.NEARBY) {
+      return ramenyaListWithGeolocationQuery.data;
+    } else {
+      return ramenyaListWithSearchQuery.data;
+    }
+  }, [searchMode, ramenyaListWithGeolocationQuery.data, ramenyaListWithSearchQuery.data]);
+
   // 지도 모드 계산
   const mapMode = useMemo<MapModeType>(() => {
-    if (selectedMarker) return MAP_MODE.CARD;
+    if (searchParams.get("selectedId")) return MAP_MODE.CARD;
     return MAP_MODE.LIST;
-  }, [selectedMarker]);
+  }, [searchParams]);
 
   // 지도 준비 완료 핸들러
   const handleMapReady = useCallback((map: naver.maps.Map) => {
+    // 맵 인스턴스 등록
     setMapInstance(map);
   }, []);
 
   // 마커 클릭 핸들러
   const handleMarkerClick = useCallback(
     (markerData: Ramenya) => {
-      setSelectedMarker((prevSelected) => {
-        if (prevSelected?._id === markerData._id) {
+      isMovingRef.current = true;
+
+      setSelectedMarker(() => {
+        if (selectedMarkerRef.current?._id === markerData._id) {
+          setSearchParamsRef.current((prev) => {
+            prev.delete("selectedId");
+            return prev;
+          });
           return null;
         } else {
-          setSearchParams((prev) => {
-            prev.set("selectedMarkerId", markerData._id);
+          setSearchParamsRef.current((prev) => {
+            prev.set("selectedId", markerData._id);
             return prev;
           });
           return markerData;
         }
       });
+      setTimeout(() => {
+        isMovingRef.current = false;
+      }, 300);
     },
-    [mapInstance, setSearchParams],
+    [setSearchParamsRef],
   );
 
   // 새로고침 핸들러
-  const handleRefreshLocation = useCallback(async () => {
+  const handleRefreshDataWithNewLocation = useCallback(async () => {
     if (!mapInstance) return;
 
+    setSelectedMarker(null);
     setSearchParams((prev) => {
-      const newSearchParams = new URLSearchParams(prev);
-
-      if (searchValue === "" || searchValue.trim() === "") {
-        newSearchParams.delete("keywordName");
-        newSearchParams.delete("selectedMarkerId");
-      } else {
-        newSearchParams.set("keywordName", searchValue);
-      }
-
-      return newSearchParams;
+      prev.delete("selectedId");
+      return prev;
     });
 
-    // 현재 지도 중심 좌표를 가져와서 상태와 URL 모두 업데이트
-    const newLocation = updateLocationData(mapInstance);
-    setSelectedMarker(null);
-
-    const refreshResult = await refreshCurrentLocation(newLocation, searchValue);
-
-    if (refreshResult.type === "location") {
-      // 위치 기반 검색은 useEffect에서 처리됨
-      ramenyaListWithGeolocationQuery.refetch();
+    if (!keyword || keyword.trim() === "") {
+      setSearchMode(SEARCH_MODE.NEARBY);
+    } else {
+      setSearchMode(SEARCH_MODE.KEYWORD);
+      setSearchParams((prev) => {
+        prev.set("nearBy", "true");
+        return prev;
+      });
     }
-  }, [mapInstance, updateLocationData, refreshCurrentLocation, ramenyaListWithGeolocationQuery]);
 
-  // 위치 기반 쿼리 결과 처리
-  useEffect(() => {
-    if (
-      isLocationInitialized &&
-      !ramenyaListWithGeolocationQuery.isLoading &&
-      ramenyaListWithGeolocationQuery.data &&
-      searchValue === "" &&
-      !searchParamsKeyword.keywordName
-    ) {
-      setRamenyaList(ramenyaListWithGeolocationQuery.data || []);
-    }
-  }, [
-    ramenyaListWithGeolocationQuery.data,
-    ramenyaListWithGeolocationQuery.isLoading,
-    isLocationInitialized,
-    searchValue,
-    searchParamsKeyword.keywordName,
-    setRamenyaList,
-  ]);
-
-  // 선택된 마커 처리
-  useEffect(() => {
-    if (searchParamsKeyword.selectedMarkerId && ramenyaList.length > 0) {
-      const selectedMarker = ramenyaList.find((ramenya) => ramenya._id === searchParamsKeyword.selectedMarkerId);
-      if (selectedMarker) {
-        setSelectedMarker(selectedMarker);
-      }
-    }
-  }, [searchParamsKeyword.selectedMarkerId, ramenyaList]);
+    setGeolocationForSearch({
+      ...mapSearchParams,
+    });
+  }, [mapInstance, setSearchParams, keyword, mapSearchParams]);
 
   // 마커 데이터 메모화
   const markerData = useMemo(() => {
@@ -160,32 +206,125 @@ const MapPage = () => {
     );
   }, [ramenyaList]);
 
+  const handleClickGPSButton = useCallback(async () => {
+    const currentLocation = await getUserPosition();
+    if (currentLocation) {
+      moveMapCenter(currentLocation.latitude, currentLocation.longitude);
+      setGeolocationForSearch({
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude,
+        radius: mapSearchParams.radius,
+      });
+    }
+  }, [getUserPosition, mapSearchParams.radius, moveMapCenter]);
+
+  useEffect(() => {
+    // 첫 좌표 세팅
+    const getCurrentLocation = async () => {
+      if (
+        mapSearchParams.latitude &&
+        mapSearchParams.longitude &&
+        !geolocationForSearch.latitude &&
+        !geolocationForSearch.longitude &&
+        !geolocationForSearch.radius
+      ) {
+        setGeolocationForSearch({
+          latitude: Number(searchParams.get("latitude")),
+          longitude: Number(searchParams.get("longitude")),
+          radius: mapSearchParams.radius,
+        });
+      }
+    };
+
+    if (!geolocationForSearch.latitude || !geolocationForSearch.longitude) {
+      getCurrentLocation();
+    }
+  }, [geolocationForSearch, mapSearchParams.latitude, mapSearchParams.longitude, mapSearchParams.radius, searchParams]);
+
+  useEffect(() => {
+    if ((ramenyaListWithSearchQuery.data || ramenyaListWithGeolocationQuery.data) && !selectedMarker) {
+      const selectedRamenya =
+        ramenyaListWithSearchQuery.data?.find((ramenya) => ramenya._id === searchParamsKeyword.selectedId) ??
+        ramenyaListWithGeolocationQuery.data?.find((ramenya) => ramenya._id === searchParamsKeyword.selectedId);
+
+      if (selectedRamenya) {
+        setSelectedMarker(selectedRamenya);
+      }
+    }
+  }, [
+    ramenyaListWithSearchQuery.data,
+    ramenyaListWithGeolocationQuery.data,
+    searchParamsKeyword.selectedId,
+    selectedMarker,
+  ]);
+
+  useEffect(() => {
+    if (!keyword || keyword.trim() === "") {
+      setSearchMode(SEARCH_MODE.NEARBY);
+    } else {
+      setSearchMode(SEARCH_MODE.KEYWORD);
+    }
+  }, [keyword]);
+
+  useEffect(() => {
+    if (searchMode === SEARCH_MODE.KEYWORD && ramenyaListWithSearchQuery.data) {
+      const location = ramenyaListWithSearchQuery.data.find((ramenya) => ramenya.name === keyword);
+
+      if (location) {
+        moveMapCenter(location.latitude, location.longitude);
+        setGeolocationForSearch({
+          latitude: location.latitude,
+          longitude: location.longitude,
+          radius: mapSearchParams.radius,
+        });
+      }
+    }
+  }, [searchMode, keyword, ramenyaListWithSearchQuery.data, moveMapCenter, mapSearchParams.radius]);
+
   return (
     <>
-      <SearchOverlay onSelectKeyword={handleKeywordClick} searchValue={searchValue} setSearchValue={setSearchValue} />
+      <SearchOverlay
+        onSelectKeyword={(keyword, isNearBy) => {
+          setSearchMode(SEARCH_MODE.KEYWORD);
+          setSearchParams((prev) => {
+            console.log("isNearBy", isNearBy);
+            if (isNearBy) {
+              prev.set("nearBy", "true");
+            } else {
+              prev.delete("nearBy");
+            }
+            return prev;
+          });
+          handleKeywordClick(keyword, isNearBy);
+        }}
+        keyword={keyword}
+        setKeyword={setKeyword}
+      />
 
-      <RefreshOverlay onRefresh={handleRefreshLocation} />
+      <RefreshOverlay onRefresh={handleRefreshDataWithNewLocation} />
 
       {/* URL 파라미터가 있을 때는 파싱이 완료된 후에만 NaverMap 렌더링 */}
-      {(!searchParams.get("latitude") || (searchParamsLocation.latitude && searchParamsLocation.longitude)) && (
+      {(!searchParams.get("latitude") || (searchParams.get("latitude") && searchParams.get("longitude"))) && (
         <NaverMap<Ramenya>
           onMapReady={handleMapReady}
           markers={markerData}
           selectedMarker={selectedMarker}
           onMarkerClick={handleMarkerClick}
           initialCenter={
-            searchParamsLocation.latitude && searchParamsLocation.longitude
+            searchParams.get("latitude") && searchParams.get("longitude")
               ? {
-                  lat: searchParamsLocation.latitude,
-                  lng: searchParamsLocation.longitude,
+                  lat: Number(searchParams.get("latitude")),
+                  lng: Number(searchParams.get("longitude")),
                 }
               : undefined
           }
+          isMovingRef={isMovingRef}
         />
       )}
 
       {mapMode === MAP_MODE.CARD && (
         <ResultCardOverlay
+          isMovingRef={isMovingRef}
           ramenyaList={ramenyaList || []}
           selectedMarker={selectedMarker}
           onMarkerSelect={setSelectedMarker}
@@ -194,18 +333,35 @@ const MapPage = () => {
       )}
 
       {mapMode === MAP_MODE.LIST && (
-        <ResultListOverlay
-          ramenyaList={ramenyaList || []}
-          selectedMarker={selectedMarker}
-          onMarkerSelect={setSelectedMarker}
-          onMoveMapCenter={moveMapCenter}
-          filterOptions={filterOptions}
-          setFilterOptions={setFilterOptions}
-        />
+        <>
+          <GPSWrapper
+            onClick={handleClickGPSButton}
+            style={{
+              bottom: GPSButtonHeight + 50,
+            }}
+          >
+            <IconGPS />
+          </GPSWrapper>
+          <ResultListOverlay
+            ramenyaList={ramenyaList || []}
+            selectedMarker={selectedMarker}
+            onMarkerSelect={setSelectedMarker}
+            onMoveMapCenter={moveMapCenter}
+            filterOptions={filterOptions}
+            setFilterOptions={setFilterOptions}
+            currentHeight={currentHeight}
+            setCurrentHeight={setCurrentHeight}
+          />
+        </>
       )}
     </>
   );
 };
+
+const GPSWrapper = tw.div`
+  absolute
+  cursor-pointer
+`;
 
 interface RefreshOverlayProps {
   onRefresh: () => void;
@@ -248,36 +404,42 @@ interface ResultOverlayProps {
   selectedMarker: Ramenya | null;
   onMarkerSelect: (marker: Ramenya) => void;
   onMoveMapCenter: (latitude: number, longitude: number) => void;
+  isMovingRef?: React.MutableRefObject<boolean>;
 }
 
 const ResultListOverlay = ({
+  currentHeight,
+  setCurrentHeight,
   ramenyaList,
   filterOptions,
   setFilterOptions,
 }: ResultOverlayProps & {
+  currentHeight: OverlayHeightType;
+  setCurrentHeight: (height: OverlayHeightType) => void;
   filterOptions: FilterOptions;
   setFilterOptions: (filterOptions: FilterOptions) => void;
 }) => {
-  const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.HALF);
+  // const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.HALF);
   const [isDragging, setIsDragging] = useState(false);
   const [tempHeight, setTempHeight] = useState<string>(OVERLAY_HEIGHTS.COLLAPSED);
 
   const overlayRef = useRef<HTMLDivElement>(null);
 
-  // vh 값을 픽셀로 변환하는 함수
-  const vhToPx = (vh: string) => {
-    const vhValue = parseFloat(vh.replace("vh", ""));
-    return (vhValue / 100) * window.innerHeight;
+  // dvh 값을 픽셀로 변환하는 함수
+  const dvhToPx = (dvh: string) => {
+    const dvhValue = parseFloat(dvh.replace("dvh", ""));
+    return (dvhValue / 100) * (window.visualViewport?.height || window.innerHeight);
   };
 
-  // 픽셀 값을 vh로 변환하는 함수
-  const pxToVh = (px: number) => {
-    return `${(px / window.innerHeight) * 100}vh`;
+  // 픽셀 값을 dvh로 변환하는 함수
+  const pxToDvh = (px: number) => {
+    const viewportHeight = window.visualViewport?.height || window.innerHeight;
+    return `${(px / viewportHeight) * 100}dvh`;
   };
 
   // 드래그 제스처 설정
   const bind = useDrag(
-    ({ movement: [, my], canceled, last, memo = vhToPx(currentHeight) }) => {
+    ({ movement: [, my], canceled, last, memo = dvhToPx(currentHeight) }) => {
       if (canceled) return;
 
       setIsDragging(true);
@@ -287,12 +449,12 @@ const ResultListOverlay = ({
       let newHeightPx = memo + deltaY;
 
       // 엄격한 높이 제한 적용 (vh를 픽셀로 변환하여 비교)
-      const minHeightPx = vhToPx(OVERLAY_HEIGHTS.COLLAPSED);
-      const maxHeightPx = vhToPx(OVERLAY_HEIGHTS.EXPANDED);
+      const minHeightPx = dvhToPx(OVERLAY_HEIGHTS.COLLAPSED);
+      const maxHeightPx = dvhToPx(OVERLAY_HEIGHTS.EXPANDED);
       newHeightPx = Math.max(minHeightPx, Math.min(maxHeightPx, newHeightPx));
 
       // 픽셀을 vh로 변환하여 tempHeight 설정
-      setTempHeight(pxToVh(newHeightPx));
+      setTempHeight(pxToDvh(newHeightPx));
 
       // 드래그 종료 시 스냅
       if (last) {
@@ -300,7 +462,7 @@ const ResultListOverlay = ({
 
         // 3단계 높이 중 가장 가까운 것 찾기
         const heights = [OVERLAY_HEIGHTS.COLLAPSED, OVERLAY_HEIGHTS.HALF, OVERLAY_HEIGHTS.EXPANDED];
-        const heightPixels = heights.map((vh) => vhToPx(vh));
+        const heightPixels = heights.map((dvh) => dvhToPx(dvh));
         const closestHeightIndex = heightPixels.reduce(
           (prev, curr, index) =>
             Math.abs(curr - newHeightPx) < Math.abs(heightPixels[prev] - newHeightPx) ? index : prev,
@@ -317,7 +479,7 @@ const ResultListOverlay = ({
       filterTaps: true,
       preventDefault: true,
       // 실시간 반응을 위한 설정
-      from: () => [0, vhToPx(currentHeight)],
+      from: () => [0, dvhToPx(currentHeight)],
     },
   );
 
@@ -362,18 +524,24 @@ const ResultListOverlay = ({
   );
 };
 
-const ResultCardOverlay = ({ ramenyaList, selectedMarker, onMarkerSelect, onMoveMapCenter }: ResultOverlayProps) => {
+const ResultCardOverlay = ({
+  ramenyaList,
+  selectedMarker,
+  onMarkerSelect,
+  onMoveMapCenter,
+  isMovingRef,
+}: ResultOverlayProps) => {
   const swiperRef = useRef<SwiperCore>();
-  const [_, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
 
   // Swiper 슬라이드 변경 시 지도 중심 이동 (디바운싱 적용)
   const swiperSlideChangeTimeout = useRef<NodeJS.Timeout | null>(null);
   const handleSwiperSlideChange = useCallback(
     (swiper: SwiperCore) => {
-      if (!selectedMarker || swiper.clickedIndex) return;
+      if (isMovingRef?.current || !selectedMarker || swiper.clickedIndex || swiper.clickedIndex === 0) return;
 
       setSearchParams((prev) => {
-        prev.set("selectedMarkerId", selectedMarker._id);
+        prev.set("selectedId", selectedMarker._id);
         prev.set("latitude", selectedMarker.latitude.toString());
         prev.set("longitude", selectedMarker.longitude.toString());
         return prev;

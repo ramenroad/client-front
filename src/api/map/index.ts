@@ -2,9 +2,9 @@ import { BusinessHour, Ramenya } from "../../types";
 import { instance, instanceWithNoVersioning } from "../index";
 
 export interface GetRamenyaListWithGeolocationParams {
-  latitude: number;
-  longitude: number;
-  radius: number;
+  latitude?: number;
+  longitude?: number;
+  radius?: number;
 }
 
 export interface GetRamenyaListWithGeolocationResponse {
@@ -27,25 +27,30 @@ export const getRamenyaListWithGeolocation = async ({
   return response.data;
 };
 
-export const getRamenyaListWithSearch = async ({
-  query,
-  latitude,
-  longitude,
-  radius,
-  inLocation,
-}: {
-  query: string;
+export interface GetRamenyaListWithSearchParams {
+  keyword?: string;
   latitude?: number;
   longitude?: number;
   radius?: number;
   inLocation?: boolean;
-}) => {
+  nearby?: boolean;
+}
+
+export const getRamenyaListWithSearch = async ({
+  keyword,
+  latitude,
+  longitude,
+  radius,
+  inLocation,
+  nearby,
+}: GetRamenyaListWithSearchParams) => {
   const response = await instanceWithNoVersioning.get<Ramenya[]>(`/search`, {
     params: {
-      query,
-      latitude,
-      longitude,
-      radius,
+      query: keyword,
+      // 주변 검색이 아닐 시 전체 검색
+      latitude: !nearby ? undefined : latitude,
+      longitude: !nearby ? undefined : longitude,
+      radius: !nearby ? undefined : radius,
       inLocation,
     },
   });
