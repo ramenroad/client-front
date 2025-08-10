@@ -175,9 +175,9 @@ export type MapModeType = (typeof MAP_MODE)[keyof typeof MAP_MODE];
 
 // ResultListOverlay 높이 상수 (3단계) - vh 기반
 export const OVERLAY_HEIGHTS = {
-  COLLAPSED: "8vh", // 최소 높이
-  HALF: "35vh", // 중간 높이
-  EXPANDED: "80vh", // 최대 높이
+  COLLAPSED: "8dvh", // 최소 높이
+  HALF: "35dvh", // 중간 높이
+  EXPANDED: "80dvh", // 최대 높이
 } as const;
 
 export type OverlayHeightType = (typeof OVERLAY_HEIGHTS)[keyof typeof OVERLAY_HEIGHTS];
