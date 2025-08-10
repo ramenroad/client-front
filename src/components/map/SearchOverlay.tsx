@@ -14,9 +14,9 @@ import { useSearchParams } from "react-router-dom";
 
 interface SearchOverlayProps extends ComponentProps<"input"> {
   isSearching?: boolean;
-  onSelectKeyword?: (keyword: { id: string; name: string; type: "keyword" | "ramenya" }) => void;
-  searchValue: string;
-  setSearchValue: (value: string) => void;
+  onSelectKeyword?: (keyword: string, isNearBy?: boolean) => void;
+  keyword: string;
+  setKeyword: (value: string) => void;
   isExternal?: boolean;
   isSearchOverlayOpen?: boolean;
   setIsSearchOverlayOpen?: (value: boolean) => void;
@@ -24,8 +24,8 @@ interface SearchOverlayProps extends ComponentProps<"input"> {
 
 export const SearchOverlay = ({
   onSelectKeyword,
-  searchValue,
-  setSearchValue,
+  keyword,
+  setKeyword,
   isExternal = false,
   isSearchOverlayOpen = false,
   setIsSearchOverlayOpen,
@@ -33,9 +33,9 @@ export const SearchOverlay = ({
 }: SearchOverlayProps) => {
   const [isFocused, setIsFocused] = useState(false);
 
-  const [_, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
 
-  const { value: debouncedSearchValue } = useDebounce<string>(searchValue, 300);
+  const { value: debouncedSearchValue } = useDebounce<string>(keyword, 300);
 
   const { searchHistoryQuery } = useSearchHistoryQuery();
   const { remove: removeSearchHistory } = useRemoveSearchHistoryMutation();
@@ -70,35 +70,41 @@ export const SearchOverlay = ({
   const addKeywordHistory = (keyword: string) => {
     if (!isSignIn) {
       setSignOutKeywordHistory((prev) => [keyword, ...prev.filter((k) => k !== keyword)]);
+      return;
     }
   };
   const removeKeywordHistory = (keyword: string) => {
     if (!isSignIn) {
       setSignOutKeywordHistory((prev) => prev.filter((k) => k !== keyword));
+      return;
     }
   };
   const clearKeywordHistory = () => {
     if (!isSignIn) {
       setSignOutKeywordHistory([]);
+      return;
     }
   };
   const addRamenyaHistory = (ramenya: { _id: string; name: string }) => {
     if (!isSignIn) {
       setSignOutRamenyaHistory((prev) => [ramenya, ...prev.filter((r) => r._id !== ramenya._id)]);
+      return;
     }
   };
   const removeRamenyaHistory = (ramenya: { _id: string }) => {
     if (!isSignIn) {
       setSignOutRamenyaHistory((prev) => prev.filter((r) => r._id !== ramenya._id));
+      return;
     }
   };
   const clearRamenyaHistory = () => {
     if (!isSignIn) {
       setSignOutRamenyaHistory([]);
+      return;
     }
   };
 
-  const isTyping = useMemo(() => searchValue.length > 0, [searchValue]);
+  const isTyping = useMemo(() => keyword.length > 0, [keyword]);
   const isAutoCompleteResultExist = useMemo(() => {
     return (
       ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.length !== 0 ||
@@ -118,12 +124,12 @@ export const SearchOverlay = ({
     setIsFocused(false);
     setIsSearchOverlayOpen?.(false);
   };
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setKeyword(e.target.value);
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.nativeEvent.isComposing) return;
     if (e.key === "Enter") {
-      onSelectKeyword?.({ id: searchValue, name: searchValue, type: "keyword" });
-      addKeywordHistory(searchValue);
+      onSelectKeyword?.(keyword, true);
+      addKeywordHistory(keyword);
       handleBlur();
       inputRef.current?.blur();
     }
@@ -152,7 +158,7 @@ export const SearchOverlay = ({
               ref={inputRef}
               {...rest}
               type="search"
-              value={searchValue}
+              value={keyword}
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               onFocus={handleFocus}
@@ -161,15 +167,14 @@ export const SearchOverlay = ({
             <SearchDeleteIconWrapper
               onClick={() => {
                 setSearchParams((prev) => {
-                  prev.delete("selectedMarkerId");
-                  prev.delete("keywordId");
-                  prev.delete("keywordName");
+                  prev.delete("selectedId");
+                  prev.delete("keyword");
                   return prev;
                 });
-                setSearchValue("");
+                setKeyword("");
               }}
             >
-              {searchValue && searchValue.trim() !== "" && <IconDeleteSearchValue />}
+              {keyword && keyword.trim() !== "" && <IconDeleteSearchValue />}
             </SearchDeleteIconWrapper>
           </SearchBox>
         </SearchOverlayContainer>
@@ -180,12 +185,12 @@ export const SearchOverlay = ({
           {isTyping ? (
             isAutoCompleteResultExist ? (
               <AutoCompleteContainer>
-                {ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.map((keyword) => (
+                {ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.map((keywordResult) => (
                   <KeywardWrapper
-                    key={keyword._id}
+                    key={keywordResult._id}
                     onClick={() => {
-                      onSelectKeyword?.({ id: keyword._id, name: keyword.name, type: "keyword" });
-                      addKeywordHistory(keyword.name);
+                      onSelectKeyword?.(keywordResult.name);
+                      addKeywordHistory(keywordResult.name);
                       setIsFocused(false);
                       setIsSearchOverlayOpen?.(false);
                     }}
@@ -193,21 +198,21 @@ export const SearchOverlay = ({
                     <IconLocate />
                     <span>
                       <MatchedText size={16} weight="sb">
-                        {getTextMatch({ query: searchValue, target: keyword.name }).matchedText}
+                        {getTextMatch({ query: keywordResult.name, target: keywordResult.name }).matchedText}
                       </MatchedText>
                       <UnMatchedText size={16} weight="sb">
-                        {getTextMatch({ query: searchValue, target: keyword.name }).unMatchedText}
+                        {getTextMatch({ query: keywordResult.name, target: keywordResult.name }).unMatchedText}
                       </UnMatchedText>
                     </span>
                   </KeywardWrapper>
                 ))}
-                {ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.map((ramenya) => (
+                {ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.map((ramenyaResult) => (
                   <KeywardWrapper
-                    key={ramenya._id}
+                    key={ramenyaResult._id}
                     onClick={() => {
-                      onSelectKeyword?.({ id: ramenya._id, name: ramenya.name, type: "ramenya" });
-                      setSearchValue(ramenya.name);
-                      addRamenyaHistory({ _id: ramenya._id, name: ramenya.name });
+                      onSelectKeyword?.(ramenyaResult.name);
+                      setKeyword(ramenyaResult.name);
+                      addRamenyaHistory({ _id: ramenyaResult._id, name: ramenyaResult.name });
                       setIsFocused(false);
                       setIsSearchOverlayOpen?.(false);
                     }}
@@ -215,10 +220,10 @@ export const SearchOverlay = ({
                     <IconLocate color={"#A0A0A0"} />
                     <span>
                       <MatchedText size={16} weight="sb">
-                        {getTextMatch({ query: searchValue, target: ramenya.name }).matchedText}
+                        {getTextMatch({ query: ramenyaResult.name, target: ramenyaResult.name }).matchedText}
                       </MatchedText>
                       <UnMatchedText size={16} weight="sb">
-                        {getTextMatch({ query: searchValue, target: ramenya.name }).unMatchedText}
+                        {getTextMatch({ query: ramenyaResult.name, target: ramenyaResult.name }).unMatchedText}
                       </UnMatchedText>
                     </span>
                   </KeywardWrapper>
@@ -258,9 +263,9 @@ export const SearchOverlay = ({
                       <KeywordHistoryTag
                         key={keyword._id}
                         onClick={() => {
-                          onSelectKeyword?.({ id: keyword._id, name: keyword.keyword, type: "keyword" });
+                          onSelectKeyword?.(keyword.keyword);
                           addKeywordHistory(keyword.keyword);
-                          setSearchValue(keyword.keyword);
+                          setKeyword(keyword.keyword);
                           setIsFocused(false);
                           setIsSearchOverlayOpen?.(false);
                         }}
@@ -320,8 +325,8 @@ export const SearchOverlay = ({
                       <KeywardWrapper
                         key={ramenya._id}
                         onClick={() => {
-                          onSelectKeyword?.({ id: ramenya._id, name: ramenya.keyword, type: "ramenya" });
-                          setSearchValue(ramenya.keyword);
+                          onSelectKeyword?.(ramenya.keyword);
+                          setKeyword(ramenya.keyword);
                           addRamenyaHistory({ _id: ramenya._id, name: ramenya.keyword });
                           setIsFocused(false);
                           setIsSearchOverlayOpen?.(false);

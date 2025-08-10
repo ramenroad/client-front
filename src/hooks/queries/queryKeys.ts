@@ -10,7 +10,13 @@ export const queryKeys = createQueryKeyStore({
     group: null,
     regions: null,
     list: (params: { type: "region" | "genre"; value: string }) => [params.type, params.value] as const,
-    listWithGeolocation: null,
+    listWithGeolocation: (latitude?: number, longitude?: number, radius?: number) => [latitude, longitude, radius],
+    listWithSearch: (keyword?: string, nearby?: boolean, latitude?: number, longitude?: number) => [
+      keyword,
+      nearby,
+      latitude,
+      longitude,
+    ],
     searchAutoComplete: (query: string) => [query],
   },
   user: {

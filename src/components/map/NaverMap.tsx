@@ -4,6 +4,8 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import tw from "twin.macro";
 import { requestLocationPermission } from "../../util";
 import { useUserLocation } from "../../hooks/common/useUserLocation";
+import { useMapLocation } from "../../hooks/common/useMapLocation";
+import { useSearchParams } from "react-router-dom";
 
 export interface NaverMapProps<T = unknown> {
   markers?: {
@@ -17,11 +19,11 @@ export interface NaverMapProps<T = unknown> {
   onMarkerClick?: (markerData: T) => void;
   selectedMarker?: T | null;
   onMapReady?: (map: naver.maps.Map) => void;
-  onMapCenterChange?: (map: naver.maps.Map) => void;
   initialCenter?: {
     lat: number;
     lng: number;
   };
+  isMovingRef?: React.MutableRefObject<boolean>;
 }
 
 // 마커 아이콘 SVG를 상수로 분리
@@ -125,6 +127,10 @@ const USER_POSITION_MARKER = `
 `;
 
 export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
+  const [searchParams] = useSearchParams();
+
+  const { updateLocationData, updateLocationDataSafe } = useMapLocation({ mapInstance: null });
+
   const [mapInstance, setMapInstance] = useState<naver.maps.Map | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -139,35 +145,6 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
   const createMarkerIcon = useCallback((isSelected: boolean, title?: string) => {
     const markerSvg = isSelected ? SELECTED_MARKER_SVG : NORMAL_MARKER_SVG;
 
-    // return {
-    //   content: `
-    //     <div style="
-    //       position: relative;
-    //       top: ${isSelected ? "-18px" : "22px"};
-    //       left: ${isSelected ? "22px" : "33px"};
-    //     ">
-    //       ${markerSvg}
-    //       ${
-    //         title
-    //           ? `
-    //         <div style="
-    //           position: absolute;
-    //           top: ${isSelected ? "52px" : "32px"};
-    //           left: ${isSelected ? "calc(50% + 24px)" : "calc(50% + 16px)"};
-    //           transform: translateX(-50%);
-    //           text-align: center;
-    //           font-size: 12px;
-    //           font-weight: 600;
-    //           color: #333;
-    //           white-space: nowrap;
-    //           max-width: 120px;
-    //           text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;
-    //         ">${title}</div>
-    //       `
-    //           : ""
-    //       }
-    //     </div>
-    //   `,
     return {
       content: `
         <div style="
@@ -231,13 +208,15 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
 
           center =
             userPosition && userPosition.latitude && userPosition.longitude
-              ? new naver.maps.LatLng(userPosition.latitude, userPosition.longitude)
-              : new naver.maps.LatLng(37.566826, 126.9786567);
+              ? // 사용자의 현재 위치
+                new naver.maps.LatLng(userPosition.latitude, userPosition.longitude)
+              : // 서울역 주변 좌표
+                new naver.maps.LatLng(37.566826, 126.9786567);
         }
 
         const map = new naver.maps.Map("map", {
           center: center,
-          zoom: 14,
+          zoom: searchParams.get("level") ? Number(searchParams.get("level")) : 14,
         });
 
         // 사용자 위치 마커 추가 (initialCenter가 없고 권한 허용된 경우만)
@@ -254,20 +233,23 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
 
         // 지도 중심 변경 이벤트 리스너 (디바운스 적용)
         let centerChangeTimeout: NodeJS.Timeout;
+
+        updateLocationData(map);
+
         naver.maps.Event.addListener(map, "center_changed", () => {
           clearTimeout(centerChangeTimeout);
           centerChangeTimeout = setTimeout(() => {
-            console.log("current location", map.getCenter());
-            props.onMapCenterChange?.(map);
+            if (props.isMovingRef?.current || window.location.pathname !== "/map") return;
+            updateLocationDataSafe(map);
           }, 300);
         });
 
         setMapInstance(map);
         setIsInitialized(true);
+
         props.onMapReady?.(map);
-        console.log("지도 초기화 완료");
       } catch (error) {
-        console.error("지도 초기화 실패:", error);
+        console.error("지도를 불러오는데 실패하였습니다.", error);
       }
     };
 
@@ -319,10 +301,11 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
       // 마커 클릭 이벤트
       naver.maps.Event.addListener(markerInstance, "click", () => {
         if (mapInstance.getZoom() < 15) {
-          mapInstance.panTo(new naver.maps.LatLng(marker.position.lat - 0.005, marker.position.lng));
+          mapInstance.setCenter(new naver.maps.LatLng(marker.position.lat - 0.005, marker.position.lng));
         } else {
-          mapInstance.panTo(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
+          mapInstance.setCenter(new naver.maps.LatLng(marker.position.lat, marker.position.lng));
         }
+
         props.onMarkerClick?.(marker.data);
       });
 

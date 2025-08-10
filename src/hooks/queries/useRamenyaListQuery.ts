@@ -1,17 +1,17 @@
 import { getRamenyaListByRegion, getRamenyaListByGenre, getRegions } from "../../api/list-page";
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "./queryKeys";
 import { FilterOptions, SortType } from "../../types/filter";
 import { checkBusinessStatus } from "../../util";
 import { useLocationStore } from "../../store/location/useLocationStore";
 import { calculateDistanceValue } from "../../util/number";
 import { OpenStatus } from "../../constants";
-import { Ramenya } from "../../types";
 import {
   getRamenyaListWithGeolocation,
   GetRamenyaListWithGeolocationParams,
   getRamenyaSearchAutoComplete,
-  GetRamenyaListWithGeolocationResponse,
+  getRamenyaListWithSearch,
+  GetRamenyaListWithSearchParams,
 } from "../../api/map";
 
 type QueryType = "region" | "genre";
@@ -85,13 +85,11 @@ export const useRamenyaListWithGeolocationQuery = ({
   longitude,
   radius,
   filterOptions,
-  queryOptions,
 }: GetRamenyaListWithGeolocationParams & {
   filterOptions?: FilterOptions;
-  queryOptions?: Partial<UseQueryOptions<GetRamenyaListWithGeolocationResponse, Error, Ramenya[]>>;
 }) => {
   const ramenyaListWithGeolocationQuery = useQuery({
-    ...queryKeys.ramenya.listWithGeolocation,
+    ...queryKeys.ramenya.listWithGeolocation(latitude, longitude, radius),
     queryFn: () => getRamenyaListWithGeolocation({ latitude, longitude, radius }),
     select: (data) => {
       // 항상 Ramenya[]를 반환하도록 수정
@@ -114,8 +112,8 @@ export const useRamenyaListWithGeolocationQuery = ({
           (a, b) =>
             calculateDistanceValue(
               {
-                latitude,
-                longitude,
+                latitude: latitude ?? 0,
+                longitude: longitude ?? 0,
               },
               {
                 latitude: a.latitude,
@@ -124,8 +122,8 @@ export const useRamenyaListWithGeolocationQuery = ({
             ) -
             calculateDistanceValue(
               {
-                latitude,
-                longitude,
+                latitude: latitude ?? 0,
+                longitude: longitude ?? 0,
               },
               {
                 latitude: b.latitude,
@@ -142,10 +140,67 @@ export const useRamenyaListWithGeolocationQuery = ({
       return filtered ?? [];
     },
     enabled: !!latitude && !!longitude && !!radius,
-    ...queryOptions,
   });
 
   return { ramenyaListWithGeolocationQuery };
+};
+
+export const useRamenyaListWithSearchQuery = ({
+  latitude,
+  longitude,
+  radius,
+  keyword,
+  filterOptions,
+  nearby,
+}: GetRamenyaListWithSearchParams & { filterOptions?: FilterOptions; nearby: boolean }) => {
+  const queryClient = useQueryClient();
+
+  const ramenyaListWithSearchQuery = useQuery({
+    ...queryKeys.ramenya.listWithSearch(keyword, nearby, latitude, longitude),
+    queryFn: async () => {
+      const data = await getRamenyaListWithSearch({ keyword, latitude, longitude, radius, inLocation: true, nearby });
+      queryClient.refetchQueries(queryKeys.search.history);
+      return data;
+    },
+    select: (data) => {
+      if (!filterOptions) return data;
+
+      let filtered = data;
+
+      if (filterOptions.isOpen) {
+        filtered = filtered.filter((ramenya) => checkBusinessStatus(ramenya.businessHours).status === OpenStatus.OPEN);
+      }
+
+      if (filterOptions.genre.length > 0) {
+        filtered = filtered.filter((ramenya) =>
+          filterOptions.genre.every((selectedGenre) => ramenya.genre.includes(selectedGenre)),
+        );
+      }
+
+      if (filterOptions.sort === SortType.DISTANCE) {
+        return [...filtered].sort(
+          (a, b) =>
+            calculateDistanceValue(
+              { latitude: latitude ?? 0, longitude: longitude ?? 0 },
+              { latitude: a.latitude, longitude: a.longitude },
+            ) -
+            calculateDistanceValue(
+              { latitude: latitude ?? 0, longitude: longitude ?? 0 },
+              { latitude: b.latitude, longitude: b.longitude },
+            ),
+        );
+      }
+
+      if (filterOptions.sort === SortType.RATING) {
+        return [...filtered].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+      }
+
+      return filtered ?? [];
+    },
+    enabled: !!keyword,
+  });
+
+  return { ramenyaListWithSearchQuery };
 };
 
 export const useRamenyaSearchAutoCompleteQuery = ({ query }: { query?: string }) => {

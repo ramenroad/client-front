@@ -109,11 +109,14 @@ const MainPage = () => {
         isExternal={true}
         isSearchOverlayOpen={isSearchOverlayOpen}
         setIsSearchOverlayOpen={setIsSearchOverlayOpen}
-        searchValue={searchValue}
-        setSearchValue={setSearchValue}
-        onSelectKeyword={(data) => {
+        keyword={searchValue}
+        setKeyword={setSearchValue}
+        onSelectKeyword={(keyword, isNearBy) => {
           const mapString = new URLSearchParams();
-          mapString.append("keywordName", data.name);
+          mapString.append("keyword", keyword);
+          if (isNearBy) {
+            mapString.append("nearBy", "true");
+          }
           navigate(`/map?${mapString}`);
         }}
       />
