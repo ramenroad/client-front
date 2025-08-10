@@ -153,7 +153,7 @@ const UserReviewPage = () => {
             <EmptyReviewOverlay />
           ) : (
             myReviewQuery.data?.pages.map((page) =>
-              page.reviews.map((review) => (
+              page.reviews?.map((review) => (
                 <>
                   <ReviewCard key={review._id} review={review} editable mypage />
                   <Line />
