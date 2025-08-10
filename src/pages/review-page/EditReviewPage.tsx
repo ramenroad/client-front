@@ -431,7 +431,7 @@ export const EditReviewPage = () => {
   const isFormValid =
     formValues.rating > 0 &&
     (formValues.menus ? formValues.menus.split(",").filter(Boolean).length > 0 : false) &&
-    formValues.review.trim().length >= 10;
+    formValues.review.trim().length >= 20;
 
   useEffect(() => {
     if (!reviewId) {
@@ -554,10 +554,10 @@ export const EditReviewPage = () => {
               <Controller
                 name="review"
                 control={control}
-                rules={{ required: true, minLength: 10 }}
+                rules={{ required: true, minLength: 20 }}
                 render={({ field }) => (
                   <ReviewTextAreaContainer>
-                    <ReviewDescriptionTextarea {...field} placeholder="최소 10자 이상 입력해주세요" />
+                    <ReviewDescriptionTextarea {...field} placeholder="최소 20자 이상 입력해주세요" />
                     <CharacterCount>
                       <TypedCount>{field.value.length}</TypedCount>/300
                     </CharacterCount>
