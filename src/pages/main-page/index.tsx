@@ -89,6 +89,8 @@ const MainPage = () => {
     const mapString = new URLSearchParams();
     mapString.append("longitude", location.longitude.toString());
     mapString.append("latitude", location.latitude.toString());
+    mapString.append("level", "14");
+    mapString.append("radius", "3241");
     navigate(`/map?${mapString}`);
   };
 
@@ -255,13 +257,13 @@ const GroupSwiperContainer = tw.div`
 const SearchInputWrapper = tw.div`
   box-border
   rounded-40
-  w-350 h-48 px-16 py-12
+  w-350 h-48 px-16
   mb-[-20px]
   bg-white
   outline-none border border-orange border-solid border-[1.2px]
   cursor-pointer
   w-350
-  flex gap-4
+  flex gap-4 items-center
 `;
 
 const SearchInput = tw.input`

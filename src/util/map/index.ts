@@ -1,6 +1,6 @@
 export const getRadiusFromMap = (map: naver.maps.Map) => {
   const projection = map.getProjection();
-  const deviceHeight = window.innerWidth;
+  const deviceHeight = 400;
   const halfDeviceHeight = Math.round(deviceHeight / 2);
 
   const p1 = new naver.maps.Point(0, 0);
