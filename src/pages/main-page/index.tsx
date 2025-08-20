@@ -208,7 +208,7 @@ const Container = tw.div`
 
 const RamenroadLogoWrapper = tw.div`
   flex items-center justify-center
-  p-10 mb-[-20px]
+  p-10 mb-[-30px]
 `;
 
 const BannerWrapper = tw.div`
