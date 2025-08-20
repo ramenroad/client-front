@@ -302,7 +302,7 @@ export const DetailPage = () => {
         <Divider />
 
         <RecommendWrapper>
-          <ReviewTitle>라멘로드 추천 메뉴</ReviewTitle>
+          <ReviewTitle>라이징 추천 메뉴</ReviewTitle>
           <RecommendBox>
             <RecommendMenuContainer>
               {ramenyaDetailQuery.data?.recommendedMenu.map((menu, index) => (

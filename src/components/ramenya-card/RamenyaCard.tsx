@@ -147,7 +147,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
 };
 
 const RamenyaCardWrapper = styled.section(({ isMapCard }: { isMapCard?: boolean }) => [
-  tw` w-full cursor-pointer
+  tw` w-[99%] cursor-pointer
   box-border px-20 py-20
   bg-white`,
   isMapCard && tw`rounded-12 shadow-lg`,

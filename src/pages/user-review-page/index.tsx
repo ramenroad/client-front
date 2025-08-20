@@ -80,7 +80,7 @@ const UserReviewPage = () => {
   const handleShareMore = () => {
     if (navigator.share) {
       navigator.share({
-        title: "라멘로드",
+        title: "라이징",
         text: `${userMyPageQuery.data?.nickname}님의 페이지를 확인해보세요!`,
         url: window.location.href,
       });
@@ -93,7 +93,7 @@ const UserReviewPage = () => {
     Kakao.Share.sendDefault({
       objectType: "feed",
       content: {
-        title: "라멘로드",
+        title: "라이징",
         description: `${userMyPageQuery.data?.nickname}`,
         // imageUrl:
         //   userMyPageQuery.data?.profileImageUrl ??

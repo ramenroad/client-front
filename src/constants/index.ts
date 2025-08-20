@@ -144,7 +144,7 @@ export const genrePath = [
   },
 ];
 
-export const ramenroadEmail = "ramenroad99@gmail.com";
+export const ramenroadEmail = "zz0905k@naver.com";
 
 export const initialFilterOptions: FilterOptions = {
   isOpen: false,
