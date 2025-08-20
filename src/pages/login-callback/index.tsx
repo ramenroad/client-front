@@ -116,7 +116,7 @@ const EmailBox = tw.div`
 `;
 
 const LoginButtonWrapper = tw.div`
-  flex flex-col items-center justify-center gap-10
+  flex flex-col items-center justify-center gap-12
   w-full mt-66
 `;
 

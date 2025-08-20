@@ -529,7 +529,7 @@ const MarketDetailReviewScore = tw.div`
 `;
 
 const MarketDetailGenreBox = tw.div`
-  flex gap-8 items-center font-14-r
+  flex gap-8 items-center font-14-r text-black
   flex-wrap
 `;
 
@@ -599,6 +599,7 @@ const Divider = tw.div`
 
 const ReviewTitle = tw.div`
   font-18-sb
+  text-black
 `;
 
 const RecommendBox = tw.div`
@@ -618,7 +619,7 @@ const RecommendMenuInfo = tw.div`
 `;
 
 const RecommendMenuName = tw.div`
-  font-14-m
+  font-14-m text-black
 `;
 
 const RecommendMenuPrice = tw.div`
@@ -640,7 +641,7 @@ const ImageWrapper = tw.div`
 `;
 
 const ImageContainer = tw.div`
-  flex flex-wrap gap-1 mb-16
+  flex flex-wrap gap-1
   w-350
   rounded-8 overflow-hidden
 `;
@@ -760,12 +761,12 @@ const MoreImageWrapper = tw.div`
 const MoreOverlay = tw.div`
   absolute top-0 left-0 w-116 h-116
   bg-black/50 
-  flex items-center justify-center gap-4
+  flex items-center justify-center
   rounded-br-8
 `;
 
 const MoreText = tw.span`
-  font-16-m text-white
+  font-14-m text-white
 `;
 
 const EmptyImageContainer = tw.div`

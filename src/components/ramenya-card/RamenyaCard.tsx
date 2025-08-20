@@ -127,7 +127,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
               <RamenyaOpenStatus status={openStatus}>{openStatus}</RamenyaOpenStatus>
               {checkBusinessStatus(businessHours || []).todayHours?.operatingTime && (
                 <>
-                  <span>·</span>
+                  <Dot />
                   <RamenyaOpenTime>
                     {openStatus === OpenStatus.BREAK
                       ? checkBusinessStatus(businessHours || []).todayHours?.breakTime
@@ -237,6 +237,10 @@ const RamenyaDistance = tw.section`
 
 const RamenyaCardBottomSection = tw.section`
   flex flex-col gap-4
+`;
+
+const Dot = tw.span`
+  w-2 h-2 bg-gray-700 rounded-full
 `;
 
 export default RamenyaCard;

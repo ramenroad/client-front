@@ -41,9 +41,9 @@ const MyPage = () => {
           </CardLayout>
           <MyReviewContainer onClick={() => navigate(`/user-review/${userInformationQuery.data?._id}`)}>
             <IconReview />
-            <RamenroadText size={16} weight="m">
+            <MyReviewText size={16} weight="m">
               작성한 리뷰
-            </RamenroadText>
+            </MyReviewText>
             <ArrowRightForReview />
           </MyReviewContainer>
         </>
@@ -71,7 +71,7 @@ const CardLayout = tw.section`
   flex items-center justify-between
   w-350 h-112
   font-20-m
-  border border-solid border-border rounded-8
+  border border-solid border-gray-100 rounded-8
   px-20 box-border
   cursor-pointer
 `;
@@ -124,6 +124,10 @@ const MyReviewContainer = tw.section`
   px-12 py-20
   bg-[#F9F9F9]
   rounded-8
+`;
+
+const MyReviewText = tw(RamenroadText)`
+  text-gray-900
 `;
 
 const ArrowRightForReview = tw(IconArrowRight)`

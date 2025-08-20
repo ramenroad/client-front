@@ -114,7 +114,7 @@ const ProfileInfo = tw.div`
 `;
 
 const ProfileDescriptionWrapper = tw.div`
-  border border-solid border-1 border-border mx-20 rounded-8 mt-32
+  border border-solid border-gray-100 mx-20 rounded-8 mt-32
 `;
 
 const NicknameEditWrapper = tw.div`
@@ -123,7 +123,7 @@ const NicknameEditWrapper = tw.div`
 
 const ProfileDescription = styled.div<{ isLast?: boolean }>(({ isLast }) => [
   tw`
-  h-57 border-b border-solid border-border border-t-0 border-x-0
+  h-57 border-b border-solid border-gray-100 border-t-0 border-x-0
   flex justify-between items-center
   font-14-m px-20
   `,

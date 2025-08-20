@@ -226,6 +226,7 @@ const LocationPathBadge = tw.div`
   bg-[#F8F8F8]
   border border-solid border-[#F1F1F1]
   cursor-pointer
+  text-gray-800
 `;
 
 const MyLocationBadge = tw.div`
