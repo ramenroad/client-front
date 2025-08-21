@@ -162,7 +162,7 @@ export const SearchOverlay = ({
               onChange={handleSearchChange}
               onKeyDown={handleKeyDown}
               onFocus={handleFocus}
-              placeholder="장르 또는 매장으로 검색해 보세요"
+              placeholder={`${isFocused ? "어떤 라멘을 찾으세요?" : "장르 또는 매장으로 검색해 보세요"}`}
             />
             <SearchDeleteIconWrapper
               onClick={() => {
@@ -198,10 +198,10 @@ export const SearchOverlay = ({
                     <IconLocate />
                     <span>
                       <MatchedText size={16} weight="sb">
-                        {getTextMatch({ query: keywordResult.name, target: keywordResult.name }).matchedText}
+                        {getTextMatch({ query: keyword, target: keywordResult.name }).matchedText}
                       </MatchedText>
                       <UnMatchedText size={16} weight="sb">
-                        {getTextMatch({ query: keywordResult.name, target: keywordResult.name }).unMatchedText}
+                        {getTextMatch({ query: keyword, target: keywordResult.name }).unMatchedText}
                       </UnMatchedText>
                     </span>
                   </KeywardWrapper>
@@ -220,10 +220,10 @@ export const SearchOverlay = ({
                     <IconLocate color={"#A0A0A0"} />
                     <span>
                       <MatchedText size={16} weight="sb">
-                        {getTextMatch({ query: ramenyaResult.name, target: ramenyaResult.name }).matchedText}
+                        {getTextMatch({ query: keyword, target: ramenyaResult.name }).matchedText}
                       </MatchedText>
                       <UnMatchedText size={16} weight="sb">
-                        {getTextMatch({ query: ramenyaResult.name, target: ramenyaResult.name }).unMatchedText}
+                        {getTextMatch({ query: keyword, target: ramenyaResult.name }).unMatchedText}
                       </UnMatchedText>
                     </span>
                   </KeywardWrapper>
@@ -420,6 +420,7 @@ const SearchInput = tw.input`
   w-full h-24
   bg-white border-none
   font-16-r text-black leading-24
+  placeholder:text-gray-200
   focus:outline-none align-middle
 `;
 

@@ -154,6 +154,14 @@ export const getTextMatch = ({
   matchedText: string;
   unMatchedText: string;
 } => {
+  console.debug(
+    "%cindex.ts:157%c -> %cquery, target",
+    "color: #90EE90",
+    "color: #FFD700",
+    "color: #87CEEB",
+    query,
+    target,
+  );
   // 한글 자모 분해
   const queryDisassembled = disassemble(query);
   const targetDisassembled = disassemble(target);

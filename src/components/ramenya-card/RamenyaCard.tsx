@@ -81,7 +81,12 @@ const RamenyaCard = (props: RamenyaCardProps) => {
     >
       <RamenyaCardLayout>
         {/* 카드 왼쪽 영역 */}
-        <RamenyaThumbnail src={thumbnailUrl || storeImage} isImageExist={!!thumbnailUrl} alt={"Thumbnail"} />
+        <RamenyaThumbnail
+          src={thumbnailUrl || storeImage}
+          isImageExist={!!thumbnailUrl}
+          alt={"Thumbnail"}
+          isMapCard={isMapCard}
+        />
 
         {/* 카드 오른쪽 영역 */}
         <RamenyaInformationWrapper>
@@ -157,10 +162,11 @@ const RamenyaCardLayout = tw.section`
   w-full flex gap-16 items-center
 `;
 
-const RamenyaThumbnail = styled.img(({ isImageExist }: { isImageExist: boolean }) => [
-  tw`w-100 h-100 object-cover rounded-lg flex-shrink-0
+const RamenyaThumbnail = styled.img(({ isImageExist, isMapCard }: { isImageExist: boolean; isMapCard?: boolean }) => [
+  tw`object-cover rounded-lg flex-shrink-0
     border border-solid border-border`,
   !isImageExist ? tw`object-contain` : tw`object-cover`,
+  isMapCard ? tw`w-110 h-110` : tw`w-100 h-100`,
 ]);
 
 const RamenyaInformationWrapper = tw.section`
@@ -215,7 +221,7 @@ export const RamenyaOpenStatus = styled.span(({ status }: { status: OpenStatus }
         : status === OpenStatus.DAY_OFF
           ? tw`text-red`
           : status === OpenStatus.CLOSED
-            ? tw`text-gray-700`
+            ? tw`text-closed`
             : tw``,
 ]);
 

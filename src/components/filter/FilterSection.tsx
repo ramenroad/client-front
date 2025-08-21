@@ -23,9 +23,9 @@ const FilterSection = (props: FilterSectionProps) => {
     let count = 0;
     if (filterOptions.isOpen) count++;
     if (filterOptions.sort !== SortType.DEFAULT) count++;
-    count += filterOptions.genre.length;
+    if (props.genre) count++;
     return count;
-  }, [filterOptions]);
+  }, [filterOptions.isOpen, filterOptions.sort, props.genre]);
 
   return (
     <FilterWrapper>

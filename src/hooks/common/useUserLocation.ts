@@ -1,9 +1,6 @@
 import { useCallback } from "react";
-import { useToast } from "../../components/toast/ToastProvider";
 
 export const useUserLocation = () => {
-  const { openToast } = useToast();
-
   const getUserPosition = useCallback(async (): Promise<{ latitude: number; longitude: number } | null> => {
     if (!navigator.geolocation) {
       return null;
@@ -17,8 +14,6 @@ export const useUserLocation = () => {
           maximumAge: 600000,
         });
       });
-
-      openToast("성공적으로 현재 위치를 불러왔습니다.");
 
       return {
         latitude: position.coords.latitude,
