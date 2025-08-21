@@ -412,10 +412,12 @@ export const DetailPage = () => {
                       </>
                     ))}
                 </ReviewCardContainer>
-                <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
-                  <span>모든 리뷰 보기</span>
-                  <IconArrowRight />
-                </AllReviewButton>
+                <AllReviewButtonWrapper>
+                  <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
+                    <span>모든 리뷰 보기</span>
+                    <IconArrowRight />
+                  </AllReviewButton>
+                </AllReviewButtonWrapper>
               </>
             )}
           </ReviewContent>
@@ -672,7 +674,6 @@ const ReviewerName = tw.span`
 
 const StarContainer = tw.div`
   flex gap-2 items-center
-  cursor-none
 `;
 
 const LargeStarContainer = tw.div`
@@ -735,6 +736,10 @@ const ReviewCardContainer = tw.div`
   flex flex-col
 `;
 
+const AllReviewButtonWrapper = tw.div`
+  px-20
+`;
+
 const AllReviewButton = tw.div`
   mt-10
   flex w-full py-10
@@ -746,7 +751,7 @@ const AllReviewButton = tw.div`
 `;
 
 const LocationTitle = tw.div`
-  font-18-sb pt-16
+  font-18-sb pt-32
 `;
 
 const LocationWrapper = tw.div`
