@@ -11,6 +11,7 @@ import {
   IconTime,
   IconArrowRight,
   IconStarMedium,
+  IconStarHalf,
   IconMap,
 } from "../../components/Icon";
 import tw from "twin.macro";
@@ -171,17 +172,22 @@ export const DetailPage = () => {
               <DetailIconTag icon={<IconStarMedium color="#CFCFCF" />} text="평점" />
               <MarketDetailReviewBox>
                 <StarContainer>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <IconStarMedium
-                      key={star}
-                      color={
-                        (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
-                        Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
-                          ? "#FFCC00"
-                          : "#E1E1E1"
-                      }
-                    />
-                  ))}
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const rating = ramenyaDetailQuery.data?.rating || 0;
+                    const reviewCount = ramenyaDetailQuery.data?.reviewCount || 0;
+
+                    if (reviewCount === 0) {
+                      return <IconStarMedium key={star} color="#E1E1E1" />;
+                    }
+
+                    if (rating >= star) {
+                      return <IconStarMedium key={star} color="#FFCC00" />;
+                    } else if (rating >= star - 0.5) {
+                      return <IconStarHalf key={star} />;
+                    } else {
+                      return <IconStarMedium key={star} color="#E1E1E1" />;
+                    }
+                  })}
                 </StarContainer>
                 <MarketDetailReviewScore>
                   {ramenyaDetailQuery.data?.rating?.toFixed(1) || "0.0"}

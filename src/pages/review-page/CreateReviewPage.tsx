@@ -1,6 +1,6 @@
 import TopBar from "../../components/top-bar/index.tsx";
 import tw from "twin.macro";
-import { IconStarLarge, IconAdd, IconClose } from "../../components/Icon/index.tsx";
+import { IconStarLarge, IconStarHalf, IconAdd, IconClose } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { createRef, useState, useEffect, useCallback, memo, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -241,8 +241,9 @@ export const CreateReviewPage = () => {
 
   const formValues = watch();
 
-  const handleStarClick = (index: number) => {
-    setValue("rating", index, { shouldValidate: true });
+  const handleStarClick = (starIndex: number, isHalf: boolean = false) => {
+    const rating = isHalf ? starIndex - 0.5 : starIndex;
+    setValue("rating", rating, { shouldValidate: true });
   };
 
   const handleMenuClick = (menu: string) => {
@@ -450,6 +451,10 @@ export const CreateReviewPage = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    console.log("rating", formValues.rating);
+  }, [formValues.rating]);
+
   return (
     <Wrapper>
       {(isSubmitting || isImageUploading) && (
@@ -470,11 +475,36 @@ export const CreateReviewPage = () => {
             <StarWrapper>
               <StarTitle>라멘은 만족하셨나요?</StarTitle>
               <StarContainer>
-                {[1, 2, 3, 4, 5].map((starIndex) => (
-                  <StarButton key={starIndex} onClick={() => handleStarClick(starIndex)} type="button">
-                    <IconStarLarge color={starIndex <= formValues.rating ? "#FFCC00" : "#E1E1E1"} />
-                  </StarButton>
-                ))}
+                {[1, 2, 3, 4, 5].map((starIndex) => {
+                  const currentRating = formValues.rating || 0;
+                  const isFullStar = starIndex <= currentRating;
+                  const isHalfStar = starIndex - 0.5 <= currentRating && currentRating < starIndex;
+
+                  return (
+                    <StarButtonContainer key={starIndex}>
+                      {/* 별 아이콘 (상태에 따라 색상 변경) */}
+                      {isHalfStar ? (
+                        <IconStarLarge isHalf={true} color={isFullStar ? "#FFCC00" : "#E1E1E1"} />
+                      ) : (
+                        <IconStarLarge color={isFullStar ? "#FFCC00" : "#E1E1E1"} />
+                      )}
+
+                      {/* 오버레이: 좌측 절반 (0.5점) */}
+                      <StarButtonLeft
+                        onClick={() => handleStarClick(starIndex, true)}
+                        type="button"
+                        aria-label={`${starIndex - 0.5}점`}
+                      />
+
+                      {/* 오버레이: 우측 절반 (1점) */}
+                      <StarButtonRight
+                        onClick={() => handleStarClick(starIndex, false)}
+                        type="button"
+                        aria-label={`${starIndex}점`}
+                      />
+                    </StarButtonContainer>
+                  );
+                })}
               </StarContainer>
               {errors.rating && <ErrorMessage>별점을 선택해주세요</ErrorMessage>}
             </StarWrapper>
@@ -873,8 +903,20 @@ const AddReviewButton = styled.button<AddReviewButtonProps>(({ active, disabled 
   (!active || disabled) && tw`cursor-not-allowed`,
 ]);
 
-const StarButton = tw.button`
+const StarButtonContainer = tw.div`
+    relative flex items-center justify-center
+`;
+
+const StarButtonLeft = tw.button`
     bg-transparent border-none cursor-pointer p-0 m-0
+    absolute left-0 w-1/2 h-full
+    flex items-center justify-center
+`;
+
+const StarButtonRight = tw.button`
+    bg-transparent border-none cursor-pointer p-0 m-0
+    absolute right-0 w-1/2 h-full
+    flex items-center justify-center
 `;
 
 const ErrorMessage = tw.div`
