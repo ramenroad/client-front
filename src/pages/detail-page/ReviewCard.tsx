@@ -213,7 +213,7 @@ const ReviewerName = tw.div`
 
 const ReviewScore = tw.div`
     flex gap-8 items-center justify-between
-    mt-12
+    h-18 mt-12
 `;
 
 const ScoreBox = tw.div`
@@ -236,6 +236,7 @@ const ScoredMenu = tw.div`
 `;
 const ReviewDate = tw.div`
     font-12-r text-gray-500
+    h-18 leading-18
 `;
 
 const ReviewDetail = tw.div`

@@ -286,10 +286,12 @@ const MenuSeparator = tw.section`
   w-1 h-10 bg-gray-100
 `;
 
-const ReviewCardSubHeaderRightSection = tw.section``;
+const ReviewCardSubHeaderRightSection = tw.section`
+  h-18 leading-18
+`;
 
 const ReviewCardContent = tw.section`
-  mt-8 leading-21
+  mt-12 leading-21
 `;
 
 const MoreButton = tw(RamenroadText)`

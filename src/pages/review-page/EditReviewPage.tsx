@@ -1,6 +1,6 @@
 import TopBar from "../../components/top-bar/index.tsx";
 import tw from "twin.macro";
-import { IconClose, IconStar } from "../../components/Icon/index.tsx";
+import { IconAdd, IconImageDelete, IconStar } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { createRef, useState, useEffect, useCallback, memo, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -189,7 +189,9 @@ const ImagePreviewItem = memo(
           </ErrorImagePlaceholder>
         )}
 
-        <ImageRemoveButton
+        <StyledIconImageDelete onClick={handleRemove} />
+
+        {/* <ImageRemoveButton
           onClick={handleRemove}
           type="button"
           disabled={isRemoving}
@@ -199,11 +201,16 @@ const ImagePreviewItem = memo(
           }}
         >
           <IconClose width={9} height={9} color={hasError ? "white" : "#585858"} />
-        </ImageRemoveButton>
+        </ImageRemoveButton> */}
       </ImagePreviewContainer>
     );
   },
 );
+
+const StyledIconImageDelete = tw(IconImageDelete)`
+  absolute top-[-8px] right-[-8px]
+  cursor-pointer
+`;
 
 export const EditReviewPage = () => {
   const { id: reviewId } = useParams();
@@ -247,8 +254,12 @@ export const EditReviewPage = () => {
 
   const formValues = watch();
 
-  const handleStarClick = (index: number) => {
-    setValue("rating", index, { shouldValidate: true });
+  const handleStarClick = (index: number, isHalf: boolean = false) => {
+    if (isHalf) {
+      setValue("rating", index - 0.5, { shouldValidate: true });
+    } else {
+      setValue("rating", index, { shouldValidate: true });
+    }
   };
 
   const handleMenuClick = (menu: string) => {
@@ -509,11 +520,36 @@ export const EditReviewPage = () => {
             <StarWrapper>
               <StarTitle>라멘은 만족하셨나요?</StarTitle>
               <StarContainer>
-                {[1, 2, 3, 4, 5].map((starIndex) => (
-                  <StarButton key={starIndex} onClick={() => handleStarClick(starIndex)} type="button">
-                    <IconStar inactive={starIndex > formValues.rating} />
-                  </StarButton>
-                ))}
+                {[1, 2, 3, 4, 5].map((starIndex) => {
+                  const currentRating = formValues.rating || 0;
+                  const isFullStar = starIndex <= currentRating;
+                  const isHalfStar = starIndex - 0.5 <= currentRating && currentRating < starIndex;
+
+                  return (
+                    <StarButtonContainer key={starIndex}>
+                      {/* 별 아이콘 (상태에 따라 색상 변경) */}
+                      {isHalfStar ? (
+                        <IconStar isHalf={true} inactive={!isFullStar} size={36} />
+                      ) : (
+                        <IconStar inactive={!isFullStar} size={36} />
+                      )}
+
+                      {/* 오버레이: 좌측 절반 (0.5점) */}
+                      <StarButtonLeft
+                        onClick={() => handleStarClick(starIndex, true)}
+                        type="button"
+                        aria-label={`${starIndex - 0.5}점`}
+                      />
+
+                      {/* 오버레이: 우측 절반 (1점) */}
+                      <StarButtonRight
+                        onClick={() => handleStarClick(starIndex, false)}
+                        type="button"
+                        aria-label={`${starIndex}점`}
+                      />
+                    </StarButtonContainer>
+                  );
+                })}
               </StarContainer>
               {errors.rating && <ErrorMessage>별점을 선택해주세요</ErrorMessage>}
             </StarWrapper>
@@ -683,12 +719,26 @@ const StarContainer = tw.div`
     flex gap-8 items-center
 `;
 
+const StarButtonContainer = tw.div`
+    relative
+`;
+
+const StarButtonLeft = tw.button`
+    absolute top-0 left-0
+    w-16 h-16
+`;
+
+const StarButtonRight = tw.button`
+    absolute top-0 right-0
+    w-16 h-16
+`;
+
 const Divider = tw.div`
     w-full h-1 bg-divider
 `;
 
 const MenuWrapper = tw.div`
-    flex flex-col mt-32 gap-12
+    flex flex-col mt-32 gap-16
 `;
 
 const MenuTitleBox = tw.div`
@@ -716,16 +766,16 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
   tw`
     flex w-fit h-29 box-border
     items-center
-    bg-white
-    border-solid border-1 border-gray-400
-    font-14-m text-gray-400
-    py-4 px-12 rounded-50
+    font-14-r
+    py-6 px-12 rounded-50
     cursor-pointer
     `,
-  selected &&
-    tw`
-        border-orange
-        text-orange
+  selected
+    ? tw`
+        bg-lightOrange text-orange
+    `
+    : tw`
+        bg-filter-background text-filter-text
     `,
 ]);
 
@@ -760,7 +810,7 @@ const MenuAddButton = tw.button`
 `;
 
 const ReviewDescriptionWrapper = tw.div`
-    flex flex-col mt-32 gap-12
+    flex flex-col mt-32 gap-16
     relative
 `;
 
@@ -863,27 +913,15 @@ const ImageUploadContentImage = tw.div`
 const ImagePreviewContainer = tw.div`
     relative
     w-96 h-96
-    rounded-8
-    overflow-visible
-    border-solid border-1 border-gray-200
+    rounded-7
+    border-solid border-1 border-border
+    flex items-center justify-center
 `;
 
 const ImagePreview = tw.img`
     w-full h-full
     object-cover
-    rounded-8
-`;
-
-const ImageRemoveButton = tw.button`
-    absolute top-[-8px] right-[-8px]
-    w-24 h-24
-    flex items-center justify-center
-    bg-white
-    rounded-full
-    cursor-pointer
-    shadow-md
-    border-solid border-1 border-gray-200
-    z-10
+    rounded-7
 `;
 
 const ImageAddButton = tw.button`
@@ -903,17 +941,14 @@ const AddReviewButton = styled.button<AddReviewButtonProps>(({ active, disabled 
   tw`
     flex items-center justify-center
     mt-32
-    w-full h-48 rounded-8 text-white
+    w-full h-48 rounded-8
+    font-16-m text-white
     px-10 py-10 bg-gray-200
     border-none box-border
     `,
   active && !disabled && tw`bg-orange cursor-pointer`,
   (!active || disabled) && tw`cursor-not-allowed`,
 ]);
-
-const StarButton = tw.button`
-    bg-transparent border-none cursor-pointer p-0 m-0
-`;
 
 const ErrorMessage = tw.div`
     font-12-r text-red

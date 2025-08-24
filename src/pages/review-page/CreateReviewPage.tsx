@@ -1,6 +1,6 @@
 import TopBar from "../../components/top-bar/index.tsx";
 import tw from "twin.macro";
-import { IconAdd, IconClose, IconStar } from "../../components/Icon/index.tsx";
+import { IconAdd, IconImageDelete, IconStar } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { createRef, useState, useEffect, useCallback, memo, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -186,7 +186,9 @@ const ImagePreviewItem = memo(
           </ErrorImagePlaceholder>
         )}
 
-        <ImageRemoveButton
+        <StyledIconImageDelete onClick={handleRemove} />
+
+        {/* <ImageRemoveButton
           onClick={handleRemove}
           type="button"
           disabled={isRemoving}
@@ -195,8 +197,8 @@ const ImagePreviewItem = memo(
             color: hasError ? "white" : "#585858",
           }}
         >
-          <IconClose width={9} height={9} color={hasError ? "white" : "#585858"} />
-        </ImageRemoveButton>
+          <StyledIconImageDelete />
+        </ImageRemoveButton> */}
       </ImagePreviewContainer>
     );
   },
@@ -548,7 +550,7 @@ export const CreateReviewPage = () => {
                 rules={{ required: true, minLength: 20 }}
                 render={({ field }) => (
                   <ReviewTextAreaContainer>
-                    <ReviewDescriptionTextarea {...field} placeholder="최소 20자 이상 입력해주세요" />
+                    <ReviewDescriptionTextarea maxLength={300} {...field} placeholder="최소 20자 이상 입력해주세요" />
                     <CharacterCount>
                       <TypedCount>{field.value.length}</TypedCount>/300
                     </CharacterCount>
@@ -679,7 +681,7 @@ const Divider = tw.div`
 `;
 
 const MenuWrapper = tw.div`
-    flex flex-col mt-32 gap-12
+    flex flex-col mt-32 gap-16
 `;
 
 const MenuTitleBox = tw.div`
@@ -707,16 +709,16 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
   tw`
     flex w-fit h-29 box-border
     items-center
-    bg-white
-    border-solid border-1 border-gray-400
-    font-14-m text-gray-400
-    py-4 px-12 rounded-50
+    font-14-r
+    py-6 px-12 rounded-50
     cursor-pointer
     `,
-  selected &&
-    tw`
-        border-orange
-        text-orange
+  selected
+    ? tw`
+        bg-lightOrange text-orange
+    `
+    : tw`
+        bg-filter-background text-filter-text
     `,
 ]);
 
@@ -751,7 +753,7 @@ const MenuAddButton = tw.button`
 `;
 
 const ReviewDescriptionWrapper = tw.div`
-    flex flex-col mt-32 gap-12
+    flex flex-col mt-32 gap-16
     relative
 `;
 
@@ -777,6 +779,7 @@ const ReviewDescriptionTextarea = styled.textarea(() => [
     bg-transparent
     border-none
     font-16-r
+    font-pretendard
     resize-none
     outline-none
     text-black
@@ -855,27 +858,20 @@ const ImageUploadContentImage = tw.div`
 const ImagePreviewContainer = tw.div`
     relative
     w-96 h-96
-    rounded-8
-    overflow-visible
-    border-solid border-1 border-gray-200
+    rounded-7
+    flex items-center justify-center
+    border-solid border-1 border-border
 `;
 
 const ImagePreview = tw.img`
     w-full h-full
     object-cover
-    rounded-8
+    rounded-7
 `;
 
-const ImageRemoveButton = tw.button`
-    absolute top-[-8px] right-[-8px]
-    w-24 h-24
-    flex items-center justify-center
-    bg-white
-    rounded-full
-    cursor-pointer
-    shadow-md
-    border-solid border-1 border-gray-200
-    z-10
+const StyledIconImageDelete = tw(IconImageDelete)`
+  absolute top-[-8px] right-[-8px]
+  cursor-pointer
 `;
 
 const ImageAddButton = tw.button`
@@ -895,8 +891,9 @@ const AddReviewButton = styled.button<AddReviewButtonProps>(({ active, disabled 
   tw`
     flex items-center justify-center
     mt-32
-    w-full h-48 rounded-8 text-white
+    w-full h-48 rounded-8
     px-10 py-10 bg-gray-200
+    font-16-m text-white
     border-none box-border
     `,
   active && !disabled && tw`bg-orange cursor-pointer`,
