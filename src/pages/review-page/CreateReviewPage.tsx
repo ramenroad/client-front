@@ -1,6 +1,6 @@
 import TopBar from "../../components/top-bar/index.tsx";
 import tw from "twin.macro";
-import { IconStarLarge, IconStarHalf, IconAdd, IconClose } from "../../components/Icon/index.tsx";
+import { IconAdd, IconClose, IconStar } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { createRef, useState, useEffect, useCallback, memo, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -484,9 +484,9 @@ export const CreateReviewPage = () => {
                     <StarButtonContainer key={starIndex}>
                       {/* 별 아이콘 (상태에 따라 색상 변경) */}
                       {isHalfStar ? (
-                        <IconStarLarge isHalf={true} color={isFullStar ? "#FFCC00" : "#E1E1E1"} />
+                        <IconStar isHalf={true} inactive={!isFullStar} size={36} />
                       ) : (
-                        <IconStarLarge color={isFullStar ? "#FFCC00" : "#E1E1E1"} />
+                        <IconStar inactive={!isFullStar} size={36} />
                       )}
 
                       {/* 오버레이: 좌측 절반 (0.5점) */}

@@ -1,7 +1,7 @@
 import tw from "twin.macro";
 import { UserReview, User, ReviewType } from "../../types/review";
 import { RamenroadText } from "../common/RamenroadText";
-import { IconArrowRight, IconStarMedium } from "../Icon";
+import { IconArrowRight, IconStar } from "../Icon";
 import defaultProfile from "../../assets/images/profile-default.png";
 import dayjs from "dayjs";
 import { useState } from "react";
@@ -149,7 +149,7 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
         <ReviewCardSubHeaderLeftSection>
           <RatingWrapper>
             {[1, 2, 3, 4, 5].map((star) => (
-              <IconStarMedium key={star} color={star <= review.rating ? "#FFCC00" : "#E1E1E1"} />
+              <IconStar key={star} inactive={star > review.rating} />
             ))}
           </RatingWrapper>
           <RamenyaMenuListWrapper>

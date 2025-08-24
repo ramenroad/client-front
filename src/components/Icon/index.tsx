@@ -1,6 +1,6 @@
-import { SVGProps } from "react";
+import { ComponentProps } from "react";
 
-interface IconProps extends Omit<SVGProps<SVGSVGElement>, "color"> {
+interface IconProps extends ComponentProps<"svg"> {
   color?: string;
 }
 
@@ -281,41 +281,37 @@ export const IconNaver = () => (
   </svg>
 );
 
-export const IconStar = ({ inactive = false }: { inactive?: boolean }) => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M7 1L8.76336 4.57295L12.7063 5.1459L9.85317 7.92705L10.5267 11.8541L7 10L3.47329 11.8541L4.14683 7.92705L1.29366 5.1459L5.23664 4.57295L7 1Z"
-      fill={inactive ? "#CFCFCF" : "#FFCC00"}
-    />
-  </svg>
-);
+export const IconStar = ({
+  inactive = false,
+  size = 14,
+  isHalf = false,
+  ...rest
+}: ComponentProps<"svg"> & {
+  inactive?: boolean;
+  size?: number;
+  isHalf?: boolean;
+}) => {
+  if (isHalf) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+        <path
+          d="M20 2L25.2901 12.7188L37.119 14.4377L28.5595 22.7812L30.5801 34.5623L20 29L9.41987 34.5623L11.4405 22.7812L2.88098 14.4377L14.7099 12.7188L20 2Z"
+          fill="#E1E1E1"
+        />
+        <path d="M20 29L9.41992 34.5625L11.4404 22.7812L2.88086 14.4375L14.71 12.7188L20 2V29Z" fill="#FFCC00" />
+      </svg>
+    );
+  }
 
-export const IconStarHalf = ({ size = 14 }: { size?: number }) => (
-  <svg width={size + 2} height={size + 2} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M20 2L25.2901 12.7188L37.119 14.4377L28.5595 22.7812L30.5801 34.5623L20 29L9.41987 34.5623L11.4405 22.7812L2.88098 14.4377L14.7099 12.7188L20 2Z"
-      fill="#E1E1E1"
-    />
-    <path d="M20.1191 29L9.53906 34.5625L11.5596 22.7812L3 14.4375L14.8291 12.7188L20.1191 2V29Z" fill="#FFCC00" />
-  </svg>
-);
-
-export const IconStarSmall = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="12"
-    height="11"
-    viewBox="0 0 12 11"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <path
-      d="M6 0L7.76336 3.57295L11.7063 4.1459L8.85317 6.92705L9.52671 10.8541L6 9L2.47329 10.8541L3.14683 6.92705L0.293661 4.1459L4.23664 3.57295L6 0Z"
-      fill={color ?? "#FFCC00"}
-    />
-  </svg>
-);
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+      <path
+        d="M20 2L25.2901 12.7188L37.119 14.4377L28.5595 22.7812L30.5801 34.5623L20 29L9.41987 34.5623L11.4405 22.7812L2.88098 14.4377L14.7099 12.7188L20 2Z"
+        fill={inactive ? "#E1E1E1" : "#FFCC00"}
+      />
+    </svg>
+  );
+};
 
 export const IconHome = ({ selected }: { selected: boolean }) => {
   if (selected) {
@@ -369,49 +365,6 @@ export const IconUser = ({ selected }: { selected: boolean }) => {
     </svg>
   );
 };
-
-export const IconStarMedium = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="14"
-    height="13"
-    viewBox="0 0 14 13"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <path
-      d="M7 0L9.05725 4.16844L13.6574 4.83688L10.3287 8.08156L11.1145 12.6631L7 10.5L2.8855 12.6631L3.6713 8.08156L0.342604 4.83688L4.94275 4.16844L7 0Z"
-      fill={color ?? "#FFCC00"}
-    />
-  </svg>
-);
-
-export const IconStarLarge = ({ color, isHalf, ...rest }: IconProps & { isHalf?: boolean }) =>
-  isHalf ? (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path
-        d="M20 2L25.2901 12.7188L37.119 14.4377L28.5595 22.7812L30.5801 34.5623L20 29L9.41987 34.5623L11.4405 22.7812L2.88098 14.4377L14.7099 12.7188L20 2Z"
-        fill="#E1E1E1"
-      />
-      <path d="M20.1191 29L9.53906 34.5625L11.5596 22.7812L3 14.4375L14.8291 12.7188L20.1191 2V29Z" fill="#FFCC00" />
-    </svg>
-  ) : (
-    <svg
-      width="36"
-      height="33"
-      viewBox="0 0 36 33"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="none"
-      {...rest}
-    >
-      <path
-        d="M18 0L23.2901 10.7188L35.119 12.4377L26.5595 20.7812L28.5801 32.5623L18 27L7.41987 32.5623L9.44049 20.7812L0.880983 12.4377L12.7099 10.7188L18 0Z"
-        fill={color ?? "#FFCC00"}
-      />
-    </svg>
-  );
 
 export const IconAdd = ({ color, ...rest }: IconProps) => (
   <svg

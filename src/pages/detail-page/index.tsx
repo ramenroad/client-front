@@ -6,13 +6,11 @@ import {
   IconDropDownSelected,
   IconInstagram,
   IconLocate,
-  IconStarLarge,
   IconTag,
   IconTime,
   IconArrowRight,
-  IconStarMedium,
-  IconStarHalf,
   IconMap,
+  IconStar,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -169,7 +167,7 @@ export const DetailPage = () => {
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
             <MarketDetailBox>
-              <DetailIconTag icon={<IconStarMedium color="#CFCFCF" />} text="평점" />
+              <DetailIconTag icon={<IconStar inactive />} text="평점" />
               <MarketDetailReviewBox>
                 <StarContainer>
                   {[1, 2, 3, 4, 5].map((star) => {
@@ -177,15 +175,15 @@ export const DetailPage = () => {
                     const reviewCount = ramenyaDetailQuery.data?.reviewCount || 0;
 
                     if (reviewCount === 0) {
-                      return <IconStarMedium key={star} color="#E1E1E1" />;
+                      return <IconStar key={star} inactive />;
                     }
 
                     if (rating >= star) {
-                      return <IconStarMedium key={star} color="#FFCC00" />;
+                      return <IconStar key={star} />;
                     } else if (rating >= star - 0.5) {
-                      return <IconStarHalf key={star} />;
+                      return <IconStar size={14} isHalf key={star} />;
                     } else {
-                      return <IconStarMedium key={star} color="#E1E1E1" />;
+                      return <IconStar key={star} inactive />;
                     }
                   })}
                 </StarContainer>
@@ -378,12 +376,7 @@ export const DetailPage = () => {
 
             <LargeStarContainer>
               {[...Array(5)].map((_, i) => (
-                <IconStarLarge
-                  key={i}
-                  color={i < selectedRating ? "#FFCC00" : "#E1E1E1"}
-                  onClick={() => handleStarClick(i + 1)}
-                  style={{ cursor: "pointer" }}
-                />
+                <IconStar key={i} inactive={i >= selectedRating} onClick={() => handleStarClick(i + 1)} size={36} />
               ))}
             </LargeStarContainer>
 

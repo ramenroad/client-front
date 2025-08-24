@@ -9,7 +9,7 @@ import CountUp from "react-countup";
 import { useEffect, useMemo } from "react";
 import { setCurrentLocation, useLocationStore } from "../../store/location/useLocationStore.ts";
 import { calculateDistance } from "../../util/number.ts";
-import { IconStarSmall } from "../Icon/index.tsx";
+import { IconStar } from "../Icon/index.tsx";
 import { RamenroadText } from "../common/RamenroadText.tsx";
 
 interface RamenyaCardProps extends Partial<Ramenya> {
@@ -99,7 +99,7 @@ const RamenyaCard = (props: RamenyaCardProps) => {
             {/* 라멘야 별점 */}
             {isReview !== false && (
               <RamenyaReviewBox>
-                <IconStarSmall color={rating && rating > 0 ? "#FFCC00" : "#E1E1E1"} />
+                <IconStar inactive={!rating || rating <= 0} />
                 <RamenyaScore>{rating && rating.toFixed(1)}</RamenyaScore>
                 <RamenyaReviewCount>({reviewCount})</RamenyaReviewCount>
               </RamenyaReviewBox>

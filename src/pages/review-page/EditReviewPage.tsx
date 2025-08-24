@@ -1,6 +1,6 @@
 import TopBar from "../../components/top-bar/index.tsx";
 import tw from "twin.macro";
-import { IconStarLarge, IconAdd, IconClose } from "../../components/Icon/index.tsx";
+import { IconClose, IconStar } from "../../components/Icon/index.tsx";
 import styled from "@emotion/styled";
 import { createRef, useState, useEffect, useCallback, memo, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -511,7 +511,7 @@ export const EditReviewPage = () => {
               <StarContainer>
                 {[1, 2, 3, 4, 5].map((starIndex) => (
                   <StarButton key={starIndex} onClick={() => handleStarClick(starIndex)} type="button">
-                    <IconStarLarge color={starIndex <= formValues.rating ? "#FFCC00" : "#E1E1E1"} />
+                    <IconStar inactive={starIndex > formValues.rating} />
                   </StarButton>
                 ))}
               </StarContainer>
