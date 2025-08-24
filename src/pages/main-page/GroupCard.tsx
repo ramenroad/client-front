@@ -75,4 +75,5 @@ const GroupListTitle = tw.span`
 
 const TextBox = tw.div`
   flex flex-col 
+  gap-2
 `;

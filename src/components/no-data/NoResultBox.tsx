@@ -17,7 +17,7 @@ const NoResultBox = ({ actionButton }: NoResultBoxProps) => {
         <NoResultDescription size={16} weight="r">
           <span>찾으시는 정보가 없나요?</span>
           <br />
-          <span>라멘로드에 제보해 주세요!</span>
+          <span>라이징에 제보해 주세요!</span>
         </NoResultDescription>
       </DescriptionWrapper>
       {actionButton}

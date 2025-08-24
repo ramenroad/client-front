@@ -53,7 +53,7 @@ export const ImagesPage = () => {
 };
 
 const Wrapper = tw.div`
-    flex flex-col pb-40 gap-20
+    flex flex-col pb-40
 `;
 
 const Header = tw.div`

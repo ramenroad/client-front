@@ -84,11 +84,17 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
 
                   <ReviewerReviewInfo>
                     <RamenroadText size={12} weight="r">
-                      평균 별점 {review.userId.avgReviewRating?.toFixed(1)}
+                      <span>평균 별점 </span>
+                      <RamenroadText size={12} weight="m">
+                        {review.userId.avgReviewRating?.toFixed(1)}
+                      </RamenroadText>
                     </RamenroadText>
                     <ReviewerReviewCountDivider />
                     <RamenroadText size={12} weight="r">
-                      리뷰 {review.userId.reviewCount}
+                      <span>리뷰</span>{" "}
+                      <RamenroadText size={12} weight="m">
+                        {review.userId.reviewCount}
+                      </RamenroadText>
                     </RamenroadText>
                   </ReviewerReviewInfo>
                 </ReviewerInfoBox>

@@ -6,5 +6,5 @@ const RamenroadLogo = () => <Logo src={ramenroadLogo} />;
 export default RamenroadLogo;
 
 const Logo = tw.img`
-  w-98 h-24
+  h-24
 `;

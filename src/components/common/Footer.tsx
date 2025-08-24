@@ -8,7 +8,7 @@ export const Footer = () => {
     <Wrapper>
       <Contact>
         <RamenroadText size={14} weight="sb">
-          팀 라멘로드
+          팀 라이징
         </RamenroadText>
         <ContactWrapper>
           <span>제휴 및 협업 문의</span>
@@ -20,10 +20,7 @@ export const Footer = () => {
           <Link
             size={12}
             weight="r"
-            onClick={() =>
-              // openPopup(PopupType.IFRAME, { url: "https://kim-junseo.notion.site/21649b91c9c580318d75e7941d6def9c" })
-              window.open("https://kim-junseo.notion.site/21649b91c9c580318d75e7941d6def9c", "_blank")
-            }
+            onClick={() => window.open("https://kim-junseo.notion.site/21649b91c9c580318d75e7941d6def9c", "_blank")}
           >
             서비스 이용 약관
           </Link>
@@ -32,15 +29,14 @@ export const Footer = () => {
             size={12}
             weight="sb"
             onClick={() =>
-              // openPopup(PopupType.IFRAME, { url: "https://www.notioniframe.com/notion/2mtbk9lo4fy" })
-              window.open("https://www.notioniframe.com/notion/2mtbk9lo4fy", "_blank")
+              window.open("https://kim-junseo.notion.site/21849b91c9c580d18097dfe035e990c2?source=copy_link", "_blank")
             }
           >
             개인정보 처리방침
           </Link>
         </Terms>
         <RamenroadText size={12} weight="r">
-          Copyright © 2025 라멘로드 All rights reserved.
+          Copyright © 2025 라이징 All rights reserved.
         </RamenroadText>
       </TermsAndConditions>
     </Wrapper>

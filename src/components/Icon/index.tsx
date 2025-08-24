@@ -884,39 +884,39 @@ export const IconDeleteSearchValue = () => (
 );
 
 export const IconGPS = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g filter="url(#filter0_d_2082_2778)">
-      <rect x="8" y="4" width="32" height="32" rx="16" fill="white" shapeRendering="crispEdges" />
-      <circle cx="24" cy="20" r="5.5" stroke="#414141" />
-      <circle cx="24" cy="20" r="2.5" fill="#414141" />
-      <rect x="23.5" y="12" width="1" height="3" rx="0.5" fill="#414141" />
-      <rect x="16" y="20.5" width="1" height="3" rx="0.5" transform="rotate(-90 16 20.5)" fill="#414141" />
-      <rect width="1" height="3" rx="0.5" transform="matrix(1 0 0 -1 23.5 28)" fill="#414141" />
-      <rect width="1" height="3" rx="0.5" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 32 20.5)" fill="#414141" />
+  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#filter0_d_2730_5366)">
+      <rect x="3" y="1" width="32" height="32" rx="16" fill="white" shape-rendering="crispEdges" />
+      <circle cx="19" cy="17" r="5.5" stroke="#414141" />
+      <circle cx="19" cy="17" r="2.5" fill="#414141" />
+      <rect x="18.5" y="9" width="1" height="3" rx="0.5" fill="#414141" />
+      <rect x="11" y="17.5" width="1" height="3" rx="0.5" transform="rotate(-90 11 17.5)" fill="#414141" />
+      <rect width="1" height="3" rx="0.5" transform="matrix(1 0 0 -1 18.5 25)" fill="#414141" />
+      <rect width="1" height="3" rx="0.5" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 27 17.5)" fill="#414141" />
     </g>
     <defs>
       <filter
-        id="filter0_d_2082_2778"
+        id="filter0_d_2730_5366"
         x="0"
         y="0"
-        width="48"
-        height="48"
+        width="38"
+        height="38"
         filterUnits="userSpaceOnUse"
-        colorInterpolationFilters="sRGB"
+        color-interpolation-filters="sRGB"
       >
-        <feFlood floodOpacity="0" result="BackgroundImageFix" />
+        <feFlood flood-opacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
           values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
           result="hardAlpha"
         />
-        <feOffset dy="4" />
-        <feGaussianBlur stdDeviation="4" />
+        <feOffset dy="2" />
+        <feGaussianBlur stdDeviation="1.5" />
         <feComposite in2="hardAlpha" operator="out" />
-        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0" />
-        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2082_2778" />
-        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2082_2778" result="shape" />
+        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0" />
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2730_5366" />
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2730_5366" result="shape" />
       </filter>
     </defs>
   </svg>
