@@ -1,7 +1,7 @@
 import tw from "twin.macro";
 import { UserReview, User, ReviewType } from "../../types/review";
 import { RamenroadText } from "../common/RamenroadText";
-import { IconArrowRight, IconStarMedium } from "../Icon";
+import { IconArrowRight, IconStar } from "../Icon";
 import defaultProfile from "../../assets/images/profile-default.png";
 import dayjs from "dayjs";
 import { useState } from "react";
@@ -84,11 +84,17 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
 
                   <ReviewerReviewInfo>
                     <RamenroadText size={12} weight="r">
-                      평균 별점 {review.userId.avgReviewRating?.toFixed(1)}
+                      <span>평균 별점 </span>
+                      <RamenroadText size={12} weight="m">
+                        {review.userId.avgReviewRating?.toFixed(1)}
+                      </RamenroadText>
                     </RamenroadText>
                     <ReviewerReviewCountDivider />
                     <RamenroadText size={12} weight="r">
-                      리뷰 {review.userId.reviewCount}
+                      <span>리뷰</span>{" "}
+                      <RamenroadText size={12} weight="m">
+                        {review.userId.reviewCount}
+                      </RamenroadText>
                     </RamenroadText>
                   </ReviewerReviewInfo>
                 </ReviewerInfoBox>
@@ -143,7 +149,7 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
         <ReviewCardSubHeaderLeftSection>
           <RatingWrapper>
             {[1, 2, 3, 4, 5].map((star) => (
-              <IconStarMedium key={star} color={star <= review.rating ? "#FFCC00" : "#E1E1E1"} />
+              <IconStar key={star} inactive={star > review.rating} />
             ))}
           </RatingWrapper>
           <RamenyaMenuListWrapper>
@@ -280,10 +286,12 @@ const MenuSeparator = tw.section`
   w-1 h-10 bg-gray-100
 `;
 
-const ReviewCardSubHeaderRightSection = tw.section``;
+const ReviewCardSubHeaderRightSection = tw.section`
+  h-18 leading-18
+`;
 
 const ReviewCardContent = tw.section`
-  mt-8 leading-21
+  mt-12 leading-21
 `;
 
 const MoreButton = tw(RamenroadText)`

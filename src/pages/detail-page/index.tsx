@@ -6,12 +6,11 @@ import {
   IconDropDownSelected,
   IconInstagram,
   IconLocate,
-  IconStarLarge,
   IconTag,
   IconTime,
   IconArrowRight,
-  IconStarMedium,
   IconMap,
+  IconStar,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -168,20 +167,25 @@ export const DetailPage = () => {
           <MarketDetailTitle>{ramenyaDetailQuery.data?.name}</MarketDetailTitle>
           <MarketDetailBoxContainer>
             <MarketDetailBox>
-              <DetailIconTag icon={<IconStarMedium color="#CFCFCF" />} text="평점" />
+              <DetailIconTag icon={<IconStar inactive />} text="평점" />
               <MarketDetailReviewBox>
                 <StarContainer>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <IconStarMedium
-                      key={star}
-                      color={
-                        (ramenyaDetailQuery.data?.reviewCount || 0) > 0 &&
-                        Math.round(ramenyaDetailQuery.data?.rating || 0) >= star
-                          ? "#FFCC00"
-                          : "#E1E1E1"
-                      }
-                    />
-                  ))}
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const rating = ramenyaDetailQuery.data?.rating || 0;
+                    const reviewCount = ramenyaDetailQuery.data?.reviewCount || 0;
+
+                    if (reviewCount === 0) {
+                      return <IconStar key={star} inactive />;
+                    }
+
+                    if (rating >= star) {
+                      return <IconStar key={star} />;
+                    } else if (rating >= star - 0.5) {
+                      return <IconStar size={14} isHalf key={star} />;
+                    } else {
+                      return <IconStar key={star} inactive />;
+                    }
+                  })}
                 </StarContainer>
                 <MarketDetailReviewScore>
                   {ramenyaDetailQuery.data?.rating?.toFixed(1) || "0.0"}
@@ -372,12 +376,7 @@ export const DetailPage = () => {
 
             <LargeStarContainer>
               {[...Array(5)].map((_, i) => (
-                <IconStarLarge
-                  key={i}
-                  color={i < selectedRating ? "#FFCC00" : "#E1E1E1"}
-                  onClick={() => handleStarClick(i + 1)}
-                  style={{ cursor: "pointer" }}
-                />
+                <IconStar key={i} inactive={i >= selectedRating} onClick={() => handleStarClick(i + 1)} size={36} />
               ))}
             </LargeStarContainer>
 
@@ -412,10 +411,12 @@ export const DetailPage = () => {
                       </>
                     ))}
                 </ReviewCardContainer>
-                <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
-                  <span>모든 리뷰 보기</span>
-                  <IconArrowRight />
-                </AllReviewButton>
+                <AllReviewButtonWrapper>
+                  <AllReviewButton onClick={() => navigate(`/review/list/${id}`)}>
+                    <span>모든 리뷰 보기</span>
+                    <IconArrowRight />
+                  </AllReviewButton>
+                </AllReviewButtonWrapper>
               </>
             )}
           </ReviewContent>
@@ -529,7 +530,7 @@ const MarketDetailReviewScore = tw.div`
 `;
 
 const MarketDetailGenreBox = tw.div`
-  flex gap-8 items-center font-14-r
+  flex gap-8 items-center font-14-r text-black
   flex-wrap
 `;
 
@@ -599,6 +600,7 @@ const Divider = tw.div`
 
 const ReviewTitle = tw.div`
   font-18-sb
+  text-black
 `;
 
 const RecommendBox = tw.div`
@@ -618,7 +620,7 @@ const RecommendMenuInfo = tw.div`
 `;
 
 const RecommendMenuName = tw.div`
-  font-14-m
+  font-14-m text-black
 `;
 
 const RecommendMenuPrice = tw.div`
@@ -640,7 +642,7 @@ const ImageWrapper = tw.div`
 `;
 
 const ImageContainer = tw.div`
-  flex flex-wrap gap-1 mb-16
+  flex flex-wrap gap-1
   w-350
   rounded-8 overflow-hidden
 `;
@@ -671,7 +673,6 @@ const ReviewerName = tw.span`
 
 const StarContainer = tw.div`
   flex gap-2 items-center
-  cursor-none
 `;
 
 const LargeStarContainer = tw.div`
@@ -734,6 +735,10 @@ const ReviewCardContainer = tw.div`
   flex flex-col
 `;
 
+const AllReviewButtonWrapper = tw.div`
+  px-20
+`;
+
 const AllReviewButton = tw.div`
   mt-10
   flex w-full py-10
@@ -745,7 +750,7 @@ const AllReviewButton = tw.div`
 `;
 
 const LocationTitle = tw.div`
-  font-18-sb pt-16
+  font-18-sb pt-32
 `;
 
 const LocationWrapper = tw.div`
@@ -760,12 +765,12 @@ const MoreImageWrapper = tw.div`
 const MoreOverlay = tw.div`
   absolute top-0 left-0 w-116 h-116
   bg-black/50 
-  flex items-center justify-center gap-4
+  flex items-center justify-center
   rounded-br-8
 `;
 
 const MoreText = tw.span`
-  font-16-m text-white
+  font-14-m text-white
 `;
 
 const EmptyImageContainer = tw.div`

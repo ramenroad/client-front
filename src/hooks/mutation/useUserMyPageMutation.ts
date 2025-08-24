@@ -10,7 +10,7 @@ export const useUserMyPageMutation = () => {
       return isPublic;
     },
     onSuccess: (isPublic) => {
-      openToast(isPublic ? "내 리뷰가 상대방에게 보입니다." : "내 리뷰가 상대방에게 보이지 않습니다.");
+      openToast(isPublic ? "내 리뷰가 상대방에게 보입니다" : "내 리뷰가 상대방에게 보이지 않습니다");
     },
   });
 

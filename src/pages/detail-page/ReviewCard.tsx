@@ -3,7 +3,7 @@ import tw from "twin.macro";
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import defaultProfile from "../../assets/images/profile-default.png";
-import { IconStarMedium } from "../../components/Icon";
+import { IconStar } from "../../components/Icon";
 import { UserReview } from "../../types";
 import { useModal } from "../../hooks/common/useModal";
 import { Modal } from "../../components/common/Modal";
@@ -91,7 +91,7 @@ export const ReviewCard = ({ review }: { review: UserReview }) => {
           <ScoreBox>
             <StarContainer>
               {[1, 2, 3, 4, 5].map((star) => (
-                <IconStarMedium key={star} color={star <= review.rating ? "#FFCC00" : "#E1E1E1"} />
+                <IconStar key={star} inactive={star > review.rating} />
               ))}
             </StarContainer>
             <ScoredMenuContainer>
@@ -213,7 +213,7 @@ const ReviewerName = tw.div`
 
 const ReviewScore = tw.div`
     flex gap-8 items-center justify-between
-    mt-12
+    h-18 mt-12
 `;
 
 const ScoreBox = tw.div`
@@ -236,6 +236,7 @@ const ScoredMenu = tw.div`
 `;
 const ReviewDate = tw.div`
     font-12-r text-gray-500
+    h-18 leading-18
 `;
 
 const ReviewDetail = tw.div`

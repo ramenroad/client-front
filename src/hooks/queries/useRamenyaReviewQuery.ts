@@ -43,6 +43,8 @@ export const useUserReviewQuery = (userId?: string) => {
 };
 
 export const useMyReviewQuery = (enabled: boolean) => {
+  console.log("enabled", enabled);
+
   const myReviewQuery = useInfiniteQuery({
     ...queryKeys.review.my,
     queryFn: ({ pageParam = 1 }) => getMyReviews({ page: pageParam, limit: 10 }),

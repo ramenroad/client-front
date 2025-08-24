@@ -72,7 +72,9 @@ const SectionTitleWrapper = tw.div`
   flex items-center justify-between
 `;
 
-const SectionTitle = tw(RamenroadText)``;
+const SectionTitle = tw(RamenroadText)`
+  text-black
+`;
 
 const SectionSubTitle = tw(RamenroadText)`
   text-gray-800

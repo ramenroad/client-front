@@ -10,6 +10,7 @@ const RegisterPage = () => {
   const params = query.get("nickname");
 
   const [nickname, setNickname] = useState("");
+  const [placeholder, setPlaceholder] = useState("최소 2-10자로 설정해주세요");
   const { updateNicknameMutation } = useUserInfoMutation();
 
   const handleClick = () => {
@@ -22,7 +23,7 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (params) {
-      setNickname(params);
+      setPlaceholder(params);
     }
   }, [params]);
 
@@ -43,15 +44,9 @@ const RegisterPage = () => {
           )}
         </DescriptionWrapper>
         <InputWrapper>
-          <Input
-            placeholder="최소 2-10자로 설정해주세요"
-            value={nickname}
-            onChange={handleChange}
-            minLength={2}
-            maxLength={11}
-          />
+          <Input placeholder={placeholder} value={nickname} onChange={handleChange} minLength={2} maxLength={11} />
         </InputWrapper>
-        <Button disabled={nickname.length < 2 || nickname.length > 10} onClick={handleClick}>
+        <Button disabled={nickname.length < 2 || nickname.length > 10 || nickname === params} onClick={handleClick}>
           {params ? "변경 완료" : "완료"}
         </Button>
       </Wrapper>
@@ -74,7 +69,7 @@ const DescriptionWrapper = tw.div`
   flex flex-col
   w-full
   font-20-m
-  mt-20 mb-16
+  mt-20 mb-20
 `;
 
 const HighlightText = tw.span`
@@ -100,6 +95,7 @@ const Input = tw.input`
     focus:outline-none
     px-20 py-10
     text-black font-16-m
+    placeholder:text-gray-200
 `;
 
 export default RegisterPage;

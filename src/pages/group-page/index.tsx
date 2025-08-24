@@ -82,7 +82,7 @@ const SubLine = tw.div`
 `;
 
 const InformationWrapper = tw.section`
-  flex flex-col w-full h-full overflow-y-auto pt-10
+  flex flex-col w-full h-full overflow-y-auto
 `;
 
 interface RamenyaListWrapperProps {

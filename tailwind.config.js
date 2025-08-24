@@ -48,6 +48,7 @@ module.exports = {
         },
 
         orange: "#FF5E00",
+        lightOrange: "#FFF4EB",
         brightOrange: "#FFE4CE",
         green: "#59BC12",
         yellow: "#F3A216",
@@ -72,7 +73,8 @@ module.exports = {
       },
 
       fontFamily: {
-        sans: ["Spoqa Han Sans Neo", ...defaultTheme.fontFamily.sans],
+        sans: ["Spoqa Han Sans Neo", "sans-serif"],
+        pretendard: ["Pretendard", "sans-serif"],
       },
 
       fontSize: {

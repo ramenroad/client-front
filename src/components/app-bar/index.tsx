@@ -6,20 +6,20 @@ import { useSignInStore } from "../../states/sign-in";
 
 const AppBar = () => {
   const navigate = useNavigate();
-  const currentPath = useLocation().pathname;
+  const currentPath = useLocation().pathname.split("/")[1];
   const { isSignIn } = useSignInStore();
 
   return (
     <AppBarWrapper>
       <AppBarContainer>
         <AppBarItem onClick={() => navigate("/")}>
-          <IconHome selected={currentPath === "/"} />
-          <ItemText selected={currentPath === "/"}>홈</ItemText>
+          <IconHome selected={currentPath === ""} />
+          <ItemText selected={currentPath === ""}>홈</ItemText>
         </AppBarItem>
 
         <AppBarItem onClick={() => navigate("/map")}>
-          <IconMapAppBar selected={currentPath === "/map"} />
-          <ItemText selected={currentPath === "/map"}>지도</ItemText>
+          <IconMapAppBar selected={currentPath === "map"} />
+          <ItemText selected={currentPath === "map"}>지도</ItemText>
         </AppBarItem>
         <AppBarItem
           onClick={() => {
@@ -30,8 +30,8 @@ const AppBar = () => {
             }
           }}
         >
-          <IconUser selected={currentPath === "/mypage"} />
-          <ItemText selected={currentPath === "/mypage"}>마이</ItemText>
+          <IconUser selected={currentPath === "mypage" || currentPath === "user-review"} />
+          <ItemText selected={currentPath === "mypage" || currentPath === "user-review"}>마이</ItemText>
         </AppBarItem>
       </AppBarContainer>
     </AppBarWrapper>

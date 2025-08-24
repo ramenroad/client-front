@@ -50,6 +50,7 @@ export const useAuthMutation = () => {
       clearTokens();
       queryClient.setQueryData(["user", "information"], null);
       navigate("/");
+      openToast("로그아웃 완료");
     },
   });
 

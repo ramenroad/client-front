@@ -38,6 +38,10 @@ const UserReviewPage = () => {
   const { updateUserMyPageMutation } = useUserMyPageMutation();
   const { myReviewQuery } = useMyReviewQuery(my);
 
+  useEffect(() => {
+    console.log("myReviewQuery", myReviewQuery.data);
+  }, [myReviewQuery.data]);
+
   const ref = useIntersectionObserver({
     onIntersect: () => {
       if (my) {
@@ -149,7 +153,7 @@ const UserReviewPage = () => {
         </ReviewResultWrapper>
         <Line />
         {my ? (
-          myReviewQuery.data?.pages.length === 0 ? (
+          myReviewQuery.data?.pages.flatMap((page) => page.reviews).length === 0 ? (
             <EmptyReviewOverlay />
           ) : (
             myReviewQuery.data?.pages.map((page) =>
@@ -233,7 +237,7 @@ const UserReviewPage = () => {
 };
 
 const ModalContent = tw.div`
-  flex flex-col gap-24 w-320 pt-20 pb-16
+  flex flex-col gap-24 w-320 pt-16 pb-20
   items-center
   justify-center
   bg-white
@@ -258,7 +262,7 @@ const ShareOption = tw.div`
 `;
 
 const URLShareOptionText = tw(RamenroadText)`
-  text-white
+  text-white font-14-sb
 `;
 
 const KakaoBackground = tw.div`
@@ -385,7 +389,7 @@ const DetailTitle = tw(RamenroadText)`
 `;
 
 const UserInformationDetailWrapper = tw.section`
-  flex flex-col gap-4 items-center
+  flex flex-col items-center
 `;
 
 const UserInformationDetailContentSection = tw.section`
@@ -411,7 +415,7 @@ const PageWrapper = tw.section`
 `;
 
 const ReviewResultWrapper = tw.section`
-  p-20
+  px-20 pb-20 pt-24
 `;
 
 const ReviewResultWrapperHeader = tw.section`

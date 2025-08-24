@@ -392,11 +392,11 @@ const RefreshButtonContainer = tw.div`
 `;
 
 const RefreshButton = tw.button`
-  w-125 h-34 px-15 py-8
+  w-125 h-34 pl-14 pr-16 py-8
   flex gap-4 items-center
-  bg-white border-none rounded-50
-  shadow-none
-  outline-none
+  bg-white rounded-50
+  outline-none border-none
+  shadow
   cursor-pointer
   z-10
 `;
@@ -653,7 +653,7 @@ const DragHandle = tw.div`
 `;
 
 const DragIndicator = tw.div`
-  w-36 h-4 bg-gray-300 rounded-full
+  w-36 h-4 bg-divider rounded-full
 `;
 
 const ListContentArea = tw.div`
@@ -668,6 +668,7 @@ const ResultListOverlayContainer = tw.div`
   absolute bottom-56 left-0 right-0 bg-white rounded-t-16 overflow-hidden flex flex-col
   z-[110] [transform:translateZ(0)] [will-change:transform] [isolation:isolate]
   border border-solid border-divider/20
+  shadow-[0_-5px_10px_rgba(0,0,0,0.1)]
 `;
 
 export default MapPage;

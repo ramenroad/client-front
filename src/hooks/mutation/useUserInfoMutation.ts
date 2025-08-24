@@ -22,7 +22,7 @@ export const useUserInfoMutation = () => {
   const updateNicknameMutation = useMutation({
     mutationFn: (nickname: string) => updateUserNickname(nickname),
     onSuccess: () => {
-      openToast("닉네임 업데이트 성공");
+      openToast("닉네임 설정 완료");
       queryClient.invalidateQueries({
         ...queryKeys.user.information,
       });

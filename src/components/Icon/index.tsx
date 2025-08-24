@@ -1,6 +1,6 @@
-import { SVGProps } from "react";
+import { ComponentProps } from "react";
 
-interface IconProps extends Omit<SVGProps<SVGSVGElement>, "color"> {
+interface IconProps extends ComponentProps<"svg"> {
   color?: string;
 }
 
@@ -281,31 +281,37 @@ export const IconNaver = () => (
   </svg>
 );
 
-export const IconStar = ({ inactive = false }: { inactive?: boolean }) => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path
-      d="M7 1L8.76336 4.57295L12.7063 5.1459L9.85317 7.92705L10.5267 11.8541L7 10L3.47329 11.8541L4.14683 7.92705L1.29366 5.1459L5.23664 4.57295L7 1Z"
-      fill={inactive ? "#CFCFCF" : "#FFCC00"}
-    />
-  </svg>
-);
+export const IconStar = ({
+  inactive = false,
+  size = 14,
+  isHalf = false,
+  ...rest
+}: ComponentProps<"svg"> & {
+  inactive?: boolean;
+  size?: number;
+  isHalf?: boolean;
+}) => {
+  if (isHalf) {
+    return (
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+        <path
+          d="M20 2L25.2901 12.7188L37.119 14.4377L28.5595 22.7812L30.5801 34.5623L20 29L9.41987 34.5623L11.4405 22.7812L2.88098 14.4377L14.7099 12.7188L20 2Z"
+          fill="#E1E1E1"
+        />
+        <path d="M20 29L9.41992 34.5625L11.4404 22.7812L2.88086 14.4375L14.71 12.7188L20 2V29Z" fill="#FFCC00" />
+      </svg>
+    );
+  }
 
-export const IconStarSmall = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="12"
-    height="11"
-    viewBox="0 0 12 11"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <path
-      d="M6 0L7.76336 3.57295L11.7063 4.1459L8.85317 6.92705L9.52671 10.8541L6 9L2.47329 10.8541L3.14683 6.92705L0.293661 4.1459L4.23664 3.57295L6 0Z"
-      fill={color ?? "#FFCC00"}
-    />
-  </svg>
-);
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+      <path
+        d="M20 2L25.2901 12.7188L37.119 14.4377L28.5595 22.7812L30.5801 34.5623L20 29L9.41987 34.5623L11.4405 22.7812L2.88098 14.4377L14.7099 12.7188L20 2Z"
+        fill={inactive ? "#E1E1E1" : "#FFCC00"}
+      />
+    </svg>
+  );
+};
 
 export const IconHome = ({ selected }: { selected: boolean }) => {
   if (selected) {
@@ -359,40 +365,6 @@ export const IconUser = ({ selected }: { selected: boolean }) => {
     </svg>
   );
 };
-
-export const IconStarMedium = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="14"
-    height="13"
-    viewBox="0 0 14 13"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <path
-      d="M7 0L9.05725 4.16844L13.6574 4.83688L10.3287 8.08156L11.1145 12.6631L7 10.5L2.8855 12.6631L3.6713 8.08156L0.342604 4.83688L4.94275 4.16844L7 0Z"
-      fill={color ?? "#FFCC00"}
-    />
-  </svg>
-);
-
-export const IconStarLarge = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="36"
-    height="33"
-    viewBox="0 0 36 33"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <path
-      d="M18 0L23.2901 10.7188L35.119 12.4377L26.5595 20.7812L28.5801 32.5623L18 27L7.41987 32.5623L9.44049 20.7812L0.880983 12.4377L12.7099 10.7188L18 0Z"
-      fill={color ?? "#FFCC00"}
-    />
-  </svg>
-);
 
 export const IconAdd = ({ color, ...rest }: IconProps) => (
   <svg
@@ -865,40 +837,94 @@ export const IconDeleteSearchValue = () => (
 );
 
 export const IconGPS = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g filter="url(#filter0_d_2082_2778)">
-      <rect x="8" y="4" width="32" height="32" rx="16" fill="white" shapeRendering="crispEdges" />
-      <circle cx="24" cy="20" r="5.5" stroke="#414141" />
-      <circle cx="24" cy="20" r="2.5" fill="#414141" />
-      <rect x="23.5" y="12" width="1" height="3" rx="0.5" fill="#414141" />
-      <rect x="16" y="20.5" width="1" height="3" rx="0.5" transform="rotate(-90 16 20.5)" fill="#414141" />
-      <rect width="1" height="3" rx="0.5" transform="matrix(1 0 0 -1 23.5 28)" fill="#414141" />
-      <rect width="1" height="3" rx="0.5" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 32 20.5)" fill="#414141" />
+  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g filter="url(#filter0_d_2730_5366)">
+      <rect x="3" y="1" width="32" height="32" rx="16" fill="white" shape-rendering="crispEdges" />
+      <circle cx="19" cy="17" r="5.5" stroke="#414141" />
+      <circle cx="19" cy="17" r="2.5" fill="#414141" />
+      <rect x="18.5" y="9" width="1" height="3" rx="0.5" fill="#414141" />
+      <rect x="11" y="17.5" width="1" height="3" rx="0.5" transform="rotate(-90 11 17.5)" fill="#414141" />
+      <rect width="1" height="3" rx="0.5" transform="matrix(1 0 0 -1 18.5 25)" fill="#414141" />
+      <rect width="1" height="3" rx="0.5" transform="matrix(-4.37114e-08 -1 -1 4.37114e-08 27 17.5)" fill="#414141" />
     </g>
     <defs>
       <filter
-        id="filter0_d_2082_2778"
+        id="filter0_d_2730_5366"
         x="0"
         y="0"
-        width="48"
-        height="48"
+        width="38"
+        height="38"
         filterUnits="userSpaceOnUse"
-        colorInterpolationFilters="sRGB"
+        color-interpolation-filters="sRGB"
       >
-        <feFlood floodOpacity="0" result="BackgroundImageFix" />
+        <feFlood flood-opacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
           values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
           result="hardAlpha"
         />
-        <feOffset dy="4" />
-        <feGaussianBlur stdDeviation="4" />
+        <feOffset dy="2" />
+        <feGaussianBlur stdDeviation="1.5" />
         <feComposite in2="hardAlpha" operator="out" />
-        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0" />
-        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2082_2778" />
-        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2082_2778" result="shape" />
+        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.12 0" />
+        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2730_5366" />
+        <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2730_5366" result="shape" />
       </filter>
     </defs>
   </svg>
 );
+
+export const IconImageDelete = (props: ComponentProps<"svg">) => {
+  return (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <g filter="url(#filter0_dd_2730_3839)">
+        <rect x="4" y="3" width="24" height="24" rx="12" fill="white" shape-rendering="crispEdges" />
+        <path
+          d="M11.6959 19.302C11.4347 19.038 11.4347 18.61 11.6959 18.346L19.263 10.698C19.5242 10.434 19.9477 10.434 20.2089 10.698C20.4701 10.962 20.4701 11.39 20.2089 11.654L12.6418 19.302C12.3806 19.566 11.9571 19.566 11.6959 19.302Z"
+          fill="#585858"
+        />
+        <path
+          d="M20.3041 19.302C20.5653 19.038 20.5653 18.61 20.3041 18.346L12.737 10.698C12.4758 10.434 12.0523 10.434 11.7911 10.698C11.5299 10.962 11.5299 11.39 11.7911 11.654L19.3582 19.302C19.6194 19.566 20.0429 19.566 20.3041 19.302Z"
+          fill="#585858"
+        />
+      </g>
+      <defs>
+        <filter
+          id="filter0_dd_2730_3839"
+          x="0"
+          y="0"
+          width="32"
+          height="32"
+          filterUnits="userSpaceOnUse"
+          color-interpolation-filters="sRGB"
+        >
+          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dy="1" />
+          <feGaussianBlur stdDeviation="2" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix type="matrix" values="0 0 0 0 0.0470588 0 0 0 0 0.0470588 0 0 0 0 0.0509804 0 0 0 0.05 0" />
+          <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2730_3839" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dy="1" />
+          <feGaussianBlur stdDeviation="2" />
+          <feComposite in2="hardAlpha" operator="out" />
+          <feColorMatrix type="matrix" values="0 0 0 0 0.0470588 0 0 0 0 0.0470588 0 0 0 0 0.0509804 0 0 0 0.1 0" />
+          <feBlend mode="normal" in2="effect1_dropShadow_2730_3839" result="effect2_dropShadow_2730_3839" />
+          <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_2730_3839" result="shape" />
+        </filter>
+      </defs>
+    </svg>
+  );
+};
