@@ -24,7 +24,7 @@ export const useAuthMutation = () => {
       return await oAuthLogin(id, code);
     },
     onSuccess: (data) => {
-      openToast("로그인 성공");
+      openToast("로그인 성공!");
       sessionStorage.setItem("isAuthenticated", "true");
 
       const decodedToken: UserInformation = jwtDecode(data.accessToken);

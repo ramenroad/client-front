@@ -672,7 +672,7 @@ const DragIndicator = tw.div`
 `;
 
 const ListContentArea = tw.div`
-  flex-1 overflow-y-auto
+  flex-1 overflow-y-auto hide-scrollbar
 `;
 
 const LineWrapper = tw.div`
