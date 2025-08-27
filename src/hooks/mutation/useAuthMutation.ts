@@ -10,12 +10,14 @@ import { useToast } from "../../components/toast/ToastProvider";
 import { setUserInformation } from "../../store/location/useUserInformationStore";
 import { jwtDecode } from "jwt-decode";
 import { UserInformation } from "../../types/user";
+import { usePageMemorize } from "../common/usePageMemorize";
 
 export const useAuthMutation = () => {
   const navigate = useNavigate();
   const { setTokens } = useSignInStore();
   const { clearTokens } = useSignInStore();
   const { openToast } = useToast();
+  const { getStoredPageData } = usePageMemorize();
 
   const login = useMutation({
     mutationFn: async ({ id, code }: { id: string; code: string }) => {
@@ -35,10 +37,15 @@ export const useAuthMutation = () => {
 
       setTokens(data);
       queryClient.invalidateQueries({ ...queryKeys.user.information });
+
       if (data.type === "signup") {
         navigate("/register");
       } else {
-        navigate("/");
+        if (getStoredPageData()) {
+          navigate(getStoredPageData()?.pathname ?? "/");
+        } else {
+          navigate("/");
+        }
       }
     },
   });
