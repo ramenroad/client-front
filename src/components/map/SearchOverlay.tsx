@@ -230,7 +230,17 @@ export const SearchOverlay = ({
                 ))}
               </AutoCompleteContainer>
             ) : (
-              <NoResultBox actionButton={<SubmitButton>제보하기</SubmitButton>} />
+              <NoResultBox
+                actionButton={
+                  <SubmitButton
+                    onClick={() => {
+                      window.open("https://forms.gle/BuqmFWMT2fCd37eK8", "_blank");
+                    }}
+                  >
+                    제보하기
+                  </SubmitButton>
+                }
+              />
             )
           ) : (
             <>
@@ -425,7 +435,7 @@ const SearchInput = tw.input`
 `;
 
 const FullScreenSearchOverlay = tw.main`
-  absolute w-full h-full inset-0 bg-white z-[150]
+  absolute w-full h-[100dvh] inset-0 bg-white z-[150]
   flex flex-col gap-32
   box-border px-16 py-20 pt-84
 `;
