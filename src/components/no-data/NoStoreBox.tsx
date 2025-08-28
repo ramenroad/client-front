@@ -21,12 +21,12 @@ const Wrapper = tw.div`
 `;
 
 const NoStoreImage = styled.img(({ type }: { type: "map" | "list" }) => [
-  type === "map" ? tw`w-110 h-70 mb-20` : tw`w-110 h-70 mb-20`,
+  type === "map" ? tw`w-80 mb-8` : tw`w-110 h-70 mb-20`,
 ]);
 
 const NoStoreTitle = styled.div(({ type }: { type: "map" | "list" }) => [
   tw`text-gray-800`,
-  type === "map" ? tw`font-16-sb mb-6` : tw`font-20-sb mb-12`,
+  type === "map" ? tw`font-16-sb mb-2` : tw`font-20-sb mb-12`,
 ]);
 
 const NoStoreDescription = styled.div(({ type }: { type: "map" | "list" }) => [

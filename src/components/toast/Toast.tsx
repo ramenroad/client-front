@@ -58,5 +58,5 @@ const ToastWrapper = styled.div<{ isVisible: boolean }>(({ isVisible }) => [
 ]);
 
 const ToastContent = tw.div`
-  bg-black/80 text-white px-6 py-3 rounded-lg font-16-sb w-350 h-48 flex justify-center items-center
+  bg-gray-700 text-white px-6 py-3 rounded-lg font-16-m w-350 h-48 flex justify-center items-center
 `;

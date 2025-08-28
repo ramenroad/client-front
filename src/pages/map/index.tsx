@@ -16,6 +16,7 @@ import {
   initialFilterOptions,
   MAP_MODE,
   MapModeType,
+  OpenStatus,
   OVERLAY_HEIGHTS,
   OverlayHeightType,
   SEARCH_MODE,
@@ -32,6 +33,7 @@ import { useMapSearch } from "../../hooks/common/useMapSearch";
 import { SearchOverlay } from "../../components/map/SearchOverlay";
 import { useSearchParams } from "react-router-dom";
 import { useUserLocation } from "../../hooks/common/useUserLocation";
+import { checkBusinessStatus } from "../../util";
 
 const MapPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -78,12 +80,13 @@ const MapPage = () => {
 
   const [currentHeight, setCurrentHeight] = useState<OverlayHeightType>(OVERLAY_HEIGHTS.HALF);
 
+  const dvhToPx = (dvh: string) => {
+    const dvhValue = parseFloat(dvh.replace("dvh", ""));
+    return (dvhValue / 100) * (window.visualViewport?.height || window.innerHeight);
+  };
+
   const GPSButtonHeight = useMemo(() => {
     // dvh 값을 픽셀로 변환하는 함수
-    const dvhToPx = (dvh: string) => {
-      const dvhValue = parseFloat(dvh.replace("dvh", ""));
-      return (dvhValue / 100) * (window.visualViewport?.height || window.innerHeight);
-    };
 
     switch (currentHeight) {
       case OVERLAY_HEIGHTS.COLLAPSED:
@@ -175,17 +178,19 @@ const MapPage = () => {
     if (!mapInstance) return;
 
     setSelectedMarker(null);
-    setSearchParams((prev) => {
-      prev.delete("selectedId");
-      return prev;
-    });
+    isMovingRef.current = true;
 
     if (!keyword || keyword.trim() === "") {
       setSearchMode(SEARCH_MODE.NEARBY);
+      setSearchParams((prev) => {
+        prev.set("nearBy", "true");
+        prev.delete("selectedId");
+        return prev;
+      });
     } else {
       setSearchMode(SEARCH_MODE.KEYWORD);
       setSearchParams((prev) => {
-        prev.set("nearBy", "true");
+        prev.delete("selectedId");
         return prev;
       });
     }
@@ -193,6 +198,10 @@ const MapPage = () => {
     setGeolocationForSearch({
       ...mapSearchParams,
     });
+
+    setTimeout(() => {
+      isMovingRef.current = false;
+    }, 300);
   }, [mapInstance, setSearchParams, keyword, mapSearchParams]);
 
   // 마커 데이터 메모화
@@ -205,6 +214,9 @@ const MapPage = () => {
         },
         data: ramenya,
         title: ramenya.name,
+        inactive:
+          checkBusinessStatus(ramenya.businessHours).status === OpenStatus.CLOSED ||
+          checkBusinessStatus(ramenya.businessHours).status === OpenStatus.DAY_OFF,
       })) || []
     );
   }, [ramenyaList]);
@@ -341,14 +353,17 @@ const MapPage = () => {
 
       {mapMode === MAP_MODE.LIST && (
         <>
-          <GPSWrapper
-            onClick={handleClickGPSButton}
-            style={{
-              bottom: GPSButtonHeight + 50,
-            }}
-          >
-            <IconGPS />
-          </GPSWrapper>
+          {currentHeight !== OVERLAY_HEIGHTS.EXPANDED && (
+            <GPSWrapper
+              onClick={handleClickGPSButton}
+              style={{
+                left: "16px",
+                bottom: GPSButtonHeight + 60,
+              }}
+            >
+              <IconGPS />
+            </GPSWrapper>
+          )}
           <ResultListOverlay
             ramenyaList={ramenyaList || []}
             selectedMarker={selectedMarker}
@@ -657,7 +672,7 @@ const DragIndicator = tw.div`
 `;
 
 const ListContentArea = tw.div`
-  flex-1 overflow-y-auto
+  flex-1 overflow-y-auto hide-scrollbar
 `;
 
 const LineWrapper = tw.div`

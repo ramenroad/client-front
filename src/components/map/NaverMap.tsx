@@ -15,6 +15,7 @@ export interface NaverMapProps<T = unknown> {
     };
     data: T;
     title?: string;
+    inactive?: boolean;
   }[];
   onMarkerClick?: (markerData: T) => void;
   selectedMarker?: T | null;
@@ -46,6 +47,27 @@ const NORMAL_MARKER_SVG = `
 </filter>
 </defs>
 </svg>`;
+
+const INACTIVE_MARKER_SVG = `
+<svg width="39" height="46" viewBox="0 0 39 46" fill="none" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px;">
+<g filter="url(#filter0_d_2502_3908)">
+<path d="M19.5 5.5C25.0293 5.5 29.489 9.73792 29.499 15.5098C29.4074 18.4555 27.5784 21.9664 25.333 25.1523C23.1399 28.264 20.678 30.8888 19.499 32.0889C18.3042 30.8737 15.796 28.2036 13.583 25.0732C11.3085 21.8558 9.5 18.3627 9.5 15.5293C9.50001 9.74748 13.9644 5.5 19.5 5.5Z" fill="#838383" stroke="white" stroke-width="2"/>
+<ellipse cx="19.5" cy="15.6691" rx="3" ry="3.04622" fill="white"/>
+</g>
+<defs>
+<filter id="filter0_d_2502_3908" x="-0.5" y="0" width="40" height="46" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="4"/>
+<feGaussianBlur stdDeviation="4"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.16 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2502_3908"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2502_3908" result="shape"/>
+</filter>
+</defs>
+</svg>
+`;
 
 const SELECTED_MARKER_SVG = `
 <svg width="56" height="67" viewBox="0 0 56 67" fill="none" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 0px; left: 0px;">
@@ -142,17 +164,17 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
   // 위치 권한 요청과 위치 가져오기 함수들
 
   // 마커 아이콘 생성 함수 메모화
-  const createMarkerIcon = useCallback((isSelected: boolean, title?: string) => {
-    const markerSvg = isSelected ? SELECTED_MARKER_SVG : NORMAL_MARKER_SVG;
+  const createMarkerIcon = useCallback((isSelected: boolean, title?: string, inactive?: boolean) => {
+    const markerSvg = inactive ? INACTIVE_MARKER_SVG : isSelected ? SELECTED_MARKER_SVG : NORMAL_MARKER_SVG;
 
     return {
       content: `
         <div style="
           position: relative;
-          width: ${isSelected ? "56px" : "38px"};
-          height: ${isSelected ? "79px" : "57px"};
-          top: ${isSelected ? "-67px" : "-45px"};
-          left: ${isSelected ? "-28px" : "-19px"};
+          width: ${isSelected && !inactive ? "56px" : "38px"};
+          height: ${isSelected && !inactive ? "79px" : "57px"};
+          top: ${isSelected && !inactive ? "-67px" : "-45px"};
+          left: ${isSelected && !inactive ? "-28px" : "-19px"};
         ">
           ${markerSvg}
           ${
@@ -294,7 +316,7 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
       const markerInstance = new naver.maps.Marker({
         map: mapInstance,
         position: new naver.maps.LatLng(marker.position.lat, marker.position.lng),
-        icon: createMarkerIcon(isSelected, marker.title),
+        icon: createMarkerIcon(isSelected, marker.title, marker.inactive),
         clickable: true,
       });
 
@@ -315,7 +337,7 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
         data: marker.data,
       });
     });
-  }, [mapInstance, markersKey, createMarkerIcon]);
+  }, [mapInstance, markersKey, createMarkerIcon, props.markers, props]);
 
   // selectedMarker 변경 시에만 마커 아이콘 업데이트 (마커를 다시 생성하지 않음)
   useEffect(() => {
@@ -327,7 +349,7 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
 
       if (markerInfo) {
         const isSelected = props.selectedMarker === marker.data;
-        const newIcon = createMarkerIcon(isSelected, marker.title);
+        const newIcon = createMarkerIcon(isSelected, marker.title, marker.inactive);
         markerInfo.instance.setIcon(newIcon);
       }
     });
