@@ -296,8 +296,8 @@ export const EditReviewPage = () => {
 
       const currentImages = formValues.reviewImages || [];
 
-      if (currentImages.length + files.length > 5) {
-        openToast("이미지는 최대 5개까지 업로드 가능합니다.");
+      if (currentImages.length + files.length > 10) {
+        openToast("이미지는 최대 10개까지 업로드 가능합니다.");
         return;
       }
 
@@ -309,7 +309,7 @@ export const EditReviewPage = () => {
         setIsImageUploading(true);
 
         for (const file of fileArray) {
-          if (currentImages.length + newImages.length >= 5) break;
+          if (currentImages.length + newImages.length >= 10) break;
 
           // HEIC 파일 변환
           let convertedFile = await convertHeicToJpeg(file);
@@ -593,9 +593,9 @@ export const EditReviewPage = () => {
                 rules={{ required: true, minLength: 20 }}
                 render={({ field }) => (
                   <ReviewTextAreaContainer>
-                    <ReviewDescriptionTextarea {...field} placeholder="최소 20자 이상 입력해주세요" />
+                    <ReviewDescriptionTextarea {...field} placeholder="최소 20자 이상 입력해주세요" maxLength={1000} />
                     <CharacterCount>
-                      <TypedCount>{field.value.length}</TypedCount>/300
+                      <TypedCount>{field.value.length}</TypedCount>/1000
                     </CharacterCount>
                   </ReviewTextAreaContainer>
                 )}
@@ -609,7 +609,7 @@ export const EditReviewPage = () => {
                   <ImageCountBox>
                     <ImageAdded>{formValues.reviewImages?.length}</ImageAdded>
                     <ImageAddedText>/</ImageAddedText>
-                    <ImageMax>5</ImageMax>
+                    <ImageMax>10</ImageMax>
                   </ImageCountBox>
                 </ImageUploadTitleBox>
                 <ImageUploadSubTitle>라멘과 무관한 사진을 첨부한 리뷰는 무통보 삭제됩니다</ImageUploadSubTitle>
@@ -625,7 +625,7 @@ export const EditReviewPage = () => {
                       onRemove={handleRemoveImage}
                     />
                   ))}
-                  {(formValues.reviewImages?.length ?? 0) < 5 && (
+                  {(formValues.reviewImages?.length ?? 0) < 10 && (
                     <ImageAddButton onClick={handleImageClick} type="button">
                       <IconAdd />
                     </ImageAddButton>
