@@ -28,22 +28,30 @@ export const IconFilterWithTag = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconInstagram = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <rect width="16" height="16" fill="white" />
-    <rect x="2" y="2" width="12" height="12" rx="3" fill={color ?? "#CFCFCF"} />
-    <circle cx="8" cy="8" r="2.5" stroke="white" />
-    <circle cx="11.5" cy="4.5" r="0.5" fill="white" />
-  </svg>
-);
+export const IconInstagram = ({ color, footer = false, ...rest }: IconProps & { footer?: boolean }) =>
+  footer ? (
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+      <rect width="40" height="40" rx="20" fill="#EBEBED" />
+      <rect x="9" y="9" width="22" height="22" rx="6" fill="#CFCFCF" />
+      <circle cx="20" cy="20" r="4.5" stroke="#F6F6F6" stroke-width="2" />
+      <circle cx="26.6" cy="13.3988" r="1.1" fill="#F6F6F6" />
+    </svg>
+  ) : (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+      {...rest}
+    >
+      <rect width="16" height="16" fill="white" />
+      <rect x="2" y="2" width="12" height="12" rx="3" fill={color ?? "#CFCFCF"} />
+      <circle cx="8" cy="8" r="2.5" stroke="white" />
+      <circle cx="11.5" cy="4.5" r="0.5" fill="white" />
+    </svg>
+  );
 
 export const IconLocate = ({ color, ...rest }: IconProps) => (
   <svg
