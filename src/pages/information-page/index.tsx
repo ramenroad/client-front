@@ -61,7 +61,11 @@ const InformationPage = () => {
             <LabelDescription>{userInformationQuery.data?.email}</LabelDescription>
           </ProfileDescription>
         </ProfileDescriptionWrapper>
-        <LogoutText onClick={() => logout.mutate()}>로그아웃</LogoutText>
+        <SignoutWrapper>
+          <LogoutText onClick={() => logout.mutate()}>로그아웃</LogoutText>
+          <Divider />
+          <LogoutText onClick={() => navigate("/withdraw")}>회원탈퇴</LogoutText>
+        </SignoutWrapper>
       </Wrapper>
     </Layout>
   );
@@ -143,7 +147,17 @@ const LogoutText = tw.span`
   text-gray-500
   font-14-m
   text-center justify-self-end
-  cursor-pointer mb-40 mt-auto
+  cursor-pointer
+`;
+
+const SignoutWrapper = tw.div`
+  flex justify-center items-center gap-8
+  w-full
+  mt-auto mb-40
+`;
+
+const Divider = tw.div`
+  bg-gray-100 h-10 w-1
 `;
 
 export default InformationPage;

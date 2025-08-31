@@ -1,7 +1,7 @@
 // sign in 및 sign out이 들어갈거라 네이밍을 이렇게 지었습니다.
 
 import { useMutation } from "@tanstack/react-query";
-import { oAuthLogin, signOut } from "../../api/auth";
+import { oAuthLogin, signOut, withdrawUser } from "../../api/auth";
 import { useSignInStore } from "../../states/sign-in";
 import { queryClient } from "../../core/queryClient";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ export const useAuthMutation = () => {
       return await oAuthLogin(id, code);
     },
     onSuccess: (data) => {
-      openToast("로그인 성공!");
+      openToast("로그인 성공 !");
       sessionStorage.setItem("isAuthenticated", "true");
 
       const decodedToken: UserInformation = jwtDecode(data.accessToken);
@@ -61,5 +61,14 @@ export const useAuthMutation = () => {
     },
   });
 
-  return { login, logout };
+  const withdraw = useMutation({
+    mutationFn: withdrawUser,
+    onSuccess: () => {
+      sessionStorage.removeItem("isAuthenticated");
+      clearTokens();
+      queryClient.setQueryData(["user", "information"], null);
+    },
+  });
+
+  return { login, logout, withdraw };
 };

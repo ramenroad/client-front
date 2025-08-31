@@ -15,6 +15,7 @@ const LoginCallbackPage = () => {
   const navigate = useNavigate();
 
   const [isEmailAlreadyExists, setIsEmailAlreadyExists] = useState(false);
+  const [isWithdrawUser, setIsWithdrawUser] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
 
   useEffect(() => {
@@ -31,6 +32,10 @@ const LoginCallbackPage = () => {
                 // 이메일이 이미 가입된 경우 처리
                 setIsEmailAlreadyExists(true);
                 setLoginEmail(error.response?.data.email);
+              }
+
+              if (error.response?.data.statusCode === 403) {
+                setIsWithdrawUser(true);
               }
             }
           },
@@ -50,49 +55,90 @@ const LoginCallbackPage = () => {
     }
   };
 
-  return !isEmailAlreadyExists ? (
-    <Wrapper>로그인 작업 진행 중</Wrapper>
-  ) : (
-    <Wrapper>
-      <img src={EmailImage} alt="email" width={110} height={82} />
+  if (!isEmailAlreadyExists && !isWithdrawUser) {
+    return <Wrapper>로그인 작업 진행 중</Wrapper>;
+  }
 
-      <AlertContainer>
-        <RamenroadText size={20} weight="m">
-          이미 가입된 이메일 주소입니다.
-        </RamenroadText>
-        <SubText size={14} weight="r">
-          네이버 혹은 카카오 계정을 확인해 주세요
-        </SubText>
-      </AlertContainer>
+  if (isEmailAlreadyExists) {
+    return (
+      <Wrapper>
+        <img src={EmailImage} alt="email" width={110} height={82} />
 
-      <EmailBox>
-        <RamenroadText size={16} weight="b">
-          {loginEmail}
-        </RamenroadText>
-      </EmailBox>
-
-      <LoginButtonWrapper>
-        <LoginButton loginType="kakao" onClick={() => handleLogin("kakao")}>
-          <IconKakao />
-          <LoginButtonText loginType="kakao">카카오 계정으로 로그인</LoginButtonText>
-        </LoginButton>
-        <LoginButton loginType="naver" onClick={() => handleLogin("naver")}>
-          <IconNaver />
-          <LoginButtonText loginType="naver">네이버 계정으로 로그인</LoginButtonText>
-        </LoginButton>
-        <BackButton>
-          <RamenroadText size={14} weight="m" onClick={() => navigate("/")}>
-            이전 화면으로 돌아가기
+        <AlertContainer>
+          <RamenroadText size={20} weight="m">
+            이미 가입된 이메일 주소입니다.
           </RamenroadText>
-        </BackButton>
-      </LoginButtonWrapper>
-    </Wrapper>
-  );
+          <SubText size={14} weight="r">
+            네이버 혹은 카카오 계정을 확인해 주세요
+          </SubText>
+        </AlertContainer>
+
+        <EmailBox>
+          <RamenroadText size={16} weight="b">
+            {loginEmail}
+          </RamenroadText>
+        </EmailBox>
+
+        <LoginButtonWrapper>
+          <LoginButton loginType="kakao" onClick={() => handleLogin("kakao")}>
+            <IconKakao />
+            <LoginButtonText loginType="kakao">카카오 계정으로 로그인</LoginButtonText>
+          </LoginButton>
+          <LoginButton loginType="naver" onClick={() => handleLogin("naver")}>
+            <IconNaver />
+            <LoginButtonText loginType="naver">네이버 계정으로 로그인</LoginButtonText>
+          </LoginButton>
+          <BackButton>
+            <RamenroadText size={14} weight="m" onClick={() => navigate("/")}>
+              이전 화면으로 돌아가기
+            </RamenroadText>
+          </BackButton>
+        </LoginButtonWrapper>
+      </Wrapper>
+    );
+  }
+
+  if (isWithdrawUser) {
+    return (
+      <Wrapper>
+        <WithdrawInformationWrapper>
+          <WithdrawTitle>이미 탈퇴한 계정입니다</WithdrawTitle>
+          <WithdrawDescription>
+            회원 탈퇴한 계정으로는 30일 내<br />
+            재가입이 불가능합니다
+          </WithdrawDescription>
+        </WithdrawInformationWrapper>
+
+        <WithdrawButtonWrapper>
+          <LoginButton loginType="kakao" onClick={() => handleLogin("kakao")}>
+            <IconKakao />
+            <LoginButtonText loginType="kakao">카카오 계정으로 로그인</LoginButtonText>
+          </LoginButton>
+          <LoginButton loginType="naver" onClick={() => handleLogin("naver")}>
+            <IconNaver />
+            <LoginButtonText loginType="naver">네이버 계정으로 로그인</LoginButtonText>
+          </LoginButton>
+          <BackButton>
+            <RamenroadText size={14} weight="m" onClick={() => navigate("/")}>
+              이전 화면으로 돌아가기
+            </RamenroadText>
+          </BackButton>
+        </WithdrawButtonWrapper>
+      </Wrapper>
+    );
+  }
 };
 
 const Wrapper = tw.div`
   flex flex-col items-center justify-center
   w-full h-full
+`;
+
+const WithdrawInformationWrapper = tw.div`
+  box-border
+  flex flex-col gap-8
+  w-full flex-1
+  px-20 pt-54
 `;
 
 const SubText = tw(RamenroadText)`
@@ -113,6 +159,11 @@ const EmailBox = tw.div`
   rounded-8
   cursor-pointer
   flex items-center justify-center
+`;
+
+const WithdrawButtonWrapper = tw.div`
+  flex flex-col items-center justify-center gap-12
+  w-full mb-154
 `;
 
 const LoginButtonWrapper = tw.div`
@@ -159,5 +210,13 @@ const LoginButtonText = styled.span(({ loginType }: { loginType: "kakao" | "nave
   loginType === "kakao" && tw`text-black/85`,
   loginType === "naver" && tw`text-white`,
 ]);
+
+const WithdrawTitle = tw.span`
+  font-regular text-black text-24 leading-36 tracking-[-2%]
+`;
+
+const WithdrawDescription = tw.span`
+  font-16-r text-gray-500 tracking-[-2%] leading-24
+`;
 
 export default LoginCallbackPage;
