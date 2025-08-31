@@ -936,3 +936,33 @@ export const IconImageDelete = (props: ComponentProps<"svg">) => {
     </svg>
   );
 };
+
+export const IconCheckbox = (props: ComponentProps<"svg"> & { checked: boolean }) => {
+  const { checked, ...rest } = props;
+
+  if (checked)
+    return (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+        <rect width="24" height="24" fill="white" />
+        <rect width="24" height="24" rx="12" fill="#292929" />
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M17.7077 8.29353C18.0979 8.6844 18.0973 9.31756 17.7065 9.70774L11.1948 16.2077C11.007 16.3952 10.7524 16.5003 10.4871 16.5C10.2217 16.4997 9.96741 16.3939 9.78009 16.2059L6.29172 12.7059C5.90184 12.3148 5.9029 11.6816 6.29407 11.2917C6.68524 10.9018 7.31841 10.9029 7.70828 11.2941L10.4902 14.0852L16.2935 8.29226C16.6844 7.90209 17.3176 7.90265 17.7077 8.29353Z"
+          fill="white"
+        />
+      </svg>
+    );
+
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+      <rect x="0.5" y="0.5" width="23" height="23" rx="11.5" fill="white" stroke="#E7E7E7" />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M17.7077 8.29353C18.0979 8.6844 18.0973 9.31756 17.7065 9.70774L11.1948 16.2077C11.007 16.3952 10.7524 16.5003 10.4871 16.5C10.2217 16.4997 9.96741 16.3939 9.78009 16.2059L6.29172 12.7059C5.90184 12.3148 5.9029 11.6816 6.29407 11.2917C6.68524 10.9018 7.31841 10.9029 7.70828 11.2941L10.4902 14.0852L16.2935 8.29226C16.6844 7.90209 17.3176 7.90265 17.7077 8.29353Z"
+        fill="#CFCFCF"
+      />
+    </svg>
+  );
+};

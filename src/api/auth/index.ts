@@ -54,3 +54,9 @@ export const signOut = async () => {
 
   return response.data;
 };
+
+export const withdrawUser = async () => {
+  const response = await instanceWithNoVersioning.post("/auth/withdrawal");
+
+  return response.data;
+};
