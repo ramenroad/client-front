@@ -720,17 +720,19 @@ const StarContainer = tw.div`
 `;
 
 const StarButtonContainer = tw.div`
-    relative
+    relative flex items-center justify-center
 `;
 
 const StarButtonLeft = tw.button`
-    absolute top-0 left-0
-    w-16 h-16
+    bg-transparent border-none cursor-pointer p-0 m-0
+    absolute left-0 w-1/2 h-full
+    flex items-center justify-center
 `;
 
 const StarButtonRight = tw.button`
-    absolute top-0 right-0
-    w-16 h-16
+    bg-transparent border-none cursor-pointer p-0 m-0
+    absolute right-0 w-1/2 h-full
+    flex items-center justify-center
 `;
 
 const Divider = tw.div`
