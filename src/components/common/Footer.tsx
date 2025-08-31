@@ -2,14 +2,15 @@ import tw from "twin.macro";
 import { ramenroadEmail } from "../../constants";
 import { RamenroadText } from "./RamenroadText";
 import { Line } from "./Line";
+import { IconInstagram } from "../Icon";
 
 export const Footer = () => {
   return (
     <Wrapper>
       <Contact>
-        <RamenroadText size={14} weight="sb">
+        <FooterTitle size={14} weight="sb">
           팀 라이징
-        </RamenroadText>
+        </FooterTitle>
         <ContactWrapper>
           <span>제휴 및 협업 문의</span>
           <Email href={`mailto:${ramenroadEmail}`}>{ramenroadEmail}</Email>
@@ -34,19 +35,37 @@ export const Footer = () => {
           >
             개인정보 처리방침
           </Link>
+          <Divider vertical />
+          <Link
+            size={12}
+            weight="r"
+            onClick={() =>
+              window.open(
+                "https://kim-junseo.notion.site/2025-08-9-24949b91c9c580b48549e8dc5195cdff?source=copy_link",
+                "_blank",
+              )
+            }
+          >
+            위치 정보 이용약관
+          </Link>
         </Terms>
         <RamenroadText size={12} weight="r">
           Copyright © 2025 라이징 All rights reserved.
         </RamenroadText>
       </TermsAndConditions>
+      <InstagramIcon footer onClick={() => window.open("https://www.instagram.com/ra.ising/", "_blank")} />
     </Wrapper>
   );
 };
 
 const Wrapper = tw.div`
-  w-full h-156 p-20 box-border
+  w-full h-212 p-20 box-border
   bg-footer text-gray-500 font-14-r
   flex flex-col gap-24
+`;
+
+const FooterTitle = tw(RamenroadText)`
+  leading-27
 `;
 
 const Contact = tw.div`
@@ -71,6 +90,11 @@ const TermsAndConditions = tw.div`
 
 const Link = tw(RamenroadText)`
   cursor-pointer
+`;
+
+const InstagramIcon = tw(IconInstagram)`
+  cursor-pointer
+  min-h-40 min-w-40 mt-[-8px]
 `;
 
 const Divider = tw(Line)`

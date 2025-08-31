@@ -19,6 +19,7 @@ import UserReviewPage from "./user-review-page";
 import { EditReviewPage } from "./review-page/EditReviewPage";
 import MapPage from "./map";
 import MapLayout from "../components/layout/MapLayout";
+import WithdrawPage from "./withdraw-page";
 
 const router = createBrowserRouter([
   {
@@ -106,6 +107,10 @@ const router = createBrowserRouter([
   {
     path: "/images/:id",
     element: <ImagesPage />,
+  },
+  {
+    path: "withdraw",
+    element: <WithdrawPage />,
   },
 ]);
 

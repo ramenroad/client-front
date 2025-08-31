@@ -148,9 +148,15 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
       <ReviewCardSubHeader>
         <ReviewCardSubHeaderLeftSection>
           <RatingWrapper>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <IconStar key={star} inactive={star > review.rating} />
-            ))}
+            {[1, 2, 3, 4, 5].map((star) => {
+              const isFullStar = star <= review.rating;
+              const isHalfStar = star - 0.5 <= review.rating && review.rating < star;
+
+              if (isHalfStar) {
+                return <IconStar key={star} inactive={!isFullStar} isHalf={true} />;
+              }
+              return <IconStar key={star} inactive={star > review.rating} />;
+            })}
           </RatingWrapper>
           <RamenyaMenuListWrapper>
             {review.menus?.map((menu, index) => {

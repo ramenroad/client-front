@@ -28,22 +28,30 @@ export const IconFilterWithTag = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconInstagram = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <rect width="16" height="16" fill="white" />
-    <rect x="2" y="2" width="12" height="12" rx="3" fill={color ?? "#CFCFCF"} />
-    <circle cx="8" cy="8" r="2.5" stroke="white" />
-    <circle cx="11.5" cy="4.5" r="0.5" fill="white" />
-  </svg>
-);
+export const IconInstagram = ({ color, footer = false, ...rest }: IconProps & { footer?: boolean }) =>
+  footer ? (
+    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+      <rect width="40" height="40" rx="20" fill="#EBEBED" />
+      <rect x="9" y="9" width="22" height="22" rx="6" fill="#CFCFCF" />
+      <circle cx="20" cy="20" r="4.5" stroke="#F6F6F6" stroke-width="2" />
+      <circle cx="26.6" cy="13.3988" r="1.1" fill="#F6F6F6" />
+    </svg>
+  ) : (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
+      {...rest}
+    >
+      <rect width="16" height="16" fill="white" />
+      <rect x="2" y="2" width="12" height="12" rx="3" fill={color ?? "#CFCFCF"} />
+      <circle cx="8" cy="8" r="2.5" stroke="white" />
+      <circle cx="11.5" cy="4.5" r="0.5" fill="white" />
+    </svg>
+  );
 
 export const IconLocate = ({ color, ...rest }: IconProps) => (
   <svg
@@ -925,6 +933,36 @@ export const IconImageDelete = (props: ComponentProps<"svg">) => {
           <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_2730_3839" result="shape" />
         </filter>
       </defs>
+    </svg>
+  );
+};
+
+export const IconCheckbox = (props: ComponentProps<"svg"> & { checked: boolean }) => {
+  const { checked, ...rest } = props;
+
+  if (checked)
+    return (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+        <rect width="24" height="24" fill="white" />
+        <rect width="24" height="24" rx="12" fill="#292929" />
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M17.7077 8.29353C18.0979 8.6844 18.0973 9.31756 17.7065 9.70774L11.1948 16.2077C11.007 16.3952 10.7524 16.5003 10.4871 16.5C10.2217 16.4997 9.96741 16.3939 9.78009 16.2059L6.29172 12.7059C5.90184 12.3148 5.9029 11.6816 6.29407 11.2917C6.68524 10.9018 7.31841 10.9029 7.70828 11.2941L10.4902 14.0852L16.2935 8.29226C16.6844 7.90209 17.3176 7.90265 17.7077 8.29353Z"
+          fill="white"
+        />
+      </svg>
+    );
+
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+      <rect x="0.5" y="0.5" width="23" height="23" rx="11.5" fill="white" stroke="#E7E7E7" />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M17.7077 8.29353C18.0979 8.6844 18.0973 9.31756 17.7065 9.70774L11.1948 16.2077C11.007 16.3952 10.7524 16.5003 10.4871 16.5C10.2217 16.4997 9.96741 16.3939 9.78009 16.2059L6.29172 12.7059C5.90184 12.3148 5.9029 11.6816 6.29407 11.2917C6.68524 10.9018 7.31841 10.9029 7.70828 11.2941L10.4902 14.0852L16.2935 8.29226C16.6844 7.90209 17.3176 7.90265 17.7077 8.29353Z"
+        fill="#CFCFCF"
+      />
     </svg>
   );
 };
