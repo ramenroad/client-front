@@ -16,9 +16,9 @@ import { useSignInStore } from "../../states/sign-in";
 import { useModal } from "../../hooks/common/useModal";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
-import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 import heic2any from "heic2any";
 import { useToast } from "../../components/toast/ToastProvider.tsx";
+import ReviewGuide from "./ReviewGuide.tsx";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -219,8 +219,6 @@ export const EditReviewPage = () => {
   const { reviewDetailQuery } = useRamenyaReviewDetailQuery(reviewId!);
   const reviewDetail = reviewDetailQuery.data;
 
-  const { data: ramenyaDetail } = useRamenyaDetailQuery(reviewDetail?.ramenyaId?._id);
-
   const navigate = useNavigate();
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
@@ -228,7 +226,7 @@ export const EditReviewPage = () => {
 
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [customMenuInput, setCustomMenuInput] = useState("");
-  const [menuList, setMenuList] = useState(reviewDetail?.menus?.map((menu) => menu) || []);
+  const [menuList, setMenuList] = useState<string[]>([]);
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [isImageUploading, setIsImageUploading] = useState(false);
 
@@ -273,7 +271,7 @@ export const EditReviewPage = () => {
   };
 
   const handleAddCustomMenu = () => {
-    if (customMenuInput.trim() !== "" && !menuList.includes(customMenuInput)) {
+    if (customMenuInput.trim() !== "") {
       setMenuList([...menuList, customMenuInput]);
       if (selectedMenus.length < 2) {
         setSelectedMenus([...selectedMenus, customMenuInput]);
@@ -336,7 +334,7 @@ export const EditReviewPage = () => {
         fileInputRef.current.value = "";
       }
     },
-    [formValues.reviewImages, setValue],
+    [fileInputRef, formValues.reviewImages, openToast, setValue],
   );
 
   const handleImageClick = () => {
@@ -459,10 +457,10 @@ export const EditReviewPage = () => {
   }, [reviewDetailQuery.isError, navigate, openToast]);
 
   useEffect(() => {
-    if (ramenyaDetail?.menus) {
-      setMenuList([...new Set([...(ramenyaDetail?.menus ?? []), ...(reviewDetail?.menus ?? [])])]);
+    if (reviewDetail?.menus) {
+      setMenuList([...new Set([...reviewDetail.menus])]);
     }
-  }, [reviewDetail?.menus, ramenyaDetail?.menus]);
+  }, [reviewDetail?.menus]);
 
   useEffect(() => {
     if (!reviewDetail) return;
@@ -510,6 +508,7 @@ export const EditReviewPage = () => {
       <Header>
         <TopBar title="리뷰 수정하기" onBackClick={handleBackClick} />
       </Header>
+      <ReviewGuide />
       {isLoading ? (
         <LoadingWrapper>
           <LoadingText>로딩중...</LoadingText>
@@ -571,7 +570,6 @@ export const EditReviewPage = () => {
             </MenuWrapper>
 
             <MenuAddWrapper>
-              <MenuAddTitle>찾으시는 메뉴가 없나요? 직접 추가해주세요</MenuAddTitle>
               <MenuInputContainer>
                 <MenuInput
                   value={customMenuInput}
@@ -782,11 +780,7 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
 ]);
 
 const MenuAddWrapper = tw.div`
-    flex flex-col mt-20 gap-12
-`;
-
-const MenuAddTitle = tw.div`
-    font-14-r text-black
+    flex flex-col mt-16 gap-12
 `;
 
 const MenuInputContainer = tw.div`
@@ -812,7 +806,7 @@ const MenuAddButton = tw.button`
 `;
 
 const ReviewDescriptionWrapper = tw.div`
-    flex flex-col mt-32 gap-16
+    flex flex-col mt-36 gap-16
     relative
 `;
 
@@ -868,7 +862,7 @@ const TypedCount = tw.span`
 `;
 
 const ImageUploadWrapper = tw.div`
-    flex flex-col mt-32 gap-12
+    flex flex-col mt-36 gap-12
 `;
 
 const ImageUploadHeader = tw.div`

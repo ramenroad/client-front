@@ -16,6 +16,7 @@ import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import heic2any from "heic2any";
 import { useToast } from "../../components/toast/ToastProvider";
+import ReviewGuide from "./ReviewGuide.tsx";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -207,7 +208,7 @@ const ImagePreviewItem = memo(
 export const CreateReviewPage = () => {
   const { id } = useParams();
   const { mutate: createReview, isPending: isSubmitting } = useRamenyaReviewMutation();
-  const { data: ramenyaDetail, isLoading, isError } = useRamenyaDetailQuery(id!);
+  const { isLoading, isError } = useRamenyaDetailQuery(id!);
   const navigate = useNavigate();
   const { isOpen: isBackModalOpen, open: openBackModal, close: closeBackModal } = useModal();
   const { isOpen: isLoginModalOpen, open: openLoginModal, close: closeLoginModal } = useModal();
@@ -219,7 +220,7 @@ export const CreateReviewPage = () => {
 
   const [isFormDirty, setIsFormDirty] = useState(false);
   const [customMenuInput, setCustomMenuInput] = useState("");
-  const [menuList, setMenuList] = useState(ramenyaDetail?.menus?.map((menu) => menu) || []);
+  const [menuList, setMenuList] = useState<string[]>([]);
   const [selectedMenus, setSelectedMenus] = useState<string[]>([]);
   const [isImageUploading, setIsImageUploading] = useState(false);
   const fileInputRef = createRef<HTMLInputElement>();
@@ -259,7 +260,7 @@ export const CreateReviewPage = () => {
   };
 
   const handleAddCustomMenu = () => {
-    if (customMenuInput.trim() !== "" && !menuList.includes(customMenuInput)) {
+    if (customMenuInput.trim() !== "") {
       setMenuList([...menuList, customMenuInput]);
       if (selectedMenus.length < 2) {
         setSelectedMenus([...selectedMenus, customMenuInput]);
@@ -322,7 +323,7 @@ export const CreateReviewPage = () => {
         fileInputRef.current.value = "";
       }
     },
-    [formValues.reviewImages, setValue],
+    [fileInputRef, formValues.reviewImages, openToast, setValue],
   );
 
   const handleImageClick = () => {
@@ -429,12 +430,6 @@ export const CreateReviewPage = () => {
   }, [isError, navigate]);
 
   useEffect(() => {
-    if (ramenyaDetail?.menus) {
-      setMenuList(ramenyaDetail.menus.map((menu) => menu));
-    }
-  }, [ramenyaDetail?.menus]);
-
-  useEffect(() => {
     const hasChanges =
       isDirty ||
       (formValues.reviewImages?.length ?? 0) > 0 ||
@@ -467,6 +462,7 @@ export const CreateReviewPage = () => {
       <Header>
         <TopBar title="리뷰 작성하기" onBackClick={handleBackClick} />
       </Header>
+      <ReviewGuide />
       {isLoading ? (
         <LoadingWrapper>
           <LoadingText>로딩중...</LoadingText>
@@ -517,18 +513,19 @@ export const CreateReviewPage = () => {
                 <MenuTitle>어떤 메뉴를 드셨나요?</MenuTitle>
                 <MenuSubTitle>최대 2개 선택 가능</MenuSubTitle>
               </MenuTitleBox>
-              <MenuTabContainer>
-                {menuList.map((menu, index) => (
-                  <MenuTab key={index} selected={selectedMenus.includes(menu)} onClick={() => handleMenuClick(menu)}>
-                    {menu}
-                  </MenuTab>
-                ))}
-              </MenuTabContainer>
+              {menuList?.length > 0 && (
+                <MenuTabContainer>
+                  {menuList.map((menu, index) => (
+                    <MenuTab key={index} selected={selectedMenus.includes(menu)} onClick={() => handleMenuClick(menu)}>
+                      {menu}
+                    </MenuTab>
+                  ))}
+                </MenuTabContainer>
+              )}
               {errors.menus && <ErrorMessage>메뉴를 선택해주세요</ErrorMessage>}
             </MenuWrapper>
 
             <MenuAddWrapper>
-              <MenuAddTitle>찾으시는 메뉴가 없나요? 직접 추가해주세요</MenuAddTitle>
               <MenuInputContainer>
                 <MenuInput
                   value={customMenuInput}
@@ -723,11 +720,7 @@ const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
 ]);
 
 const MenuAddWrapper = tw.div`
-    flex flex-col mt-20 gap-12
-`;
-
-const MenuAddTitle = tw.div`
-    font-14-r text-black
+    flex flex-col mt-16 gap-12
 `;
 
 const MenuInputContainer = tw.div`
@@ -753,7 +746,7 @@ const MenuAddButton = tw.button`
 `;
 
 const ReviewDescriptionWrapper = tw.div`
-    flex flex-col mt-32 gap-16
+    flex flex-col mt-36 gap-16
     relative
 `;
 
@@ -811,7 +804,7 @@ const TypedCount = tw.span`
 `;
 
 const ImageUploadWrapper = tw.div`
-    flex flex-col mt-32 gap-12
+    flex flex-col mt-36 gap-12
 `;
 
 const ImageUploadHeader = tw.div`
