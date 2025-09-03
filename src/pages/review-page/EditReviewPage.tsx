@@ -19,6 +19,7 @@ import loadingAnimation from "../../assets/lotties/loading.json";
 import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery.ts";
 import heic2any from "heic2any";
 import { useToast } from "../../components/toast/ToastProvider.tsx";
+import ReviewGuide from "./ReviewGuide.tsx";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -510,6 +511,7 @@ export const EditReviewPage = () => {
       <Header>
         <TopBar title="리뷰 수정하기" onBackClick={handleBackClick} />
       </Header>
+      <ReviewGuide />
       {isLoading ? (
         <LoadingWrapper>
           <LoadingText>로딩중...</LoadingText>

@@ -16,6 +16,7 @@ import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import heic2any from "heic2any";
 import { useToast } from "../../components/toast/ToastProvider";
+import ReviewGuide from "./ReviewGuide.tsx";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -467,6 +468,7 @@ export const CreateReviewPage = () => {
       <Header>
         <TopBar title="리뷰 작성하기" onBackClick={handleBackClick} />
       </Header>
+      <ReviewGuide />
       {isLoading ? (
         <LoadingWrapper>
           <LoadingText>로딩중...</LoadingText>
