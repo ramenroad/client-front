@@ -7,9 +7,11 @@ import styled from "@emotion/styled";
 import TopBar from "../../components/top-bar/index.tsx";
 import { useScrollToTop } from "../../hooks/common/useScrollToTop.tsx";
 import { FilterOptions } from "../../types/filter/index.ts";
-import { initialFilterOptions, RamenyaType } from "../../constants/index.ts";
+import { genreDescriptions, initialFilterOptions, RamenyaType } from "../../constants/index.ts";
 import { useSessionStorage } from "usehooks-ts";
 import FilterSection from "../../components/filter/FilterSection.tsx";
+import { IconTooltip } from "../../components/Icon/index.tsx";
+import Tooltip from "../../components/common/Tooltip.tsx";
 
 export const GenrePage = () => {
   useScrollToTop();
@@ -31,7 +33,14 @@ export const GenrePage = () => {
     <Layout>
       <Wrapper>
         <HeaderContainer>
-          <TopBar title={genre || ""} />
+          <TopBar
+            title={genre || ""}
+            tooltip={
+              <Tooltip content={genreDescriptions[genre as RamenyaType]}>
+                <IconTooltip />
+              </Tooltip>
+            }
+          />
 
           {/* 필터 영역 */}
           <FilterSection
