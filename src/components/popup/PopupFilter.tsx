@@ -12,7 +12,7 @@ import { BottomPopupLayout } from "./BottomPopupLayout";
 export interface PopupFilterProps extends ModalProps {
   initialFilterOptions: FilterOptions;
   currentFilterOptions: FilterOptions;
-  pinned?: (typeof RAMENYA_TYPES)[number];
+  pinned?: (typeof RAMENYA_TYPES)[keyof typeof RAMENYA_TYPES];
   onChange: (filterOptions: FilterOptions | null) => void;
 }
 
@@ -20,7 +20,7 @@ const PopupFilter: React.FC<PopupFilterProps> = (props) => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(props.currentFilterOptions);
 
   const ramenyaGenre = useMemo(() => {
-    const filteredTypes = RAMENYA_TYPES.filter((type) => type !== props.pinned);
+    const filteredTypes = Object.values(RAMENYA_TYPES).filter((type) => type !== props.pinned);
     return props.pinned ? [props.pinned, ...filteredTypes] : filteredTypes;
   }, [props.pinned]);
 
