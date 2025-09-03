@@ -6,6 +6,7 @@ interface TopBarProps {
   title: string;
   navigate?: string;
   onBackClick?: () => void;
+  tooltip?: React.ReactNode;
   icon?: React.ReactNode;
   onIconClick?: () => void;
 }
@@ -33,6 +34,7 @@ const TopBar = (props: TopBarProps) => {
         <StyledIconBack onClick={handleBackClick} />
       </IconWrapper>
       <HeaderTitle>{props.title}</HeaderTitle>
+      {props.tooltip && props.tooltip}
       {props.icon && <AdditionalIconWrapper onClick={props.onIconClick}>{props.icon}</AdditionalIconWrapper>}
     </TopBarWrapper>
   );

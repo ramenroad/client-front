@@ -13,19 +13,78 @@ import mazemen from "../assets/images/ramen/mazemen.png";
 import { FilterOptions } from "../types/filter";
 import { SortType } from "../types/filter";
 
-export const RAMENYA_TYPES = [
-  "이에케",
-  "돈코츠",
-  "쇼유",
-  "시오",
-  "미소",
-  "청탕",
-  "아부라",
-  "지로",
-  "탄탄멘",
-  "토리",
-  "츠케멘",
-] as const;
+// export const genrePath = [
+//   {
+//     genre: "쇼유",
+//     image: soy,
+//   },
+//   {
+//     genre: "시오",
+//     image: sio,
+//   },
+//   {
+//     genre: "미소",
+//     image: miso,
+//   },
+//   {
+//     genre: "돈코츠",
+//     image: pig,
+//   },
+//   {
+//     genre: "츠케멘",
+//     image: tsukemen,
+//   },
+
+//   {
+//     genre: "이에케",
+//     image: iekei,
+//   },
+//   {
+//     genre: "지로",
+//     image: jiro,
+//   },
+//   {
+//     genre: "토리파이탄",
+//     image: toripaitan,
+//   },
+//   {
+//     genre: "니보시",
+//     image: niboshi,
+//   },
+//   // {
+//   //   genre: "아사리",
+//   //   image: asari,
+//   // },
+//   {
+//     genre: "아부라소바",
+//     image: aburasoba,
+//   },
+//   {
+//     genre: "탄탄멘",
+//     image: dandan,
+//   },
+//   {
+//     genre: "마제소바",
+//     image: mazemen,
+//   },
+// ];
+
+export const RAMENYA_TYPES = {
+  SHOUYU: "쇼유",
+  SIO: "시오",
+  MISO: "미소",
+  PIG: "돈코츠",
+
+  TSUKEMEN: "츠케멘",
+  IEKEI: "이에케",
+  JIRO: "지로",
+  TORIPAITAN: "토리파이탄",
+
+  NIBOSHI: "니보시",
+  ABURASOBA: "아부라소바",
+  DANDAN: "탄탄멘",
+  MAZEMEN: "마제소바",
+} as const;
 
 export const RAMENYA_LOCATION_LIST = [
   {
@@ -78,7 +137,7 @@ export const RAMENYA_LOCATION_LIST = [
   },
 ] as const;
 
-export type RamenyaType = (typeof RAMENYA_TYPES)[number];
+export type RamenyaType = (typeof RAMENYA_TYPES)[keyof typeof RAMENYA_TYPES];
 
 export enum OpenStatus {
   OPEN = "영업 중",
@@ -90,40 +149,40 @@ export enum OpenStatus {
 
 export const genrePath = [
   {
-    genre: "쇼유",
+    genre: RAMENYA_TYPES.SHOUYU,
     image: soy,
   },
   {
-    genre: "시오",
+    genre: RAMENYA_TYPES.SIO,
     image: sio,
   },
   {
-    genre: "미소",
+    genre: RAMENYA_TYPES.MISO,
     image: miso,
   },
   {
-    genre: "돈코츠",
+    genre: RAMENYA_TYPES.PIG,
     image: pig,
   },
   {
-    genre: "츠케멘",
+    genre: RAMENYA_TYPES.TSUKEMEN,
     image: tsukemen,
   },
 
   {
-    genre: "이에케",
+    genre: RAMENYA_TYPES.IEKEI,
     image: iekei,
   },
   {
-    genre: "지로",
+    genre: RAMENYA_TYPES.JIRO,
     image: jiro,
   },
   {
-    genre: "토리파이탄",
+    genre: RAMENYA_TYPES.TORIPAITAN,
     image: toripaitan,
   },
   {
-    genre: "니보시",
+    genre: RAMENYA_TYPES.NIBOSHI,
     image: niboshi,
   },
   // {
@@ -131,18 +190,33 @@ export const genrePath = [
   //   image: asari,
   // },
   {
-    genre: "아부라소바",
+    genre: RAMENYA_TYPES.ABURASOBA,
     image: aburasoba,
   },
   {
-    genre: "탄탄멘",
+    genre: RAMENYA_TYPES.DANDAN,
     image: dandan,
   },
   {
-    genre: "마제소바",
+    genre: RAMENYA_TYPES.MAZEMEN,
     image: mazemen,
   },
 ];
+
+export const genreDescriptions = {
+  [RAMENYA_TYPES.SIO]: "소금 타래(소스) 베이스",
+  [RAMENYA_TYPES.SHOUYU]: "간장 타래(소스) 베이스",
+  [RAMENYA_TYPES.MISO]: "미소 타래(소스) 베이스",
+  [RAMENYA_TYPES.PIG]: "돼지뼈 육수 베이스",
+  [RAMENYA_TYPES.TSUKEMEN]: "진한 츠케지루(스프)에 면을 찍어먹는 라멘",
+  [RAMENYA_TYPES.IEKEI]: "진한 돼지뼈 육수 + 간장 베이스",
+  [RAMENYA_TYPES.JIRO]: "돼지뼈 육수 + 채수 베이스 위에 숙주와 마늘이 듬뿍",
+  [RAMENYA_TYPES.TORIPAITAN]: "진한 닭육수 베이스",
+  [RAMENYA_TYPES.NIBOSHI]: "멸치 육수 베이스",
+  [RAMENYA_TYPES.ABURASOBA]: "기름 베이스의 비벼먹는 라멘",
+  [RAMENYA_TYPES.DANDAN]: "땅콩소스 + 고추기름 베이스",
+  [RAMENYA_TYPES.MAZEMEN]: "고기 + 부추 베이스의 비벼먹는 일본식 중화라멘",
+} as const;
 
 export const ramenroadEmail = "zz0905k@naver.com";
 
