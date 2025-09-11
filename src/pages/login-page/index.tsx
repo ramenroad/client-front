@@ -4,12 +4,19 @@ import tw from "twin.macro";
 import { Line } from "../../components/common/Line";
 import { IconKakao, IconNaver } from "../../components/Icon";
 import styled from "@emotion/styled";
+import { useKakaoSDK } from "../../hooks/common/useKakaoSDK";
 
 const LoginPage = () => {
+  const { Kakao } = useKakaoSDK();
+
   const handleLogin = (loginType: "kakao" | "naver") => {
     switch (loginType) {
       case "kakao":
-        window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/kakao&response_type=code`;
+        console.debug("%cindex.tsx:15%c -> %cKakao", "color: #90EE90", "color: #FFD700", "color: #87CEEB", Kakao);
+        // window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/kakao&response_type=code`;
+        Kakao?.Auth.authorize({
+          redirectUri: `${window.location.origin}/oauth/kakao`,
+        });
         break;
       case "naver":
         window.location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=${import.meta.env.VITE_NAVER_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/naver&response_type=code&state=ramenroad`;
