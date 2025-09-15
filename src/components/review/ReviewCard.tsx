@@ -179,7 +179,12 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
       </ReviewCardSubHeader>
       <ReviewCardContent>
         <RamenroadText size={14} weight="r">
-          {displayReview}
+          {displayReview.split("\n").map((line, index) => (
+            <span key={index}>
+              {line}
+              {index < displayReview.split("\n").length - 1 && <br />}
+            </span>
+          ))}
         </RamenroadText>
         {isReviewLong && (
           <MoreButton size={14} weight="m" onClick={() => setIsReviewExpanded(!isReviewExpanded)}>
