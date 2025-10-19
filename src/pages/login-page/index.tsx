@@ -26,6 +26,11 @@ const LoginPage = () => {
         window.AppleID.auth.init({
           clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
           redirectURI: `https://ra-ising.com/oauth/apple`,
+          scope: "name email", // 요청할 사용자 정보
+          state: "raising", // CSRF 방지를 위한 임의 문자열
+          usePopup: false, // redirect 모드 사용
+          response_mode: "form_post", // or 'query' (테스트 시 'query' 추천)
+          response_type: "code id_token", // 반드시 포함되어야 함
         });
         // @ts-ignore
         window.AppleID.auth.signIn();
