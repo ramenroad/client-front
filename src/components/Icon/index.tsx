@@ -259,8 +259,8 @@ export const IconTalk = ({ color, ...rest }: IconProps) => (
 
 export const IconKakao = ({ color, ...rest }: IconProps) => (
   <svg
-    width="19"
-    height="18"
+    width="16"
+    height="16"
     viewBox="0 0 19 18"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -278,8 +278,8 @@ export const IconKakao = ({ color, ...rest }: IconProps) => (
 
 export const IconNaver = () => (
   <svg
-    width="14"
-    height="14"
+    width="16"
+    height="16"
     viewBox="0 0 14 14"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
