@@ -7,6 +7,7 @@ import { IconKakao, IconNaver } from "../../components/Icon";
 import { RamenroadText } from "../../components/common/RamenroadText";
 import styled from "@emotion/styled";
 import EmailImage from "../../assets/images/email/email.png";
+import { canBeChoseong } from "es-hangul";
 
 const LoginCallbackPage = () => {
   const { id } = useParams();
@@ -21,9 +22,14 @@ const LoginCallbackPage = () => {
   useEffect(() => {
     const code = new URLSearchParams(window.location.search).get("code");
 
-    if (code && !login.isPending) {
+    // URL fragment에서 access_token 추출 (Google OAuth용)
+    const hash = window.location.hash.substring(1); // # 제거
+    const hashParams = new URLSearchParams(hash);
+    const access_token = hashParams.get("access_token");
+
+    if ((code || access_token) && !login.isPending) {
       login.mutate(
-        { id: id!, code: code },
+        { id: id!, code: access_token || code || "" },
         {
           onError: (error) => {
             console.error(error);

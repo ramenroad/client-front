@@ -5,15 +5,15 @@ import { Line } from "../../components/common/Line";
 import { IconKakao, IconNaver } from "../../components/Icon";
 import styled from "@emotion/styled";
 import { useKakaoSDK } from "../../hooks/common/useKakaoSDK";
+import AppleLoginButton from "../../assets/images/apple/login-button.png";
+import IconGoogle from "../../assets/images/google/icon.png";
 
 const LoginPage = () => {
   const { Kakao } = useKakaoSDK();
 
-  const handleLogin = (loginType: "kakao" | "naver") => {
+  const handleLogin = (loginType: "kakao" | "naver" | "apple" | "google") => {
     switch (loginType) {
       case "kakao":
-        console.debug("%cindex.tsx:15%c -> %cKakao", "color: #90EE90", "color: #FFD700", "color: #87CEEB", Kakao);
-        // window.location.href = `https://kauth.kakao.com/oauth/authorize?client_id=${import.meta.env.VITE_KAKAO_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/kakao&response_type=code`;
         Kakao?.Auth.authorize({
           redirectUri: `${window.location.origin}/oauth/kakao`,
         });
@@ -21,6 +21,21 @@ const LoginPage = () => {
       case "naver":
         window.location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=${import.meta.env.VITE_NAVER_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/naver&response_type=code&state=ramenroad`;
         break;
+      case "apple":
+        // @ts-ignore
+        window.AppleID.auth.init({
+          clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
+          redirectURI: `https://ra-ising.com/oauth/apple`,
+        });
+        // @ts-ignore
+        window.AppleID.auth.signIn();
+        break;
+      case "google":
+        window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?
+		client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}
+		&redirect_uri=${window.origin}/oauth/google
+		&response_type=token
+		&scope=email profile`;
     }
   };
 
@@ -44,6 +59,19 @@ const LoginPage = () => {
           <LoginButton loginType="naver" onClick={() => handleLogin("naver")}>
             <IconNaver />
             <LoginButtonText loginType="naver">네이버로 계속하기</LoginButtonText>
+          </LoginButton>
+          {/* <AppleLogin
+            clientId={import.meta.env.VITE_APPLE_CLIENT_ID}
+            redirectURI={`https://ra-ising.com/oauth/apple`}
+            designProp={{
+              height: 310,
+              width: 310,
+            }}
+          /> */}
+          <AppleLoginButtonImage src={AppleLoginButton} alt="apple-login-button" onClick={() => handleLogin("apple")} />
+          <LoginButton loginType="google" onClick={() => handleLogin("google")}>
+            <IconGoogleImage src={IconGoogle} />
+            <LoginButtonText loginType="google">Google로 계속하기</LoginButtonText>
           </LoginButton>
         </LoginButtonWrapper>
       </LoginActionWrapper>
@@ -69,6 +97,15 @@ const LoginText = tw.span`
   font-14-m text-gray-400 w-full
 `;
 
+const AppleLoginButtonImage = tw.img`
+  w-310 h-46
+  cursor-pointer
+`;
+
+const IconGoogleImage = tw.img`
+  w-16 h-16
+`;
+
 const LoginActionWrapper = tw.div`
   flex flex-col items-center justify-center
   w-full mt-auto mb-80 px-40
@@ -85,7 +122,7 @@ const LoginButtonWrapper = tw.div`
   w-full mt-20
 `;
 
-const LoginButton = styled.button(({ loginType }: { loginType: "kakao" | "naver" }) => [
+const LoginButton = styled.button(({ loginType }: { loginType: "kakao" | "naver" | "google" }) => [
   tw`
     flex items-center justify-center gap-8
     w-310 h-46
@@ -102,14 +139,16 @@ const LoginButton = styled.button(({ loginType }: { loginType: "kakao" | "naver"
   `,
   loginType === "kakao" && tw`bg-kakao`,
   loginType === "naver" && tw`bg-naver`,
+  loginType === "google" && tw`bg-white border border-solid border-gray-200`,
 ]);
 
-const LoginButtonText = styled.span(({ loginType }: { loginType: "kakao" | "naver" }) => [
+const LoginButtonText = styled.span(({ loginType }: { loginType: "kakao" | "naver" | "google" }) => [
   tw`
-    font-14-m
+    font-18-m
   `,
   loginType === "kakao" && tw`text-black/85`,
   loginType === "naver" && tw`text-white`,
+  loginType === "google" && tw`text-black`,
 ]);
 
 export default LoginPage;

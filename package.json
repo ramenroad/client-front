@@ -29,6 +29,7 @@
     "lottie-react": "^2.4.1",
     "prettier": "^3.3.3",
     "react": "^18.3.1",
+    "react-apple-login": "^1.1.6",
     "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",
