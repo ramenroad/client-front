@@ -52,6 +52,8 @@ jobs:
             VITE_KAKAO_APP_KEY=${{ secrets.VITE_KAKAO_APP_KEY }}
             VITE_KAKAO_CLIENT_ID=${{ secrets.VITE_KAKAO_CLIENT_ID }}
             VITE_NAVER_CLIENT_ID=${{ secrets.VITE_NAVER_CLIENT_ID }}
+            VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+            VITE_APPLE_CLIENT_ID=${{ secrets.VITE_APPLE_CLIENT_ID }}
             VITE_API_URL=${{ secrets.VITE_API_URL }}
   # 배포 Job
   deploy:
