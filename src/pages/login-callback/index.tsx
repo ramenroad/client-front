@@ -7,7 +7,6 @@ import { IconKakao, IconNaver } from "../../components/Icon";
 import { RamenroadText } from "../../components/common/RamenroadText";
 import styled from "@emotion/styled";
 import EmailImage from "../../assets/images/email/email.png";
-import { canBeChoseong } from "es-hangul";
 
 const LoginCallbackPage = () => {
   const { id } = useParams();
