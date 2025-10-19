@@ -10,7 +10,15 @@ interface pageMemorizeData {
 
 const SESSION_STORAGE_KEY = "ramenroad_page_memorize";
 
-const ignorePathname = ["/login", "/register", "/oauth", "/oauth/naver", "/oauth/kakao"];
+const ignorePathname = [
+  "/login",
+  "/register",
+  "/oauth",
+  "/oauth/naver",
+  "/oauth/kakao",
+  "/oauth/google",
+  "/oauth/apple",
+];
 
 export const usePageMemorize = () => {
   const location = useLocation();
