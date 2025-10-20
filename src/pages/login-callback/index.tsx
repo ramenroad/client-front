@@ -7,16 +7,10 @@ import { IconKakao, IconNaver } from "../../components/Icon";
 import { RamenroadText } from "../../components/common/RamenroadText";
 import styled from "@emotion/styled";
 import EmailImage from "../../assets/images/email/email.png";
-import { useSignInStore } from "../../states/sign-in";
-import { setUserInformation } from "../../store/location/useUserInformationStore";
-import { UserInformation } from "../../types/user";
-import { jwtDecode } from "jwt-decode";
 
 const LoginCallbackPage = () => {
   const { id } = useParams();
   const { login } = useAuthMutation();
-
-  const { setTokens } = useSignInStore();
 
   const navigate = useNavigate();
 
