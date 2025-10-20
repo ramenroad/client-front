@@ -7,9 +7,18 @@ import styled from "@emotion/styled";
 import { useKakaoSDK } from "../../hooks/common/useKakaoSDK";
 import AppleLoginButton from "../../assets/images/apple/login-button.png";
 import IconGoogle from "../../assets/images/google/icon.png";
+import AppleLogin from "react-apple-login";
 
 const LoginPage = () => {
   const { Kakao } = useKakaoSDK();
+
+  const handleAppleLogin = (response: { authorization?: { code: string; state: string } }) => {
+    console.log("Apple login response:", response);
+    // Apple 로그인 성공 시 처리
+    if (response.authorization?.code) {
+      window.location.href = `/oauth/apple?code=${response.authorization.code}&state=${response.authorization.state}`;
+    }
+  };
 
   const handleLogin = (loginType: "kakao" | "naver" | "apple" | "google") => {
     switch (loginType) {
@@ -22,18 +31,7 @@ const LoginPage = () => {
         window.location.href = `https://nid.naver.com/oauth2.0/authorize?client_id=${import.meta.env.VITE_NAVER_CLIENT_ID}&redirect_uri=${window.location.origin}/oauth/naver&response_type=code&state=ramenroad`;
         break;
       case "apple":
-        // @ts-ignore
-        window.AppleID.auth.init({
-          clientId: import.meta.env.VITE_APPLE_CLIENT_ID,
-          redirectURI: `https://ra-ising.com/oauth/apple`,
-          scope: "name email", // 요청할 사용자 정보
-          state: "raising", // CSRF 방지를 위한 임의 문자열
-          usePopup: false, // redirect 모드 사용
-          response_mode: "query", // or 'query' (테스트 시 'query' 추천)
-          response_type: "code id_token", // 반드시 포함되어야 함
-        });
-        // @ts-ignore
-        window.AppleID.auth.signIn();
+        // react-apple-login 라이브러리를 통해 처리
         break;
       case "google":
         window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?
@@ -65,15 +63,17 @@ const LoginPage = () => {
             <IconNaver />
             <LoginButtonText loginType="naver">네이버로 계속하기</LoginButtonText>
           </LoginButton>
-          {/* <AppleLogin
+          <AppleLogin
             clientId={import.meta.env.VITE_APPLE_CLIENT_ID}
             redirectURI={`https://ra-ising.com/oauth/apple`}
-            designProp={{
-              height: 310,
-              width: 310,
-            }}
-          /> */}
-          <AppleLoginButtonImage src={AppleLoginButton} alt="apple-login-button" onClick={() => handleLogin("apple")} />
+            responseType="code"
+            responseMode="query"
+            state="raising"
+            callback={handleAppleLogin}
+            render={(props) => (
+              <AppleLoginButtonImage src={AppleLoginButton} alt="apple-login-button" onClick={props.onClick} />
+            )}
+          />
           <LoginButton loginType="google" onClick={() => handleLogin("google")}>
             <IconGoogleImage src={IconGoogle} />
             <LoginButtonText loginType="google">Google로 계속하기</LoginButtonText>

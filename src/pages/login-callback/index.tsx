@@ -27,31 +27,6 @@ const LoginCallbackPage = () => {
   useEffect(() => {
     if (!id) return;
 
-    if (id === "apple") {
-      const accessToken = new URLSearchParams(window.location.search).get("accessToken");
-      const refreshToken = new URLSearchParams(window.location.search).get("refreshToken");
-      const type = new URLSearchParams(window.location.search).get("type");
-
-      if (accessToken && refreshToken && type) {
-        const decodedToken: UserInformation = jwtDecode(accessToken);
-
-        setUserInformation({
-          id: decodedToken.id,
-          email: decodedToken.email,
-          nickname: decodedToken.nickname,
-        });
-
-        setTokens({ accessToken, refreshToken });
-
-        if (type === "signup") {
-          navigate("/register");
-        } else {
-          navigate("/");
-        }
-      }
-      return;
-    } // 애플 예외 케이스
-
     const code = new URLSearchParams(window.location.search).get("code");
 
     // URL fragment에서 access_token 추출 (Google OAuth용)
