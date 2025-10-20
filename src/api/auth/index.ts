@@ -8,9 +8,10 @@ export interface oAuthLoginResponse {
 
 export const oAuthLogin = async (id: string, code: string) => {
   const response = await instanceWithNoVersioning.post<oAuthLoginResponse>(`/auth/signin/${id}`, {
-    ...(id !== "google" ? { authorizationCode: code } : {}),
+    ...(id === "kakao" ? { authorizationCode: code } : {}),
     ...(id === "google" ? { accessToken: code } : {}),
-    ...(id === "naver" ? { state: "ramenroad" } : {}),
+    ...(id === "naver" ? { authorizationCode: code, state: "ramenroad" } : {}),
+    ...(id === "apple" ? { code: code } : {}),
   });
 
   return response.data;
