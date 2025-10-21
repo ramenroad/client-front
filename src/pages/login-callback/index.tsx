@@ -11,11 +11,14 @@ import { UserInformation } from "../../types/user";
 import { jwtDecode } from "jwt-decode";
 import { setUserInformation } from "../../store/location/useUserInformationStore";
 import { useSignInStore } from "../../states/sign-in";
+import { useToast } from "../../components/toast/ToastProvider";
 
 const LoginCallbackPage = () => {
   const { id } = useParams();
   const { login } = useAuthMutation();
   const { setTokens } = useSignInStore();
+
+  const { openToast } = useToast();
 
   const navigate = useNavigate();
 
@@ -32,20 +35,28 @@ const LoginCallbackPage = () => {
       const type = new URLSearchParams(window.location.search).get("type");
 
       if (accessToken && refreshToken && type) {
-        const decodedToken: UserInformation = jwtDecode(accessToken);
+        try {
+          const decodedToken: UserInformation = jwtDecode(accessToken);
 
-        setUserInformation({
-          id: decodedToken.id,
-          email: decodedToken.email,
-          nickname: decodedToken.nickname,
-        });
+          setUserInformation({
+            id: decodedToken.id,
+            email: decodedToken.email,
+            nickname: decodedToken.nickname,
+          });
 
-        setTokens({ accessToken, refreshToken });
+          setTokens({ accessToken, refreshToken });
 
-        if (type === "signup") {
-          navigate("/register");
-        } else {
-          navigate("/");
+          openToast("로그인 성공");
+
+          if (type === "signup") {
+            navigate("/register");
+          } else {
+            navigate("/");
+          }
+        } catch (error) {
+          console.error(error);
+          openToast("로그인 실패");
+          navigate("/login");
         }
       }
       return;
