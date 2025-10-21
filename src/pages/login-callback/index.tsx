@@ -10,6 +10,7 @@ import EmailImage from "../../assets/images/email/email.png";
 import { UserInformation } from "../../types/user";
 import { jwtDecode } from "jwt-decode";
 import { setUserInformation } from "../../store/location/useUserInformationStore";
+import { useSignInStore } from "../../states/sign-in";
 
 const LoginCallbackPage = () => {
   const { id } = useParams();
