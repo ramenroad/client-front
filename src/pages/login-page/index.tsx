@@ -65,10 +65,11 @@ const LoginPage = () => {
           </LoginButton>
           <AppleLogin
             clientId={import.meta.env.VITE_APPLE_CLIENT_ID}
-            redirectURI={`https://ra-ising.com/oauth/apple`}
-            responseType="code"
-            responseMode="query"
+            redirectURI={`https://ra-ising.com/api/oauth/apple`}
+            responseType="code id_token"
+            responseMode="form_post"
             state="raising"
+            scope="name email"
             callback={handleAppleLogin}
             render={(props) => (
               <AppleLoginButtonImage src={AppleLoginButton} alt="apple-login-button" onClick={props.onClick} />

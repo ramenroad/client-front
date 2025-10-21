@@ -7,10 +7,14 @@ import { IconKakao, IconNaver } from "../../components/Icon";
 import { RamenroadText } from "../../components/common/RamenroadText";
 import styled from "@emotion/styled";
 import EmailImage from "../../assets/images/email/email.png";
+import { UserInformation } from "../../types/user";
+import { jwtDecode } from "jwt-decode";
+import { setUserInformation } from "../../store/location/useUserInformationStore";
 
 const LoginCallbackPage = () => {
   const { id } = useParams();
   const { login } = useAuthMutation();
+  const { setTokens } = useSignInStore();
 
   const navigate = useNavigate();
 
@@ -20,6 +24,31 @@ const LoginCallbackPage = () => {
 
   useEffect(() => {
     if (!id) return;
+
+    if (id === "apple") {
+      const accessToken = new URLSearchParams(window.location.search).get("accessToken");
+      const refreshToken = new URLSearchParams(window.location.search).get("refreshToken");
+      const type = new URLSearchParams(window.location.search).get("type");
+
+      if (accessToken && refreshToken && type) {
+        const decodedToken: UserInformation = jwtDecode(accessToken);
+
+        setUserInformation({
+          id: decodedToken.id,
+          email: decodedToken.email,
+          nickname: decodedToken.nickname,
+        });
+
+        setTokens({ accessToken, refreshToken });
+
+        if (type === "signup") {
+          navigate("/register");
+        } else {
+          navigate("/");
+        }
+      }
+      return;
+    } // 애플 예외 케이스
 
     const code = new URLSearchParams(window.location.search).get("code");
 
