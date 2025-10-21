@@ -12,14 +12,6 @@ import AppleLogin from "react-apple-login";
 const LoginPage = () => {
   const { Kakao } = useKakaoSDK();
 
-  const handleAppleLogin = (response: { authorization?: { code: string; state: string } }) => {
-    console.log("Apple login response:", response);
-    // Apple 로그인 성공 시 처리
-    if (response.authorization?.code) {
-      window.location.href = `/oauth/apple?code=${response.authorization.code}&state=${response.authorization.state}`;
-    }
-  };
-
   const handleLogin = (loginType: "kakao" | "naver" | "apple" | "google") => {
     switch (loginType) {
       case "kakao":
@@ -65,12 +57,11 @@ const LoginPage = () => {
           </LoginButton>
           <AppleLogin
             clientId={import.meta.env.VITE_APPLE_CLIENT_ID}
-            redirectURI={`https://ra-ising.com/api/oauth/apple`}
+            redirectURI={`${window.location.origin}/api/auth/apple`}
             responseType="code id_token"
             responseMode="form_post"
             state="raising"
-            scope="name email"
-            callback={handleAppleLogin}
+            scope="email name"
             render={(props) => (
               <AppleLoginButtonImage src={AppleLoginButton} alt="apple-login-button" onClick={props.onClick} />
             )}
