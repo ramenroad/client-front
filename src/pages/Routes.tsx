@@ -20,6 +20,7 @@ import { EditReviewPage } from "./review-page/EditReviewPage";
 import MapPage from "./map";
 import MapLayout from "../components/layout/MapLayout";
 import WithdrawPage from "./withdraw-page";
+import { MenuBoardSubmitPage } from "./menu-board-submit-page";
 
 const router = createBrowserRouter([
   {
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
       {
         path: "register",
         element: <RegisterPage />,
+      },
+      {
+        path: "menu-board-submit/:id",
+        element: <MenuBoardSubmitPage />,
       },
     ],
   },

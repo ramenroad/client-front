@@ -33,7 +33,7 @@ export const IconInstagram = ({ color, footer = false, ...rest }: IconProps & { 
     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
       <rect width="40" height="40" rx="20" fill="#EBEBED" />
       <rect x="9" y="9" width="22" height="22" rx="6" fill="#CFCFCF" />
-      <circle cx="20" cy="20" r="4.5" stroke="#F6F6F6" stroke-width="2" />
+      <circle cx="20" cy="20" r="4.5" stroke="#F6F6F6" strokeWidth="2" />
       <circle cx="26.6" cy="13.3988" r="1.1" fill="#F6F6F6" />
     </svg>
   ) : (
@@ -969,8 +969,49 @@ export const IconCheckbox = (props: ComponentProps<"svg"> & { checked: boolean }
 
 export const IconTooltip = (props: ComponentProps<"svg">) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-    <circle cx="12" cy="12" r="7.4" fill="white" stroke="#CFCFCF" stroke-width="1.2" />
+    <circle cx="12" cy="12" r="7.4" fill="white" stroke="#CFCFCF" strokeWidth="1.2" />
     <rect x="11.25" y="10.5" width="1.5" height="5" fill="#CFCFCF" />
     <rect x="11.25" y="8" width="1.5" height="1.5" fill="#CFCFCF" />
+  </svg>
+);
+
+export const IconMenuBoard = (props: ComponentProps<"svg">) => (
+  <svg width="80" height="62" viewBox="0 0 80 62" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path
+      d="M19 9.7018C19 8.72081 19.7115 7.88462 20.6799 7.72759L53.6799 2.37624C54.8963 2.17898 56 3.11812 56 4.35045V51C56 52.1046 55.1046 53 54 53H21C19.8954 53 19 52.1046 19 51V9.7018Z"
+      fill="#EDEDED"
+    />
+    <rect x="19" y="8" width="43" height="50" rx="2" fill="#F4F4F5" />
+    <rect x="25" y="43" width="23" height="2" rx="1" fill="#ECECEC" />
+    <rect x="25" y="37" width="30" height="2" rx="1" fill="#ECECEC" />
+    <path
+      d="M26.8449 19.9297H28.9055L30.7316 24.3828H30.8098L32.6359 19.9297H34.6965V27H33.0754V22.6055H33.0168L31.298 26.9609H30.2434L28.5246 22.5859H28.466V27H26.8449V19.9297ZM35.5707 27V19.9297H40.4633V21.2871H37.2309V22.7812H40.2094V24.1387H37.2309V25.6426H40.473V27H35.5707ZM47.3238 19.9297V27H45.9078L43.0367 22.8496H42.9879V27H41.3277V19.9297H42.7633L45.6051 24.0801H45.6637V19.9297H47.3238ZM52.4852 19.9297H54.1551V24.4902C54.1551 26.0723 52.9539 27.0977 51.1766 27.0977C49.3895 27.0977 48.198 26.0723 48.198 24.4902V19.9297H49.8582V24.3535C49.8582 25.1055 50.3953 25.6426 51.1766 25.6426C51.9578 25.6426 52.4852 25.1055 52.4852 24.3535V19.9297Z"
+      fill="#E5E5E5"
+    />
+  </svg>
+);
+
+export const IconMenuBoardRightImage = (props: ComponentProps<"svg">) => (
+  <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path
+      d="M0.75 4.25L3.43182 7.25L9.75 0.75"
+      stroke="white"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const IconMenuBoardWrongImage = (props: ComponentProps<"svg">) => (
+  <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path
+      d="M0.195899 8.80201C-0.0652996 8.53801 -0.0652997 8.11 0.195899 7.84601L7.76298 0.197994C8.02418 -0.0659981 8.44766 -0.065998 8.70886 0.197994C8.97006 0.461987 8.97006 0.890003 8.70886 1.154L1.14178 8.80201C0.880585 9.066 0.457098 9.066 0.195899 8.80201Z"
+      fill="white"
+    />
+    <path
+      d="M8.8041 8.80201C9.0653 8.53801 9.0653 8.11 8.8041 7.84601L1.23702 0.197994C0.975823 -0.0659981 0.552336 -0.065998 0.291137 0.197994C0.0299385 0.461987 0.0299383 0.890003 0.291137 1.154L7.85822 8.80201C8.11942 9.066 8.5429 9.066 8.8041 8.80201Z"
+      fill="white"
+    />
   </svg>
 );

@@ -7,7 +7,7 @@ import {
 } from "../../hooks/queries/useRamenyaListQuery";
 import { Ramenya } from "../../types";
 import RamenyaCard from "../../components/ramenya-card/RamenyaCard";
-import { RamenroadText } from "../../components/common/RamenroadText";
+import { RaisingText } from "../../components/common/RamenroadText";
 import { IconGPS, IconRefresh } from "../../components/Icon";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
@@ -416,7 +416,7 @@ const RefreshButton = tw.button`
   z-10
 `;
 
-const RefreshButtonText = tw(RamenroadText)`
+const RefreshButtonText = tw(RaisingText)`
   text-gray-700
   whitespace-nowrap
 `;

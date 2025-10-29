@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import tw from "twin.macro";
 import { useMobileState } from "../../hooks/common/useMobileState.ts";
 import styled from "@emotion/styled/macro";
-import { RamenroadText } from "../../components/common/RamenroadText.tsx";
+import { RaisingText } from "../../components/common/RamenroadText.tsx";
 
 interface LocationPathCardProps {
   location: string;
@@ -30,6 +30,6 @@ const Wrapper = styled.div(({ isMobile }: { isMobile: boolean }) => [
   !isMobile && tw`hover:(bg-orange text-white) active:(bg-orange text-white)`,
 ]);
 
-const LocationPathText = tw(RamenroadText)`
+const LocationPathText = tw(RaisingText)`
   flex
 `;

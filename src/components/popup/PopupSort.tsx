@@ -4,7 +4,7 @@ import { SortType } from "../../types/filter";
 import styled from "@emotion/styled";
 import { IconCheck, IconClose } from "../Icon";
 import { ModalProps } from "../../types";
-import { RamenroadText } from "../common/RamenroadText";
+import { RaisingText } from "../common/RamenroadText";
 import { BottomPopupLayout } from "./BottomPopupLayout";
 
 export interface PopupSortProps extends ModalProps {
@@ -24,9 +24,9 @@ const PopupSort: React.FC<PopupSortProps> = (props) => {
     <BottomPopupLayout>
       <Wrapper>
         <Header>
-          <RamenroadText size={18} weight="sb">
+          <RaisingText size={18} weight="sb">
             정렬
-          </RamenroadText>
+          </RaisingText>
           <CloseButton onClick={props.onClose} />
         </Header>
 

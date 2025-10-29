@@ -1,6 +1,6 @@
 import tw from "twin.macro";
 import { UserReview, User, ReviewType } from "../../types/review";
-import { RamenroadText } from "../common/RamenroadText";
+import { RaisingText } from "../common/RamenroadText";
 import { IconArrowRight, IconStar } from "../Icon";
 import defaultProfile from "../../assets/images/profile-default.png";
 import dayjs from "dayjs";
@@ -68,9 +68,9 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
                 navigate(`/detail/${isDetailedRamenya(review.ramenyaId) ? review.ramenyaId._id : review.ramenyaId}`)
               }
             >
-              <RamenroadText size={16} weight="sb">
+              <RaisingText size={16} weight="sb">
                 {isDetailedRamenya(review.ramenyaId) ? review.ramenyaId.name : review.ramenyaId}
-              </RamenroadText>
+              </RaisingText>
               <IconArrowRight />
             </div>
           ) : (
@@ -78,24 +78,24 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
               <ReviewNameBox onClick={() => navigate(`/user-review/${review.userId._id}`)}>
                 <ReviewerProfileImage src={review.userId.profileImageUrl || defaultProfile} />
                 <ReviewerInfoBox>
-                  <RamenroadText size={14} weight="sb">
+                  <RaisingText size={14} weight="sb">
                     {review.userId.nickname}
-                  </RamenroadText>
+                  </RaisingText>
 
                   <ReviewerReviewInfo>
-                    <RamenroadText size={12} weight="r">
+                    <RaisingText size={12} weight="r">
                       <span>평균 별점 </span>
-                      <RamenroadText size={12} weight="m">
+                      <RaisingText size={12} weight="m">
                         {review.userId.avgReviewRating?.toFixed(1)}
-                      </RamenroadText>
-                    </RamenroadText>
+                      </RaisingText>
+                    </RaisingText>
                     <ReviewerReviewCountDivider />
-                    <RamenroadText size={12} weight="r">
+                    <RaisingText size={12} weight="r">
                       <span>리뷰</span>{" "}
-                      <RamenroadText size={12} weight="m">
+                      <RaisingText size={12} weight="m">
                         {review.userId.reviewCount}
-                      </RamenroadText>
-                    </RamenroadText>
+                      </RaisingText>
+                    </RaisingText>
                   </ReviewerReviewInfo>
                 </ReviewerInfoBox>
               </ReviewNameBox>
@@ -107,9 +107,9 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
         {props.editable && (
           <ReviewActionWrapper>
             <ActionButton onClick={handleEditReview}>
-              <RamenroadText size={12} weight="r">
+              <RaisingText size={12} weight="r">
                 수정
-              </RamenroadText>
+              </RaisingText>
             </ActionButton>
             <ActionButton
               onClick={() => {
@@ -138,9 +138,9 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
                 });
               }}
             >
-              <RamenroadText size={12} weight="r">
+              <RaisingText size={12} weight="r">
                 삭제
-              </RamenroadText>
+              </RaisingText>
             </ActionButton>
           </ReviewActionWrapper>
         )}
@@ -162,9 +162,9 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
             {review.menus?.map((menu, index) => {
               return (
                 <RamenyaMenuWrapper>
-                  <RamenroadText size={12} weight="r">
+                  <RaisingText size={12} weight="r">
                     {menu}
-                  </RamenroadText>
+                  </RaisingText>
                   {index !== review.menus.length - 1 && <MenuSeparator />}
                 </RamenyaMenuWrapper>
               );
@@ -172,20 +172,20 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
           </RamenyaMenuListWrapper>
         </ReviewCardSubHeaderLeftSection>
         <ReviewCardSubHeaderRightSection>
-          <RamenroadText size={12} weight="r">
+          <RaisingText size={12} weight="r">
             {dayjs(review.createdAt).format("YY.M.DD")}
-          </RamenroadText>
+          </RaisingText>
         </ReviewCardSubHeaderRightSection>
       </ReviewCardSubHeader>
       <ReviewCardContent>
-        <RamenroadText size={14} weight="r">
+        <RaisingText size={14} weight="r">
           {displayReview.split("\n").map((line, index) => (
             <span key={index}>
               {line}
               {index < displayReview.split("\n").length - 1 && <br />}
             </span>
           ))}
-        </RamenroadText>
+        </RaisingText>
         {isReviewLong && (
           <MoreButton size={14} weight="m" onClick={() => setIsReviewExpanded(!isReviewExpanded)}>
             {isReviewExpanded ? "접기" : "더보기"}
@@ -305,7 +305,7 @@ const ReviewCardContent = tw.section`
   mt-12 leading-21
 `;
 
-const MoreButton = tw(RamenroadText)`
+const MoreButton = tw(RaisingText)`
   cursor-pointer
   text-gray-400
   ml-4

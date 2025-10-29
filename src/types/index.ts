@@ -63,6 +63,34 @@ export interface RemenyaDetail {
   naverMapUrl?: string;
   kakaoMapUrl?: string;
   googleMapUrl?: string;
+  menuBoard: MenuBoard[];
+}
+
+// "menuBoard": [
+//   {
+//     "_id": "string",
+//     "userId": {
+//       "_id": "string",
+//       "nickname": "string",
+//       "profileImageUrl": "string"
+//     },
+//     "imageUrl": "string",
+//     "description": "string",
+//     "isApproved": true,
+//     "createdAt": "2025-10-28T11:36:57.670Z"
+//   }
+
+export interface MenuBoard {
+  _id: string;
+  userId: {
+    _id: string;
+    nickname: string;
+    profileImageUrl: string;
+  };
+  imageUrl: string;
+  description: string;
+  isApproved: boolean;
+  createdAt: string;
 }
 
 export interface Banner {

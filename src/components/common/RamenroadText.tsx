@@ -39,7 +39,7 @@ const fontClassMap = {
   "22-b": tw`font-22-b`,
 };
 
-export const RamenroadText = (props: TextProps) => {
+export const RaisingText = (props: TextProps) => {
   const { children, size, weight, ...rest } = props;
   return (
     <Text size={size} weight={weight} {...rest}>

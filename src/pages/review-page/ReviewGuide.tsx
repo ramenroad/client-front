@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import { RamenroadText } from "../../components/common/RamenroadText";
+import { RaisingText } from "../../components/common/RamenroadText";
 
 const ReviewGuide = () => {
   return (
@@ -26,11 +26,11 @@ const ReviewGuideContainer = tw.section`
   flex justify-between
 `;
 
-const ReviewGuideText = tw(RamenroadText)`
+const ReviewGuideText = tw(RaisingText)`
   text-gray-500
 `;
 
-const ReviewGuideAnchor = tw(RamenroadText)`
+const ReviewGuideAnchor = tw(RaisingText)`
   text-[#818181]
   cursor-pointer underline
 `;

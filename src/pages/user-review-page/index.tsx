@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import { RamenroadText } from "../../components/common/RamenroadText";
+import { RaisingText } from "../../components/common/RamenroadText";
 import TopBar from "../../components/top-bar";
 import { useMyReviewQuery, useUserReviewQuery } from "../../hooks/queries/useRamenyaReviewQuery";
 import { Line } from "../../components/common/Line";
@@ -133,9 +133,9 @@ const UserReviewPage = () => {
         <BoldLine />
         <ReviewResultWrapper>
           <ReviewResultWrapperHeader>
-            <RamenroadText size={18} weight="m">
+            <RaisingText size={18} weight="m">
               총 작성 리뷰 {userMyPageQuery.data?.reviewCount || 0}개
-            </RamenroadText>
+            </RaisingText>
             <ReviewToggleWrapper>
               <ReviewToggleText size={12} weight="m">
                 리뷰 {userMyPageQuery.data?.isPublic ? "공개" : "비공개"}
@@ -175,9 +175,9 @@ const UserReviewPage = () => {
               다른 리뷰 보러 가보실래요?
             </PrivateReviewDescription>
             <RedirectButton onClick={() => navigate("/")}>
-              <RamenroadText size={16} weight="m">
+              <RaisingText size={16} weight="m">
                 메인 화면으로 이동
-              </RamenroadText>
+              </RaisingText>
             </RedirectButton>
           </UnavailableReviewOverlay>
         ) : (
@@ -196,9 +196,9 @@ const UserReviewPage = () => {
         <Modal isOpen={isSharePopupOpen} onClose={() => setIsSharePopupOpen(false)}>
           <ModalContent>
             <ModalHeader>
-              <RamenroadText size={16} weight="sb">
+              <RaisingText size={16} weight="sb">
                 공유하기
-              </RamenroadText>
+              </RaisingText>
               <ModalCloseButton onClick={() => setIsSharePopupOpen(false)} />
             </ModalHeader>
             <ModalShareContent>
@@ -261,7 +261,7 @@ const ShareOption = tw.div`
   cursor-pointer
 `;
 
-const URLShareOptionText = tw(RamenroadText)`
+const URLShareOptionText = tw(RaisingText)`
   text-white font-14-sb
 `;
 
@@ -280,7 +280,7 @@ const MoreBackground = tw.div`
   flex justify-center items-center
 `;
 
-const ShareOptionText = tw(RamenroadText)`
+const ShareOptionText = tw(RaisingText)`
   text-14 text-gray-70
 `;
 
@@ -316,9 +316,9 @@ const UserInformationCard = (props: UserInformationCardProps) => {
           <UserInformationCardContentRightSectionName>{props.userName}</UserInformationCardContentRightSectionName>
           <UserInformationCardContentRightSectionSubName>
             이번 달 작성 리뷰{" "}
-            <RamenroadText size={14} weight="m">
+            <RaisingText size={14} weight="m">
               {props.monthlyReviewCount}
-            </RamenroadText>
+            </RaisingText>
           </UserInformationCardContentRightSectionSubName>
         </UserInformationCardContentRightSection>
       </UserInformationCardContent>
@@ -326,9 +326,9 @@ const UserInformationCard = (props: UserInformationCardProps) => {
         {/* 평균 별점 | 리뷰 */}
         <UserInformationDetailContentSection>
           <UserInformationDetailWrapper>
-            <RamenroadText size={20} weight="sb">
+            <RaisingText size={20} weight="sb">
               {props.avgReviewRating}
-            </RamenroadText>
+            </RaisingText>
             <DetailTitle size={14} weight="r">
               평균 별점
             </DetailTitle>
@@ -339,9 +339,9 @@ const UserInformationCard = (props: UserInformationCardProps) => {
         </LineWrapper>
         <UserInformationDetailContentSection>
           <UserInformationDetailWrapper>
-            <RamenroadText size={20} weight="sb">
+            <RaisingText size={20} weight="sb">
               {props.reviewCount}
-            </RamenroadText>
+            </RaisingText>
             <DetailTitle size={14} weight="r">
               리뷰
             </DetailTitle>
@@ -384,7 +384,7 @@ const UserInformationDetailContent = tw.section`
   w-full h-75 bg-[#F9F9F9] flex rounded-8
 `;
 
-const DetailTitle = tw(RamenroadText)`
+const DetailTitle = tw(RaisingText)`
   text-gray-500
 `;
 
@@ -405,7 +405,7 @@ const BoldLine = tw(Line)`
   h-8
 `;
 
-const ReviewToggleText = tw(RamenroadText)`
+const ReviewToggleText = tw(RaisingText)`
   text-filter-text
 `;
 
@@ -428,11 +428,11 @@ const ReviewToggleWrapper = tw.section`
 
 export default UserReviewPage;
 
-const PrivateReviewTitle = tw(RamenroadText)`
+const PrivateReviewTitle = tw(RaisingText)`
   text-black mt-8
 `;
 
-const PrivateReviewDescription = tw(RamenroadText)`
+const PrivateReviewDescription = tw(RaisingText)`
   text-gray-70 mt-4
 `;
 

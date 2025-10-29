@@ -11,6 +11,7 @@ import {
   IconArrowRight,
   IconMap,
   IconStar,
+  IconMenuBoard,
 } from "../../components/Icon";
 import tw from "twin.macro";
 import { useParams } from "react-router-dom";
@@ -37,6 +38,7 @@ import { useMobileState } from "../../hooks/common/useMobileState";
 import { RamenyaOpenStatus } from "../../components/ramenya-card/RamenyaCard";
 import { DAY_MAP, OpenStatus, WEEKDAYS_ORDER, WeekdaysOrderType } from "../../constants";
 import styled from "@emotion/styled";
+import { RaisingText } from "../../components/common/RamenroadText";
 
 export const DetailPage = () => {
   const { id } = useParams();
@@ -53,6 +55,8 @@ export const DetailPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number>(0);
+
+  const isMenuBoardEmpty = ramenyaDetailQuery.data?.menuBoard.length === 0;
 
   // 오늘 요일 구하기
   const getCurrentDayIndex = () => {
@@ -323,6 +327,35 @@ export const DetailPage = () => {
             </RecommendMenuContainer>
           </RecommendBox>
         </RecommendWrapper>
+
+        <Divider />
+
+        <SectionWrapper>
+          <TitleWrapper>
+            <Title size={18} weight="sb">
+              메뉴판
+            </Title>
+          </TitleWrapper>
+          <MenuboardEmptyContainer>
+            {isMenuBoardEmpty ? (
+              <>
+                <IconMenuBoard />
+                <MenuBoardEmptyDescription size={16} weight="r">
+                  등록된 메뉴판이 없습니다
+                </MenuBoardEmptyDescription>
+                <MenuBoardEmptyCaption size={14} weight="r">
+                  첫 등록의 주인공이 되어주세요!
+                </MenuBoardEmptyCaption>
+                <MenuBoardSubmitbutton onClick={() => navigate(`/menu-board-submit/${id}`)}>
+                  등록하기
+                </MenuBoardSubmitbutton>
+              </>
+            ) : (
+              <></>
+            )}
+          </MenuboardEmptyContainer>
+        </SectionWrapper>
+
         <Divider />
 
         <ImageWrapper>
@@ -636,6 +669,18 @@ const ImageTitle = tw.div`
   font-18-sb
 `;
 
+const SectionWrapper = tw.div`
+  flex flex-col gap-14
+  px-20 py-32
+`;
+
+const TitleWrapper = tw.div`
+`;
+
+const Title = tw(RaisingText)`
+  text-black
+`;
+
 const ImageWrapper = tw.div`
   flex flex-col gap-16 
   px-20 py-32
@@ -682,6 +727,16 @@ const LargeStarContainer = tw.div`
 
 const LoginButton = tw.div`
   mt-16
+  flex w-fit py-10 px-32
+  box-border
+  justify-center items-center
+  font-16-m
+  bg-brightOrange rounded-100 gap-2
+  cursor-pointer
+  text-orange
+`;
+
+const MenuBoardSubmitbutton = tw.div`
   flex w-fit py-10 px-32
   box-border
   justify-center items-center
@@ -832,6 +887,10 @@ const ModalConfirmButton = tw.button`
     bg-transparent
 `;
 
+const MenuboardEmptyContainer = tw.div`
+  flex flex-col items-center justify-center
+`;
+
 const MapRedirectButtonContainer = tw.div`
   flex flex-col px-20 gap-8 mt-16
 `;
@@ -848,6 +907,14 @@ const MapRedirectButton = tw.button`
 
 const StyledIconArrowRight = tw(IconArrowRight)`
   ml-auto
+`;
+
+const MenuBoardEmptyDescription = tw(RaisingText)`
+  text-black pt-8 pb-4
+`;
+
+const MenuBoardEmptyCaption = tw(RaisingText)`
+  text-gray-70 pb-16
 `;
 
 export default DetailPage;
