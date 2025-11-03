@@ -15,6 +15,7 @@ import MenuBoardImage2 from "../../assets/images/menu-board/menu-board-2.png";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMenuBoardMutation } from "../../hooks/mutation/useMenuBoardMutation";
 import { useToast } from "../../components/toast/ToastProvider";
+import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -197,9 +198,19 @@ export const MenuBoardSubmitPage = () => {
 
   const navigate = useNavigate();
 
+  const { ramenyaDetailQuery } = useRamenyaDetailQuery(id!);
+
   const [selectedImages, setSelectedImages] = useState<(File | string)[]>([]);
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [description, setDescription] = useState("");
+
+  const isEdit = useMemo(() => {
+    if (window.location.pathname.includes("edit")) {
+      return true;
+    }
+    return false;
+  }, []);
+
   const fileInputRef = createRef<HTMLInputElement>();
 
   const { addMenuBoard } = useMenuBoardMutation();
@@ -309,6 +320,12 @@ export const MenuBoardSubmitPage = () => {
     },
     [selectedImages],
   );
+
+  useEffect(() => {
+    if (isEdit && ramenyaDetailQuery.isSuccess) {
+      setSelectedImages(ramenyaDetailQuery.data?.menuBoard?.map((menu) => menu.imageUrl) ?? []);
+    }
+  });
 
   return (
     <>

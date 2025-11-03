@@ -3,14 +3,14 @@ import { ComponentProps } from "react";
 import tw from "twin.macro";
 
 interface ButtonProps extends ComponentProps<"button"> {
-  variant?: "primary" | "secondary" | "gray";
+  variant?: "primary" | "secondary" | "gray" | "gray-outline";
 }
 
 export const Button = ({ variant = "primary", ...props }: ButtonProps) => {
   return <ButtonWrapper variant={variant} {...props} />;
 };
 
-const ButtonWrapper = styled.button<{ variant: "primary" | "secondary" | "gray"; disabled?: boolean }>(
+const ButtonWrapper = styled.button<{ variant: "primary" | "secondary" | "gray" | "gray-outline"; disabled?: boolean }>(
   ({ variant, disabled }) => [
     tw`
     w-full h-48
@@ -21,6 +21,7 @@ const ButtonWrapper = styled.button<{ variant: "primary" | "secondary" | "gray";
     variant === "primary" && tw`bg-orange text-white border-gray-500`,
     variant === "secondary" && tw`bg-white text-gray-700 border border-solid border-gray-500`,
     variant === "gray" && tw`bg-border text-gray-900`,
+    variant === "gray-outline" && tw`bg-transparent text-gray-500 border border-solid border-border`,
     disabled && tw`bg-gray-200 cursor-not-allowed`,
   ],
 );
