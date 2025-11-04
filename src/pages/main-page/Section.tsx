@@ -1,6 +1,6 @@
 import { ComponentProps } from "react";
 import tw from "twin.macro";
-import { RamenroadText } from "../../components/common/RamenroadText";
+import { RaisingText } from "../../components/common/RamenroadText";
 import { IconArrowRight } from "../../components/Icon";
 
 export interface SectionProps extends ComponentProps<"article"> {
@@ -72,11 +72,11 @@ const SectionTitleWrapper = tw.div`
   flex items-center justify-between
 `;
 
-const SectionTitle = tw(RamenroadText)`
+const SectionTitle = tw(RaisingText)`
   text-black
 `;
 
-const SectionSubTitle = tw(RamenroadText)`
+const SectionSubTitle = tw(RaisingText)`
   text-gray-800
 `;
 
@@ -84,6 +84,6 @@ const AdditionalInformationWrapper = tw.div`
   flex items-center gap-2 cursor-pointer
 `;
 
-const AdditionalInformationText = tw(RamenroadText)`
+const AdditionalInformationText = tw(RaisingText)`
   text-gray-700
 `;

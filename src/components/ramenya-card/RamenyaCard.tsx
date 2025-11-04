@@ -10,7 +10,7 @@ import { useEffect, useMemo } from "react";
 import { setCurrentLocation, useLocationStore } from "../../store/location/useLocationStore.ts";
 import { calculateDistance } from "../../util/number.ts";
 import { IconStar } from "../Icon/index.tsx";
-import { RamenroadText } from "../common/RamenroadText.tsx";
+import { RaisingText } from "../common/RamenroadText.tsx";
 
 interface RamenyaCardProps extends Partial<Ramenya> {
   isReview?: boolean;
@@ -186,7 +186,7 @@ const RamenyaScore = tw.span`
   font-12-m text-black
 `;
 
-const RamenyaName = tw(RamenroadText)`
+const RamenyaName = tw(RaisingText)`
   text-black
 `;
 

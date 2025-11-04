@@ -20,6 +20,8 @@ import { EditReviewPage } from "./review-page/EditReviewPage";
 import MapPage from "./map";
 import MapLayout from "../components/layout/MapLayout";
 import WithdrawPage from "./withdraw-page";
+import { MenuBoardSubmitPage } from "./menu-board-submit-page";
+import { MenuBoardImagesPage } from "./detail-page/images-page/menu-board";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +78,14 @@ const router = createBrowserRouter([
         path: "register",
         element: <RegisterPage />,
       },
+      {
+        path: "menu-board-submit/:id",
+        element: <MenuBoardSubmitPage />,
+      },
+      {
+        path: "menu-board-edit/:id",
+        element: <MenuBoardSubmitPage />,
+      },
     ],
   },
   {
@@ -107,6 +117,10 @@ const router = createBrowserRouter([
   {
     path: "/images/:id",
     element: <ImagesPage />,
+  },
+  {
+    path: "/menu-board-images/:id",
+    element: <MenuBoardImagesPage />,
   },
   {
     path: "withdraw",

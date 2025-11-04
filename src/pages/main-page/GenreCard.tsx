@@ -1,5 +1,5 @@
 import tw from "twin.macro";
-import { RamenroadText } from "../../components/common/RamenroadText";
+import { RaisingText } from "../../components/common/RamenroadText";
 
 export interface GenreIconProps {
   genreName: string;
@@ -28,6 +28,6 @@ const GenreIconImage = tw.img`
   w-48 h-48
 `;
 
-const GenreIconInformation = tw(RamenroadText)`
+const GenreIconInformation = tw(RaisingText)`
   text-black whitespace-nowrap
 `;

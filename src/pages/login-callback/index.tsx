@@ -4,7 +4,7 @@ import { useAuthMutation } from "../../hooks/mutation/useAuthMutation";
 import tw from "twin.macro";
 import { AxiosError } from "axios";
 import { IconKakao, IconNaver } from "../../components/Icon";
-import { RamenroadText } from "../../components/common/RamenroadText";
+import { RaisingText } from "../../components/common/RamenroadText";
 import styled from "@emotion/styled";
 import EmailImage from "../../assets/images/email/email.png";
 import { UserInformation } from "../../types/user";
@@ -113,18 +113,18 @@ const LoginCallbackPage = () => {
         <img src={EmailImage} alt="email" width={110} height={82} />
 
         <AlertContainer>
-          <RamenroadText size={20} weight="m">
+          <RaisingText size={20} weight="m">
             이미 가입된 이메일 주소입니다.
-          </RamenroadText>
+          </RaisingText>
           <SubText size={14} weight="r">
             네이버 혹은 카카오 계정을 확인해 주세요
           </SubText>
         </AlertContainer>
 
         <EmailBox>
-          <RamenroadText size={16} weight="b">
+          <RaisingText size={16} weight="b">
             {loginEmail}
-          </RamenroadText>
+          </RaisingText>
         </EmailBox>
 
         <LoginButtonWrapper>
@@ -137,9 +137,9 @@ const LoginCallbackPage = () => {
             <LoginButtonText loginType="naver">네이버 계정으로 로그인</LoginButtonText>
           </LoginButton>
           <BackButton>
-            <RamenroadText size={14} weight="m" onClick={() => navigate("/")}>
+            <RaisingText size={14} weight="m" onClick={() => navigate("/")}>
               이전 화면으로 돌아가기
-            </RamenroadText>
+            </RaisingText>
           </BackButton>
         </LoginButtonWrapper>
       </Wrapper>
@@ -167,9 +167,9 @@ const LoginCallbackPage = () => {
             <LoginButtonText loginType="naver">네이버 계정으로 로그인</LoginButtonText>
           </LoginButton>
           <BackButton>
-            <RamenroadText size={14} weight="m" onClick={() => navigate("/")}>
+            <RaisingText size={14} weight="m" onClick={() => navigate("/")}>
               이전 화면으로 돌아가기
-            </RamenroadText>
+            </RaisingText>
           </BackButton>
         </WithdrawButtonWrapper>
       </Wrapper>
@@ -189,7 +189,7 @@ const WithdrawInformationWrapper = tw.div`
   px-20 pt-54
 `;
 
-const SubText = tw(RamenroadText)`
+const SubText = tw(RaisingText)`
   text-gray-400
 `;
 

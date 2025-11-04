@@ -1,6 +1,6 @@
 import tw from "twin.macro";
 import noResultImage from "../../assets/images/no-results.png";
-import { RamenroadText } from "../common/RamenroadText";
+import { RaisingText } from "../common/RamenroadText";
 
 interface NoResultBoxProps {
   actionButton?: React.ReactNode;
@@ -38,12 +38,12 @@ const DescriptionWrapper = tw.div`
   flex flex-col items-center justify-center
 `;
 
-const NoResultTitle = tw(RamenroadText)`
+const NoResultTitle = tw(RaisingText)`
   text-gray-800 mb-6
   text-center
 `;
 
-const NoResultDescription = tw(RamenroadText)`
+const NoResultDescription = tw(RaisingText)`
   text-gray-500
   text-center
 `;

@@ -5,7 +5,7 @@ import { useUserInfoMutation } from "../../hooks/mutation/useUserInfoMutation";
 import styled from "@emotion/styled";
 import { Button } from "../../components/common/Button";
 import { AxiosError } from "axios";
-import { RamenroadText } from "../../components/common/RamenroadText";
+import { RaisingText } from "../../components/common/RamenroadText";
 
 const RegisterPage = () => {
   const query = new URLSearchParams(window.location.search);
@@ -128,7 +128,7 @@ const Input = styled.input<{ isError?: boolean }>(({ isError }) => [
   isError ? tw`border-red border-solid border-2` : tw`border-none`,
 ]);
 
-const ErrorMessage = tw(RamenroadText)`
+const ErrorMessage = tw(RaisingText)`
   text-red
   mt-4
 `;

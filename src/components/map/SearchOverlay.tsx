@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, ComponentProps, useEffect } from "react";
 import tw from "twin.macro";
-import { RamenroadText } from "../common/RamenroadText";
+import { RaisingText } from "../common/RamenroadText";
 import { IconBack, IconClose, IconComment, IconDeleteSearchValue, IconLocate, IconSearch } from "../Icon";
 import { useDebounce } from "../../hooks/common/useDebounce";
 import { useSearchHistoryQuery } from "../../hooks/queries/useSearchQuery";
@@ -246,9 +246,9 @@ export const SearchOverlay = ({
             <>
               <HistoryContainer>
                 <HistoryHeader>
-                  <RamenroadText size={16} weight="sb">
+                  <RaisingText size={16} weight="sb">
                     최근 검색어
-                  </RamenroadText>
+                  </RaisingText>
                   <RemoveText
                     size={12}
                     weight="r"
@@ -280,9 +280,9 @@ export const SearchOverlay = ({
                           setIsSearchOverlayOpen?.(false);
                         }}
                       >
-                        <RamenroadText size={14} weight="r">
+                        <RaisingText size={14} weight="r">
                           {keyword.keyword}
-                        </RamenroadText>
+                        </RaisingText>
                         <XIcon
                           color="#A0A0A0"
                           onClick={(e) => {
@@ -308,9 +308,9 @@ export const SearchOverlay = ({
               </HistoryContainer>
               <HistoryContainer>
                 <HistoryHeader>
-                  <RamenroadText size={16} weight="sb">
+                  <RaisingText size={16} weight="sb">
                     검색한 매장
-                  </RamenroadText>
+                  </RaisingText>
                   <RemoveText
                     size={12}
                     weight="r"
@@ -343,9 +343,9 @@ export const SearchOverlay = ({
                         }}
                       >
                         <IconLocate color={"#A0A0A0"} />
-                        <RamenroadText size={16} weight="r">
+                        <RaisingText size={16} weight="r">
                           {ramenya.keyword}
-                        </RamenroadText>
+                        </RaisingText>
                         <RamenyaXIcon
                           color="#A0A0A0"
                           onClick={(e) => {
@@ -396,11 +396,11 @@ const KeywardWrapper = tw.div`
   cursor-pointer
 `;
 
-const MatchedText = tw(RamenroadText)`
+const MatchedText = tw(RaisingText)`
   text-orange
 `;
 
-const UnMatchedText = tw(RamenroadText)`
+const UnMatchedText = tw(RaisingText)`
 `;
 
 const SearchOverlayContainer = tw.figure`
@@ -449,7 +449,7 @@ const HistoryHeader = tw.div`
   w-full
 `;
 
-const RemoveText = tw(RamenroadText)`
+const RemoveText = tw(RaisingText)`
   text-gray-400 cursor-pointer
 `;
 
@@ -477,7 +477,7 @@ const NoHistoryWrapper = tw.div`
   mt-12
 `;
 
-const NoHistoryText = tw(RamenroadText)`
+const NoHistoryText = tw(RaisingText)`
   text-gray-400
 `;
 

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import tw from 'twin.macro';
-import { IconClose, IconNavLeft, IconNavRight } from '../Icon';
+import React, { useEffect, useRef } from "react";
+import tw from "twin.macro";
+import { IconClose, IconNavLeft, IconNavRight } from "../Icon";
 
 interface ImagePopupProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface ImagePopupProps {
   selectedIndex: number;
   onIndexChange: (index: number) => void;
   title?: string;
+  children?: React.ReactNode;
 }
 
 export const ImagePopup: React.FC<ImagePopupProps> = ({
@@ -18,6 +19,7 @@ export const ImagePopup: React.FC<ImagePopupProps> = ({
   selectedIndex,
   onIndexChange,
   title,
+  children,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -29,7 +31,7 @@ export const ImagePopup: React.FC<ImagePopupProps> = ({
 
     return () => {
       if (containerRef.current) {
-        containerRef.current.style.marginRight = '0px';
+        containerRef.current.style.marginRight = "0px";
       }
     };
   }, [isOpen]);
@@ -62,16 +64,18 @@ export const ImagePopup: React.FC<ImagePopupProps> = ({
             <IconNavRight />
           </NavButtonRight>
         )}
+        {children && <ChildrenWrapper>{children}</ChildrenWrapper>}
       </PopupContent>
     </PopupContainer>
   );
 };
 
 const PopupContainer = tw.div`
-  flex 
-  flex-col 
-  items-center 
-  w-full h-screen 
+  relative
+  flex
+  flex-col
+  items-center
+  w-full h-screen
   bg-black
 `;
 
@@ -113,6 +117,10 @@ const NavButtonLeft = tw.button`
 `;
 
 const NavButtonRight = tw.button`
-  absolute top-1/2 -translate-y-1/2  right-4 transform 
+  absolute top-1/2 -translate-y-1/2  right-4 transform
   bg-transparent border-none cursor-pointer
+`;
+
+const ChildrenWrapper = tw.div`
+  absolute bottom-20 left-20
 `;

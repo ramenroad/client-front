@@ -1,6 +1,6 @@
 import tw from "twin.macro";
 import { ramenroadEmail } from "../../constants";
-import { RamenroadText } from "./RamenroadText";
+import { RaisingText } from "./RamenroadText";
 import { Line } from "./Line";
 import { IconInstagram } from "../Icon";
 
@@ -49,9 +49,9 @@ export const Footer = () => {
             위치 정보 이용약관
           </Link>
         </Terms>
-        <RamenroadText size={12} weight="r">
+        <RaisingText size={12} weight="r">
           Copyright © 2025 라이징 All rights reserved.
-        </RamenroadText>
+        </RaisingText>
       </TermsAndConditions>
       <InstagramIcon footer onClick={() => window.open("https://www.instagram.com/ra.ising/", "_blank")} />
     </Wrapper>
@@ -64,7 +64,7 @@ const Wrapper = tw.div`
   flex flex-col gap-24
 `;
 
-const FooterTitle = tw(RamenroadText)`
+const FooterTitle = tw(RaisingText)`
   leading-27
 `;
 
@@ -88,7 +88,7 @@ const TermsAndConditions = tw.div`
   flex flex-col gap-4
 `;
 
-const Link = tw(RamenroadText)`
+const Link = tw(RaisingText)`
   cursor-pointer
 `;
 

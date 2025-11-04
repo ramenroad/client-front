@@ -4,7 +4,7 @@ import { IconArrowRight, IconReview, IconUnSignInUser, IconUnSignInUserProfile }
 import { useUserInformationQuery } from "../../hooks/queries/useUserInformationQuery";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/common/Button";
-import { RamenroadText } from "../../components/common/RamenroadText";
+import { RaisingText } from "../../components/common/RamenroadText";
 
 const MyPage = () => {
   const { userInformationQuery } = useUserInformationQuery();
@@ -126,7 +126,7 @@ const MyReviewContainer = tw.section`
   rounded-8
 `;
 
-const MyReviewText = tw(RamenroadText)`
+const MyReviewText = tw(RaisingText)`
   text-gray-900
 `;
 
