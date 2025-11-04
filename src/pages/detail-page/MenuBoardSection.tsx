@@ -108,7 +108,7 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
 
   const handleLoginConfirm = () => {
     closeLoginModal();
-    navigate(`/menu-board-submit/${ramenyaId}`);
+    navigate(`/login`);
   };
 
   const openLoginModal = () => {
@@ -125,9 +125,11 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
         <Title size={18} weight="sb">
           메뉴판
         </Title>
-        <EditButton variant="gray-outline" onClick={handleSubmitMenuBoard}>
-          <span>등록하기</span>
-        </EditButton>
+        {!isMenuBoardEmpty && (
+          <EditButton variant="gray-outline" onClick={handleSubmitMenuBoard}>
+            <span>등록하기</span>
+          </EditButton>
+        )}
       </TitleWrapper>
 
       {isMenuBoardEmpty ? (
