@@ -51,13 +51,14 @@ const AppBarWrapper = tw.div`
 const AppBarContainer = tw.div`
   flex items-center justify-center
   w-full h-full
+  pt-4 pb-8
   px-20 box-border
 `;
 
 const AppBarItem = tw.div`
-  flex flex-col items-center justify-center gap-1
-  pt-4 pb-8
-  w-54 h-full
+  flex flex-col items-center gap-1
+  py-[2.5px]
+  w-54 h-44
   cursor-pointer
   box-border
 `;
