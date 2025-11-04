@@ -107,9 +107,9 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
         {props.editable && (
           <ReviewActionWrapper>
             <ActionButton onClick={handleEditReview}>
-              <RaisingText size={12} weight="r">
+              <ActionText size={12} weight="r">
                 수정
-              </RaisingText>
+              </ActionText>
             </ActionButton>
             <ActionButton
               onClick={() => {
@@ -138,9 +138,9 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
                 });
               }}
             >
-              <RaisingText size={12} weight="r">
+              <ActionText size={12} weight="r">
                 삭제
-              </RaisingText>
+              </ActionText>
             </ActionButton>
           </ReviewActionWrapper>
         )}
@@ -222,6 +222,10 @@ const ReviewCard = <T extends boolean = false>(props: MyReviewCardProps<T>) => {
 };
 
 export default ReviewCard;
+
+const ActionText = tw(RaisingText)`
+  whitespace-nowrap
+`;
 
 const ReviewNameBox = tw.div`
     flex gap-10 items-center

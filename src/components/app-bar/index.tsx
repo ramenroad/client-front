@@ -41,7 +41,7 @@ const AppBar = () => {
 const AppBarWrapper = tw.div`
   box-border
   fixed bottom-0 -translate-x-1/2
-  w-388 h-56
+  w-388 h-62
   bg-white
   border-0 border-t border-border border-solid
   shadow-[0_-4px_4px_-4px_rgba(0,0,0,0.08)]
@@ -51,7 +51,7 @@ const AppBarWrapper = tw.div`
 const AppBarContainer = tw.div`
   flex items-center justify-center
   w-full h-full
-  pt-4 pb-8
+  pt-6 pb-12
   px-20 box-border
 `;
 
