@@ -33,7 +33,7 @@ export const ReviewPhotoSection = ({
               />
             </ImageBox>
           ))}
-          {ramenyaReviewImagesUrls?.length > 5 && (
+          {ramenyaReviewImagesUrls?.length && ramenyaReviewImagesUrls?.length > 5 && (
             <MoreImageWrapper onClick={onNavigateImagesPage}>
               <ImageBox>
                 <ReviewImage src={ramenyaReviewImagesUrls?.[5]} />

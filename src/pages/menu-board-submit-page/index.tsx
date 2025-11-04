@@ -1,7 +1,7 @@
 import tw from "twin.macro";
 import TopBar from "../../components/top-bar";
 import { RaisingText } from "../../components/common/RamenroadText";
-import { useState, createRef, useCallback, memo, useEffect, useMemo } from "react";
+import { useState, createRef, useCallback, memo, useMemo, useEffect } from "react";
 import { IconAdd, IconImageDelete, IconMenuBoardRightImage, IconMenuBoardWrongImage } from "../../components/Icon";
 import heic2any from "heic2any";
 import Lottie from "lottie-react";
@@ -15,7 +15,6 @@ import MenuBoardImage2 from "../../assets/images/menu-board/menu-board-2.png";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMenuBoardMutation } from "../../hooks/mutation/useMenuBoardMutation";
 import { useToast } from "../../components/toast/ToastProvider";
-import { useRamenyaDetailQuery } from "../../hooks/queries/useRamenyaDetailQuery";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -198,18 +197,9 @@ export const MenuBoardSubmitPage = () => {
 
   const navigate = useNavigate();
 
-  const { ramenyaDetailQuery } = useRamenyaDetailQuery(id!);
-
   const [selectedImages, setSelectedImages] = useState<(File | string)[]>([]);
   const [isImageUploading, setIsImageUploading] = useState(false);
   const [description, setDescription] = useState("");
-
-  const isEdit = useMemo(() => {
-    if (window.location.pathname.includes("edit")) {
-      return true;
-    }
-    return false;
-  }, []);
 
   const fileInputRef = createRef<HTMLInputElement>();
 
@@ -321,12 +311,6 @@ export const MenuBoardSubmitPage = () => {
     [selectedImages],
   );
 
-  useEffect(() => {
-    if (isEdit && ramenyaDetailQuery.isSuccess) {
-      setSelectedImages(ramenyaDetailQuery.data?.menuBoard?.map((menu) => menu.imageUrl) ?? []);
-    }
-  });
-
   return (
     <>
       {isImageUploading && (
@@ -389,6 +373,7 @@ const TopLabelContainer = tw.div`
   w-full h-44 box-border
   bg-lightOrange
   px-20 py-12
+  flex items-center gap-2
 `;
 
 const HighlightedText = tw(RaisingText)`

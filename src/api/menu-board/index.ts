@@ -8,3 +8,18 @@ export const postMenuBoard = async (data: FormData) => {
   });
   return response.data;
 };
+
+interface DeleteMenuBoardProps {
+  menuBoardId: string;
+  ramenyaId: string;
+}
+
+export const deleteMenuBoard = async ({ menuBoardId, ramenyaId }: DeleteMenuBoardProps) => {
+  const response = await instance.delete(`/ramenya/menu-board`, {
+    data: {
+      menuBoardId,
+      ramenyaId,
+    },
+  });
+  return response.data;
+};

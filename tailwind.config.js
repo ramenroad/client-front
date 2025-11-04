@@ -219,6 +219,11 @@ module.exports = {
           lineHeight: "15px",
           fontWeight: 700,
         },
+        ".font-12-l": {
+          fontSize: "12px",
+          lineHeight: "18px",
+          fontWeight: 300,
+        },
         ".font-12-r": {
           fontSize: "12px",
           lineHeight: "18px",

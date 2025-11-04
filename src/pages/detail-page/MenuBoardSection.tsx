@@ -1,30 +1,122 @@
+// React
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IconMenuBoard, IconArrowRight } from "../../components/Icon";
+
+// Third-party
 import tw from "twin.macro";
-import { RaisingText } from "../../components/common/RamenroadText";
+import { useQueryClient } from "@tanstack/react-query";
+
+// UI Components
 import { Button } from "../../components/common/Button";
 import { Line } from "../../components/common/Line";
-import { useModal } from "../../hooks/common/useModal";
-import { useState } from "react";
-import { ImagePopup } from "../../components/popup/ImagePopup";
 import { Modal } from "../../components/common/Modal";
+import { RaisingText } from "../../components/common/RamenroadText";
+import { ImagePopup } from "../../components/popup/ImagePopup";
+import { useToast } from "../../components/toast/ToastProvider";
+
+// Icons
+import { IconMenuBoard, IconArrowRight } from "../../components/Icon";
+
+// Hooks
+import { useModal } from "../../hooks/common/useModal";
+import { useMenuBoardMutation } from "../../hooks/mutation/useMenuBoardMutation";
+import { queryKeys } from "../../hooks/queries/queryKeys";
+
+// Stores
+import { useUserInformationStore } from "../../store/location/useUserInformationStore";
+import { useSignInStore } from "../../states/sign-in";
+
+// Types
+import { MenuBoard } from "../../types";
+
+// Local Components
+import { MenuBoardDetail } from "./MenuBoardDetail";
+import {
+  ModalButtonBox,
+  ModalCancelButton,
+  ModalConfirmButton,
+  ModalContent,
+  ModalText,
+  ModalTextBox,
+  ModalTitle,
+} from "./commonStyles";
 
 interface MenuBoardSectionProps {
-  menuBoard: { _id: string; imageUrl: string }[];
+  menuBoard: MenuBoard[];
   ramenyaId: string;
 }
 
 export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps) => {
   const navigate = useNavigate();
 
+  // Hooks - UI state
   const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [isRemoveMenuBoardModalOpen, setIsRemoveMenuBoardModalOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
+  // Hooks - Data
+  const { openToast } = useToast();
+  const queryClient = useQueryClient();
+  const { removeMenuBoard } = useMenuBoardMutation();
+  const { userInformation } = useUserInformationStore();
+  const { isSignIn } = useSignInStore();
+
+  // Computed values
   const isMenuBoardEmpty = menuBoard.length === 0;
 
+  // Event handlers
   const handleOpenImagePopup = (index: number) => {
     setSelectedImageIndex(index);
     openImagePopup();
+  };
+
+  const handleSubmitMenuBoard = () => {
+    if (!isSignIn) {
+      openLoginModal();
+    } else {
+      navigate(`/menu-board-submit/${ramenyaId}`);
+    }
+  };
+
+  const handleRemoveMenuBoard = () => {
+    removeMenuBoard.mutate(
+      { menuBoardId: menuBoard[selectedImageIndex!]._id, ramenyaId },
+      {
+        onSuccess: () => {
+          openToast("메뉴판 삭제 성공");
+          queryClient.invalidateQueries({ ...queryKeys.ramenya.detail(ramenyaId) });
+          const newIndex = selectedImageIndex! === 0 ? 0 : selectedImageIndex! - 1;
+          setSelectedImageIndex(newIndex);
+          closeRemoveMenuBoardModal();
+        },
+        onError: () => {
+          openToast("메뉴판 삭제에 실패했습니다.");
+        },
+      },
+    );
+  };
+
+  // Modal handlers
+  const openRemoveMenuBoardModal = () => {
+    setIsRemoveMenuBoardModalOpen(true);
+  };
+
+  const closeRemoveMenuBoardModal = () => {
+    setIsRemoveMenuBoardModalOpen(false);
+  };
+
+  const handleLoginConfirm = () => {
+    closeLoginModal();
+    navigate(`/menu-board-submit/${ramenyaId}`);
+  };
+
+  const openLoginModal = () => {
+    setIsLoginModalOpen(true);
+  };
+
+  const closeLoginModal = () => {
+    setIsLoginModalOpen(false);
   };
 
   return (
@@ -33,8 +125,8 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
         <Title size={18} weight="sb">
           메뉴판
         </Title>
-        <EditButton variant="gray-outline" onClick={() => navigate(`/menu-board-edit/${ramenyaId}`)}>
-          <span>수정하기</span>
+        <EditButton variant="gray-outline" onClick={handleSubmitMenuBoard}>
+          <span>등록하기</span>
         </EditButton>
       </TitleWrapper>
 
@@ -47,14 +139,12 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
           <MenuBoardEmptyCaption size={14} weight="r">
             첫 등록의 주인공이 되어주세요!
           </MenuBoardEmptyCaption>
-          <MenuBoardSubmitbutton onClick={() => navigate(`/menu-board-submit/${ramenyaId}`)}>
-            등록하기
-          </MenuBoardSubmitbutton>
+          <MenuBoardSubmitbutton onClick={handleSubmitMenuBoard}>등록하기</MenuBoardSubmitbutton>
         </MenuboardEmptyContainer>
       ) : (
         <MenuBoardContainer>
           <MenuBoardImageContainer>
-            {menuBoard.map((menu, index) => (
+            {menuBoard.slice(0, 10).map((menu, index) => (
               <MenuBoardImage key={menu._id} src={menu.imageUrl} onClick={() => handleOpenImagePopup(index)} />
             ))}
           </MenuBoardImageContainer>
@@ -73,8 +163,43 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
             images={menuBoard.map((menu) => menu.imageUrl)}
             selectedIndex={selectedImageIndex}
             onIndexChange={setSelectedImageIndex}
-          />
+          >
+            <MenuBoardDetail
+              profileImage={menuBoard[selectedImageIndex].userId.profileImageUrl}
+              nickname={menuBoard[selectedImageIndex].userId.nickname}
+              createdAt={menuBoard[selectedImageIndex].createdAt}
+              description={menuBoard[selectedImageIndex].description}
+              isMine={userInformation?.id === menuBoard[selectedImageIndex].userId._id}
+              onDelete={openRemoveMenuBoardModal}
+            />
+          </ImagePopup>
         )}
+      </Modal>
+
+      <Modal isOpen={isRemoveMenuBoardModalOpen} onClose={closeRemoveMenuBoardModal}>
+        <ModalContent>
+          <ModalTextBox>
+            <ModalTitle>메뉴판 삭제</ModalTitle>
+            <ModalText>메뉴판을 삭제하시겠습니까?</ModalText>
+          </ModalTextBox>
+          <ModalButtonBox>
+            <ModalCancelButton onClick={closeRemoveMenuBoardModal}>취소</ModalCancelButton>
+            <ModalConfirmButton onClick={handleRemoveMenuBoard}>확인</ModalConfirmButton>
+          </ModalButtonBox>
+        </ModalContent>
+      </Modal>
+
+      <Modal isOpen={isLoginModalOpen} onClose={closeLoginModal}>
+        <ModalContent>
+          <ModalTextBox>
+            <ModalTitle>로그인이 필요해요</ModalTitle>
+            <ModalText>로그인 하시겠습니까?</ModalText>
+          </ModalTextBox>
+          <ModalButtonBox>
+            <ModalCancelButton onClick={closeLoginModal}>취소</ModalCancelButton>
+            <ModalConfirmButton onClick={handleLoginConfirm}>확인</ModalConfirmButton>
+          </ModalButtonBox>
+        </ModalContent>
       </Modal>
     </SectionWrapper>
   );
