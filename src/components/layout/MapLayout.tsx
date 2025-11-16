@@ -19,6 +19,6 @@ const MapLayout = () => {
 export default MapLayout;
 
 const MapScreen = tw.main`
-  w-full h-[calc(100dvh-56px)] relative overflow-hidden
-  pb-56
+  w-full h-[calc(100dvh-60px)] relative overflow-hidden
+  pb-60
 `;

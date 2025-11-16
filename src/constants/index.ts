@@ -12,6 +12,7 @@ import dandan from "../assets/images/ramen/dandan.png";
 import mazemen from "../assets/images/ramen/mazemen.png";
 import { FilterOptions } from "../types/filter";
 import { SortType } from "../types/filter";
+import { NavigationItem } from "../components/navigation-bar";
 
 // export const genrePath = [
 //   {
@@ -262,3 +263,28 @@ export const SEARCH_MODE = {
 } as const;
 
 export type SearchModeType = (typeof SEARCH_MODE)[keyof typeof SEARCH_MODE];
+
+export const COMMUNITY_NAVIGATION_ITEMS: NavigationItem[] = [
+  {
+    label: "전체",
+    value: "all",
+  },
+  {
+    label: "인기순",
+    value: "popular",
+  },
+  {
+    label: "이벤트",
+    value: "event",
+  },
+  {
+    label: "신장개업",
+    value: "new-opening",
+  },
+  {
+    label: "질문",
+    value: "question",
+  },
+] as const;
+
+export type CommunityNavigationItem = (typeof COMMUNITY_NAVIGATION_ITEMS)[number];

@@ -62,6 +62,10 @@ module.exports = {
         kakao: "#FEE500",
         naver: "#03C75A",
 
+        navigation: {
+          underline: "#0E0E0E",
+        },
+
         filter: {
           background: "#F6F6F6",
           text: "#A0A0A0",
@@ -248,6 +252,11 @@ module.exports = {
           fontSize: "14px",
           lineHeight: "21px",
           fontWeight: 400,
+        },
+        ".font-13-m": {
+          fontSize: "13px",
+          lineHeight: "19.5px",
+          fontWeight: 500,
         },
         ".font-14-m": {
           fontSize: "14px",

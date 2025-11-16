@@ -22,6 +22,7 @@ import MapLayout from "../components/layout/MapLayout";
 import WithdrawPage from "./withdraw-page";
 import { MenuBoardSubmitPage } from "./menu-board-submit-page";
 import { MenuBoardImagesPage } from "./detail-page/images-page/menu-board";
+import { CommunityPage } from "./community-page";
 
 const router = createBrowserRouter([
   {
@@ -67,6 +68,16 @@ const router = createBrowserRouter([
       {
         path: "/review/list/:id",
         element: <ReviewListPage />,
+      },
+    ],
+  },
+  {
+    path: "/community",
+    element: <MapLayout />,
+    children: [
+      {
+        path: ":tab",
+        element: <CommunityPage />,
       },
     ],
   },
