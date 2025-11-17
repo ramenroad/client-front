@@ -23,6 +23,7 @@ import WithdrawPage from "./withdraw-page";
 import { MenuBoardSubmitPage } from "./menu-board-submit-page";
 import { MenuBoardImagesPage } from "./detail-page/images-page/menu-board";
 import { CommunityPage } from "./community-page";
+import { CommunitySubmitPage } from "./community-submit-page";
 
 const router = createBrowserRouter([
   {
@@ -108,6 +109,10 @@ const router = createBrowserRouter([
         element: <MapPage />,
       },
     ],
+  },
+  {
+    path: "community/submit/:type",
+    element: <CommunitySubmitPage />,
   },
   {
     path: "login",

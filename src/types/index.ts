@@ -155,6 +155,7 @@ export enum PopupType {
   SORT = "SORT",
   CONFIRM = "CONFIRM",
   IFRAME = "IFRAME",
+  COMMUNITY_ARTICLE_TYPE = "COMMUNITY_ARTICLE_TYPE",
 }
 
 export interface ModalProps {

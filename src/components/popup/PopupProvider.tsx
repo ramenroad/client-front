@@ -5,6 +5,8 @@ import PopupSort, { PopupSortProps } from "./PopupSort";
 import PopupConfirm, { PopupConfirmProps } from "./PopupConfirm";
 import { PopupIframe, PopupIframeProps } from "./PopupIframe";
 import { Popup } from "./Popup";
+import { PopupSelectProps } from "./PopupSelect";
+import PopupSelect from "./PopupSelect";
 
 interface PopupContextType {
   openPopup: (type: PopupType, options?: unknown) => void;
@@ -49,6 +51,10 @@ export const PopupProvider = ({ children }: { children: ReactNode }) => {
     case PopupType.IFRAME:
       popupContent = <PopupIframe {...(popupOptions as PopupIframeProps)} onClose={closePopup} />;
       popupDirection = "center";
+      break;
+    case PopupType.COMMUNITY_ARTICLE_TYPE:
+      popupContent = <PopupSelect {...(popupOptions as PopupSelectProps)} onClose={closePopup} />;
+      popupDirection = "bottom";
       break;
     default:
       popupContent = null;

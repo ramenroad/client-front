@@ -66,6 +66,10 @@ module.exports = {
           underline: "#0E0E0E",
         },
 
+        select: {
+          underline: "#D9D9D9",
+        },
+
         filter: {
           background: "#F6F6F6",
           text: "#A0A0A0",

@@ -1080,3 +1080,12 @@ export const IconCommentArticle = (props: ComponentProps<"svg">) => (
     <rect x="5.25" y="8.75" width="3.5" height="0.5" rx="0.25" stroke="#A0A0A0" stroke-width="0.5" />
   </svg>
 );
+
+export const IconCameraUpload = (props: ComponentProps<"svg">) => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <rect x="36" width="36" height="36" rx="18" transform="rotate(90 36 0)" fill="#E7E7E7" />
+    <rect x="27.5" y="12.5" width="13" height="19" rx="0.5" transform="rotate(90 27.5 12.5)" fill="white" />
+    <rect x="21.5" y="9.5" width="10" height="7" rx="0.5" transform="rotate(90 21.5 9.5)" fill="white" />
+    <circle cx="18" cy="19" r="3.5" fill="#CFCFCF" />
+  </svg>
+);

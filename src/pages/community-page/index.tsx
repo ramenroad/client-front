@@ -46,7 +46,7 @@ export const CommunityPage = () => {
         defaultActiveValue={initialItem.value}
         onItemClick={handleNavigationItemClick}
       />
-      <IconPenWrapper>
+      <IconPenWrapper onClick={() => navigate(`/community/submit/new`)}>
         <IconPen />
       </IconPenWrapper>
       <ArticleList>
