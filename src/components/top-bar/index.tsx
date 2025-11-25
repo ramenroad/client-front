@@ -9,6 +9,7 @@ interface TopBarProps {
   tooltip?: React.ReactNode;
   icon?: React.ReactNode;
   onIconClick?: () => void;
+  additionalButton?: React.ReactNode;
 }
 
 const TopBar = (props: TopBarProps) => {
@@ -36,6 +37,7 @@ const TopBar = (props: TopBarProps) => {
       <HeaderTitle>{props.title}</HeaderTitle>
       {props.tooltip && props.tooltip}
       {props.icon && <AdditionalIconWrapper onClick={props.onIconClick}>{props.icon}</AdditionalIconWrapper>}
+      {props.additionalButton && <AdditionalButton>{props.additionalButton}</AdditionalButton>}
     </TopBarWrapper>
   );
 };
@@ -62,6 +64,11 @@ const AdditionalIconWrapper = tw.div`
   absolute right-20
   w-24 h-24
   cursor-pointer
+`;
+
+const AdditionalButton = tw.div`
+  absolute right-20
+  flex items-center
 `;
 
 export default TopBar;

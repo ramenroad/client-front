@@ -24,6 +24,7 @@ import { MenuBoardSubmitPage } from "./menu-board-submit-page";
 import { MenuBoardImagesPage } from "./detail-page/images-page/menu-board";
 import { CommunityPage } from "./community-page";
 import { CommunitySubmitPage } from "./community-submit-page";
+import { CommunityDetailPage } from "./community-detail-page";
 
 const router = createBrowserRouter([
   {
@@ -113,6 +114,10 @@ const router = createBrowserRouter([
   {
     path: "community/submit/:type",
     element: <CommunitySubmitPage />,
+  },
+  {
+    path: "community/detail/:id",
+    element: <CommunityDetailPage />,
   },
   {
     path: "login",

@@ -3,33 +3,41 @@ import { NavigationBar, NavigationItem } from "../../components/navigation-bar";
 import { IconNotification, IconPen } from "../../components/Icon";
 import { COMMUNITY_NAVIGATION_ITEMS } from "../../constants";
 import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { Fragment } from "react";
 import { ArticleCard } from "../../components/article/ArticleCard";
 import { Line } from "../../components/common/Line";
-
-const dummyBoard = {
-  _id: "1",
-  userId: {
-    _id: "1",
-    nickname: "해피",
-    profileImageUrl: "https://ramenroad-dev.s3.amazonaws.com/images/profiles/5.jpg.webp",
-  },
-  category: "이벤트",
-  title: "강남 라멘 맛있는 곳 추천해주세요!",
-  body: "갑자기 돈코츠 라멘 먹고싶은데 괜찮은 곳 추천 가능할까요? 너무 배고프네요ㅠ 추천 감사합니다. 만나서 반갑습니다. 안녕하세요, 저는 김종운입니다.",
-  commentCount: 0,
-  likeCount: 0,
-  viewCount: 0,
-  ImageUrls: ["https://png.pngtree.com/png-clipart/20240831/original/pngtree-shoyu-ramen-png-image_15897747.png"],
-  createdAt: "2021-01-01",
-  updatedAt: "2021-01-01",
-};
+import { useArticleQuery } from "../../hooks/queries/community";
+import { Article } from "../../types/community";
 
 export const CommunityPage = () => {
   const { tab } = useParams();
+  const navigate = useNavigate();
+
+  const { articleQuery } = useArticleQuery();
+  console.log(articleQuery.data);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // URL의 tab 파라미터에 해당하는 아이템을 찾거나 기본값 사용
   const initialItem = COMMUNITY_NAVIGATION_ITEMS.find((item) => item.value === tab) || COMMUNITY_NAVIGATION_ITEMS[0];
-  const navigate = useNavigate();
+
+  // 무한스크롤을 위한 Intersection Observer 설정
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && articleQuery.hasNextPage && !articleQuery.isFetchingNextPage) {
+          articleQuery.fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(loadMoreRef.current);
+
+    return () => observer.disconnect();
+  }, [articleQuery]);
 
   const handleNavigationItemClick = (item: NavigationItem) => {
     navigate(`/community/${item.value}`);
@@ -50,12 +58,20 @@ export const CommunityPage = () => {
         <IconPen />
       </IconPenWrapper>
       <ArticleList>
-        {Array.from({ length: 10 }).map((_, index) => (
-          <>
-            <ArticleCard key={index} board={dummyBoard} />
-            <Line />
-          </>
-        ))}
+        {articleQuery.isLoading && <div>Loading...</div>}
+        {articleQuery.data?.pages.flatMap((page) =>
+          page.boards.map((article: Article) => (
+            <Fragment key={article._id}>
+              <ArticleCard article={article} onClick={() => navigate(`/community/detail/${article._id}`)} />
+              <Line />
+            </Fragment>
+          )),
+        )}
+        {articleQuery.hasNextPage && (
+          <div ref={loadMoreRef} style={{ height: "20px" }}>
+            {articleQuery.isFetchingNextPage && <div>Loading more...</div>}
+          </div>
+        )}
       </ArticleList>
     </Layout>
   );

@@ -161,3 +161,8 @@ export enum PopupType {
 export interface ModalProps {
   onClose: () => void;
 }
+
+export interface ArticleQueryParams {
+  page: number;
+  limit: number;
+}

@@ -1,5 +1,8 @@
 import tw from "twin.macro";
 import { IconCommentArticle, IconEyeArticle, IconLikeArticle } from "../Icon";
+import { Article } from "../../types/community";
+import { useMemo } from "react";
+import { CommunityArticleType, CommunityArticleTypeLabel } from "../../pages/community-submit-page";
 
 interface User {
   _id: string;
@@ -7,62 +10,53 @@ interface User {
   profileImageUrl: string;
 }
 
-interface Board {
-  _id: string;
-  userId: User;
-  category: string;
-  title: string;
-  body: string;
-  commentCount: number;
-  likeCount: number;
-  viewCount: number;
-  ImageUrls: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface ArticleCardProps {
-  board: Board;
+  article: Article;
   onClick?: () => void;
 }
 
-export const ArticleCard: React.FC<ArticleCardProps> = ({ board, onClick }) => {
-  const hasImage = board.ImageUrls.length > 0;
-  const thumbnailUrl = hasImage ? board.ImageUrls[0] : null;
+export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onClick }) => {
+  const hasImage = article.ImageUrls.length > 0;
+  const thumbnailUrl = hasImage ? article.ImageUrls[0] : null;
+
+  const parsedCategory = useMemo(() => {
+    // CommunityArticleType에 해당하는 라벨 반환
+    return CommunityArticleTypeLabel[article.category as CommunityArticleType] ?? "기타";
+  }, [article.category]);
 
   return (
     <CardContainer onClick={onClick}>
       <CardWrapper>
-        <CategoryBadge>{board.category}</CategoryBadge>
+        <CategoryBadge>{parsedCategory}</CategoryBadge>
         <ContentWrapper>
           <VerticalLayout>
-            <Title>{board.title}</Title>
-            <Body>{board.body}</Body>
+            <Title>{article.title}</Title>
+            <Body>{article.body}</Body>
           </VerticalLayout>
 
           <ThumbnailWrapper>
-            <ThumbnailImage src={thumbnailUrl ?? ""} alt={board.title} />
+            <ThumbnailImage src={thumbnailUrl ?? ""} alt={article.title} />
           </ThumbnailWrapper>
         </ContentWrapper>
 
         <InfoRow>
           <UserInfo>
-            <ProfileImage src={board.userId.profileImageUrl} alt={board.userId.nickname} />
-            <Nickname>{board.userId.nickname}</Nickname>
+            <ProfileImage src={article.userId.profileImageUrl} alt={article.userId.nickname} />
+            <Nickname>{article.userId.nickname}</Nickname>
           </UserInfo>
 
           <StatsWrapper>
             <StatItem>
               <IconEyeArticle width={16} height={16} />
-              <StatText>{board.viewCount}</StatText>
+              <StatText>{article.viewCount}</StatText>
             </StatItem>
             <StatItem>
               <IconLikeArticle width={16} height={16} />
-              <StatText>{board.likeCount}</StatText>
+              <StatText>{article.likeCount}</StatText>
             </StatItem>
             <StatItem>
               <IconCommentArticle width={16} height={16} />
-              <StatText>{board.commentCount}</StatText>
+              <StatText>{article.commentCount}</StatText>
             </StatItem>
           </StatsWrapper>
         </InfoRow>
@@ -92,6 +86,7 @@ const ContentWrapper = tw.div`
 
 const VerticalLayout = tw.div`
   flex flex-col
+  flex-1
 `;
 
 const CategoryBadge = tw.span`
