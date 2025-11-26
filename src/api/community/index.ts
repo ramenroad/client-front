@@ -1,5 +1,6 @@
 import { instanceWithNoVersioning } from "..";
 import { Article, ArticleDetail } from "../../types/community";
+import { Comment } from "../../types/community";
 
 export interface ArticleListResponse {
   lastPage: number;
@@ -27,5 +28,10 @@ export const postArticle = async (data: FormData) => {
       "Content-Type": "multipart/form-data",
     },
   });
+  return response.data;
+};
+
+export const getArticleCommentList = async (id: string) => {
+  const response = await instanceWithNoVersioning.get<Comment[]>(`/community/board/${id}/comment`);
   return response.data;
 };

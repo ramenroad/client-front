@@ -1,14 +1,7 @@
 import tw from "twin.macro";
 import { IconCommentArticle, IconEyeArticle, IconLikeArticle } from "../Icon";
 import { Article } from "../../types/community";
-import { useMemo } from "react";
-import { CommunityArticleType, CommunityArticleTypeLabel } from "../../pages/community-submit-page";
-
-interface User {
-  _id: string;
-  nickname: string;
-  profileImageUrl: string;
-}
+import { parseCategory } from "../../util";
 
 interface ArticleCardProps {
   article: Article;
@@ -19,24 +12,21 @@ export const ArticleCard: React.FC<ArticleCardProps> = ({ article, onClick }) =>
   const hasImage = article.ImageUrls.length > 0;
   const thumbnailUrl = hasImage ? article.ImageUrls[0] : null;
 
-  const parsedCategory = useMemo(() => {
-    // CommunityArticleType에 해당하는 라벨 반환
-    return CommunityArticleTypeLabel[article.category as CommunityArticleType] ?? "기타";
-  }, [article.category]);
-
   return (
     <CardContainer onClick={onClick}>
       <CardWrapper>
-        <CategoryBadge>{parsedCategory}</CategoryBadge>
+        <CategoryBadge>{parseCategory(article.category)}</CategoryBadge>
         <ContentWrapper>
           <VerticalLayout>
             <Title>{article.title}</Title>
             <Body>{article.body}</Body>
           </VerticalLayout>
 
-          <ThumbnailWrapper>
-            <ThumbnailImage src={thumbnailUrl ?? ""} alt={article.title} />
-          </ThumbnailWrapper>
+          {hasImage && (
+            <ThumbnailWrapper>
+              <ThumbnailImage src={thumbnailUrl ?? ""} alt={article.title} />
+            </ThumbnailWrapper>
+          )}
         </ContentWrapper>
 
         <InfoRow>

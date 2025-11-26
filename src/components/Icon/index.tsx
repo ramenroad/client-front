@@ -1089,3 +1089,35 @@ export const IconCameraUpload = (props: ComponentProps<"svg">) => (
     <circle cx="18" cy="19" r="3.5" fill="#CFCFCF" />
   </svg>
 );
+
+export const IconLike = ({ like = false, ...rest }: ComponentProps<"svg"> & { like?: boolean }) => {
+  if (like)
+    return (
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+        <path
+          d="M5.8125 2.625C3.84525 2.625 2.25 4.32 2.25 6.41025C2.25 10.5938 9 15.375 9 15.375C9 15.375 15.75 10.5938 15.75 6.41025C15.75 3.8205 14.1547 2.625 12.1875 2.625C10.7925 2.625 9.585 3.477 9 4.7175C8.415 3.477 7.2075 2.625 5.8125 2.625Z"
+          fill="#FF5E00"
+        />
+      </svg>
+    );
+
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M5.8125 2.625C3.84525 2.625 2.25 4.32 2.25 6.41025C2.25 10.5938 9 15.375 9 15.375C9 15.375 15.75 10.5938 15.75 6.41025C15.75 3.8205 14.1547 2.625 12.1875 2.625C10.7925 2.625 9.585 3.477 9 4.7175C8.415 3.477 7.2075 2.625 5.8125 2.625Z"
+        stroke="#A0A0A0"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  );
+};
+
+export const IconReply = (props: ComponentProps<"svg">) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <path
+      d="M6 3C6.55228 3 7 3.44772 7 4V9H12C12.5523 9 13 9.44772 13 10V11C13 11.5523 12.5523 12 12 12H5C4.44772 12 4 11.5523 4 11V4C4 3.44772 4.44772 3 5 3H6Z"
+      fill="#EBEBED"
+    />
+  </svg>
+);

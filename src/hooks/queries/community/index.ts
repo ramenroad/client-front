@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../queryKeys";
-import { getArticleDetail, getArticleList } from "../../../api/community";
+import { getArticleCommentList, getArticleDetail, getArticleList } from "../../../api/community";
 
 export interface ArticleQueryParams {
   page: number;
@@ -26,4 +26,14 @@ export const useArticleDetailQuery = (id?: string) => {
   });
 
   return { articleDetailQuery };
+};
+
+export const useArticleCommentListQuery = (id?: string) => {
+  const articleCommentListQuery = useQuery({
+    ...queryKeys.communityArticle.commentList(id ?? ""),
+    queryFn: () => getArticleCommentList(id!),
+    enabled: !!id,
+  });
+
+  return { articleCommentListQuery };
 };

@@ -28,3 +28,24 @@ export interface ArticleDetail {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CommentUser {
+  _id: string;
+  nickname: string;
+  profileImageUrl: string;
+}
+
+export interface Comment {
+  _id: string;
+  userId: CommentUser;
+  body: string;
+  likeCount: number;
+  likeUserIds: string[];
+  parentCommentId: string | null;
+  depth: number;
+  isDeleted: boolean;
+  deletedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  replies: Comment[];
+}

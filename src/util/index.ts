@@ -1,6 +1,8 @@
 import { BusinessHour, BusinessStatus } from "../types";
 import { DAY_MAP, OpenStatus, WEEKDAYS_ORDER } from "../constants";
 import { disassemble } from "es-hangul";
+import { CommunityArticleType, CommunityArticleTypeLabel } from "../pages/community-submit-page";
+import { kstFormat } from "@toss/date";
 
 export const checkBusinessStatus = (businessHours: BusinessHour[]): BusinessStatus => {
   const currentDay = new Date().toLocaleString("en-us", { weekday: "short" }).toLowerCase();
@@ -262,4 +264,41 @@ export const requestLocationPermission = async (): Promise<boolean> => {
     console.error("위치 권한 확인 실패:", error);
     return false;
   }
+};
+
+export const parseCategory = (category: string): string => {
+  return CommunityArticleTypeLabel[category as CommunityArticleType] ?? "기타";
+};
+
+export const parseCreatedAt = (createdAt: string): string => {
+  const created = new Date(createdAt);
+  const now = new Date();
+
+  // ms 단위 차이
+  const diffMs = now.getTime() - created.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  // 미래 값 들어올 수도 있으니 방어
+  if (diffMs < 0) {
+    return kstFormat(created, "yyyy.MM.dd HH:mm");
+  }
+
+  if (diffMin < 1) {
+    return "방금 전";
+  }
+  if (diffHour < 1) {
+    return `${diffMin}분 전`;
+  }
+  if (diffDay < 1) {
+    return `${diffHour}시간 전`;
+  }
+  if (diffDay === 1) {
+    return "어제";
+  }
+
+  // 그 외는 KST 기준 날짜 포맷
+  return kstFormat(created, "yyyy.MM.dd HH:mm");
 };

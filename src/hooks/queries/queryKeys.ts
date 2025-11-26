@@ -4,6 +4,7 @@ export const queryKeys = createQueryKeyStore({
   communityArticle: {
     list: (params: { page: number; limit: number }) => [params.page, params.limit] as const,
     detail: (id: string) => [id],
+    commentList: (id: string) => [id],
   },
   banner: {
     all: null,
