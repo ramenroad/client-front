@@ -1,0 +1,1 @@
+export { ImagePopup } from "./ImagePopup";

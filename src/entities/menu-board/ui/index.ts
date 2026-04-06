@@ -1,0 +1,1 @@
+export { MenuBoardDetail } from "./MenuBoardDetail";

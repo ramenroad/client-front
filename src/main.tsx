@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.tsx";
+import App from "@/app";
+import "@/app/styles/global.css";
 
 declare global {
-    interface Window {
+  interface Window {
     kakao: any;
   }
-  }
+}
 
 createRoot(document.getElementById("root")!).render(<App />);

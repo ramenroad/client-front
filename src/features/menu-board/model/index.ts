@@ -1,0 +1,1 @@
+export { useMenuBoardMutation } from "./mutations";
