@@ -1,5 +1,13 @@
+# 공통 베이스 단계
+FROM node:18-alpine AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+
 # 빌드 단계
-FROM node:18-alpine AS builder
+FROM base AS builder
 
 WORKDIR /app
 
@@ -20,8 +28,8 @@ ENV VITE_NAVER_CLIENT_ID=$VITE_NAVER_CLIENT_ID
 ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 ENV VITE_APPLE_CLIENT_ID=$VITE_APPLE_CLIENT_ID
 
-COPY package.json ./
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY . .
 
@@ -32,14 +40,14 @@ RUN VITE_KAKAO_APP_KEY=$VITE_KAKAO_APP_KEY \
     VITE_API_URL=$VITE_API_URL \
     VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID \
     VITE_APPLE_CLIENT_ID=$VITE_APPLE_CLIENT_ID \
-    npm run build
+    pnpm run build
 
 # 실행 단계
-FROM node:18-alpine AS runner
+FROM base AS runner
 
 WORKDIR /app
 
-RUN npm i -g serve
+RUN pnpm add -g serve
 
 COPY --from=builder /app/dist ./dist
 COPY package.json .
