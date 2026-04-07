@@ -1,23 +1,22 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/autoplay";
-import { useBannerQuery } from "@/entities/curation/model";
+import type { Banner as BannerItem } from "@/entities/curation/model";
 import render from "@/shared/ui/render";
 
-export const Banner = () => {
-  const navigate = useNavigate();
-  const { bannerQuery } = useBannerQuery();
-  const { data: bannerData } = bannerQuery;
-  const [currentIndex, setCurrentIndex] = useState(0);
+interface BannerProps {
+  banners: BannerItem[];
+  currentIndex: number;
+  onBannerClick: (banner: BannerItem) => void;
+  onMoreClick: () => void;
+  onSlideChange: (index: number) => void;
+}
 
-  if (!bannerData?.length) {
+export const Banner = ({ banners, currentIndex, onBannerClick, onMoreClick, onSlideChange }: BannerProps) => {
+  if (!banners.length) {
     return null;
   }
-
-  const sortedBannerData = [...bannerData].sort((a, b) => a.priority - b.priority);
 
   return (
     <Wrapper>
@@ -30,37 +29,25 @@ export const Banner = () => {
             delay: 3000,
             disableOnInteraction: false,
           }}
-          onSlideChange={(swiper) => setCurrentIndex(swiper.activeIndex)}
+          onSlideChange={(swiper) => onSlideChange(swiper.activeIndex)}
         >
-          {sortedBannerData.map((banner, index) => (
-            <SwiperSlide key={index}>
-              <BannerImage
-                key={banner._id}
-                src={banner.bannerImageUrl}
-                alt="banner"
-                onClick={() => {
-                  const url = banner.redirectUrl;
-                  if (url.startsWith("http://") || url.startsWith("https://")) {
-                    window.open(url, "_blank");
-                    return;
-                  }
-                  navigate(url);
-                }}
-              />
+          {banners.map((banner) => (
+            <SwiperSlide key={banner._id}>
+              <BannerImage src={banner.bannerImageUrl} alt={banner.name} onClick={() => onBannerClick(banner)} />
             </SwiperSlide>
           ))}
         </Swiper>
       </SwiperWrapper>
-      <BannerButtonWrapper onClick={() => navigate("/banner")}>
+      <BannerButtonWrapper onClick={onMoreClick}>
         <PresentNumber>{currentIndex + 1}</PresentNumber>
         <Divide>/</Divide>
-        <TotalNumber>{bannerData.length} +</TotalNumber>
+        <TotalNumber>{banners.length} +</TotalNumber>
       </BannerButtonWrapper>
     </Wrapper>
   );
 };
 
-const Wrapper = render.div("flex flex-col w-full overflow-hidden");
+const Wrapper = render.div("relative flex w-full overflow-hidden");
 
 const SwiperWrapper = render.div("w-350 h-140 relative");
 

@@ -1,13 +1,13 @@
 import { RaisingText } from "@/shared/ui/text";
 import render from "@/shared/ui/render";
 
-export interface GenreIconProps {
+interface GenreCardProps {
   genreName: string;
   genreIcon: string;
   onClick: () => void;
 }
 
-const GenreCard = ({ genreName, genreIcon, onClick }: GenreIconProps) => {
+export const GenreCard = ({ genreName, genreIcon, onClick }: GenreCardProps) => {
   return (
     <GenreIconContainer onClick={onClick}>
       <GenreIconImage src={genreIcon} alt={genreName} />
@@ -17,8 +17,6 @@ const GenreCard = ({ genreName, genreIcon, onClick }: GenreIconProps) => {
     </GenreIconContainer>
   );
 };
-
-export default GenreCard;
 
 const GenreIconContainer = render.div("flex flex-col items-center gap-4 cursor-pointer");
 

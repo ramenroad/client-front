@@ -1,4 +1,4 @@
-import { ComponentProps } from "react";
+import type { ComponentProps } from "react";
 import { RaisingText } from "@/shared/ui/text";
 import { IconArrowRight } from "@/shared/ui/icon";
 import render from "@/shared/ui/render";
@@ -10,21 +10,7 @@ export interface SectionProps extends ComponentProps<"article"> {
   onClickAdditionalInformation?: () => void;
 }
 
-/**
- * @author 김종운 (CDD)
- *
- * @description 메인 페이지 섹션 컴포넌트
- *
- * @param {string} title
- * @param {string} subTitle
- * @param {boolean} isAdditionalInformation
- * @param {() => void} onClickAdditionalInformation
- * @param {React.ReactNode} children
- * @param {SectionProps} ...props
- * @returns {React.ReactNode}
- */
-
-const Section = ({
+export const Section = ({
   title,
   subTitle,
   isAdditionalInformation,
@@ -48,16 +34,16 @@ const Section = ({
             </AdditionalInformationWrapper>
           )}
         </SectionTitleWrapper>
-        <SectionSubTitle size={14} weight="r">
-          {subTitle}
-        </SectionSubTitle>
+        {subTitle && (
+          <SectionSubTitle size={14} weight="r">
+            {subTitle}
+          </SectionSubTitle>
+        )}
       </SectionHeaderContainer>
       {children}
     </SectionContainer>
   );
 };
-
-export default Section;
 
 const SectionContainer = render.article("flex flex-col gap-16 w-full");
 

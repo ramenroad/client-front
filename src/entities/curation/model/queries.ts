@@ -6,7 +6,7 @@ export const useBannerQuery = () => {
   const bannerQuery = useQuery({
     ...queryKeys.banner.all,
     queryFn: getBanner,
-    select: (data) => (Array.isArray(data) ? data.sort((a, b) => b.priority - a.priority) : []),
+    select: (data) => (Array.isArray(data) ? [...data].sort((a, b) => a.priority - b.priority) : []),
   });
 
   return { bannerQuery };

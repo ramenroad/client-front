@@ -1,6 +1,7 @@
 import { IconClose } from "@/shared/ui/icon";
 import { useNavigate } from "react-router-dom";
 import { useBannerQuery } from "@/entities/curation/model";
+import { isExternalUrl, openUrl } from "@/shared/lib/browser";
 import render from "@/shared/ui/render";
 
 export const BannerPage = () => {
@@ -17,13 +18,13 @@ export const BannerPage = () => {
       <BannerListContainer>
         {bannerData?.map((banner) => (
           <BannerImage
-            key={banner.id}
+            key={banner._id}
             src={banner.bannerImageUrl}
             alt="banner"
             onClick={() => {
               const url = banner.redirectUrl;
-              if (url.startsWith("http://") || url.startsWith("https://")) {
-                window.open(url, "_blank");
+              if (isExternalUrl(url)) {
+                openUrl(url);
               } else {
                 navigate(url);
               }

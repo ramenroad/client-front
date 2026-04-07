@@ -15,7 +15,7 @@ export const GroupCard = ({ title, subTitle, image, onClick, type, region }: Gro
     case 1:
       return (
         <Wrapper onClick={onClick}>
-          <GroupListImage src={image} />
+          <GroupListImage src={image} alt={title} />
           <TextBox>
             <GroupListTitle>{title}</GroupListTitle>
             <RamenyaTag>{subTitle}</RamenyaTag>
@@ -26,12 +26,14 @@ export const GroupCard = ({ title, subTitle, image, onClick, type, region }: Gro
       return (
         <GroupListRoundedWrapper onClick={onClick}>
           <GroupListImageWrapper>
-            <GroupListRoundedImage src={image} />
+            <GroupListRoundedImage src={image} alt={title} />
             <GroupListLocation>{region.slice(0, 2)}</GroupListLocation>
           </GroupListImageWrapper>
           <GroupListTitle>{title}</GroupListTitle>
         </GroupListRoundedWrapper>
       );
+    default:
+      return null;
   }
 };
 

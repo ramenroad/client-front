@@ -1,99 +1,30 @@
-import { useNavigate } from "react-router-dom";
 import { genrePath, RAMENYA_LOCATION_LIST } from "@/entities/ramenya/model";
-import { Banner } from "@/entities/curation/ui";
-import { GroupCard } from "./GroupCard";
-import { useRamenyaGroupQuery } from "@/entities/curation/model";
 import { Swiper, SwiperSlide } from "swiper/react";
-import RamenroadLogo from "./RamenroadLogo";
-import Section from "./Section";
-import GenreCard from "./GenreCard";
-import React, { useState, useRef, useCallback } from "react";
 import { SearchOverlay } from "@/widgets/map/search-overlay";
+import { GenreCard, GroupCard, HomeBanner, RamenroadLogo, Section } from "@/widgets/home";
 import { IconCoordinate, IconSearch } from "@/shared/ui/icon";
-import { requestLocationPermission } from "@/shared/lib/geolocation";
-import { useToast } from "@/shared/ui/toast";
-import { useUserLocation } from "@/shared/lib/use-user-location";
 import styled from "@emotion/styled";
 import render from "@/shared/ui/render";
+import { useHomePage } from "./model/useHomePage";
 
-const MainPage = () => {
-  const navigate = useNavigate();
-  const locationContainerRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-
-  const { ramenyaGroupQuery } = useRamenyaGroupQuery();
-  const { data: ramenyaGroup } = ramenyaGroupQuery;
-
-  const { openToast } = useToast();
-  const { getUserPosition } = useUserLocation();
-
-  const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!locationContainerRef.current) return;
-
-    setIsDragging(true);
-    setStartX(e.pageX - locationContainerRef.current.offsetLeft);
-    setScrollLeft(locationContainerRef.current.scrollLeft);
-  }, []);
-
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-
-      if (!isDragging || !locationContainerRef.current) return;
-
-      e.preventDefault();
-      const x = e.pageX - locationContainerRef.current.offsetLeft;
-      const walk = (x - startX) * 2;
-      locationContainerRef.current.scrollLeft = scrollLeft - walk;
-    },
-    [isDragging, startX, scrollLeft],
-  );
-
-  const handleMouseUp = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDragging(false);
-  }, []);
-
-  const handleMouseLeave = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDragging(false);
-  }, []);
-
-  const handleClickLocationBadge = async (location: { longitude: number; latitude: number } | null) => {
-    if (!location) {
-      const permission = await requestLocationPermission();
-      if (!permission) {
-        openToast("위치 권한을 허용해주세요.");
-        return;
-      }
-
-      const position = await getUserPosition();
-      if (!position) {
-        openToast("위치 정보를 불러오는데 실패했습니다.");
-        return;
-      }
-
-      const mapString = new URLSearchParams();
-      mapString.append("longitude", position.longitude.toString());
-      mapString.append("latitude", position.latitude.toString());
-      navigate(`/map?${mapString}`);
-
-      return;
-    }
-
-    const mapString = new URLSearchParams();
-    mapString.append("longitude", location.longitude.toString());
-    mapString.append("latitude", location.latitude.toString());
-    mapString.append("level", "14");
-    mapString.append("radius", "3241");
-    navigate(`/map?${mapString}`);
-  };
+const HomePage = () => {
+  const {
+    ramenyaGroup,
+    locationContainerRef,
+    isDragging,
+    isSearchOverlayOpen,
+    setIsSearchOverlayOpen,
+    searchValue,
+    setSearchValue,
+    handleOpenSearchOverlay,
+    handleLocationBadgeClick,
+    handleSearchKeywordSelect,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    handleMouseLeave,
+    navigate,
+  } = useHomePage();
 
   return (
     <Container>
@@ -103,9 +34,9 @@ const MainPage = () => {
       </RamenroadLogoWrapper>
 
       {/* 검색 */}
-      <SearchInputWrapper onClick={() => setIsSearchOverlayOpen(true)}>
+      <SearchInputWrapper type="button" onClick={handleOpenSearchOverlay}>
         <IconSearch color="#FF5200" />
-        <SearchInput placeholder="무슨 라멘 먹을까?" readOnly />
+        <SearchPlaceholder>무슨 라멘 먹을까?</SearchPlaceholder>
       </SearchInputWrapper>
 
       <SearchOverlay
@@ -114,19 +45,12 @@ const MainPage = () => {
         setIsSearchOverlayOpen={setIsSearchOverlayOpen}
         keyword={searchValue}
         setKeyword={setSearchValue}
-        onSelectKeyword={(keyword, isNearBy) => {
-          const mapString = new URLSearchParams();
-          mapString.append("keyword", keyword);
-          if (isNearBy) {
-            mapString.append("nearBy", "true");
-          }
-          navigate(`/map?${mapString}`);
-        }}
+        onSelectKeyword={handleSearchKeywordSelect}
       />
 
       {/* 배너 */}
       <BannerWrapper>
-        <Banner />
+        <HomeBanner />
       </BannerWrapper>
 
       {/* 장르: 라멘 종류 */}
@@ -153,18 +77,19 @@ const MainPage = () => {
           onMouseLeave={handleMouseLeave}
           $isDragging={isDragging}
         >
-          <MyLocationBadge onClick={() => handleClickLocationBadge(null)}>
+          <MyLocationBadge type="button" onClick={() => handleLocationBadgeClick(null)}>
             <IconCoordinate />
-            <span>내 주변</span>
+            <BadgeText>내 주변</BadgeText>
           </MyLocationBadge>
 
           {RAMENYA_LOCATION_LIST.map((location) => (
             <LocationPathBadge
+              type="button"
               key={location.name.join(",")}
-              onClick={() => handleClickLocationBadge(location.location)}
+              onClick={() => handleLocationBadgeClick(location.location)}
             >
               {location.name.map((name) => (
-                <span key={name}>{name}</span>
+                <BadgeText key={name}>{name}</BadgeText>
               ))}
             </LocationPathBadge>
           ))}
@@ -210,12 +135,12 @@ const BannerWrapper = render.div("flex relative");
 
 const GenrePathContainer = render.div("grid grid-cols-4 gap-x-14 gap-y-12");
 
-const LocationPathBadge = render.div(
-  "flex flex-col items-center justify-center min-w-52 w-52 h-71 rounded-[50px] bg-[#F8F8F8] border border-solid border-[#F1F1F1] cursor-pointer text-gray-800",
+const LocationPathBadge = render.button(
+  "flex h-71 w-52 min-w-52 cursor-pointer flex-col items-center justify-center rounded-[50px] border border-solid border-[#F1F1F1] bg-[#F8F8F8] text-gray-800 shadow-none outline-none",
 );
 
-const MyLocationBadge = render.div(
-  "min-w-71 w-71 h-71 flex flex-col items-center justify-center rounded-[50px] bg-[#FFF4EE] border border-solid border-[#FFE4D4] text-orange cursor-pointer",
+const MyLocationBadge = render.button(
+  "flex h-71 w-71 min-w-71 cursor-pointer flex-col items-center justify-center rounded-[50px] border border-solid border-[#FFE4D4] bg-[#FFF4EE] text-orange shadow-none outline-none",
 );
 
 const LocationSwiperContainer = styled.div<{ $isDragging: boolean }>(({ $isDragging }) => ({
@@ -239,12 +164,12 @@ const LocationSwiperContainer = styled.div<{ $isDragging: boolean }>(({ $isDragg
 
 const GroupSwiperContainer = render.div("w-350");
 
-const SearchInputWrapper = render.div(
-  "box-border rounded-[40px] w-350 h-48 px-16 mb-[-20px] bg-white outline-none border border-orange border-solid border-[1.2px] cursor-pointer w-350 flex gap-4 items-center",
+const SearchInputWrapper = render.button(
+  "mb-[-20px] flex h-48 w-350 cursor-pointer items-center gap-4 rounded-[40px] border-[1.2px] border-solid border-orange bg-white px-16 shadow-none outline-none",
 );
 
-const SearchInput = render.input(
-  "w-full h-full outline-none border-none bg-transparent text-black placeholder:text-gray-400 font-16-r",
-);
+const SearchPlaceholder = render.span("font-16-r text-gray-400");
 
-export default MainPage;
+const BadgeText = render.span("text-inherit");
+
+export default HomePage;
