@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { IconStar, IconArrowRight } from "@/shared/ui/icon";
-import emptyReview from "../../assets/images/empty-review.png";
-import ReviewCard from "@/entities/review/ui";
+import emptyReview from "@/assets/images/empty-review.png";
 import { Line } from "@/shared/ui/line";
 import { UserReview } from "@/entities/review/model";
 import render from "@/shared/ui/render";
+import { ReviewCard } from "@/widgets/review";
 
 interface ReviewSectionProps {
   userInformation: { _id: string; nickname: string; email: string; profileImageUrl?: string } | undefined;
@@ -32,6 +32,12 @@ export const ReviewSection = ({
   ramenyaId,
 }: ReviewSectionProps) => {
   const navigate = useNavigate();
+  const reviews = ramenyaReviewData?.pages.flatMap((page) => page.reviews) ?? [];
+  const topReviews = reviews
+    .slice()
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 3);
+  const isReviewEmpty = reviews.length === 0;
 
   return (
     <ReviewWrapper>
@@ -47,40 +53,38 @@ export const ReviewSection = ({
           ))}
         </LargeStarContainer>
 
-        {!isSignIn && <LoginButton onClick={() => navigate("/login")}>로그인하기</LoginButton>}
+        {!isSignIn && (
+          <LoginButton type="button" onClick={() => navigate("/login")}>
+            로그인하기
+          </LoginButton>
+        )}
       </ReviewHeader>
       <ReviewDivider />
 
       <ReviewContent>
         <ReviewContentTitle>고객 리뷰</ReviewContentTitle>
-        {ramenyaReviewData?.pages.flatMap((page) => page.reviews)?.length === 0 ? (
+        {isReviewEmpty ? (
           <EmptyReviewContainer>
             <EmptyReviewImage src={emptyReview} />
             <EmptyReviewTitle>등록된 리뷰가 없습니다.</EmptyReviewTitle>
             <EmptyReviewText>방문하셨나요? 평가를 남겨보세요!</EmptyReviewText>
-            <CreateReviewButton onClick={() => onNavigateReviewCreatePage()}>리뷰 작성하기</CreateReviewButton>
+            <CreateReviewButton type="button" onClick={() => onNavigateReviewCreatePage()}>
+              리뷰 작성하기
+            </CreateReviewButton>
           </EmptyReviewContainer>
         ) : (
           <>
             <ReviewCardContainer>
-              {ramenyaReviewData?.pages
-                .flatMap((page) => page.reviews)
-                ?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                .slice(0, 3)
-                .map((review: UserReview) => (
-                  <>
-                    <ReviewCard
-                      key={review._id}
-                      review={review}
-                      editable={userInformation?._id === review.userId?._id}
-                    />
-                    <Line />
-                  </>
-                ))}
+              {topReviews.map((review: UserReview, index) => (
+                <ReviewListItem key={review._id}>
+                  <ReviewCard review={review} editable={userInformation?._id === review.userId?._id} />
+                  {index < topReviews.length - 1 && <Line />}
+                </ReviewListItem>
+              ))}
             </ReviewCardContainer>
             <AllReviewButtonWrapper>
-              <AllReviewButton onClick={() => navigate(`/review/list/${ramenyaId}`)}>
-                <span>모든 리뷰 보기</span>
+              <AllReviewButton type="button" onClick={() => navigate(`/review/list/${ramenyaId}`)}>
+                <ButtonText>모든 리뷰 보기</ButtonText>
                 <IconArrowRight />
               </AllReviewButton>
             </AllReviewButtonWrapper>
@@ -102,8 +106,8 @@ const ReviewerName = render.span("text-orange");
 
 const LargeStarContainer = render.div("flex gap-2 items-center cursor-pointer");
 
-const LoginButton = render.div(
-  "mt-16 flex w-fit py-10 px-32 box-border justify-center items-center font-16-m bg-bright-orange rounded-[100px] gap-2 cursor-pointer text-orange",
+const LoginButton = render.button(
+  "mt-16 flex w-fit items-center justify-center gap-2 rounded-[100px] bg-bright-orange px-32 py-10 font-16-m text-orange cursor-pointer border-none shadow-none outline-none",
 );
 
 const ReviewDivider = render.div("w-full h-1 bg-divider");
@@ -120,14 +124,18 @@ const EmptyReviewTitle = render.div("font-16-r text-black pb-4");
 
 const EmptyReviewText = render.span("font-14-r text-gray-700");
 
-const CreateReviewButton = render.div(
-  "mt-16 flex w-fit py-10 px-32 box-border justify-center items-center font-16-m bg-bright-orange rounded-[100px] gap-2 cursor-pointer text-orange",
+const CreateReviewButton = render.button(
+  "mt-16 flex w-fit items-center justify-center gap-2 rounded-[100px] bg-bright-orange px-32 py-10 font-16-m text-orange cursor-pointer border-none shadow-none outline-none",
 );
 
 const ReviewCardContainer = render.div("flex flex-col");
 
+const ReviewListItem = render.div("flex flex-col");
+
 const AllReviewButtonWrapper = render.div("px-20");
 
-const AllReviewButton = render.div(
-  "mt-10 flex w-full py-10 box-border justify-center items-center font-14-m text-black bg-border rounded-[8px] gap-2 cursor-pointer",
+const AllReviewButton = render.button(
+  "mt-10 flex w-full items-center justify-center gap-2 rounded-[8px] bg-border py-10 font-14-m text-black cursor-pointer border-none shadow-none outline-none",
 );
+
+const ButtonText = render.span("text-inherit");

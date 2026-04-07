@@ -6,7 +6,8 @@ export {
   useRamenyaListWithSearchQuery,
   useRamenyaSearchAutoCompleteQuery,
 } from "./queries";
-export type { BusinessHour, BusinessStatus, Ramenya, RemenyaDetail, Region, Coordinate } from "./types";
+export type { BusinessHour, BusinessStatus, Ramenya, RamenyaDetail, Region } from "./types";
+export type { Coordinate } from "@/shared/lib/number";
 export type { FilterOptions } from "./filter";
 export { SortType } from "./filter";
 export {

@@ -1,3 +1,5 @@
+import { type ComponentProps } from "react";
+import { twMerge } from "tailwind-merge";
 import {
   IconBar,
   IconCall,
@@ -5,19 +7,18 @@ import {
   IconDropDownSelected,
   IconInstagram,
   IconLocate,
+  IconStar,
   IconTag,
   IconTime,
-  IconStar,
 } from "@/shared/ui/icon";
 import { checkBusinessStatus, checkBusinessStatusSpecial } from "@/entities/ramenya/lib";
-import { DAY_MAP, OpenStatus, type RemenyaDetail } from "@/entities/ramenya/model";
-import DetailIconTag from "./DetailIconTag";
+import { DAY_MAP, OpenStatus, type RamenyaDetail } from "@/entities/ramenya/model";
 import { RamenyaOpenStatus } from "@/entities/ramenya/ui";
-import styled from "@emotion/styled";
 import render from "@/shared/ui/render";
+import DetailIconTag from "./DetailIconTag";
 
 interface RamenyaInformationSectionProps {
-  ramenyaData: RemenyaDetail | undefined;
+  ramenyaData: RamenyaDetail | undefined;
   isTimeExpanded: boolean;
   setIsTimeExpanded: (expanded: boolean) => void;
   todayBusinessHour: { day: string; isOpen: boolean; operatingTime: string; breakTime?: string } | undefined;
@@ -33,6 +34,14 @@ export const RamenyaInformationSection = ({
   sortBusinessHoursByCurrentDay,
   todayBusinessHour,
 }: RamenyaInformationSectionProps) => {
+  const businessHours = ramenyaData?.businessHours ?? [];
+  const businessStatus = checkBusinessStatus(businessHours);
+  const businessStatusSpecial = checkBusinessStatusSpecial(businessHours);
+  const sortedBusinessHours = sortBusinessHoursByCurrentDay(businessHours);
+  const genres = ramenyaData?.genre ?? [];
+  const rating = ramenyaData?.rating ?? 0;
+  const reviewCount = ramenyaData?.reviewCount ?? 0;
+
   return (
     <MarketDetailWrapper>
       <MarketDetailTitle>{ramenyaData?.name}</MarketDetailTitle>
@@ -42,20 +51,19 @@ export const RamenyaInformationSection = ({
           <MarketDetailReviewBox>
             <StarContainer>
               {[1, 2, 3, 4, 5].map((star) => {
-                const rating = ramenyaData?.rating || 0;
-                const reviewCount = ramenyaData?.reviewCount || 0;
-
                 if (reviewCount === 0) {
                   return <IconStar key={star} inactive />;
                 }
 
                 if (rating >= star) {
                   return <IconStar key={star} />;
-                } else if (rating >= star - 0.5) {
-                  return <IconStar size={14} isHalf key={star} />;
-                } else {
-                  return <IconStar key={star} inactive />;
                 }
+
+                if (rating >= star - 0.5) {
+                  return <IconStar key={star} size={14} isHalf />;
+                }
+
+                return <IconStar key={star} inactive />;
               })}
             </StarContainer>
             <MarketDetailReviewScore>{ramenyaData?.rating?.toFixed(1) || "0.0"}</MarketDetailReviewScore>
@@ -65,9 +73,10 @@ export const RamenyaInformationSection = ({
         <MarketDetailBox>
           <DetailIconTag icon={<IconTag />} text="장르" />
           <MarketDetailGenreBox>
-            {ramenyaData?.genre.map((genre: string, index: number) => (
+            {genres.map((genre, index) => (
               <MarketDetailGenre key={genre}>
-                {genre} {index !== ramenyaData?.genre.length - 1 && <IconBar />}
+                {genre}
+                {index < genres.length - 1 && <IconBar />}
               </MarketDetailGenre>
             ))}
           </MarketDetailGenreBox>
@@ -81,14 +90,10 @@ export const RamenyaInformationSection = ({
         <MarketDetailBox>
           <DetailIconTag icon={<IconTime />} text="운영시간" />
           <MarketDetailBoxContent>
-            <OperationgTimeTextContainer>
-              <RamenyaOpenStatus status={checkBusinessStatus(ramenyaData?.businessHours ?? []).status}>
-                {checkBusinessStatus(ramenyaData?.businessHours ?? []).status}
-              </RamenyaOpenStatus>
+            <OperatingTimeTextContainer>
+              <RamenyaOpenStatus status={businessStatus.status}>{businessStatus.status}</RamenyaOpenStatus>
               <TimeHeader>
-                {todayBusinessHour?.isOpen
-                  ? `${todayBusinessHour.operatingTime}`
-                  : checkBusinessStatusSpecial(ramenyaData?.businessHours ?? []).closeInformation}
+                {todayBusinessHour?.isOpen ? todayBusinessHour.operatingTime : businessStatusSpecial.closeInformation}
                 {isTimeExpanded ? (
                   <StyledIconDropDownSelected onClick={() => setIsTimeExpanded(false)} />
                 ) : (
@@ -97,36 +102,35 @@ export const RamenyaInformationSection = ({
               </TimeHeader>
               {isTimeExpanded && (
                 <BusinessHoursWrapper>
-                  {checkBusinessStatusSpecial(ramenyaData?.businessHours ?? []).daily.allSame ? (
+                  {businessStatusSpecial.daily.allSame ? (
                     <BusinessHoursContainer today={true}>
                       <BusinessHoursDay>매일</BusinessHoursDay>
                       <BusinessHoursTime>
-                        <div>{`${checkBusinessStatusSpecial(ramenyaData?.businessHours ?? []).daily.operatingTime}`}</div>
-                        {checkBusinessStatusSpecial(ramenyaData?.businessHours ?? []).daily.breakTime && (
-                          <div>{`${checkBusinessStatusSpecial(ramenyaData?.businessHours ?? []).daily.breakTime} ${OpenStatus.BREAK}`}</div>
+                        <BusinessHoursTextLine>{businessStatusSpecial.daily.operatingTime}</BusinessHoursTextLine>
+                        {businessStatusSpecial.daily.breakTime && (
+                          <BusinessHoursTextLine>
+                            {businessStatusSpecial.daily.breakTime} {OpenStatus.BREAK}
+                          </BusinessHoursTextLine>
                         )}
                       </BusinessHoursTime>
                     </BusinessHoursContainer>
                   ) : (
-                    sortBusinessHoursByCurrentDay(ramenyaData?.businessHours || []).map((businessHour) => (
-                      <BusinessHoursContainer
-                        key={businessHour.day}
-                        today={todayBusinessHour?.day === businessHour.day}
-                      >
+                    sortedBusinessHours.map((businessHour) => (
+                      <BusinessHoursContainer key={businessHour.day} today={todayBusinessHour?.day === businessHour.day}>
                         <BusinessHoursDay>{DAY_MAP[businessHour.day]}</BusinessHoursDay>
                         <BusinessHoursTime>
                           {businessHour.isOpen ? (
-                            <div key={businessHour.day}>
-                              <div>{`${businessHour.operatingTime}`}</div>
+                            <BusinessHoursTextGroup>
+                              <BusinessHoursTextLine>{businessHour.operatingTime}</BusinessHoursTextLine>
                               {businessHour.breakTime && (
                                 <BreakTimeText>
-                                  <span>{businessHour.breakTime}</span>
-                                  <span>{OpenStatus.BREAK}</span>
+                                  <BreakTimeValue>{businessHour.breakTime}</BreakTimeValue>
+                                  <BreakTimeValue>{OpenStatus.BREAK}</BreakTimeValue>
                                 </BreakTimeText>
                               )}
-                            </div>
+                            </BusinessHoursTextGroup>
                           ) : (
-                            <div>{`매주 휴무`}</div>
+                            <BusinessHoursTextLine>매주 휴무</BusinessHoursTextLine>
                           )}
                         </BusinessHoursTime>
                       </BusinessHoursContainer>
@@ -134,7 +138,7 @@ export const RamenyaInformationSection = ({
                   )}
                 </BusinessHoursWrapper>
               )}
-            </OperationgTimeTextContainer>
+            </OperatingTimeTextContainer>
           </MarketDetailBoxContent>
         </MarketDetailBox>
 
@@ -149,8 +153,8 @@ export const RamenyaInformationSection = ({
           <DetailIconTag icon={<IconInstagram />} text="인스타그램" />
           <MarketDetailBoxContent>
             {ramenyaData?.instagramProfile ? (
-              <InstagramLink href={ramenyaData?.instagramProfile} target="_blank" rel="noopener noreferrer">
-                {ramenyaData?.instagramProfile}
+              <InstagramLink href={ramenyaData.instagramProfile} target="_blank" rel="noopener noreferrer">
+                {ramenyaData.instagramProfile}
               </InstagramLink>
             ) : (
               <PhoneNumberText>미공개</PhoneNumberText>
@@ -162,30 +166,29 @@ export const RamenyaInformationSection = ({
   );
 };
 
-// 스타일 컴포넌트들
 const MarketDetailWrapper = render.div("flex flex-col gap-16 px-20 pt-20 pb-32");
 
 const MarketDetailTitle = render.div("font-22-sb");
 
-const MarketDetailBox = render.div("flex gap-16 items-start");
+const MarketDetailBox = render.div("flex items-start gap-16");
 
-const MarketDetailReviewBox = render.div("flex gap-4 items-center");
+const MarketDetailReviewBox = render.div("flex items-center gap-4");
 
 const MarketDetailReviewScore = render.div("font-14-r text-black");
 
-const MarketDetailGenreBox = render.div("flex gap-8 items-center font-14-r text-black flex-wrap");
+const MarketDetailGenreBox = render.div("flex flex-wrap items-center gap-8 font-14-r text-black");
 
 const MarketDetailBoxAddressText = render.div("font-14-r");
 
-const MarketDetailGenre = render.div("flex gap-8 items-center font-14-r");
+const MarketDetailGenre = render.div("flex items-center gap-8 font-14-r");
 
 const MarketDetailBoxContainer = render.div("flex flex-col gap-12");
 
-const MarketDetailBoxContent = render.div("font-14-r max-w-254 break-words");
+const MarketDetailBoxContent = render.div("max-w-254 break-words font-14-r");
 
-const OperationgTimeTextContainer = render.div("flex flex-col gap-6 items-start");
+const OperatingTimeTextContainer = render.div("flex flex-col items-start gap-6");
 
-const TimeHeader = render.div("flex gap-4 items-center");
+const TimeHeader = render.div("flex items-center gap-4");
 
 const StyledIconDropDown = render.extend(IconDropDown, "cursor-pointer");
 
@@ -193,24 +196,30 @@ const StyledIconDropDownSelected = render.extend(IconDropDownSelected, "cursor-p
 
 const BusinessHoursWrapper = render.div("flex flex-col gap-8");
 
-const BusinessHoursContainer = styled.div<{ today: boolean }>(({ today }) => [
-  {
-    display: "flex",
-    gap: "7px",
-  },
-  today && {
-    fontWeight: 600,
-  },
-]);
+interface BusinessHoursContainerProps extends ComponentProps<"div"> {
+  today: boolean;
+}
 
-const BusinessHoursDay = render.span("");
+const BusinessHoursContainerBase = render.div("flex gap-7");
+
+const BusinessHoursContainer = ({ today, className, ...props }: BusinessHoursContainerProps) => {
+  return <BusinessHoursContainerBase {...props} className={twMerge(today ? "font-semibold" : "", className ?? "")} />;
+};
+
+const BusinessHoursDay = render.span();
 
 const BusinessHoursTime = render.div("flex flex-col gap-4");
 
-const BreakTimeText = render.div("flex gap-4 items-center");
+const BusinessHoursTextGroup = render.div("flex flex-col gap-4");
+
+const BusinessHoursTextLine = render.div("text-inherit");
+
+const BreakTimeText = render.div("flex items-center gap-4");
+
+const BreakTimeValue = render.span("text-inherit");
 
 const PhoneNumberText = render.div("font-14-r");
 
 const InstagramLink = render.a("font-14-r text-blue");
 
-const StarContainer = render.div("flex gap-2 items-center");
+const StarContainer = render.div("flex items-center gap-2");

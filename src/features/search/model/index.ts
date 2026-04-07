@@ -1,1 +1,1 @@
-export { useSearchHistoryQuery, useRemoveSearchHistoryMutation } from "./hooks";
+export { useMapSearchResultsQuery, useSearchHistoryQuery, useRemoveSearchHistoryMutation } from "./hooks";

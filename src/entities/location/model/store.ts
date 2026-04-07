@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import type { Coordinate } from "@/entities/ramenya/model";
+import type { Coordinate } from "@/shared/lib/number";
 
 interface UseLocationStoreType {
   current: Coordinate;

@@ -9,11 +9,6 @@ export type BusinessHour = {
   isOpen: boolean;
 };
 
-export interface Coordinate {
-  latitude: number;
-  longitude: number;
-}
-
 export interface Ramenya {
   _id: string;
   name: string;
@@ -43,7 +38,7 @@ export interface BusinessStatus {
   } | null;
 }
 
-export interface RemenyaDetail {
+export interface RamenyaDetail {
   name: string;
   thumbnailUrl: string;
   genre: string[];

@@ -24,14 +24,16 @@ export const ImagePopup: React.FC<ImagePopupProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen && containerRef.current) {
+    const container = containerRef.current;
+
+    if (isOpen && container) {
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      containerRef.current.style.marginRight = `${scrollbarWidth}px`;
+      container.style.marginRight = `${scrollbarWidth}px`;
     }
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.style.marginRight = "0px";
+      if (container) {
+        container.style.marginRight = "0px";
       }
     };
   }, [isOpen]);

@@ -1,20 +1,24 @@
 import { useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import CountUp from "react-countup";
 import storeImage from "@/assets/images/store.png";
 import { setCurrentLocation, useLocationStore } from "@/entities/location/model";
 import { checkBusinessStatus } from "@/entities/ramenya/lib";
 import { OpenStatus, type Ramenya } from "@/entities/ramenya/model";
+import { useUserLocation } from "@/shared/lib/use-user-location";
 import { calculateDistance } from "@/shared/lib/number";
 import { IconStar } from "@/shared/ui/icon";
 import { RaisingText } from "@/shared/ui/text";
 import render from "@/shared/ui/render";
+import { RamenyaOpenStatus } from "./RamenyaOpenStatus";
+
+let currentLocationPromise: Promise<void> | null = null;
 
 interface RamenyaCardProps extends Partial<Ramenya> {
   isReview?: boolean;
   width?: number | string;
   isMapCard?: boolean;
+  onClick?: () => void;
 }
 
 const RamenyaCard = ({
@@ -31,9 +35,10 @@ const RamenyaCard = ({
   isReview,
   isMapCard,
   width,
+  onClick,
 }: RamenyaCardProps) => {
-  const navigate = useNavigate();
   const { current } = useLocationStore();
+  const { getUserPosition } = useUserLocation();
 
   const currentDistance = useMemo(() => {
     if (!latitude || !longitude) {
@@ -49,32 +54,29 @@ const RamenyaCard = ({
   const openStatus = useMemo(() => checkBusinessStatus(businessHours || []).status, [businessHours]);
 
   useEffect(() => {
-    if (!navigator.geolocation) {
+    if (current.latitude !== 0 && current.longitude !== 0) {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition((pos) => {
-      setCurrentLocation({
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-      });
-    });
+    currentLocationPromise ??= getUserPosition()
+      .then((position) => {
+        if (!position) {
+          return;
+        }
 
-    const watchId = navigator.geolocation.watchPosition((pos) => {
-      setCurrentLocation({
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
+        setCurrentLocation(position);
+      })
+      .finally(() => {
+        currentLocationPromise = null;
       });
-    });
-
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, []);
+  }, [current.latitude, current.longitude, getUserPosition]);
 
   return (
     <RamenyaCardWrapper
+      clickable={!!onClick}
       isMapCard={isMapCard}
       key={_id}
-      onClick={() => navigate(`/detail/${_id}`)}
+      onClick={onClick}
       style={{ ...(width ? { width } : {}) }}
     >
       <RamenyaCardLayout>
@@ -140,9 +142,9 @@ const RamenyaCard = ({
   );
 };
 
-const RamenyaCardWrapper = styled.section<{ isMapCard?: boolean }>(({ isMapCard }) => ({
+const RamenyaCardWrapper = styled.section<{ clickable: boolean; isMapCard?: boolean }>(({ clickable, isMapCard }) => ({
   width: "99%",
-  cursor: "pointer",
+  cursor: clickable ? "pointer" : "default",
   boxSizing: "border-box",
   padding: "20px",
   backgroundColor: "#ffffff",
@@ -185,21 +187,6 @@ const RamenyaAddress = render.span(
 );
 
 const RamenyaOpenStatusWrapper = render.span("flex gap-2 items-center font-12-r h-14");
-
-export const RamenyaOpenStatus = styled.span<{ status: OpenStatus }>(({ status }) => ({
-  color:
-    status === OpenStatus.BEFORE_OPEN
-      ? "#585858"
-      : status === OpenStatus.OPEN
-        ? "#59bc12"
-        : status === OpenStatus.BREAK
-          ? "#f3a216"
-          : status === OpenStatus.DAY_OFF
-            ? "#ff5454"
-            : status === OpenStatus.CLOSED
-              ? "#838383"
-              : undefined,
-}));
 
 const RamenyaOpenTime = render.span("font-12-r");
 

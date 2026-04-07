@@ -1,6 +1,6 @@
 import { IconArrowRight } from "@/shared/ui/icon";
 import { ReviewImage } from "@/entities/review/ui";
-import emptyImage from "../../assets/images/empty-images.png";
+import emptyImage from "@/assets/images/empty-images.png";
 import render from "@/shared/ui/render";
 
 interface ReviewPhotoSectionProps {

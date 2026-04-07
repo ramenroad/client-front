@@ -1,21 +1,16 @@
 import { instance, instanceWithNoVersioning } from "@/shared/api/http";
-import type { BusinessHour, Ramenya, Region, RemenyaDetail } from "../model/types";
+import type { BusinessHour, Ramenya, Region, RamenyaDetail } from "../model/types";
+
+export type RamenyaListFilterType = "region" | "genre";
 
 export const getRamenyaDetail = async (id: string) => {
-  const response = await instance.get<RemenyaDetail>(`/ramenya/${id}`);
+  const response = await instance.get<RamenyaDetail>(`/ramenya/${id}`);
   return response.data;
 };
 
-export const getRamenyaListByRegion = async (location: string) => {
+export const getRamenyaList = async ({ type, value }: { type: RamenyaListFilterType; value: string }) => {
   const response = await instance.get<Ramenya[]>("/ramenya/all", {
-    params: { region: location },
-  });
-  return response.data;
-};
-
-export const getRamenyaListByGenre = async (genre: string) => {
-  const response = await instance.get<Ramenya[]>("/ramenya/all", {
-    params: { genre },
+    params: { [type]: value },
     paramsSerializer: {
       encode: (param: string) => encodeURIComponent(param),
     },

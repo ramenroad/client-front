@@ -1,1 +1,2 @@
-export { default, default as RamenyaCard, RamenyaOpenStatus } from "./RamenyaCard";
+export { default, default as RamenyaCard } from "./RamenyaCard";
+export { RamenyaOpenStatus } from "./RamenyaOpenStatus";

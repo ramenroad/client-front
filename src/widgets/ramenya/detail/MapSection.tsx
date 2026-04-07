@@ -1,5 +1,5 @@
 import { IconMap, IconArrowRight } from "@/shared/ui/icon";
-import KakaoMap from "./KaKaoMap";
+import KakaoMap from "./KakaoMap";
 import render from "@/shared/ui/render";
 
 interface MapSectionProps {
@@ -36,7 +36,7 @@ export const MapSection = ({ latitude, longitude, mapButtons, onOpenMapURL }: Ma
               }}
             >
               <IconMap type={button.type} />
-              <span>{button.label}</span>
+              <MapRedirectLabel>{button.label}</MapRedirectLabel>
               <StyledIconArrowRight color="#888888" />
             </MapRedirectButton>
           ))}
@@ -55,5 +55,7 @@ const MapRedirectButtonContainer = render.div("flex flex-col px-20 gap-8 mt-16")
 const MapRedirectButton = render.button(
   "bg-transparent box-border border border-solid border-gray-100 rounded-[8px] flex items-center gap-10 py-14 px-20 h-52 font-14-r text-black cursor-pointer",
 );
+
+const MapRedirectLabel = render.span("text-inherit");
 
 const StyledIconArrowRight = render.extend(IconArrowRight, "ml-auto");

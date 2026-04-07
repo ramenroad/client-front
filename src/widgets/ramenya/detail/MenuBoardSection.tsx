@@ -64,6 +64,8 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
 
   // Computed values
   const isMenuBoardEmpty = menuBoard.length === 0;
+  const menuBoardImages = menuBoard.map((menu) => menu.imageUrl);
+  const selectedMenuBoard = selectedImageIndex === null ? undefined : menuBoard[selectedImageIndex];
 
   // Event handlers
   const handleOpenImagePopup = (index: number) => {
@@ -80,8 +82,12 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
   };
 
   const handleRemoveMenuBoard = () => {
+    if (!selectedMenuBoard) {
+      return;
+    }
+
     remove.mutate(
-      { menuBoardId: menuBoard[selectedImageIndex!]._id, ramenyaId },
+      { menuBoardId: selectedMenuBoard._id, ramenyaId },
       {
         onSuccess: () => {
           openToast("메뉴판 삭제 성공");
@@ -127,7 +133,7 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
         </Title>
         {!isMenuBoardEmpty && (
           <EditButton variant="gray-outline" onClick={handleSubmitMenuBoard}>
-            <span>등록하기</span>
+            등록하기
           </EditButton>
         )}
       </TitleWrapper>
@@ -141,7 +147,9 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
           <MenuBoardEmptyCaption size={14} weight="r">
             첫 등록의 주인공이 되어주세요!
           </MenuBoardEmptyCaption>
-          <MenuBoardSubmitbutton onClick={handleSubmitMenuBoard}>등록하기</MenuBoardSubmitbutton>
+          <MenuBoardSubmitButton type="button" onClick={handleSubmitMenuBoard}>
+            등록하기
+          </MenuBoardSubmitButton>
         </MenuboardEmptyContainer>
       ) : (
         <MenuBoardContainer>
@@ -151,27 +159,27 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
             ))}
           </MenuBoardImageContainer>
           <Line />
-          <Button variant="gray" onClick={() => navigate(`/menu-board-images/${ramenyaId}`)}>
-            <span>전체 메뉴판 보기</span>
+          <Button type="button" variant="gray" onClick={() => navigate(`/menu-board-images/${ramenyaId}`)}>
+            <ButtonText>전체 메뉴판 보기</ButtonText>
             <MenuBoardAllArrowRight color="#888888" />
           </Button>
         </MenuBoardContainer>
       )}
       <Modal isOpen={isImagePopupOpen} onClose={closeImagePopup}>
-        {selectedImageIndex !== null && menuBoard[selectedImageIndex] && (
+        {selectedImageIndex !== null && selectedMenuBoard && (
           <ImagePopup
             isOpen={isImagePopupOpen}
             onClose={closeImagePopup}
-            images={menuBoard.map((menu) => menu.imageUrl)}
+            images={menuBoardImages}
             selectedIndex={selectedImageIndex}
             onIndexChange={setSelectedImageIndex}
           >
             <MenuBoardDetail
-              profileImage={menuBoard[selectedImageIndex].userId.profileImageUrl}
-              nickname={menuBoard[selectedImageIndex].userId.nickname}
-              createdAt={menuBoard[selectedImageIndex].createdAt}
-              description={menuBoard[selectedImageIndex].description}
-              isMine={userInformation?.id === menuBoard[selectedImageIndex].userId._id}
+              profileImage={selectedMenuBoard.userId.profileImageUrl}
+              nickname={selectedMenuBoard.userId.nickname}
+              createdAt={selectedMenuBoard.createdAt}
+              description={selectedMenuBoard.description}
+              isMine={userInformation?.id === selectedMenuBoard.userId._id}
               onDelete={openRemoveMenuBoardModal}
             />
           </ImagePopup>
@@ -222,8 +230,8 @@ const MenuBoardEmptyDescription = render.extend(RaisingText, "text-black pt-8 pb
 
 const MenuBoardEmptyCaption = render.extend(RaisingText, "text-gray-70 pb-16");
 
-const MenuBoardSubmitbutton = render.div(
-  "flex w-fit py-10 px-32 box-border justify-center items-center font-16-m bg-bright-orange rounded-[100px] gap-2 cursor-pointer text-orange",
+const MenuBoardSubmitButton = render.button(
+  "flex w-fit items-center justify-center gap-2 rounded-[100px] bg-bright-orange px-32 py-10 font-16-m text-orange cursor-pointer border-none shadow-none outline-none",
 );
 
 const MenuBoardContainer = render.div("flex flex-col gap-10");
@@ -231,5 +239,7 @@ const MenuBoardContainer = render.div("flex flex-col gap-10");
 const MenuBoardImageContainer = render.div("flex gap-10 w-full rounded-[8px] overflow-x-auto");
 
 const MenuBoardImage = render.img("w-110 h-110 object-cover rounded-[8px] cursor-pointer");
+
+const ButtonText = render.span("text-inherit");
 
 const MenuBoardAllArrowRight = render.extend(IconArrowRight, "pl-2");
