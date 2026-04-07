@@ -1,11 +1,11 @@
 import TopBar from "@/shared/ui/top-bar";
-import tw from "twin.macro";
 import { useParams } from "react-router-dom";
 import { useRamenyaReviewQuery } from "@/entities/review/model";
 import ReviewCard from "@/entities/review/ui";
 import { Line } from "@/shared/ui/line";
 import { useUserInformationQuery } from "@/entities/viewer/model";
 import { useIntersectionObserver } from "@/shared/lib/use-intersection-observer";
+import render from "@/shared/ui/render";
 
 export const ReviewListPage = () => {
   const { id } = useParams();
@@ -41,19 +41,10 @@ export const ReviewListPage = () => {
   );
 };
 
-const Wrapper = tw.div`
-  flex flex-col w-full pb-20
-`;
+const Wrapper = render.div("flex flex-col w-full pb-20");
 
-const Container = tw.div`
-  flex flex-col
-`;
+const Container = render.div("flex flex-col");
 
-const ReviewListTitle = tw.div`
-    font-18-sb text-black
-    px-20 mt-20 mb-[-4]
-`;
+const ReviewListTitle = render.div("font-18-sb text-black px-20 mt-20 mb-[-4]");
 
-const ReviewListContainer = tw.div`
-  flex flex-col
-`;
+const ReviewListContainer = render.div("flex flex-col");

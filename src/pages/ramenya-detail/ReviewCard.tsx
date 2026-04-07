@@ -1,5 +1,4 @@
 import React from "react";
-import tw from "twin.macro";
 import styled from "@emotion/styled";
 import { useNavigate } from "react-router-dom";
 import defaultProfile from "../../assets/images/profile-default.png";
@@ -11,6 +10,7 @@ import { useUserInformationQuery } from "@/entities/viewer/model";
 import { useRamenyaReviewDeleteMutation } from "@/entities/review/model";
 import { useRamenyaDetailQuery } from "@/entities/ramenya/model";
 import { ImagePopup } from "@/shared/ui/image-popup";
+import render from "@/shared/ui/render";
 
 export const ReviewCard = ({ review }: { review: UserReview<ReviewType.USER> }) => {
   const navigate = useNavigate();
@@ -158,154 +158,80 @@ export const ReviewCard = ({ review }: { review: UserReview<ReviewType.USER> }) 
   );
 };
 
-const Wrapper = tw.div`
-    flex flex-col
-`;
+const Wrapper = render.div("flex flex-col");
 
-const ReviewHeader = tw.div`
-    flex gap-8 items-center justify-between
-`;
+const ReviewHeader = render.div("flex gap-8 items-center justify-between");
 
-const ReviewNameBox = tw.div`
-    flex gap-10 items-center
-`;
+const ReviewNameBox = render.div("flex gap-10 items-center");
 
-const ButtonContainer = tw.div`
-    flex gap-6 items-center
-`;
+const ButtonContainer = render.div("flex gap-6 items-center");
 
-const ReviewButton = tw.button`
-    font-12-r text-black
-    cursor-pointer
-    border-none
-    bg-border
-    rounded-12
-    px-10 py-4
-    box-border
-`;
+const ReviewButton = render.button(
+  "font-12-r text-black cursor-pointer border-none bg-border rounded-[12px] px-10 py-4 box-border",
+);
 
-const ReviewerProfileImage = tw.img`
-    w-36 h-36 rounded-full
-`;
+const ReviewerProfileImage = render.img("w-36 h-36 rounded-full");
 
-const ReviewerInfoBox = tw.div`
-    flex flex-col
-`;
+const ReviewerInfoBox = render.div("flex flex-col");
 
-const ReviewerReviewInfo = tw.div`
-    flex gap-6 items-center
-`;
+const ReviewerReviewInfo = render.div("flex gap-6 items-center");
 
-const ReviewerReviewRating = tw.div`
-    font-12-r text-gray-70
-`;
+const ReviewerReviewRating = render.div("font-12-r text-gray-70");
 
-const ReviewerReviewCountDivider = tw.div`
-    w-1 h-10 bg-gray-100
-`;
+const ReviewerReviewCountDivider = render.div("w-1 h-10 bg-gray-100");
 
-const ReviewerReviewCount = tw.div`
-    font-12-r text-gray-70
-`;
+const ReviewerReviewCount = render.div("font-12-r text-gray-70");
 
-const ReviewerName = tw.div`
-    font-14-m text-black
-    cursor-pointer
-`;
+const ReviewerName = render.div("font-14-m text-black cursor-pointer");
 
-const ReviewScore = tw.div`
-    flex gap-8 items-center justify-between
-    h-18 mt-12
-`;
+const ReviewScore = render.div("flex gap-8 items-center justify-between h-18 mt-12");
 
-const ScoreBox = tw.div`
-    flex gap-8 items-center
-`;
+const ScoreBox = render.div("flex gap-8 items-center");
 
-const StarContainer = tw.div`
-`;
+const StarContainer = render.div("");
 
-const ScoredMenuContainer = tw.div`
-    flex gap-4 items-center
-`;
+const ScoredMenuContainer = render.div("flex gap-4 items-center");
 
-const MenuDivider = tw.div`
-    w-1 h-10 bg-gray-100
-`;
+const MenuDivider = render.div("w-1 h-10 bg-gray-100");
 
-const ScoredMenu = tw.div`
-    font-12-r text-gray-500
-`;
-const ReviewDate = tw.div`
-    font-12-r text-gray-500
-    h-18 leading-18
-`;
+const ScoredMenu = render.div("font-12-r text-gray-500");
+const ReviewDate = render.div("font-12-r text-gray-500 h-18 leading-18");
 
-const ReviewDetail = tw.div`
-    mt-8
-`;
+const ReviewDetail = render.div("mt-8");
 
-const ReviewTextContainer = tw.div`
-    font-14-r text-black
-    inline-block
-`;
+const ReviewTextContainer = render.div("font-14-r text-black inline-block");
 
-const MoreButton = tw.button`
-    font-14-m text-gray-400
-    cursor-pointer
-    border-none
-    bg-transparent
-    inline-block
-    p-0
-    m-0
-`;
+const MoreButton = render.button(
+  "font-14-m text-gray-400 cursor-pointer border-none bg-transparent inline-block p-0 m-0",
+);
 
-const ReviewImages = tw.div`
-    flex gap-1 items-center
-    overflow-x-auto
-    mt-12
-    scrollbar-hide
-    relative
-    -mr-20
-`;
+const ReviewImages = render.div("flex gap-1 items-center overflow-x-auto mt-12 scrollbar-hide relative -mr-20");
 
 const ReviewImage = styled.img<{ index: number; totalImages: number }>(({ totalImages }) => [
-  tw`    
-    first:rounded-l-8
-    last:rounded-r-8
-    [&:only-child]:rounded-8 
-    object-cover flex-shrink-0`,
-  totalImages <= 3 ? tw`w-116 h-116` : tw`w-96 h-96`,
+  {
+    objectFit: "cover",
+    flexShrink: 0,
+    "&:first-of-type": {
+      borderTopLeftRadius: "8px",
+      borderBottomLeftRadius: "8px",
+    },
+    "&:last-of-type": {
+      borderTopRightRadius: "8px",
+      borderBottomRightRadius: "8px",
+    },
+    "&:only-child": {
+      borderRadius: "8px",
+    },
+  },
+  totalImages <= 3 ? { width: "116px", height: "116px" } : { width: "96px", height: "96px" },
 ]);
 
-const ModalContent = tw.div`
-    flex flex-col gap-16 w-290 pt-32
-    items-center
-    justify-center
-    bg-white
-    rounded-12
-`;
+const ModalContent = render.div("flex flex-col gap-16 w-290 pt-32 items-center justify-center bg-white rounded-[12px]");
 
-const ModalTitle = tw.div`
-    font-16-r text-gray-900
-    text-center
-`;
+const ModalTitle = render.div("font-16-r text-gray-900 text-center");
 
-const ModalButtonBox = tw.div`
-    flex h-60 w-full
-`;
+const ModalButtonBox = render.div("flex h-60 w-full");
 
-const ModalCancelButton = tw.button`
-    w-full
-    font-16-r text-black
-    cursor-pointer
-    border-none
-    bg-transparent
-`;
+const ModalCancelButton = render.button("w-full font-16-r text-black cursor-pointer border-none bg-transparent");
 
-const ModalConfirmButton = tw.button`
-    w-full
-    font-16-r text-orange
-    cursor-pointer
-    border-none
-    bg-transparent`;
+const ModalConfirmButton = render.button("w-full font-16-r text-orange cursor-pointer border-none bg-transparent");

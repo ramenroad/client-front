@@ -82,7 +82,7 @@
 - **Frontend**
   - vite + ReactJS
   - Typescript
-  - TailwindCSS + twin.macro
+  - TailwindCSS v4 + className + render components
 - **DevOps**
   - Github Actions
   - Docker

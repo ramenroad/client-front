@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import tw from "twin.macro";
 import { IconClose, IconNavLeft, IconNavRight } from "@/shared/ui/icon";
+import render from "@/shared/ui/render";
 
 interface ImagePopupProps {
   isOpen: boolean;
@@ -72,50 +72,28 @@ export const ImagePopup: React.FC<ImagePopupProps> = ({
   );
 };
 
-const PopupContainer = tw.div`
-  relative flex flex-col items-center
-  w-full h-screen bg-black
-`;
+const PopupContainer = render.div("relative flex flex-col items-center w-full h-screen bg-black");
 
-const PopupHeader = tw.div`
-  relative flex w-full min-h-44
-  justify-center items-center
-  mt-32
-`;
+const PopupHeader = render.div("relative flex w-full min-h-44 justify-center items-center mt-32");
 
-const CloseButtonWrapper = tw.div`
-  absolute top-10 left-20
-  flex items-center justify-center
-  w-24 h-24 cursor-pointer
-`;
+const CloseButtonWrapper = render.div(
+  "absolute top-10 left-20 flex items-center justify-center w-24 h-24 cursor-pointer",
+);
 
-const PopupContent = tw.div`
-  flex flex-col h-full w-390 relative
-  gap-4 items-start justify-center
-`;
+const PopupContent = render.div("flex flex-col h-full w-390 relative gap-4 items-start justify-center");
 
-const ImageCounter = tw.div`
-  text-white font-16-sb
-`;
+const ImageCounter = render.div("text-white font-16-sb");
 
-const Title = tw.div`
-  text-white font-16-sb
-`;
+const Title = render.div("text-white font-16-sb");
 
-const PopUpImage = tw.img`
-  w-390 h-fit object-cover
-`;
+const PopUpImage = render.img("w-390 h-fit object-cover");
 
-const NavButtonLeft = tw.button`
-  absolute top-1/2 -translate-y-1/2 left-4 transform
-  bg-transparent border-none cursor-pointer
-`;
+const NavButtonLeft = render.button(
+  "absolute top-1/2 -translate-y-1/2 left-4 transform bg-transparent border-none cursor-pointer",
+);
 
-const NavButtonRight = tw.button`
-  absolute top-1/2 -translate-y-1/2 right-4 transform
-  bg-transparent border-none cursor-pointer
-`;
+const NavButtonRight = render.button(
+  "absolute top-1/2 -translate-y-1/2 right-4 transform bg-transparent border-none cursor-pointer",
+);
 
-const ChildrenWrapper = tw.div`
-  absolute bottom-20 left-20
-`;
+const ChildrenWrapper = render.div("absolute bottom-20 left-20");

@@ -1,4 +1,3 @@
-import tw from "twin.macro";
 import { useNavigate } from "react-router-dom";
 import { genrePath, RAMENYA_LOCATION_LIST } from "@/entities/ramenya/model";
 import { Banner } from "@/entities/curation/ui";
@@ -8,13 +7,14 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import RamenroadLogo from "./RamenroadLogo";
 import Section from "./Section";
 import GenreCard from "./GenreCard";
-import { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { SearchOverlay } from "@/widgets/map/search-overlay";
 import { IconCoordinate, IconSearch } from "@/shared/ui/icon";
 import { requestLocationPermission } from "@/shared/lib/geolocation";
 import { useToast } from "@/shared/ui/toast";
 import { useUserLocation } from "@/shared/lib/use-user-location";
 import styled from "@emotion/styled";
+import render from "@/shared/ui/render";
 
 const MainPage = () => {
   const navigate = useNavigate();
@@ -202,78 +202,49 @@ const MainPage = () => {
   );
 };
 
-const Container = tw.div`
-  flex flex-col items-center justify-center
-  gap-40 px-20 pt-20 pb-40
-`;
+const Container = render.div("flex flex-col items-center justify-center gap-40 px-20 pt-20 pb-40");
 
-const RamenroadLogoWrapper = tw.div`
-  flex items-center justify-center
-  p-10 mb-[-30px]
-`;
+const RamenroadLogoWrapper = render.div("flex items-center justify-center p-10 mb-[-30px]");
 
-const BannerWrapper = tw.div`
-  flex relative
-`;
+const BannerWrapper = render.div("flex relative");
 
-const GenrePathContainer = tw.div`
-  grid grid-cols-4 gap-x-14 gap-y-12
-`;
+const GenrePathContainer = render.div("grid grid-cols-4 gap-x-14 gap-y-12");
 
-const LocationPathBadge = tw.div`
-  flex flex-col items-center justify-center
-  min-w-52 w-52 h-71
-  rounded-50
-  bg-[#F8F8F8]
-  border border-solid border-[#F1F1F1]
-  cursor-pointer
-  text-gray-800
-`;
+const LocationPathBadge = render.div(
+  "flex flex-col items-center justify-center min-w-52 w-52 h-71 rounded-[50px] bg-[#F8F8F8] border border-solid border-[#F1F1F1] cursor-pointer text-gray-800",
+);
 
-const MyLocationBadge = tw.div`
-  min-w-71 w-71 h-71
-  flex flex-col items-center justify-center
-  rounded-50
-  bg-[#FFF4EE]
-  border border-solid border-[#FFE4D4]
-  text-orange
-  cursor-pointer
-`;
+const MyLocationBadge = render.div(
+  "min-w-71 w-71 h-71 flex flex-col items-center justify-center rounded-[50px] bg-[#FFF4EE] border border-solid border-[#FFE4D4] text-orange cursor-pointer",
+);
 
-const LocationSwiperContainer = styled.div<{ $isDragging: boolean }>`
-  ${tw`
-    w-350
-    flex items-center gap-5 overflow-x-auto
-    font-14-r
-    select-none
-    whitespace-nowrap
-    hide-scrollbar
-  `}
-  ${({ $isDragging }) => ($isDragging ? tw`cursor-grabbing` : tw`cursor-grab`)}
-`;
+const LocationSwiperContainer = styled.div<{ $isDragging: boolean }>(({ $isDragging }) => ({
+  width: "350px",
+  display: "flex",
+  alignItems: "center",
+  gap: "5px",
+  overflowX: "auto",
+  fontSize: "14px",
+  lineHeight: "21px",
+  fontWeight: 400,
+  userSelect: "none",
+  whiteSpace: "nowrap",
+  cursor: $isDragging ? "grabbing" : "grab",
+  msOverflowStyle: "none",
+  scrollbarWidth: "none",
+  "&::-webkit-scrollbar": {
+    display: "none",
+  },
+}));
 
-const GroupSwiperContainer = tw.div`
-  w-350
-`;
+const GroupSwiperContainer = render.div("w-350");
 
-const SearchInputWrapper = tw.div`
-  box-border
-  rounded-40
-  w-350 h-48 px-16
-  mb-[-20px]
-  bg-white
-  outline-none border border-orange border-solid border-[1.2px]
-  cursor-pointer
-  w-350
-  flex gap-4 items-center
-`;
+const SearchInputWrapper = render.div(
+  "box-border rounded-[40px] w-350 h-48 px-16 mb-[-20px] bg-white outline-none border border-orange border-solid border-[1.2px] cursor-pointer w-350 flex gap-4 items-center",
+);
 
-const SearchInput = tw.input`
-  w-full h-full
-  outline-none border-none
-  bg-transparent
-  text-black
-  placeholder:text-gray-400 font-16-r
-`;
+const SearchInput = render.input(
+  "w-full h-full outline-none border-none bg-transparent text-black placeholder:text-gray-400 font-16-r",
+);
 
 export default MainPage;

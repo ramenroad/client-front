@@ -1,10 +1,20 @@
-import { IconBar, IconCall, IconDropDown, IconDropDownSelected, IconInstagram, IconLocate, IconTag, IconTime, IconStar } from "@/shared/ui/icon";
+import {
+  IconBar,
+  IconCall,
+  IconDropDown,
+  IconDropDownSelected,
+  IconInstagram,
+  IconLocate,
+  IconTag,
+  IconTime,
+  IconStar,
+} from "@/shared/ui/icon";
 import { checkBusinessStatus, checkBusinessStatusSpecial } from "@/entities/ramenya/lib";
 import { DAY_MAP, OpenStatus, type RemenyaDetail } from "@/entities/ramenya/model";
-import tw from "twin.macro";
 import DetailIconTag from "./DetailIconTag";
 import { RamenyaOpenStatus } from "@/entities/ramenya/ui";
 import styled from "@emotion/styled";
+import render from "@/shared/ui/render";
 
 interface RamenyaInformationSectionProps {
   ramenyaData: RemenyaDetail | undefined;
@@ -153,92 +163,54 @@ export const RamenyaInformationSection = ({
 };
 
 // 스타일 컴포넌트들
-const MarketDetailWrapper = tw.div`
-  flex flex-col gap-16 px-20
-  pt-20
-  pb-32
-`;
+const MarketDetailWrapper = render.div("flex flex-col gap-16 px-20 pt-20 pb-32");
 
-const MarketDetailTitle = tw.div`
-  font-22-sb
-`;
+const MarketDetailTitle = render.div("font-22-sb");
 
-const MarketDetailBox = tw.div`
-  flex gap-16 items-start
-`;
+const MarketDetailBox = render.div("flex gap-16 items-start");
 
-const MarketDetailReviewBox = tw.div`
-  flex gap-4 items-center
-`;
+const MarketDetailReviewBox = render.div("flex gap-4 items-center");
 
-const MarketDetailReviewScore = tw.div`
-  font-14-r text-black
-`;
+const MarketDetailReviewScore = render.div("font-14-r text-black");
 
-const MarketDetailGenreBox = tw.div`
-  flex gap-8 items-center font-14-r text-black
-  flex-wrap
-`;
+const MarketDetailGenreBox = render.div("flex gap-8 items-center font-14-r text-black flex-wrap");
 
-const MarketDetailBoxAddressText = tw.div`
-  font-14-r
-`;
+const MarketDetailBoxAddressText = render.div("font-14-r");
 
-const MarketDetailGenre = tw.div`
-  flex gap-8 items-center font-14-r
-`;
+const MarketDetailGenre = render.div("flex gap-8 items-center font-14-r");
 
-const MarketDetailBoxContainer = tw.div`
-  flex flex-col gap-12
-`;
+const MarketDetailBoxContainer = render.div("flex flex-col gap-12");
 
-const MarketDetailBoxContent = tw.div`
-  font-14-r max-w-254 break-words
-`;
+const MarketDetailBoxContent = render.div("font-14-r max-w-254 break-words");
 
-const OperationgTimeTextContainer = tw.div`
-  flex flex-col gap-6 items-start
-`;
+const OperationgTimeTextContainer = render.div("flex flex-col gap-6 items-start");
 
-const TimeHeader = tw.div`
-  flex gap-4 items-center
-`;
+const TimeHeader = render.div("flex gap-4 items-center");
 
-const StyledIconDropDown = tw(IconDropDown)`
-  cursor-pointer
-`;
+const StyledIconDropDown = render.extend(IconDropDown, "cursor-pointer");
 
-const StyledIconDropDownSelected = tw(IconDropDownSelected)`
-  cursor-pointer
-`;
+const StyledIconDropDownSelected = render.extend(IconDropDownSelected, "cursor-pointer");
 
-const BusinessHoursWrapper = tw.div`
-  flex flex-col gap-8
-`;
+const BusinessHoursWrapper = render.div("flex flex-col gap-8");
 
 const BusinessHoursContainer = styled.div<{ today: boolean }>(({ today }) => [
-  tw`flex gap-7`,
-  today && tw`font-semibold`,
+  {
+    display: "flex",
+    gap: "7px",
+  },
+  today && {
+    fontWeight: 600,
+  },
 ]);
 
-const BusinessHoursDay = tw.span``;
+const BusinessHoursDay = render.span("");
 
-const BusinessHoursTime = tw.div`
-  flex flex-col gap-4
-`;
+const BusinessHoursTime = render.div("flex flex-col gap-4");
 
-const BreakTimeText = tw.div`
-  flex gap-4 items-center
-`;
+const BreakTimeText = render.div("flex gap-4 items-center");
 
-const PhoneNumberText = tw.div`
-  font-14-r
-`;
+const PhoneNumberText = render.div("font-14-r");
 
-const InstagramLink = tw.a`
-  font-14-r text-blue
-`;
+const InstagramLink = render.a("font-14-r text-blue");
 
-const StarContainer = tw.div`
-  flex gap-2 items-center
-`;
+const StarContainer = render.div("flex gap-2 items-center");

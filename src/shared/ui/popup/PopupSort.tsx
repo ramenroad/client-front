@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import tw from "twin.macro";
 import styled from "@emotion/styled";
 import { SortType } from "@/entities/ramenya/model";
 import { RaisingText } from "@/shared/ui/text";
 import { IconCheck, IconClose } from "@/shared/ui/icon";
 import type { ModalProps } from "@/shared/model/popup";
 import { BottomPopupLayout } from "./BottomPopupLayout";
+import render from "@/shared/ui/render";
 
 export interface PopupSortProps extends ModalProps {
   sortOption: SortType;
@@ -44,33 +44,28 @@ const PopupSort: React.FC<PopupSortProps> = ({ sortOption, onChange, onClose }) 
   );
 };
 
-const Wrapper = tw.div`
-  w-350 max-w-350 flex flex-col gap-20
-  box-border
-`;
+const Wrapper = render.div("w-350 max-w-350 flex flex-col gap-20 box-border");
 
-const Header = tw.div`
-  flex items-center justify-between
-  box-border
-`;
+const Header = render.div("flex items-center justify-between box-border");
 
-const CloseButton = tw(IconClose)`
-  cursor-pointer
-`;
+const CloseButton = render.extend(IconClose, "cursor-pointer");
 
-const Section = tw.div`
-  flex flex-col gap-20 justify-between
-  box-border
-`;
+const Section = render.div("flex flex-col gap-20 justify-between box-border");
 
-const Flex = tw.div`
-  flex justify-between items-center
-  box-border
-`;
+const Flex = render.div("flex justify-between items-center box-border");
 
 const SectionTitle = styled.div<{ selected?: boolean }>(({ selected }) => [
-  tw`font-16-r text-filter-text mb-4 cursor-pointer`,
-  selected && tw`text-orange`,
+  {
+    fontSize: "16px",
+    lineHeight: "24px",
+    fontWeight: 400,
+    color: "#a0a0a0",
+    marginBottom: "4px",
+    cursor: "pointer",
+  },
+  selected && {
+    color: "#ff5e00",
+  },
 ]);
 
 export default PopupSort;

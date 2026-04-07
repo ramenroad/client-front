@@ -1,6 +1,5 @@
 import TopBar from "@/shared/ui/top-bar";
 import RamenroadMainLogo from "../../assets/images/full-logo.png";
-import tw from "twin.macro";
 import { Line } from "@/shared/ui/line";
 import { IconKakao, IconNaver } from "@/shared/ui/icon";
 import styled from "@emotion/styled";
@@ -8,6 +7,7 @@ import { useKakaoSDK } from "@/shared/lib/use-kakao-sdk";
 import AppleLoginButton from "../../assets/images/apple/login-button.png";
 import IconGoogle from "../../assets/images/google/icon.png";
 import AppleLogin from "react-apple-login";
+import render from "@/shared/ui/render";
 
 const LoginPage = () => {
   const { Kakao } = useKakaoSDK();
@@ -76,76 +76,54 @@ const LoginPage = () => {
   );
 };
 
-const Layout = tw.div`
-  flex flex-col items-center
-  w-full h-full
-`;
+const Layout = render.div("flex flex-col items-center w-full h-full");
 
-const LogoWrapper = tw.div`
-  flex flex-col items-center justify-center gap-8
-  mt-200
-`;
+const LogoWrapper = render.div("flex flex-col items-center justify-center gap-8 mt-200");
 
-const LogoImage = tw.img`
-  h-74
-`;
+const LogoImage = render.img("h-74");
 
-const LoginText = tw.span`
-  font-14-m text-gray-400 w-full
-`;
+const LoginText = render.span("font-14-m text-gray-400 w-full");
 
-const AppleLoginButtonImage = tw.img`
-  w-310 h-46
-  cursor-pointer
-`;
+const AppleLoginButtonImage = render.img("w-310 h-46 cursor-pointer");
 
-const IconGoogleImage = tw.img`
-  w-16 h-16
-`;
+const IconGoogleImage = render.img("w-16 h-16");
 
-const LoginActionWrapper = tw.div`
-  flex flex-col items-center justify-center
-  w-full mt-auto mb-80 px-40
-  box-border
-`;
+const LoginActionWrapper = render.div(
+  "flex flex-col items-center justify-center w-full mt-auto mb-80 px-40 box-border",
+);
 
-const LoginTextWrapper = tw.div`
-  flex items-center justify-center gap-8
-  w-full
-`;
+const LoginTextWrapper = render.div("flex items-center justify-center gap-8 w-full");
 
-const LoginButtonWrapper = tw.div`
-  flex flex-col items-center justify-center gap-12
-  w-full mt-20
-`;
+const LoginButtonWrapper = render.div("flex flex-col items-center justify-center gap-12 w-full mt-20");
 
 const LoginButton = styled.button(({ loginType }: { loginType: "kakao" | "naver" | "google" }) => [
-  tw`
-    flex items-center justify-center gap-8
-    w-310 h-46
-    rounded-50
-    shadow-none
-    outline-none
-    border-none
-    cursor-pointer
-    focus:outline-none
-    focus:ring-0
-    focus:ring-offset-0
-    active:shadow-none
-    hover:shadow-none
-  `,
-  loginType === "kakao" && tw`bg-kakao`,
-  loginType === "naver" && tw`bg-naver`,
-  loginType === "google" && tw`bg-white border border-solid border-gray-200`,
+  {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    width: "310px",
+    height: "46px",
+    borderRadius: "50px",
+    boxShadow: "none",
+    outline: "none",
+    border: "none",
+    cursor: "pointer",
+  },
+  loginType === "kakao" && { backgroundColor: "#fee500" },
+  loginType === "naver" && { backgroundColor: "#03c75a" },
+  loginType === "google" && { backgroundColor: "#ffffff", border: "1px solid #cfcfcf" },
 ]);
 
 const LoginButtonText = styled.span(({ loginType }: { loginType: "kakao" | "naver" | "google" }) => [
-  tw`
-    font-18-m
-  `,
-  loginType === "kakao" && tw`text-black/85`,
-  loginType === "naver" && tw`text-white`,
-  loginType === "google" && tw`text-black`,
+  {
+    fontSize: "18px",
+    lineHeight: "27px",
+    fontWeight: 500,
+  },
+  loginType === "kakao" && { color: "rgb(17 17 17 / 0.85)" },
+  loginType === "naver" && { color: "#ffffff" },
+  loginType === "google" && { color: "#111111" },
 ]);
 
 export default LoginPage;

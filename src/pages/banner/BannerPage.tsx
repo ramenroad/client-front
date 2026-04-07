@@ -1,7 +1,7 @@
 import { IconClose } from "@/shared/ui/icon";
-import tw from "twin.macro";
 import { useNavigate } from "react-router-dom";
 import { useBannerQuery } from "@/entities/curation/model";
+import render from "@/shared/ui/render";
 
 export const BannerPage = () => {
   const navigate = useNavigate();
@@ -35,28 +35,13 @@ export const BannerPage = () => {
   );
 };
 
-const Wrapper = tw.div`
-  flex flex-col items-center h-full
-`;
-const Header = tw.div`
-  flex h-44 items-center justify-center w-full
-  relative
-`;
+const Wrapper = render.div("flex flex-col items-center h-full");
+const Header = render.div("flex h-44 items-center justify-center w-full relative");
 
-const Title = tw.div`
-  font-16-sb
-`;
+const Title = render.div("font-16-sb");
 
-const StyledIconClose = tw(IconClose)`
-  w-14 h-14 cursor-pointer 
-  absolute right-20
-`;
+const StyledIconClose = render.extend(IconClose, "w-14 h-14 cursor-pointer absolute right-20");
 
-const BannerListContainer = tw.div`
-  flex flex-col items-center justify-center
-  px-20 pt-10 gap-20
-`;
+const BannerListContainer = render.div("flex flex-col items-center justify-center px-20 pt-10 gap-20");
 
-const BannerImage = tw.img`
-  w-350 h-200 rounded-8 cursor-pointer
-`;
+const BannerImage = render.img("w-350 h-200 rounded-[8px] cursor-pointer");

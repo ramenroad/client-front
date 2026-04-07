@@ -1,5 +1,5 @@
-import tw from "twin.macro";
 import { RaisingText } from "@/shared/ui/text";
+import render from "@/shared/ui/render";
 
 export interface GenreIconProps {
   genreName: string;
@@ -20,14 +20,8 @@ const GenreCard = ({ genreName, genreIcon, onClick }: GenreIconProps) => {
 
 export default GenreCard;
 
-const GenreIconContainer = tw.div`
-  flex flex-col items-center gap-4 cursor-pointer
-`;
+const GenreIconContainer = render.div("flex flex-col items-center gap-4 cursor-pointer");
 
-const GenreIconImage = tw.img`
-  w-48 h-48
-`;
+const GenreIconImage = render.img("w-48 h-48");
 
-const GenreIconInformation = tw(RaisingText)`
-  text-black whitespace-nowrap
-`;
+const GenreIconInformation = render.extend(RaisingText, "text-black whitespace-nowrap");

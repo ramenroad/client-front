@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import tw from "twin.macro";
+import render from "@/shared/ui/render";
 
 interface KakaoMapProps {
   latitude: number | undefined;
@@ -76,9 +76,6 @@ const KakaoMap = ({ latitude, longitude }: KakaoMapProps) => {
   return <Wrapper id="map"></Wrapper>;
 };
 
-const Wrapper = tw.div`
-  w-full h-210 rounded-8
-  border border-solid border-border
-`;
+const Wrapper = render.div("w-full h-210 rounded-[8px] border border-solid border-border");
 
 export default KakaoMap;

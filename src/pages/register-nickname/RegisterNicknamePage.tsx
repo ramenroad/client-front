@@ -1,11 +1,11 @@
-import tw from "twin.macro";
 import TopBar from "@/shared/ui/top-bar";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useUserInfoMutation } from "@/features/profile/model";
 import styled from "@emotion/styled";
 import { Button } from "@/shared/ui/button";
 import { AxiosError } from "axios";
 import { RaisingText } from "@/shared/ui/text";
+import render from "@/shared/ui/render";
 
 const RegisterPage = () => {
   const query = new URLSearchParams(window.location.search);
@@ -81,56 +81,44 @@ const RegisterPage = () => {
   );
 };
 
-const Layout = tw.div`
-  flex flex-col
-  w-full h-full
-`;
+const Layout = render.div("flex flex-col w-full h-full");
 
-const Wrapper = tw.div`
-  flex flex-col
-  w-full h-full
-  px-20 box-border
-`;
+const Wrapper = render.div("flex flex-col w-full h-full px-20 box-border");
 
-const DescriptionWrapper = tw.div`
-  flex flex-col
-  w-full
-  font-20-m
-  mt-20 mb-20
-`;
+const DescriptionWrapper = render.div("flex flex-col w-full font-20-m mt-20 mb-20");
 
-const HighlightText = tw.span`
-  text-orange
-`;
+const HighlightText = render.span("text-orange");
 
-const UpdateNicknameText = tw.span`
-  font-16-m
-`;
+const UpdateNicknameText = render.span("font-16-m");
 
 const InputWrapper = styled.div`
-  ${tw`mb-394 h-44`}
+  margin-bottom: 394px;
+  height: 44px;
 
   @media (min-width: 768px) {
-    ${tw`mb-40`}
+    margin-bottom: 40px;
   }
 `;
 
 const Input = styled.input<{ isError?: boolean }>(({ isError }) => [
-  tw`
-    w-350
-    box-border
-    bg-border rounded-8 outline-none
-    focus:outline-none
-    px-20 py-10
-    text-black font-16-m
-    placeholder:text-gray-200
-  `,
-  isError ? tw`border-red border-solid border-2` : tw`border-none`,
+  {
+    width: "350px",
+    boxSizing: "border-box",
+    backgroundColor: "#f4f4f5",
+    borderRadius: "8px",
+    outline: "none",
+    padding: "10px 20px",
+    color: "#111111",
+    fontSize: "16px",
+    lineHeight: "24px",
+    fontWeight: 500,
+    "::placeholder": {
+      color: "#cfcfcf",
+    },
+  },
+  isError ? { border: "2px solid #ff5454" } : { border: "none" },
 ]);
 
-const ErrorMessage = tw(RaisingText)`
-  text-red
-  mt-4
-`;
+const ErrorMessage = render.extend(RaisingText, "text-red mt-4");
 
 export default RegisterPage;

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthMutation } from "@/features/auth/model";
-import tw from "twin.macro";
 import { AxiosError } from "axios";
 import { IconKakao, IconNaver } from "@/shared/ui/icon";
 import { RaisingText } from "@/shared/ui/text";
@@ -12,6 +11,7 @@ import { jwtDecode } from "jwt-decode";
 import { setUserInformation } from "@/entities/viewer/model";
 import { useSignInStore } from "@/entities/viewer/model";
 import { useToast } from "@/shared/ui/toast";
+import render from "@/shared/ui/render";
 
 const LoginCallbackPage = () => {
   const { id } = useParams();
@@ -177,94 +177,56 @@ const LoginCallbackPage = () => {
   }
 };
 
-const Wrapper = tw.div`
-  flex flex-col items-center justify-center
-  w-full h-full
-`;
+const Wrapper = render.div("flex flex-col items-center justify-center w-full h-full");
 
-const WithdrawInformationWrapper = tw.div`
-  box-border
-  flex flex-col gap-8
-  w-full flex-1
-  px-20 pt-54
-`;
+const WithdrawInformationWrapper = render.div("box-border flex flex-col gap-8 w-full flex-1 px-20 pt-54");
 
-const SubText = tw(RaisingText)`
-  text-gray-400
-`;
+const SubText = render.extend(RaisingText, "text-gray-400");
 
-const AlertContainer = tw.div`
-  mt-20
-  flex flex-col items-center justify-center gap-6
-  w-full
-`;
+const AlertContainer = render.div("mt-20 flex flex-col items-center justify-center gap-6 w-full");
 
-const EmailBox = tw.div`
-  mt-32
-  w-350 h-90
-  bg-[#f9f9f9]
-  outline-none border-none
-  rounded-8
-  cursor-pointer
-  flex items-center justify-center
-`;
+const EmailBox = render.div(
+  "mt-32 w-350 h-90 bg-[#f9f9f9] outline-none border-none rounded-[8px] cursor-pointer flex items-center justify-center",
+);
 
-const WithdrawButtonWrapper = tw.div`
-  flex flex-col items-center justify-center gap-12
-  w-full mb-154
-`;
+const WithdrawButtonWrapper = render.div("flex flex-col items-center justify-center gap-12 w-full mb-154");
 
-const LoginButtonWrapper = tw.div`
-  flex flex-col items-center justify-center gap-12
-  w-full mt-66
-`;
+const LoginButtonWrapper = render.div("flex flex-col items-center justify-center gap-12 w-full mt-66");
 
 const LoginButton = styled.button(({ loginType }: { loginType: "kakao" | "naver" }) => [
-  tw`
-    flex items-center justify-center gap-8
-    w-310 h-46
-    rounded-50
-    shadow-none
-    outline-none
-    border-none
-    cursor-pointer
-    focus:outline-none
-    focus:ring-0
-    focus:ring-offset-0
-    active:shadow-none
-    hover:shadow-none
-  `,
-  loginType === "kakao" && tw`bg-kakao`,
-  loginType === "naver" && tw`bg-naver`,
+  {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    width: "310px",
+    height: "46px",
+    borderRadius: "50px",
+    boxShadow: "none",
+    outline: "none",
+    border: "none",
+    cursor: "pointer",
+  },
+  loginType === "kakao" && { backgroundColor: "#fee500" },
+  loginType === "naver" && { backgroundColor: "#03c75a" },
 ]);
 
-const BackButton = tw.button`
-  py-11
-  flex items-center justify-center gap-8
-  w-310 h-46
-  bg-white
-  text-black
-  border border-gray-100 border-solid
-  rounded-50
-  shadow-none
-  outline-none
-  cursor-pointer
-`;
+const BackButton = render.button(
+  "py-11 flex items-center justify-center gap-8 w-310 h-46 bg-white text-black border border-gray-100 border-solid rounded-[50px] shadow-none outline-none cursor-pointer",
+);
 
 const LoginButtonText = styled.span(({ loginType }: { loginType: "kakao" | "naver" }) => [
-  tw`
-    font-14-m
-  `,
-  loginType === "kakao" && tw`text-black/85`,
-  loginType === "naver" && tw`text-white`,
+  {
+    fontSize: "14px",
+    lineHeight: "21px",
+    fontWeight: 500,
+  },
+  loginType === "kakao" && { color: "rgb(17 17 17 / 0.85)" },
+  loginType === "naver" && { color: "#ffffff" },
 ]);
 
-const WithdrawTitle = tw.span`
-  font-regular text-black text-24 leading-36 tracking-[-2%]
-`;
+const WithdrawTitle = render.span("font-regular text-black text-[24px] leading-36 tracking-[-2%]");
 
-const WithdrawDescription = tw.span`
-  font-16-r text-gray-500 tracking-[-2%] leading-24
-`;
+const WithdrawDescription = render.span("font-16-r text-gray-500 tracking-[-2%] leading-24");
 
 export default LoginCallbackPage;

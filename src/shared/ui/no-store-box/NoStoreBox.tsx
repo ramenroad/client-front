@@ -1,6 +1,6 @@
-import tw from "twin.macro";
 import styled from "@emotion/styled";
 import noStoreImage from "@/assets/images/store.png";
+import render from "@/shared/ui/render";
 
 interface NoStoreBoxProps {
   type?: "map" | "list";
@@ -16,22 +16,55 @@ const NoStoreBox = ({ type = "list" }: NoStoreBoxProps) => {
   );
 };
 
-const Wrapper = tw.div`
-  flex flex-col items-center justify-center h-full
-`;
+const Wrapper = render.div("flex flex-col items-center justify-center h-full");
 
 const NoStoreImage = styled.img(({ type }: { type: "map" | "list" }) => [
-  type === "map" ? tw`w-80 mb-8` : tw`w-110 h-70 mb-20`,
+  type === "map"
+    ? {
+        width: "80px",
+        marginBottom: "8px",
+      }
+    : {
+        width: "110px",
+        height: "70px",
+        marginBottom: "20px",
+      },
 ]);
 
 const NoStoreTitle = styled.div(({ type }: { type: "map" | "list" }) => [
-  tw`text-gray-800`,
-  type === "map" ? tw`font-16-sb mb-2` : tw`font-20-sb mb-12`,
+  {
+    color: "#414141",
+  },
+  type === "map"
+    ? {
+        fontSize: "16px",
+        lineHeight: "24px",
+        fontWeight: 600,
+        marginBottom: "2px",
+      }
+    : {
+        fontSize: "20px",
+        lineHeight: "30px",
+        fontWeight: 600,
+        marginBottom: "12px",
+      },
 ]);
 
 const NoStoreDescription = styled.div(({ type }: { type: "map" | "list" }) => [
-  tw`text-gray-500`,
-  type === "map" ? tw`font-14-r` : tw`font-16-r`,
+  {
+    color: "#888888",
+  },
+  type === "map"
+    ? {
+        fontSize: "14px",
+        lineHeight: "21px",
+        fontWeight: 400,
+      }
+    : {
+        fontSize: "16px",
+        lineHeight: "24px",
+        fontWeight: 400,
+      },
 ]);
 
 export default NoStoreBox;

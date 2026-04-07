@@ -1,6 +1,6 @@
 import { IconMap, IconArrowRight } from "@/shared/ui/icon";
-import tw from "twin.macro";
 import KakaoMap from "./KaKaoMap";
+import render from "@/shared/ui/render";
 
 interface MapSectionProps {
   latitude: number | undefined;
@@ -46,28 +46,14 @@ export const MapSection = ({ latitude, longitude, mapButtons, onOpenMapURL }: Ma
 };
 
 // 스타일 컴포넌트들
-const LocationTitle = tw.div`
-  font-18-sb pt-32
-`;
+const LocationTitle = render.div("font-18-sb pt-32");
 
-const LocationWrapper = tw.div`
-  flex flex-col gap-16 px-20
-`;
+const LocationWrapper = render.div("flex flex-col gap-16 px-20");
 
-const MapRedirectButtonContainer = tw.div`
-  flex flex-col px-20 gap-8 mt-16
-`;
+const MapRedirectButtonContainer = render.div("flex flex-col px-20 gap-8 mt-16");
 
-const MapRedirectButton = tw.button`
-  bg-transparent box-border
-  border border-solid border-gray-100 rounded-8
-  flex items-center gap-10
-  py-14 px-20 h-52
-  font-14-r
-  text-black
-  cursor-pointer
-`;
+const MapRedirectButton = render.button(
+  "bg-transparent box-border border border-solid border-gray-100 rounded-[8px] flex items-center gap-10 py-14 px-20 h-52 font-14-r text-black cursor-pointer",
+);
 
-const StyledIconArrowRight = tw(IconArrowRight)`
-  ml-auto
-`;
+const StyledIconArrowRight = render.extend(IconArrowRight, "ml-auto");

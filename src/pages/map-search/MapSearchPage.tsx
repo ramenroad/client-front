@@ -1,5 +1,4 @@
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import tw from "twin.macro";
+import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { NaverMap } from "@/widgets/map/naver-map";
 import {
   useRamenyaListWithGeolocationQuery,
@@ -32,6 +31,7 @@ import { useMapSearch } from "@/shared/lib/use-map-search";
 import { SearchOverlay } from "@/widgets/map/search-overlay";
 import { useSearchParams } from "react-router-dom";
 import { useUserLocation } from "@/shared/lib/use-user-location";
+import render from "@/shared/ui/render";
 
 const MapPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -378,10 +378,7 @@ const MapPage = () => {
   );
 };
 
-const GPSWrapper = tw.div`
-  absolute
-  cursor-pointer
-`;
+const GPSWrapper = render.div("absolute cursor-pointer");
 
 interface RefreshOverlayProps {
   onRefresh: () => void;
@@ -400,24 +397,13 @@ const RefreshOverlay = ({ onRefresh }: RefreshOverlayProps) => {
   );
 };
 
-const RefreshButtonContainer = tw.div`
-  absolute top-80 z-10 absolute-center-x
-`;
+const RefreshButtonContainer = render.div("absolute top-80 z-10 absolute-center-x");
 
-const RefreshButton = tw.button`
-  w-125 h-34 pl-14 pr-16 py-8
-  flex gap-4 items-center
-  bg-white rounded-50
-  outline-none border-none
-  shadow
-  cursor-pointer
-  z-10
-`;
+const RefreshButton = render.button(
+  "w-125 h-34 pl-14 pr-16 py-8 flex gap-4 items-center bg-white rounded-[50px] outline-none border-none shadow cursor-pointer z-10",
+);
 
-const RefreshButtonText = tw(RaisingText)`
-  text-gray-700
-  whitespace-nowrap
-`;
+const RefreshButtonText = render.extend(RaisingText, "text-gray-700 whitespace-nowrap");
 
 interface ResultOverlayProps {
   ramenyaList: Ramenya[];
@@ -551,11 +537,11 @@ const ResultCardOverlay = ({
   onMoveMapCenter,
   isMovingRef,
 }: ResultOverlayProps) => {
-  const swiperRef = useRef<SwiperCore>();
+  const swiperRef = useRef<SwiperCore | null>(null);
   const [, setSearchParams] = useSearchParams();
 
   // Swiper 슬라이드 변경 시 지도 중심 이동 (디바운싱 적용)
-  const swiperSlideChangeTimeout = useRef<NodeJS.Timeout | null>(null);
+  const swiperSlideChangeTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleSwiperSlideChange = useCallback(
     (swiper: SwiperCore) => {
       if (isMovingRef?.current || !selectedMarker || swiper.clickedIndex || swiper.clickedIndex === 0) return;
@@ -645,43 +631,26 @@ const ResultCardOverlay = ({
 };
 
 // ResultCardOverlay 스타일
-const ResultCardContainer = tw.div`
-  absolute left-0 right-0 bottom-70 z-10
-  flex justify-center w-full pointer-events-none
-  box-border
-`;
+const ResultCardContainer = render.div(
+  "absolute left-0 right-0 bottom-70 z-10 flex justify-center w-full pointer-events-none box-border",
+);
 
-const SwiperWrapper = tw.div`
-  w-full pointer-events-auto
-  flex justify-center
-`;
+const SwiperWrapper = render.div("w-full pointer-events-auto flex justify-center");
 
 // ResultListOverlay는 인라인 스타일로 구현
 
-const DragHandle = tw.div`
-  w-full h-20 flex items-center justify-center
-  cursor-grab active:cursor-grabbing
-  touch-none select-none
-  touch-none
-`;
+const DragHandle = render.div(
+  "w-full h-20 flex items-center justify-center cursor-grab active:cursor-grabbing touch-none select-none touch-none",
+);
 
-const DragIndicator = tw.div`
-  w-36 h-4 bg-divider rounded-full
-`;
+const DragIndicator = render.div("w-36 h-4 bg-divider rounded-full");
 
-const ListContentArea = tw.div`
-  flex-1 overflow-y-auto hide-scrollbar
-`;
+const ListContentArea = render.div("flex-1 overflow-y-auto hide-scrollbar");
 
-const LineWrapper = tw.div`
-  px-20
-`;
+const LineWrapper = render.div("px-20");
 
-const ResultListOverlayContainer = tw.div`
-  absolute bottom-56 left-0 right-0 bg-white rounded-t-16 overflow-hidden flex flex-col
-  z-[110] [transform:translateZ(0)] [will-change:transform] [isolation:isolate]
-  border border-solid border-divider/20
-  shadow-[0_-5px_10px_rgba(0,0,0,0.1)]
-`;
+const ResultListOverlayContainer = render.div(
+  "absolute bottom-56 left-0 right-0 bg-white rounded-t-16 overflow-hidden flex flex-col z-[110] [transform:translateZ(0)] [will-change:transform] [isolation:isolate] border border-solid border-divider/20 shadow-[0_-5px_10px_rgba(0,0,0,0.1)]",
+);
 
 export default MapPage;

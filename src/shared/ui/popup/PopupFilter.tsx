@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import tw from "twin.macro";
 import styled from "@emotion/styled";
 import { FilterOptions, RAMENYA_TYPES, SortType } from "@/entities/ramenya/model";
 import { Button } from "@/shared/ui/button";
@@ -7,6 +6,7 @@ import { Toggle } from "@/shared/ui/toggle";
 import { IconClose, IconPinned } from "@/shared/ui/icon";
 import type { ModalProps } from "@/shared/model/popup";
 import { BottomPopupLayout } from "./BottomPopupLayout";
+import render from "@/shared/ui/render";
 
 export interface PopupFilterProps extends ModalProps {
   initialFilterOptions: FilterOptions;
@@ -79,7 +79,11 @@ const PopupFilter: React.FC<PopupFilterProps> = ({
           <SectionTitle>정렬</SectionTitle>
           <ButtonGroup>
             {Object.values(SortType).map((type) => (
-              <FilterButton active={filterOptions.sort === type} key={type} onClick={() => handleFilterChange("sort", type)}>
+              <FilterButton
+                active={filterOptions.sort === type}
+                key={type}
+                onClick={() => handleFilterChange("sort", type)}
+              >
                 {type}
               </FilterButton>
             ))}
@@ -135,46 +139,44 @@ const PopupFilter: React.FC<PopupFilterProps> = ({
   );
 };
 
-const Wrapper = tw.div`
-  w-full flex flex-col gap-20
-`;
+const Wrapper = render.div("w-full flex flex-col gap-20");
 
-const Header = tw.div`
-  flex items-center justify-between
-`;
+const Header = render.div("flex items-center justify-between");
 
-const Flex = tw.div`
-  flex justify-between items-center gap-8
-`;
+const Flex = render.div("flex justify-between items-center gap-8");
 
-const Title = tw.span`
-  font-18-sb
-`;
+const Title = render.span("font-18-sb");
 
-const CloseButton = tw(IconClose)`
-  cursor-pointer
-`;
+const CloseButton = render.extend(IconClose, "cursor-pointer");
 
-const Section = tw.div`
-  flex flex-col gap-8 mb-12
-`;
+const Section = render.div("flex flex-col gap-8 mb-12");
 
-const SectionTitle = tw.div`
-  font-16-m text-black mb-4
-`;
+const SectionTitle = render.div("font-16-m text-black mb-4");
 
-const ButtonGroup = tw.div`
-  flex gap-8 flex-wrap
-`;
+const ButtonGroup = render.div("flex gap-8 flex-wrap");
 
 const FilterButton = styled.button<{ active?: boolean; pinned?: boolean }>(({ active, pinned }) => [
-  tw`
-    px-12 py-6 rounded-50 font-14-r border-none cursor-pointer
-    bg-filter-background text-filter-text
-    flex items-center gap-[1.5px]
-  `,
-  active && tw`bg-filter-active-background text-filter-active-text`,
-  pinned && tw`pl-8`,
+  {
+    padding: "6px 12px",
+    borderRadius: "50px",
+    fontSize: "14px",
+    lineHeight: "21px",
+    fontWeight: 400,
+    border: "none",
+    cursor: "pointer",
+    backgroundColor: "#f6f6f6",
+    color: "#a0a0a0",
+    display: "flex",
+    alignItems: "center",
+    gap: "1.5px",
+  },
+  active && {
+    backgroundColor: "#fff4eb",
+    color: "#ff5e00",
+  },
+  pinned && {
+    paddingLeft: "8px",
+  },
 ]);
 
 export default PopupFilter;

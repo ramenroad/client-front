@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import styled from "@emotion/styled";
-import tw from "twin.macro";
 import defaultProfile from "@/assets/images/profile-default.png";
 import { ReviewType, type User, type UserReview } from "@/entities/review/model";
 import { useRamenyaReviewDeleteMutation } from "@/entities/review/model";
@@ -16,6 +15,7 @@ import { Modal } from "@/shared/ui/modal";
 import { RaisingText } from "@/shared/ui/text";
 import { useToast } from "@/shared/ui/toast";
 import { useModal } from "@/shared/lib/use-modal";
+import render from "@/shared/ui/render";
 
 interface MyReviewCardProps<T extends boolean = false> {
   review: UserReview<T extends true ? ReviewType.MYPAGE : ReviewType.USER>;
@@ -36,13 +36,16 @@ const ReviewCard = <T extends boolean = false>({ review, ...props }: MyReviewCar
   const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
   const queryClient = useQueryClient();
   const isReviewLong = review.review.length > MAX_REVIEW_LENGTH;
-  const displayReview = isReviewLong && !isReviewExpanded ? `${review.review.slice(0, MAX_REVIEW_LENGTH)}...` : review.review;
+  const displayReview =
+    isReviewLong && !isReviewExpanded ? `${review.review.slice(0, MAX_REVIEW_LENGTH)}...` : review.review;
 
   const isDetailedRamenya = (ramenyaId: unknown): ramenyaId is { _id: string; name: string } => {
     return typeof ramenyaId === "object" && ramenyaId !== null && "_id" in ramenyaId;
   };
 
-  const hasUserId = (currentReview: UserReview<ReviewType>): currentReview is UserReview<ReviewType> & { userId: User } => {
+  const hasUserId = (
+    currentReview: UserReview<ReviewType>,
+  ): currentReview is UserReview<ReviewType> & { userId: User } => {
     return "userId" in currentReview && currentReview.userId !== undefined;
   };
 
@@ -205,104 +208,68 @@ const ReviewCard = <T extends boolean = false>({ review, ...props }: MyReviewCar
   );
 };
 
-const ActionText = tw(RaisingText)`
-  whitespace-nowrap
-`;
+const ActionText = render.extend(RaisingText, "whitespace-nowrap");
 
-const ReviewNameBox = tw.div`
-  flex gap-10 items-center
-`;
+const ReviewNameBox = render.div("flex gap-10 items-center");
 
-const ReviewerProfileImage = tw.img`
-  w-36 h-36 rounded-full
-`;
+const ReviewerProfileImage = render.img("w-36 h-36 rounded-full");
 
-const ReviewerInfoBox = tw.div`
-  flex flex-col
-`;
+const ReviewerInfoBox = render.div("flex flex-col");
 
-const ReviewerReviewInfo = tw.div`
-  flex flex-row gap-6 items-center
-  text-gray-70
-`;
+const ReviewerReviewInfo = render.div("flex flex-row gap-6 items-center text-gray-70");
 
-const ReviewerReviewCountDivider = tw.span`
-  w-1 h-10 bg-gray-100
-`;
+const ReviewerReviewCountDivider = render.span("w-1 h-10 bg-gray-100");
 
-const ReviewCardWrapper = tw.section`
-  p-20 flex flex-col
-`;
+const ReviewCardWrapper = render.section("p-20 flex flex-col");
 
-const ReviewCardHeader = tw.section`
-  flex flex-row justify-between
-`;
+const ReviewCardHeader = render.section("flex flex-row justify-between");
 
-const ReviewCardTitle = tw.section`
-  flex flex-row gap-2 items-center
-  cursor-pointer
-`;
+const ReviewCardTitle = render.section("flex flex-row gap-2 items-center cursor-pointer");
 
-const ReviewActionWrapper = tw.section`
-  flex flex-row gap-6
-`;
+const ReviewActionWrapper = render.section("flex flex-row gap-6");
 
-const ActionButton = tw.button`
-  w-41 h-25 bg-border rounded-12
-  shadow-none outline-none border-none
-  cursor-pointer text-black
-`;
+const ActionButton = render.button(
+  "w-41 h-25 bg-border rounded-[12px] shadow-none outline-none border-none cursor-pointer text-black",
+);
 
-const ReviewCardSubHeader = tw.section`
-  flex flex-row gap-2 items-center justify-between
-  text-gray-500 mt-10
-`;
+const ReviewCardSubHeader = render.section("flex flex-row gap-2 items-center justify-between text-gray-500 mt-10");
 
-const RatingWrapper = tw.section`
-  flex flex-row gap-2 items-center
-`;
+const RatingWrapper = render.section("flex flex-row gap-2 items-center");
 
-const ReviewCardSubHeaderLeftSection = tw.section`
-  flex flex-row gap-8 items-center flex-1
-`;
+const ReviewCardSubHeaderLeftSection = render.section("flex flex-row gap-8 items-center flex-1");
 
-const RamenyaMenuListWrapper = tw.section`
-  flex flex-row gap-4 items-center flex-1
-`;
+const RamenyaMenuListWrapper = render.section("flex flex-row gap-4 items-center flex-1");
 
-const RamenyaMenuWrapper = tw.section`
-  flex flex-row gap-4 items-center leading-18
-`;
+const RamenyaMenuWrapper = render.section("flex flex-row gap-4 items-center leading-18");
 
-const MenuSeparator = tw.section`
-  w-1 h-10 bg-gray-100
-`;
+const MenuSeparator = render.section("w-1 h-10 bg-gray-100");
 
-const ReviewCardSubHeaderRightSection = tw.section`
-  h-18 leading-18
-`;
+const ReviewCardSubHeaderRightSection = render.section("h-18 leading-18");
 
-const ReviewCardContent = tw.section`
-  mt-12 leading-21
-`;
+const ReviewCardContent = render.section("mt-12 leading-21");
 
-const MoreButton = tw(RaisingText)`
-  cursor-pointer text-gray-400 ml-4
-`;
+const MoreButton = render.extend(RaisingText, "cursor-pointer text-gray-400 ml-4");
 
-const ReviewImages = tw.div`
-  flex gap-1 items-center overflow-x-auto
-  mt-12 scrollbar-hide relative -mr-20
-`;
+const ReviewImages = render.div("flex gap-1 items-center overflow-x-auto mt-12 scrollbar-hide relative -mr-20");
 
 const ReviewImage = styled.img<{ index: number; totalImages: number }>(({ totalImages }) => [
-  tw`
-    first:rounded-l-8
-    last:rounded-r-8
-    [&:only-child]:rounded-8
-    object-cover flex-shrink-0 cursor-pointer
-  `,
-  totalImages <= 3 ? tw`w-116 h-116` : tw`w-96 h-96`,
+  {
+    objectFit: "cover",
+    flexShrink: 0,
+    cursor: "pointer",
+    "&:first-of-type": {
+      borderTopLeftRadius: "8px",
+      borderBottomLeftRadius: "8px",
+    },
+    "&:last-of-type": {
+      borderTopRightRadius: "8px",
+      borderBottomRightRadius: "8px",
+    },
+    "&:only-child": {
+      borderRadius: "8px",
+    },
+  },
+  totalImages <= 3 ? { width: "116px", height: "116px" } : { width: "96px", height: "96px" },
 ]);
 
 export default ReviewCard;

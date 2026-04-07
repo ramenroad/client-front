@@ -1,20 +1,307 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+@import "tailwindcss";
 
-:root {
-  font-family: "Pretendard", sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@theme {
+  --spacing: 1px;
 
-  color-scheme: light dark;
-  color: black;
-  background-color: #ffffff;
+  --color-white: #ffffff;
+  --color-black: #111111;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --color-gray-50: #f7f7f7;
+  --color-gray-70: #585858;
+  --color-gray-100: #e7e7e7;
+  --color-gray-200: #cfcfcf;
+  --color-gray-400: #a0a0a0;
+  --color-gray-500: #888888;
+  --color-gray-700: #585858;
+  --color-gray-800: #414141;
+  --color-gray-900: #292929;
+
+  --color-orange: #ff5e00;
+  --color-light-orange: #fff4eb;
+  --color-bright-orange: #ffeee0;
+  --color-green: #59bc12;
+  --color-yellow: #f3a216;
+  --color-red: #ff5454;
+  --color-closed: #838383;
+  --color-blue: #3476e6;
+  --color-divider: #ebebed;
+  --color-border: #f4f4f5;
+  --color-footer: #fafafa;
+  --color-kakao: #fee500;
+  --color-naver: #03c75a;
+  --color-filter-background: #f6f6f6;
+  --color-filter-text: #a0a0a0;
+  --color-filter-active-background: #fff4eb;
+  --color-filter-active-text: #ff5e00;
+
+  --font-sans: "Spoqa Han Sans Neo", sans-serif;
+  --font-pretendard: "Pretendard", sans-serif;
+
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 }
 
-body {
-  margin: 0;
+@utility flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@utility absolute-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@utility absolute-center-x {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+@utility absolute-center-y {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@utility clickable {
+  cursor: pointer;
+}
+
+@utility non-clickable {
+  cursor: not-allowed;
+  user-select: none;
+}
+
+@utility transition-color {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+@utility text-gradient-blue-left {
+  background: linear-gradient(180deg, #a9dffc 0%, #a9dffc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility hide-scrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@utility scrollbar-hide {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@utility font-10-r {
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 400;
+}
+
+@utility font-10-m {
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 500;
+}
+
+@utility font-10-sb {
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 600;
+}
+
+@utility font-10-b {
+  font-size: 10px;
+  line-height: 15px;
+  font-weight: 700;
+}
+
+@utility font-12-l {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 300;
+}
+
+@utility font-12-r {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+}
+
+@utility font-12-m {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+}
+
+@utility font-12-sb {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 600;
+}
+
+@utility font-12-b {
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+}
+
+@utility font-14-r {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 400;
+}
+
+@utility font-14-m {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 500;
+}
+
+@utility font-14-sb {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 600;
+}
+
+@utility font-14-b {
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 700;
+}
+
+@utility font-16-r {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+}
+
+@utility font-16-m {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+@utility font-16-sb {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+@utility font-16-b {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+}
+
+@utility font-18-r {
+  font-size: 18px;
+  line-height: 27px;
+  font-weight: 400;
+}
+
+@utility font-18-m {
+  font-size: 18px;
+  line-height: 27px;
+  font-weight: 500;
+}
+
+@utility font-18-sb {
+  font-size: 18px;
+  line-height: 27px;
+  font-weight: 600;
+}
+
+@utility font-18-b {
+  font-size: 18px;
+  line-height: 27px;
+  font-weight: 700;
+}
+
+@utility font-20-r {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 400;
+}
+
+@utility font-20-m {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 500;
+}
+
+@utility font-20-sb {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 600;
+}
+
+@utility font-20-b {
+  font-size: 20px;
+  line-height: 30px;
+  font-weight: 700;
+}
+
+@utility font-22-r {
+  font-size: 22px;
+  line-height: 33px;
+  font-weight: 400;
+}
+
+@utility font-22-m {
+  font-size: 22px;
+  line-height: 33px;
+  font-weight: 500;
+}
+
+@utility font-22-sb {
+  font-size: 22px;
+  line-height: 33px;
+  font-weight: 600;
+}
+
+@utility font-22-b {
+  font-size: 22px;
+  line-height: 33px;
+  font-weight: 700;
+}
+
+@layer base {
+  :root {
+    font-family: "Pretendard", sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+
+    color-scheme: light;
+    color: #111111;
+    background-color: #ffffff;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
 }

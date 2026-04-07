@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import tw from "twin.macro";
 import styled from "@emotion/styled";
+import render from "@/shared/ui/render";
 
 interface TooltipProps {
   children: React.ReactNode;
@@ -94,10 +94,7 @@ const Tooltip: React.FC<TooltipProps> = ({ children, content, title }) => {
   );
 };
 
-const TriggerWrapper = tw.div`
-  cursor-pointer
-  h-24
-`;
+const TriggerWrapper = render.div("cursor-pointer h-24");
 
 const TooltipContainer = styled.div`
   animation: fadeIn 0.2s ease-in-out;
@@ -114,18 +111,13 @@ const TooltipContainer = styled.div`
   }
 `;
 
-const TooltipContent = tw.div`
-  rounded-lg shadow-lg border border-gray-200
-  py-8 px-12 max-w-xs relative bg-[#414141]
-`;
+const TooltipContent = render.div(
+  "rounded-lg shadow-lg border border-gray-200 py-8 px-12 max-w-xs relative bg-[#414141]",
+);
 
-const TooltipTitle = tw.div`
-  font-semibold text-white text-lg mb-2
-`;
+const TooltipTitle = render.div("font-semibold text-white text-lg mb-2");
 
-const TooltipText = tw.div`
-  font-12-m text-white leading-relaxed
-`;
+const TooltipText = render.div("font-12-m text-white leading-relaxed");
 
 const TooltipArrow = styled.div`
   position: absolute;

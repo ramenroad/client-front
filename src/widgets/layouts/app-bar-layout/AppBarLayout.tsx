@@ -1,8 +1,8 @@
 import { Outlet } from "react-router-dom";
-import tw from "twin.macro";
 import { usePageMemorize } from "@/shared/lib/use-page-memorize";
 import AppBar from "@/widgets/navigation/app-bar";
 import { Footer } from "@/widgets/footer";
+import render from "@/shared/ui/render";
 
 const AppBarLayout = () => {
   usePageMemorize();
@@ -17,8 +17,6 @@ const AppBarLayout = () => {
   );
 };
 
-const Space = tw.div`
-  h-55 min-h-55
-`;
+const Space = render.div("h-55 min-h-55");
 
 export default AppBarLayout;

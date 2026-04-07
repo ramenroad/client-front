@@ -1,5 +1,6 @@
-import tw from "twin.macro";
+import React from "react";
 import type { ModalProps } from "@/shared/model/popup";
+import render from "@/shared/ui/render";
 
 export interface PopupConfirmProps extends ModalProps {
   content: string | React.ReactNode;
@@ -19,29 +20,16 @@ const PopupConfirm = ({ content, confirmText, onClose, onConfirm }: PopupConfirm
   );
 };
 
-const PopupContainer = tw.div`
-  flex flex-col gap-16 w-290 pt-32
-  items-center justify-center
-  bg-white rounded-12
-`;
+const PopupContainer = render.div(
+  "flex flex-col gap-16 w-290 pt-32 items-center justify-center bg-white rounded-[12px]",
+);
 
-const PopupTitle = tw.div`
-  font-16-r text-gray-900
-  text-center
-`;
+const PopupTitle = render.div("font-16-r text-gray-900 text-center");
 
-const PopupButtonBox = tw.div`
-  flex h-60 w-full
-`;
+const PopupButtonBox = render.div("flex h-60 w-full");
 
-const PopupCancelButton = tw.button`
-  w-full font-16-r text-black
-  cursor-pointer border-none bg-transparent
-`;
+const PopupCancelButton = render.button("w-full font-16-r text-black cursor-pointer border-none bg-transparent");
 
-const PopupConfirmButton = tw.button`
-  w-full font-16-r text-orange
-  cursor-pointer border-none bg-transparent
-`;
+const PopupConfirmButton = render.button("w-full font-16-r text-orange cursor-pointer border-none bg-transparent");
 
 export default PopupConfirm;

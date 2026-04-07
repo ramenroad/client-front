@@ -1,11 +1,11 @@
 import { useMemo } from "react";
-import tw from "twin.macro";
 import styled from "@emotion/styled";
 import { FilterOptions, initialFilterOptions, RamenyaType, SortType } from "@/entities/ramenya/model";
 import { PopupType } from "@/shared/model/popup";
 import { usePopup } from "@/shared/lib/use-popup";
 import { IconFilterWithTag } from "@/shared/ui/icon";
 import { Line } from "@/shared/ui/line";
+import render from "@/shared/ui/render";
 
 interface FilterSectionProps {
   sessionStorageKey: string;
@@ -92,39 +92,38 @@ const FilterSection = ({ filterOptions, onFilterChange, genre }: FilterSectionPr
   );
 };
 
-const FilterWrapper = tw.section`
-  flex flex-nowrap items-center
-  box-border px-20 gap-8 w-full py-11
-  overflow-x-auto scrollbar-hide
-  whitespace-nowrap box-border
-`;
+const FilterWrapper = render.section(
+  "flex flex-nowrap items-center box-border px-20 gap-8 w-full py-11 overflow-x-auto scrollbar-hide whitespace-nowrap box-border",
+);
 
-const RelativeWrapper = tw.div`
-  relative flex-shrink-0 box-border h-30
-`;
+const RelativeWrapper = render.div("relative flex-shrink-0 box-border h-30");
 
-const StyledIconFilter = tw(IconFilterWithTag)`
-  cursor-pointer
-`;
+const StyledIconFilter = render.extend(IconFilterWithTag, "cursor-pointer");
 
-const FilterCount = tw.div`
-  absolute top-[-4px] right-0 w-14 h-14
-  flex items-center justify-center
-  rounded-full bg-orange text-white
-  text-9
-`;
+const FilterCount = render.div(
+  "absolute top-[-4px] right-0 w-14 h-14 flex items-center justify-center rounded-full bg-orange text-white text-[9px]",
+);
 
-const Divider = tw(Line)`
-  h-18
-`;
+const Divider = render.extend(Line, "h-18");
 
 const FilterButton = styled.button<{ active?: boolean }>(({ active }) => [
-  tw`
-    px-12 py-4 rounded-50 font-14-r border-none cursor-pointer
-    bg-filter-background text-filter-text
-    flex-shrink-0 inline-block
-  `,
-  active && tw`bg-filter-active-background text-filter-active-text`,
+  {
+    padding: "4px 12px",
+    borderRadius: "50px",
+    fontSize: "14px",
+    lineHeight: "21px",
+    fontWeight: 400,
+    border: "none",
+    cursor: "pointer",
+    backgroundColor: "#f6f6f6",
+    color: "#a0a0a0",
+    flexShrink: 0,
+    display: "inline-block",
+  },
+  active && {
+    backgroundColor: "#fff4eb",
+    color: "#ff5e00",
+  },
 ]);
 
 export default FilterSection;

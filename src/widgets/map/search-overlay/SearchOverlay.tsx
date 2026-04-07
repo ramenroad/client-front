@@ -1,5 +1,4 @@
 import React, { useState, useRef, useMemo, ComponentProps, useEffect } from "react";
-import tw from "twin.macro";
 import { RaisingText } from "@/shared/ui/text";
 import { IconBack, IconClose, IconComment, IconDeleteSearchValue, IconLocate, IconSearch } from "@/shared/ui/icon";
 import { useDebounce } from "@/shared/lib/use-debounce";
@@ -11,6 +10,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { getTextMatch } from "@/shared/lib/text";
 import NoResultBox from "@/shared/ui/no-result-box";
 import { useSearchParams } from "react-router-dom";
+import render from "@/shared/ui/render";
 
 interface SearchOverlayProps extends ComponentProps<"input"> {
   isSearching?: boolean;
@@ -377,122 +377,58 @@ export const SearchOverlay = ({
   );
 };
 
-const AutoCompleteContainer = tw.div`
-  flex flex-col
-`;
+const AutoCompleteContainer = render.div("flex flex-col");
 
-const SubmitButton = tw.button`
-  text-orange bg-[#FFE4CE]
-  font-16-m
-  px-32 py-10
-  rounded-100
-  outline-none border-none
-  cursor-pointer
-`;
+const SubmitButton = render.button(
+  "text-orange bg-[#FFE4CE] font-16-m px-32 py-10 rounded-[100px] outline-none border-none cursor-pointer",
+);
 
-const KeywardWrapper = tw.div`
-  flex items-center gap-8
-  h-36
-  cursor-pointer
-`;
+const KeywardWrapper = render.div("flex items-center gap-8 h-36 cursor-pointer");
 
-const MatchedText = tw(RaisingText)`
-  text-orange
-`;
+const MatchedText = render.extend(RaisingText, "text-orange");
 
-const UnMatchedText = tw(RaisingText)`
-`;
+const UnMatchedText = render.extend(RaisingText, "");
 
-const SearchOverlayContainer = tw.figure`
-  absolute top-16 left-0 right-0 z-[200]
-  m-0 px-20
-  h-48
-  box-border
-  flex gap-12 items-center
-`;
+const SearchOverlayContainer = render.figure(
+  "absolute top-16 left-0 right-0 z-[200] m-0 px-20 h-48 box-border flex gap-12 items-center",
+);
 
-const SearchBox = tw.div`
-  flex items-center gap-8
-  w-full h-full rounded-8
-  box-border border border-solid border-divider
-  bg-white px-16 py-12
-`;
+const SearchBox = render.div(
+  "flex items-center gap-8 w-full h-full rounded-[8px] box-border border border-solid border-divider bg-white px-16 py-12",
+);
 
-const IconWrapper = tw.div`
-  w-24 h-24
-`;
+const IconWrapper = render.div("w-24 h-24");
 
-const FocusResetIcon = tw(IconBack)`
-  cursor-pointer
-`;
+const FocusResetIcon = render.extend(IconBack, "cursor-pointer");
 
-const SearchInput = tw.input`
-  w-full h-24
-  bg-white border-none
-  font-16-r text-black leading-24
-  placeholder:text-gray-200
-  focus:outline-none align-middle
-`;
+const SearchInput = render.input(
+  "w-full h-24 bg-white border-none font-16-r text-black leading-24 placeholder:text-gray-200 focus:outline-none align-middle",
+);
 
-const FullScreenSearchOverlay = tw.main`
-  absolute w-full h-[100dvh] inset-0 bg-white z-[150]
-  flex flex-col gap-32
-  box-border px-16 py-20 pt-84
-`;
+const FullScreenSearchOverlay = render.main(
+  "absolute w-full h-[100dvh] inset-0 bg-white z-[150] flex flex-col gap-32 box-border px-16 py-20 pt-84",
+);
 
-const HistoryContainer = tw.div`
-  flex flex-col gap-16
-`;
+const HistoryContainer = render.div("flex flex-col gap-16");
 
-const HistoryHeader = tw.div`
-  flex justify-between items-center
-  w-full
-`;
+const HistoryHeader = render.div("flex justify-between items-center w-full");
 
-const RemoveText = tw(RaisingText)`
-  text-gray-400 cursor-pointer
-`;
+const RemoveText = render.extend(RaisingText, "text-gray-400 cursor-pointer");
 
-const HistoryTagWrapper = tw.div`
-  flex flex-wrap gap-8
-`;
+const HistoryTagWrapper = render.div("flex flex-wrap gap-8");
 
-const KeywordHistoryTag = tw.div`
-  flex items-center gap-8
-  box-border h-33
-  py-6 px-12
-  cursor-pointer
-  border border-solid border-gray-200 rounded-50
-  font-14-r text-gray-900
-`;
+const KeywordHistoryTag = render.div(
+  "flex items-center gap-8 box-border h-33 py-6 px-12 cursor-pointer border border-solid border-gray-200 rounded-[50px] font-14-r text-gray-900",
+);
 
-const RamenyaHistoryWrapper = tw.div`
-  flex flex-col
-`;
+const RamenyaHistoryWrapper = render.div("flex flex-col");
 
-const NoHistoryWrapper = tw.div`
-  flex flex-col
-  items-center gap-8
-  cursor-pointer
-  mt-12
-`;
+const NoHistoryWrapper = render.div("flex flex-col items-center gap-8 cursor-pointer mt-12");
 
-const NoHistoryText = tw(RaisingText)`
-  text-gray-400
-`;
+const NoHistoryText = render.extend(RaisingText, "text-gray-400");
 
-const RamenyaXIcon = tw(IconClose)`
-  ml-auto
-  w-9 h-9
-  cursor-pointer
-`;
+const RamenyaXIcon = render.extend(IconClose, "ml-auto w-9 h-9 cursor-pointer");
 
-const XIcon = tw(IconClose)`
-  w-9 h-9
-  cursor-pointer
-`;
+const XIcon = render.extend(IconClose, "w-9 h-9 cursor-pointer");
 
-const SearchDeleteIconWrapper = tw.div`
-  cursor-pointer
-  flex h-full items-center
-`;
+const SearchDeleteIconWrapper = render.div("cursor-pointer flex h-full items-center");

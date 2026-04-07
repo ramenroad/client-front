@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Third-party
-import tw from "twin.macro";
 import { useQueryClient } from "@tanstack/react-query";
 
 // UI Components
@@ -31,6 +30,7 @@ import type { MenuBoard } from "@/entities/menu-board/model";
 
 // Local Components
 import { MenuBoardDetail } from "@/entities/menu-board/ui";
+import render from "@/shared/ui/render";
 import {
   ModalButtonBox,
   ModalCancelButton,
@@ -208,64 +208,28 @@ export const MenuBoardSection = ({ menuBoard, ramenyaId }: MenuBoardSectionProps
 };
 
 // 스타일 컴포넌트들
-const SectionWrapper = tw.div`
-  flex flex-col gap-14
-  px-20 py-32
-`;
+const SectionWrapper = render.div("flex flex-col gap-14 px-20 py-32");
 
-const TitleWrapper = tw.div`
-  flex items-center justify-between
-`;
+const TitleWrapper = render.div("flex items-center justify-between");
 
-const Title = tw(RaisingText)`
-  text-black
-`;
+const Title = render.extend(RaisingText, "text-black");
 
-const EditButton = tw(Button)`
-  w-61 h-18
-  font-12-m
-  flex items-center justify-center
-  rounded-100
-`;
+const EditButton = render.extend(Button, "w-61 h-18 font-12-m flex items-center justify-center rounded-[100px]");
 
-const MenuboardEmptyContainer = tw.div`
-  flex flex-col items-center justify-center
-`;
+const MenuboardEmptyContainer = render.div("flex flex-col items-center justify-center");
 
-const MenuBoardEmptyDescription = tw(RaisingText)`
-  text-black pt-8 pb-4
-`;
+const MenuBoardEmptyDescription = render.extend(RaisingText, "text-black pt-8 pb-4");
 
-const MenuBoardEmptyCaption = tw(RaisingText)`
-  text-gray-70 pb-16
-`;
+const MenuBoardEmptyCaption = render.extend(RaisingText, "text-gray-70 pb-16");
 
-const MenuBoardSubmitbutton = tw.div`
-  flex w-fit py-10 px-32
-  box-border
-  justify-center items-center
-  font-16-m
-  bg-brightOrange rounded-100 gap-2
-  cursor-pointer
-  text-orange
-`;
+const MenuBoardSubmitbutton = render.div(
+  "flex w-fit py-10 px-32 box-border justify-center items-center font-16-m bg-bright-orange rounded-[100px] gap-2 cursor-pointer text-orange",
+);
 
-const MenuBoardContainer = tw.div`
-  flex flex-col gap-10
-`;
+const MenuBoardContainer = render.div("flex flex-col gap-10");
 
-const MenuBoardImageContainer = tw.div`
-  flex gap-10
-  w-full
-  rounded-8 overflow-x-auto
-`;
+const MenuBoardImageContainer = render.div("flex gap-10 w-full rounded-[8px] overflow-x-auto");
 
-const MenuBoardImage = tw.img`
-  w-110 h-110 object-cover
-  rounded-8
-  cursor-pointer
-`;
+const MenuBoardImage = render.img("w-110 h-110 object-cover rounded-[8px] cursor-pointer");
 
-const MenuBoardAllArrowRight = tw(IconArrowRight)`
-  pl-2
-`;
+const MenuBoardAllArrowRight = render.extend(IconArrowRight, "pl-2");

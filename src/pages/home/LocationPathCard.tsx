@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import tw from "twin.macro";
 import { useMobileState } from "@/shared/lib/use-mobile-state.ts";
-import styled from "@emotion/styled/macro";
+import styled from "@emotion/styled";
 import { RaisingText } from "@/shared/ui/text";
+import render from "@/shared/ui/render";
 
 interface LocationPathCardProps {
   location: string;
@@ -22,14 +22,24 @@ export const LocationPathCard = ({ location }: LocationPathCardProps) => {
 };
 
 const Wrapper = styled.div(({ isMobile }: { isMobile: boolean }) => [
-  tw`
-    flex items-center justify-center
-    border-solid border-1 border-divider
-    rounded-4 w-110 h-50
-    cursor-pointer`,
-  !isMobile && tw`hover:(bg-orange text-white) active:(bg-orange text-white)`,
+  {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderStyle: "solid",
+    borderWidth: "1px",
+    borderColor: "#ebebed",
+    borderRadius: "4px",
+    width: "110px",
+    height: "50px",
+    cursor: "pointer",
+  },
+  !isMobile && {
+    "&:hover, &:active": {
+      backgroundColor: "#ff5e00",
+      color: "#ffffff",
+    },
+  },
 ]);
 
-const LocationPathText = tw(RaisingText)`
-  flex
-`;
+const LocationPathText = render.extend(RaisingText, "flex");

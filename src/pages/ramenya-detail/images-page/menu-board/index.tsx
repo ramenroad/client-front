@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 // Third-party
-import tw from "twin.macro";
 import { useQueryClient } from "@tanstack/react-query";
 
 // UI Components
@@ -26,6 +25,7 @@ import type { MenuBoard } from "@/entities/menu-board/model";
 
 // Local Components
 import { MenuBoardDetail } from "@/entities/menu-board/ui";
+import render from "@/shared/ui/render";
 import {
   ModalButtonBox,
   ModalCancelButton,
@@ -143,20 +143,10 @@ export const MenuBoardImagesPage = () => {
   );
 };
 
-const Wrapper = tw.div`
-    flex flex-col pb-40
-`;
+const Wrapper = render.div("flex flex-col pb-40");
 
-const Header = tw.div`
-    flex flex-col
-    w-full
-    max-w-390
-`;
+const Header = render.div("flex flex-col w-full max-w-390");
 
-const ImageContainer = tw.div`
-    grid grid-cols-3 gap-1
-`;
+const ImageContainer = render.div("grid grid-cols-3 gap-1");
 
-const Image = tw.img`
-    w-full aspect-square object-cover
-`;
+const Image = render.img("w-full aspect-square object-cover");

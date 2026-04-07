@@ -1,11 +1,11 @@
 /// <reference types="navermaps" />
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import tw from "twin.macro";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { requestLocationPermission } from "@/shared/lib/geolocation";
 import { useUserLocation } from "@/shared/lib/use-user-location";
 import { useMapLocation } from "@/shared/lib/use-map-location";
 import { useSearchParams } from "react-router-dom";
+import render from "@/shared/ui/render";
 
 export interface NaverMapProps<T = unknown> {
   markers?: {
@@ -254,7 +254,7 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
         }
 
         // 지도 중심 변경 이벤트 리스너 (디바운스 적용)
-        let centerChangeTimeout: NodeJS.Timeout;
+        let centerChangeTimeout: ReturnType<typeof setTimeout>;
 
         updateLocationData(map);
 
@@ -362,10 +362,6 @@ export const NaverMap = <T = unknown,>(props: NaverMapProps<T>) => {
   );
 };
 
-const MapWrapper = tw.article`
-  w-full h-full overflow-hidden
-`;
+const MapWrapper = render.article("w-full h-full overflow-hidden");
 
-const NaverMapComponent = tw.div`
-  w-full h-full
-`;
+const NaverMapComponent = render.div("w-full h-full");

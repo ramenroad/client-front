@@ -1,20 +1,19 @@
-import tw from "twin.macro";
 import TopBar from "@/shared/ui/top-bar";
 import { RaisingText } from "@/shared/ui/text";
-import { useState, createRef, useCallback, memo, useMemo, useEffect } from "react";
+import React, { useState, createRef, useCallback, memo, useMemo, useEffect } from "react";
 import { IconAdd, IconImageDelete, IconMenuBoardRightImage, IconMenuBoardWrongImage } from "@/shared/ui/icon";
 import heic2any from "heic2any";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import { Line } from "@/shared/ui/line";
 import styled from "@emotion/styled";
-import { css } from "@emotion/react";
 import { Button } from "@/shared/ui/button";
 import MenuBoardImage1 from "../../assets/images/menu-board/menu-board-1.png";
 import MenuBoardImage2 from "../../assets/images/menu-board/menu-board-2.png";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMenuBoardMutation } from "@/features/menu-board/model";
 import { useToast } from "@/shared/ui/toast";
+import render from "@/shared/ui/render";
 
 // 이미지 압축 및 리사이징 함수
 const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.8): Promise<File> => {
@@ -346,15 +345,9 @@ export const MenuBoardSubmitPage = () => {
   );
 };
 
-const ButtonWrapper = tw.div`
-  box-border w-full
-  pb-20 px-20
-`;
+const ButtonWrapper = render.div("box-border w-full pb-20 px-20");
 
-const Container = tw.form`
-  flex flex-col box-border
-  w-full
-`;
+const Container = render.form("flex flex-col box-border w-full");
 
 const TopLabel = () => {
   return (
@@ -369,21 +362,14 @@ const TopLabel = () => {
   );
 };
 
-const TopLabelContainer = tw.div`
-  w-full h-44 box-border
-  bg-lightOrange
-  px-20 py-12
-  flex items-center gap-2
-`;
+const TopLabelContainer = render.div("w-full h-44 box-border bg-light-orange px-20 py-12 flex items-center gap-2");
 
-const HighlightedText = tw(RaisingText)`
-  text-orange  
-`;
+const HighlightedText = render.extend(RaisingText, "text-orange");
 
 interface PhotoUploadSectionProps {
   selectedImages: (File | string)[];
   setSelectedImages: (images: (File | string)[]) => void;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleImageClick: () => void;
   handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleRemoveImage: (index: number) => void;
@@ -447,96 +433,49 @@ const PhotoUploadSection = (props: PhotoUploadSectionProps) => {
   );
 };
 
-const LineWrapper = tw.div`
-  pt-20
-`;
+const LineWrapper = render.div("pt-20");
 
-const PhotoUploadSectionContainer = tw.div`
-  w-full box-border
-  p-20
-`;
+const PhotoUploadSectionContainer = render.div("w-full box-border p-20");
 
-const PhotoUploadSectionTitleContainer = tw.div`
-  flex justify-center flex-col
-`;
+const PhotoUploadSectionTitleContainer = render.div("flex justify-center flex-col");
 
-const PhtotoUploadSectionTitleWrapper = tw.div`
-  pr-8
-`;
+const PhtotoUploadSectionTitleWrapper = render.div("pr-8");
 
-const PhotoUploadSectionTitleText = tw(RaisingText)`
-  pr-8
-`;
+const PhotoUploadSectionTitleText = render.extend(RaisingText, "pr-8");
 
-const PhotoUploadSectionTotalUploadableCount = tw(RaisingText)`
-  text-filter-text
-`;
+const PhotoUploadSectionTotalUploadableCount = render.extend(RaisingText, "text-filter-text");
 
-const PhotoUploadSectionCaption = tw(RaisingText)`
-  text-gray-500
-`;
+const PhotoUploadSectionCaption = render.extend(RaisingText, "text-gray-500");
 
-const PhotoUploadSectionImageContainer = tw.div`
-  mt-16
-`;
+const PhotoUploadSectionImageContainer = render.div("mt-16");
 
-const ImageUploadContent = tw.div`
-  flex flex-col gap-12
-`;
+const ImageUploadContent = render.div("flex flex-col gap-12");
 
-const ImageUploadContentImage = tw.div`
-  flex flex-row flex-wrap gap-12
-`;
+const ImageUploadContentImage = render.div("flex flex-row flex-wrap gap-12");
 
-const ImagePreviewContainer = tw.div`
-  relative
-  w-96 h-96
-  rounded-7
-  flex items-center justify-center
-  border-solid border-1 border-border
-`;
+const ImagePreviewContainer = render.div(
+  "relative w-96 h-96 rounded-[7px] flex items-center justify-center border-solid border border-border",
+);
 
-const ImagePreview = tw.img`
-  w-full h-full
-  object-cover
-  rounded-7
-`;
+const ImagePreview = render.img("w-full h-full object-cover rounded-[7px]");
 
-const ErrorImagePlaceholder = tw.div`
-  w-full h-full
-  flex flex-col items-center justify-center
-  text-gray-400 text-12
-`;
+const ErrorImagePlaceholder = render.div(
+  "w-full h-full flex flex-col items-center justify-center text-gray-400 text-[12px]",
+);
 
-const StyledIconImageDelete = tw(IconImageDelete)`
-  absolute top-[-8px] right-[-8px]
-  cursor-pointer
-`;
+const StyledIconImageDelete = render.extend(IconImageDelete, "absolute top-[-8px] right-[-8px] cursor-pointer");
 
-const ImageAddButton = tw.button`
-  flex items-center justify-center
-  w-96 h-96 rounded-8 bg-border
-  border-solid border-1 border-gray-200
-  border-dashed
-  cursor-pointer
-`;
+const ImageAddButton = render.button(
+  "flex items-center justify-center w-96 h-96 rounded-[8px] bg-border border-solid border border-gray-200 border-dashed cursor-pointer",
+);
 
-const LoadingOverlay = tw.div`
-  fixed
-  top-0 left-0 right-0 bottom-0
-  bg-[#000000]/20
-  flex flex-col justify-start items-center
-  pt-[40vh]
-  z-10
-`;
+const LoadingOverlay = render.div(
+  "fixed top-0 left-0 right-0 bottom-0 bg-[#000000]/20 flex flex-col justify-start items-center pt-[40vh] z-10",
+);
 
-const LottieWrapper = tw.div``;
+const LottieWrapper = render.div("");
 
-const MobileLoadingText = tw.div`
-  font-16-m text-white
-  text-center
-  py-4
-`;
+const MobileLoadingText = render.div("font-16-m text-white text-center py-4");
 
 interface DescriptionSectionProps {
   description: string;
@@ -571,60 +510,41 @@ const DescriptionSection = (props: DescriptionSectionProps) => {
   );
 };
 
-const DescriptionWrapper = tw.div`
-  flex flex-col gap-16
-  box-border px-20
-  relative
-`;
+const DescriptionWrapper = render.div("flex flex-col gap-16 box-border px-20 relative");
 
-const DescriptionTextAreaContainer = tw.div`
-  flex flex-col gap-4 relative
-  bg-border
-  rounded-8
-  px-12 pt-10
-  pb-36
-  border-solid border-1 border-transparent
-  outline-none
-  box-border
-  focus-within:(border-orange)
-`;
+const DescriptionTextAreaContainer = render.div(
+  "flex flex-col gap-4 relative bg-border rounded-[8px] px-12 pt-10 pb-36 border-solid border border-transparent outline-none box-border focus-within:(border-orange)",
+);
 
-const DescriptionTextarea = styled.textarea(() => [
-  tw`
-    flex h-110 w-full
-    bg-transparent
-    border-none
-    font-14-r
-    font-pretendard
-    resize-none
-    outline-none
-    text-black
-  `,
-  css`
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #d9d9d9;
-      border-radius: 3px;
-    }
-  `,
-]);
+const DescriptionTextarea = styled.textarea({
+  display: "flex",
+  height: "110px",
+  width: "100%",
+  backgroundColor: "transparent",
+  border: "none",
+  fontSize: "14px",
+  lineHeight: "21px",
+  fontWeight: 400,
+  fontFamily: '"Pretendard", sans-serif',
+  resize: "none",
+  outline: "none",
+  color: "#111111",
+  "&::-webkit-scrollbar": {
+    width: "4px",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: "transparent",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    background: "#d9d9d9",
+    borderRadius: "3px",
+  },
+});
 
 // 글자 수 표시 스타일
-const CharacterCount = tw.div`
-  absolute bottom-14 right-12
-  font-14-r text-gray-400
-`;
+const CharacterCount = render.div("absolute bottom-14 right-12 font-14-r text-gray-400");
 
-const TypedCount = tw.span`
-  font-14-r text-black
-`;
+const TypedCount = render.span("font-14-r text-black");
 
 const GuideSection = () => {
   return (
@@ -655,59 +575,38 @@ const GuideSection = () => {
   );
 };
 
-const GuideSectionWrapper = tw.div`
-  box-border w-full
-  px-20 pt-20
-`;
+const GuideSectionWrapper = render.div("box-border w-full px-20 pt-20");
 
-const GuideSectionContainer = tw.div`
-  box-border w-full
-  flex flex-col items-center
-  rounded-8
-  h-190
-  pt-20 pb-27
-  bg-border
-`;
+const GuideSectionContainer = render.div(
+  "box-border w-full flex flex-col items-center rounded-[8px] h-190 pt-20 pb-27 bg-border",
+);
 
-const GuideSectionTitle = tw.div`
-  font-14-sb text-gray-800
-`;
+const GuideSectionTitle = render.div("font-14-sb text-gray-800");
 
-const GuideSectionContent = tw.div`
-  font-14-m text-gray-800
-`;
+const GuideSectionContent = render.div("font-14-m text-gray-800");
 
-const GuideSectionImageContainer = tw.div`
-  flex flex-row gap-20
-  pt-16
-`;
+const GuideSectionImageContainer = render.div("flex flex-row gap-20 pt-16");
 
-const GuideSectionImageOverlay = tw.div`
-  relative
-`;
+const GuideSectionImageOverlay = render.div("relative");
 
 const GuideSectionImageIcon = styled.div<{ status: "right" | "wrong" }>(({ status }) => [
-  tw`
-    absolute bottom-[2px] right-[-13px]
-    rounded-full
-    w-23 h-23
-    flex items-center justify-center
-  `,
-  status === "right" && tw`bg-[#06B526]`,
-  status === "wrong" && tw`bg-[#FF5234]`,
+  {
+    position: "absolute",
+    bottom: "2px",
+    right: "-13px",
+    borderRadius: "9999px",
+    width: "23px",
+    height: "23px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  status === "right" && { backgroundColor: "#06b526" },
+  status === "wrong" && { backgroundColor: "#ff5234" },
 ]);
 
-const GuideSectionImage = tw.img`
-  w-86 h-86
-  object-cover
-  rounded-4
-`;
+const GuideSectionImage = render.img("w-86 h-86 object-cover rounded-[4px]");
 
-const GuideSectionHighlightedText = tw.span`
-  text-[#06B526] font-14-m
-`;
+const GuideSectionHighlightedText = render.span("text-[#06B526] font-14-m");
 
-const GuideCaption = tw.div`
-  text-gray-500 font-14-m
-  pt-14 pb-73
-`;
+const GuideCaption = render.div("text-gray-500 font-14-m pt-14 pb-73");

@@ -1,14 +1,14 @@
-import tw from "twin.macro";
 import TopBar from "@/shared/ui/top-bar";
 import { Line } from "@/shared/ui/line";
 import { IconCheckbox } from "@/shared/ui/icon";
 import { useRef, useState } from "react";
 import { useModal } from "@/shared/lib/use-modal";
 import { Modal } from "@/shared/ui/modal";
-import styled from "@emotion/styled/macro";
+import styled from "@emotion/styled";
 import { useAuthMutation } from "@/features/auth/model";
 import { useToast } from "@/shared/ui/toast";
 import { useNavigate } from "react-router-dom";
+import render from "@/shared/ui/render";
 
 const WithdrawPage = () => {
   const [isConfirmedPolicy, setIsConfirmedPolicy] = useState(false);
@@ -107,108 +107,68 @@ const WithdrawPage = () => {
   );
 };
 
-const PageContainer = tw.div`
-  flex flex-col
-  w-full h-full pt-10 px-20 pb-20 box-border
-  text-black
-`;
+const PageContainer = render.div("flex flex-col w-full h-full pt-10 px-20 pb-20 box-border text-black");
 
-const WithdrawInformationContainer = tw.div`
-  flex flex-col gap-16 flex-1
-`;
+const WithdrawInformationContainer = render.div("flex flex-col gap-16 flex-1");
 
-const WithdrawTitle = tw.span`
-  w-154 h-72 leading-36
-  text-24 font-regular
-`;
+const WithdrawTitle = render.span("w-154 h-72 leading-36 text-[24px] font-regular");
 
-const WithdrawDescription = tw.span`
-  w-full flex-1 leading-24
-  text-16 font-regular text-gray-800 tracking-[-2%]
-`;
+const WithdrawDescription = render.span(
+  "w-full flex-1 leading-24 text-[16px] font-regular text-gray-800 tracking-[-2%]",
+);
 
-const WithdrawActionContainer = tw.div`
-  flex flex-col gap-24
-`;
+const WithdrawActionContainer = render.div("flex flex-col gap-24");
 
-const WithdrawInputContainer = tw.div`
-  flex items-center gap-8
-  cursor-pointer
-`;
+const WithdrawInputContainer = render.div("flex items-center gap-8 cursor-pointer");
 
-const WithdrawCheckbox = tw(IconCheckbox)`
-  cursor-pointer
-`;
+const WithdrawCheckbox = render.extend(IconCheckbox, "cursor-pointer");
 
-const WithdrawCheckboxLabel = tw.span`
-  font-16-m text-gray-800
-`;
+const WithdrawCheckboxLabel = render.span("font-16-m text-gray-800");
 
-const WithdrawButton = tw.button`
-  w-full h-48
-  bg-gray-900 shadow-none
-  font-16-sb text-white leading-24 tracking-[-2%]
-  rounded-8 border-none py-12
-  cursor-pointer
-  border-none
-  outline-none
-  shadow-none
-  disabled:bg-gray-200 disabled:cursor-not-allowed
-`;
+const WithdrawButton = render.button(
+  "w-full h-48 bg-gray-900 shadow-none font-16-sb text-white leading-24 tracking-[-2%] rounded-[8px] border-none py-12 cursor-pointer border-none outline-none shadow-none disabled:bg-gray-200 disabled:cursor-not-allowed",
+);
 
-const ModalContent = tw.div`
-  flex flex-col items-center gap-16
-  box-border
-  font-16-r text-gray-900
-  w-290 pt-32
-`;
+const ModalContent = render.div("flex flex-col items-center gap-16 box-border font-16-r text-gray-900 w-290 pt-32");
 
-const ModalConfirmWrapper = tw.div`
-  flex flex-col
-  text-center
-`;
+const ModalConfirmWrapper = render.div("flex flex-col text-center");
 
-const ModalConfirmText = tw.span`
-  font-semibold
-`;
+const ModalConfirmText = render.span("font-semibold");
 
-const ModalInputWrapper = tw.div`
-  box-border
-  w-full px-31
-`;
+const ModalInputWrapper = render.div("box-border w-full px-31");
 
-const ModalInput = styled.input(({ active }: { active: boolean }) => [
-  tw`
-  box-border
-  w-full h-56
-  shadow-none
-  outline-none
-  bg-border rounded-8
-  font-16-r text-black
-  px-16
-`,
-  active ? tw`border-2 border-solid border-green` : tw`border-2 border-solid border-red`,
-]);
+const ModalInput = styled.input<{ active: boolean }>(({ active }) => ({
+  boxSizing: "border-box",
+  width: "100%",
+  height: "56px",
+  boxShadow: "none",
+  outline: "none",
+  backgroundColor: "#f4f4f5",
+  borderRadius: "8px",
+  fontSize: "16px",
+  lineHeight: "24px",
+  fontWeight: 400,
+  color: "#111111",
+  paddingLeft: "16px",
+  paddingRight: "16px",
+  border: active ? "2px solid #59bc12" : "2px solid #ff5454",
+}));
 
-const ModalActionButtonContainer = tw.div`
-  flex h-60 w-full
-`;
+const ModalActionButtonContainer = render.div("flex h-60 w-full");
 
-const ModalActionButton = styled.button(
-  ({ variant, disabled }: { variant: "cancel" | "confirm"; disabled?: boolean }) => [
-    tw`
-    w-full
-    bg-transparent
-    border-none
-    outline-none
-    shadow-none
-    cursor-pointer
-    font-16-r text-black
-  `,
-    variant === "cancel" && tw`text-black`,
-    variant === "confirm" && tw`text-orange font-semibold`,
-    variant === "confirm" && disabled && tw`text-gray-200 cursor-not-allowed`,
-  ],
+const ModalActionButton = styled.button<{ variant: "cancel" | "confirm"; disabled?: boolean }>(
+  ({ variant, disabled }) => ({
+    width: "100%",
+    backgroundColor: "transparent",
+    border: "none",
+    outline: "none",
+    boxShadow: "none",
+    cursor: variant === "confirm" && disabled ? "not-allowed" : "pointer",
+    fontSize: "16px",
+    lineHeight: "24px",
+    fontWeight: variant === "confirm" ? 600 : 400,
+    color: variant === "confirm" ? (disabled ? "#cfcfcf" : "#ff5e00") : "#111111",
+  }),
 );
 
 export default WithdrawPage;

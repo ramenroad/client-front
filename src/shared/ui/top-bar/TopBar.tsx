@@ -1,6 +1,7 @@
-import tw from "twin.macro";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { IconBack } from "@/shared/ui/icon";
+import render from "@/shared/ui/render";
 
 interface TopBarProps {
   title: string;
@@ -40,28 +41,14 @@ const TopBar = ({ title, navigate: navigatePath, onBackClick, tooltip, icon, onI
   );
 };
 
-const TopBarWrapper = tw.section`
-  flex items-center justify-center
-  h-44
-`;
+const TopBarWrapper = render.section("flex items-center justify-center h-44");
 
-const IconWrapper = tw.div`
-  absolute left-20
-  w-24 h-24
-`;
+const IconWrapper = render.div("absolute left-20 w-24 h-24");
 
-const StyledIconBack = tw(IconBack)`
-  cursor-pointer
-`;
+const StyledIconBack = render.extend(IconBack, "cursor-pointer");
 
-const HeaderTitle = tw.span`
-  font-16-sb text-black
-`;
+const HeaderTitle = render.span("font-16-sb text-black");
 
-const AdditionalIconWrapper = tw.div`
-  absolute right-20
-  w-24 h-24
-  cursor-pointer
-`;
+const AdditionalIconWrapper = render.div("absolute right-20 w-24 h-24 cursor-pointer");
 
 export default TopBar;

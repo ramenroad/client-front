@@ -1,10 +1,8 @@
-import { css } from "@emotion/react";
 import styled from "@emotion/styled";
 import { Controller, useForm } from "react-hook-form";
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Lottie from "lottie-react";
-import tw from "twin.macro";
 import heic2any from "heic2any";
 import { useRamenyaDetailQuery } from "@/entities/ramenya/model";
 import {
@@ -21,6 +19,7 @@ import TopBar from "@/shared/ui/top-bar";
 import { useToast } from "@/shared/ui/toast";
 import loadingAnimation from "../../assets/lotties/loading.json";
 import ReviewGuide from "./ReviewGuide.tsx";
+import render from "@/shared/ui/render";
 
 export type ReviewFormMode = "create" | "edit";
 
@@ -782,351 +781,204 @@ export const ReviewFormPage = ({ mode }: ReviewFormPageProps) => {
   );
 };
 
-const LoadingOverlay = tw.div`
-    fixed
-    top-0 left-0 right-0 bottom-0
-    bg-[#000000]/20
-    flex flex-col justify-start items-center
-    pt-[40vh]
-    z-10
-`;
+const LoadingOverlay = render.div(
+  "fixed top-0 left-0 right-0 bottom-0 bg-[#000000]/20 flex flex-col justify-start items-center pt-[40vh] z-10",
+);
 
-const LottieWrapper = tw.div`
-`;
+const LottieWrapper = render.div("");
 
-const Wrapper = tw.div`
-    flex
-    flex-col
-    w-full
-    pb-40
-`;
+const Wrapper = render.div("flex flex-col w-full pb-40");
 
-const Header = tw.div`
-`;
+const Header = render.div("");
 
-const ContentsWrapper = tw.div`
-    flex
-    flex-col
-    px-20
-`;
+const ContentsWrapper = render.div("flex flex-col px-20");
 
-const StarWrapper = tw.div`
-    flex flex-col
-    items-center
-    pt-20
-    pb-32
-    gap-12
-`;
+const StarWrapper = render.div("flex flex-col items-center pt-20 pb-32 gap-12");
 
-const StarTitle = tw.div`
-    font-16-m text-black
-`;
+const StarTitle = render.div("font-16-m text-black");
 
-const StarContainer = tw.div`
-    flex gap-8 items-center
-`;
+const StarContainer = render.div("flex gap-8 items-center");
 
-const StarButtonContainer = tw.div`
-    relative flex items-center justify-center
-`;
+const StarButtonContainer = render.div("relative flex items-center justify-center");
 
-const StarButtonLeft = tw.button`
-    bg-transparent border-none cursor-pointer p-0 m-0
-    absolute left-0 w-1/2 h-full
-    flex items-center justify-center
-`;
+const StarButtonLeft = render.button(
+  "bg-transparent border-none cursor-pointer p-0 m-0 absolute left-0 w-1/2 h-full flex items-center justify-center",
+);
 
-const StarButtonRight = tw.button`
-    bg-transparent border-none cursor-pointer p-0 m-0
-    absolute right-0 w-1/2 h-full
-    flex items-center justify-center
-`;
+const StarButtonRight = render.button(
+  "bg-transparent border-none cursor-pointer p-0 m-0 absolute right-0 w-1/2 h-full flex items-center justify-center",
+);
 
-const Divider = tw.div`
-    w-full h-1 bg-divider
-`;
+const Divider = render.div("w-full h-1 bg-divider");
 
-const MenuWrapper = tw.div`
-    flex flex-col mt-32 gap-16
-`;
+const MenuWrapper = render.div("flex flex-col mt-32 gap-16");
 
-const MenuTitleBox = tw.div`
-    flex items-center
-    gap-4
-`;
+const MenuTitleBox = render.div("flex items-center gap-4");
 
-const MenuTitle = tw.div`
-    font-16-m text-black
-`;
+const MenuTitle = render.div("font-16-m text-black");
 
-const MenuSubTitle = tw.div`
-    font-12-r text-gray-400
-`;
+const MenuSubTitle = render.div("font-12-r text-gray-400");
 
-const MenuTabContainer = tw.div`
-    flex flex-wrap gap-8
-`;
+const MenuTabContainer = render.div("flex flex-wrap gap-8");
 
 interface MenuTabProps {
   selected: boolean;
 }
 
 const MenuTab = styled.div<MenuTabProps>(({ selected }) => [
-  tw`
-    flex w-fit h-29 box-border
-    items-center
-    font-14-r
-    py-6 px-12 rounded-50
-    cursor-pointer
-    `,
+  {
+    display: "flex",
+    width: "fit-content",
+    height: "29px",
+    boxSizing: "border-box",
+    alignItems: "center",
+    fontSize: "14px",
+    lineHeight: "21px",
+    fontWeight: 400,
+    padding: "6px 12px",
+    borderRadius: "50px",
+    cursor: "pointer",
+  },
   selected
-    ? tw`
-        bg-lightOrange text-orange
-      `
-    : tw`
-        bg-filter-background text-filter-text
-      `,
+    ? {
+        backgroundColor: "#fff4eb",
+        color: "#ff5e00",
+      }
+    : {
+        backgroundColor: "#f6f6f6",
+        color: "#a0a0a0",
+      },
 ]);
 
-const MenuAddWrapper = tw.div`
-    flex flex-col mt-16 gap-12
-`;
+const MenuAddWrapper = render.div("flex flex-col mt-16 gap-12");
 
-const MenuInputContainer = tw.div`
-    flex items-center gap-4
-`;
+const MenuInputContainer = render.div("flex items-center gap-4");
 
-const MenuInput = tw.input`
-    flex-1 h-44 rounded-8
-    bg-border box-border
-    px-12 py-10
-    font-16-r
-    border-solid border-1 border-transparent
-    outline-none
-    text-black
-    focus-within:(border-orange)
-`;
+const MenuInput = render.input(
+  "flex-1 h-44 rounded-[8px] bg-border box-border px-12 py-10 font-16-r border-solid border border-transparent outline-none text-black focus-within:(border-orange)",
+);
 
-const MenuAddButton = tw.button`
-    w-67 h-43 rounded-8 text-black
-    px-10 py-8 bg-white
-    border-solid border-1 border-gray-100
-`;
+const MenuAddButton = render.button(
+  "w-67 h-43 rounded-[8px] text-black px-10 py-8 bg-white border-solid border border-gray-100",
+);
 
-const ReviewDescriptionWrapper = tw.div`
-    flex flex-col mt-36 gap-16
-    relative
-`;
+const ReviewDescriptionWrapper = render.div("flex flex-col mt-36 gap-16 relative");
 
-const ReviewDescriptionTitle = tw.div`
-    font-16-m text-black
-`;
+const ReviewDescriptionTitle = render.div("font-16-m text-black");
 
-const ReviewTextAreaContainer = tw.div`
-    flex flex-col gap-4 relative
-    bg-border
-    rounded-8
-    px-12 pt-10
-    pb-36
-    border-solid border-1 border-transparent
-    outline-none
-    box-border
-    focus-within:(border-orange)
-`;
+const ReviewTextAreaContainer = render.div(
+  "flex flex-col gap-4 relative bg-border rounded-[8px] px-12 pt-10 pb-36 border-solid border border-transparent outline-none box-border focus-within:(border-orange)",
+);
 
-const ReviewDescriptionTextarea = styled.textarea(() => [
-  tw`
-    flex h-214 w-full
-    bg-transparent
-    border-none
-    font-16-r
-    font-pretendard
-    resize-none
-    outline-none
-    text-black
-    `,
-  css`
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
+const ReviewDescriptionTextarea = styled.textarea({
+  display: "flex",
+  height: "214px",
+  width: "100%",
+  backgroundColor: "transparent",
+  border: "none",
+  fontSize: "16px",
+  lineHeight: "24px",
+  fontWeight: 400,
+  fontFamily: '"Pretendard", sans-serif',
+  resize: "none",
+  outline: "none",
+  color: "#111111",
+  "&::-webkit-scrollbar": {
+    width: "4px",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: "transparent",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    background: "#d9d9d9",
+    borderRadius: "3px",
+  },
+});
 
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
+const CharacterCount = render.div("absolute bottom-14 right-12 font-14-r text-gray-400");
 
-    &::-webkit-scrollbar-thumb {
-      background: #d9d9d9;
-      border-radius: 3px;
-    }
-  `,
-]);
+const TypedCount = render.span("font-14-r text-black");
 
-const CharacterCount = tw.div`
-    absolute bottom-14 right-12
-    font-14-r text-gray-400
-`;
+const ImageUploadWrapper = render.div("flex flex-col mt-36 gap-12");
 
-const TypedCount = tw.span`
-    font-14-r text-black
-`;
+const ImageUploadHeader = render.div("flex flex-col gap-2");
 
-const ImageUploadWrapper = tw.div`
-    flex flex-col mt-36 gap-12
-`;
+const ImageUploadTitleBox = render.div("flex items-center gap-8");
 
-const ImageUploadHeader = tw.div`
-    flex flex-col gap-2
-`;
+const ImageUploadTitle = render.div("font-16-m text-black");
 
-const ImageUploadTitleBox = tw.div`
-    flex items-center gap-8
-`;
+const ImageCountBox = render.div("flex items-center");
 
-const ImageUploadTitle = tw.div`
-    font-16-m text-black
-`;
+const ImageAdded = render.div("font-16-m text-black");
 
-const ImageCountBox = tw.div`
-    flex items-center
-`;
+const ImageAddedText = render.div("font-16-m text-black");
 
-const ImageAdded = tw.div`
-    font-16-m text-black
-`;
+const ImageMax = render.div("font-16-m text-black");
 
-const ImageAddedText = tw.div`
-    font-16-m text-black
-`;
+const ImageUploadSubTitle = render.div("font-12-r text-gray-400");
 
-const ImageMax = tw.div`
-    font-16-m text-black
-`;
+const ImageUploadContent = render.div("flex flex-col gap-12");
 
-const ImageUploadSubTitle = tw.div`
-    font-12-r text-gray-400
-`;
+const ImageUploadContentImage = render.div("flex flex-row flex-wrap gap-12");
 
-const ImageUploadContent = tw.div`
-    flex flex-col gap-12
-`;
+const ImagePreviewContainer = render.div(
+  "relative w-96 h-96 rounded-[7px] flex items-center justify-center border-solid border border-border",
+);
 
-const ImageUploadContentImage = tw.div`
-    flex flex-row flex-wrap gap-12
-`;
+const ImagePreview = render.img("w-full h-full object-cover rounded-[7px]");
 
-const ImagePreviewContainer = tw.div`
-    relative
-    w-96 h-96
-    rounded-7
-    flex items-center justify-center
-    border-solid border-1 border-border
-`;
+const StyledIconImageDelete = render.extend(IconImageDelete, "absolute top-[-8px] right-[-8px] cursor-pointer");
 
-const ImagePreview = tw.img`
-    w-full h-full
-    object-cover
-    rounded-7
-`;
-
-const StyledIconImageDelete = tw(IconImageDelete)`
-  absolute top-[-8px] right-[-8px]
-  cursor-pointer
-`;
-
-const ImageAddButton = tw.button`
-    flex items-center justify-center
-    w-96 h-96 rounded-8 bg-border
-    border-solid border-1 border-gray-200
-    border-dashed
-    cursor-pointer
-`;
+const ImageAddButton = render.button(
+  "flex items-center justify-center w-96 h-96 rounded-[8px] bg-border border-solid border border-gray-200 border-dashed cursor-pointer",
+);
 
 interface AddReviewButtonProps {
   active: boolean;
   disabled?: boolean;
 }
 
-const AddReviewButton = styled.button<AddReviewButtonProps>(({ active, disabled }) => [
-  tw`
-    flex items-center justify-center
-    mt-32
-    w-full h-48 rounded-8
-    px-10 py-10 bg-gray-200
-    font-16-m text-white
-    border-none box-border
-    `,
-  active && !disabled && tw`bg-orange cursor-pointer`,
-  (!active || disabled) && tw`cursor-not-allowed`,
-]);
+const AddReviewButton = styled.button<AddReviewButtonProps>(({ active, disabled }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  marginTop: "32px",
+  width: "100%",
+  height: "48px",
+  borderRadius: "8px",
+  padding: "10px",
+  backgroundColor: active && !disabled ? "#ff5e00" : "#cfcfcf",
+  fontSize: "16px",
+  lineHeight: "24px",
+  fontWeight: 500,
+  color: "#ffffff",
+  border: "none",
+  boxSizing: "border-box",
+  cursor: active && !disabled ? "pointer" : "not-allowed",
+}));
 
-const ErrorMessage = tw.div`
-    font-12-r text-red
-    mt-4
-`;
+const ErrorMessage = render.div("font-12-r text-red mt-4");
 
-const ModalContent = tw.div`
-    flex flex-col gap-16 w-290 pt-32
-    items-center
-    justify-center
-    bg-white
-    rounded-12
-`;
+const ModalContent = render.div("flex flex-col gap-16 w-290 pt-32 items-center justify-center bg-white rounded-[12px]");
 
-const ModalTextBox = tw.div`
-    flex flex-col
-`;
+const ModalTextBox = render.div("flex flex-col");
 
-const ModalTitle = tw.div`
-    font-16-sb text-gray-900
-    text-center
-`;
+const ModalTitle = render.div("font-16-sb text-gray-900 text-center");
 
-const ModalText = tw.div`
-    font-16-r text-gray-900
-    text-center
-`;
+const ModalText = render.div("font-16-r text-gray-900 text-center");
 
-const ModalButtonBox = tw.div`
-    flex h-60 w-full
-`;
+const ModalButtonBox = render.div("flex h-60 w-full");
 
-const ModalCancelButton = tw.button`
-    w-full
-    font-16-r text-black
-    cursor-pointer
-    border-none
-    bg-transparent
-`;
+const ModalCancelButton = render.button("w-full font-16-r text-black cursor-pointer border-none bg-transparent");
 
-const ModalConfirmButton = tw.button`
-    w-full
-    font-16-r text-orange
-    cursor-pointer
-    border-none
-    bg-transparent
-`;
+const ModalConfirmButton = render.button("w-full font-16-r text-orange cursor-pointer border-none bg-transparent");
 
-const LoadingWrapper = tw.div`
-    flex items-center justify-center
-    w-full h-full
-    min-h-200
-`;
+const LoadingWrapper = render.div("flex items-center justify-center w-full h-full min-h-200");
 
-const LoadingText = tw.div`
-    font-16-m text-gray-400
-`;
+const LoadingText = render.div("font-16-m text-gray-400");
 
-const MobileLoadingText = tw.div`
-    font-16-m text-white
-    text-center
-    py-4
-`;
+const MobileLoadingText = render.div("font-16-m text-white text-center py-4");
 
-const ErrorImagePlaceholder = tw.div`
-    w-full h-full
-    bg-gray-100
-    rounded-8
-    flex items-center justify-center
-    font-12-r text-gray-400
-    text-center
-`;
+const ErrorImagePlaceholder = render.div(
+  "w-full h-full bg-gray-100 rounded-[8px] flex items-center justify-center font-12-r text-gray-400 text-center",
+);

@@ -1,5 +1,5 @@
-import tw from "twin.macro";
 import TopBar from "@/shared/ui/top-bar";
+import render from "@/shared/ui/render";
 
 export const DetailReviewPage = () => {
   return (
@@ -11,9 +11,6 @@ export const DetailReviewPage = () => {
   );
 };
 
-const Wrapper = tw.div`
-    flex flex-col pb-40
-`;
+const Wrapper = render.div("flex flex-col pb-40");
 
-const Header = tw.div`
-`;
+const Header = render.div("");

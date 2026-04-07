@@ -1,8 +1,8 @@
-import tw from "twin.macro";
 import { ramenroadEmail } from "@/entities/ramenya/model";
 import { RaisingText } from "@/shared/ui/text";
 import { Line } from "@/shared/ui/line";
 import { IconInstagram } from "@/shared/ui/icon";
+import render from "@/shared/ui/render";
 
 export const Footer = () => {
   return (
@@ -58,45 +58,22 @@ export const Footer = () => {
   );
 };
 
-const Wrapper = tw.div`
-  w-full h-212 p-20 box-border
-  bg-footer text-gray-500 font-14-r
-  flex flex-col gap-24
-`;
+const Wrapper = render.div("w-full h-212 p-20 box-border bg-footer text-gray-500 font-14-r flex flex-col gap-24");
 
-const FooterTitle = tw(RaisingText)`
-  leading-27
-`;
+const FooterTitle = render.extend(RaisingText, "leading-27");
 
-const Contact = tw.div`
-  flex flex-col gap-4
-`;
+const Contact = render.div("flex flex-col gap-4");
 
-const Email = tw.a`
-  font-14-m link:text-gray-500 no-underline
-`;
+const Email = render.a("font-14-m link:text-gray-500 no-underline");
 
-const ContactWrapper = tw.div`
-  flex gap-8
-`;
+const ContactWrapper = render.div("flex gap-8");
 
-const Terms = tw.div`
-  flex gap-4 items-center
-`;
+const Terms = render.div("flex gap-4 items-center");
 
-const TermsAndConditions = tw.div`
-  flex flex-col gap-4
-`;
+const TermsAndConditions = render.div("flex flex-col gap-4");
 
-const Link = tw(RaisingText)`
-  cursor-pointer
-`;
+const Link = render.extend(RaisingText, "cursor-pointer");
 
-const InstagramIcon = tw(IconInstagram)`
-  cursor-pointer
-  min-h-40 min-w-40 mt-[-8px]
-`;
+const InstagramIcon = render.extend(IconInstagram, "cursor-pointer min-h-40 min-w-40 mt-[-8px]");
 
-const Divider = tw(Line)`
-  h-10
-`;
+const Divider = render.extend(Line, "h-10");

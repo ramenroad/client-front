@@ -1,5 +1,5 @@
 import React from "react";
-import tw from "twin.macro";
+import render from "@/shared/ui/render";
 
 interface DetailIconTagProps {
   icon: React.ReactNode;
@@ -15,16 +15,10 @@ const DetailIconTag = ({ icon, text }: DetailIconTagProps) => {
   );
 };
 
-const Wrapper = tw.div`
-  flex items-center justify-center gap-4
-`;
+const Wrapper = render.div("flex items-center justify-center gap-4");
 
-const IconWrapper = tw.div`
-  flex items-center justify-center
-`;
+const IconWrapper = render.div("flex items-center justify-center");
 
-const TextWrapper = tw.div`
-  w-60 font-14-r text-gray-400 whitespace-nowrap
-`;
+const TextWrapper = render.div("w-60 font-14-r text-gray-400 whitespace-nowrap");
 
 export default DetailIconTag;

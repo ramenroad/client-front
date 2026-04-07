@@ -1,4 +1,3 @@
-import tw from "twin.macro";
 import { RaisingText } from "@/shared/ui/text";
 import TopBar from "@/shared/ui/top-bar";
 import { useMyReviewQuery, useUserReviewQuery } from "@/entities/review/model";
@@ -16,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { IconClose, IconEmptyReview, IconKakao, IconLock, IconMore, IconShare } from "@/shared/ui/icon";
 import { Modal } from "@/shared/ui/modal";
 import { useToast } from "@/shared/ui/toast";
+import render from "@/shared/ui/render";
 
 const { Kakao } = window as any;
 
@@ -236,53 +236,27 @@ const UserReviewPage = () => {
   );
 };
 
-const ModalContent = tw.div`
-  flex flex-col gap-24 w-320 pt-16 pb-20
-  items-center
-  justify-center
-  bg-white
-  rounded-12
-`;
+const ModalContent = render.div(
+  "flex flex-col gap-24 w-320 pt-16 pb-20 items-center justify-center bg-white rounded-[12px]",
+);
 
-const ModalHeader = tw.div`
-  relative flex justify-center items-center w-full
-`;
+const ModalHeader = render.div("relative flex justify-center items-center w-full");
 
-const ModalCloseButton = tw(IconClose)`
-  absolute right-20 top-4 cursor-pointer
-`;
+const ModalCloseButton = render.extend(IconClose, "absolute right-20 top-4 cursor-pointer");
 
-const ModalShareContent = tw.div`
-  flex gap-30 w-full justify-center items-center
-`;
+const ModalShareContent = render.div("flex gap-30 w-full justify-center items-center");
 
-const ShareOption = tw.div`
-  flex flex-col gap-10 items-center
-  cursor-pointer
-`;
+const ShareOption = render.div("flex flex-col gap-10 items-center cursor-pointer");
 
-const URLShareOptionText = tw(RaisingText)`
-  text-white font-14-sb
-`;
+const URLShareOptionText = render.extend(RaisingText, "text-white font-14-sb");
 
-const KakaoBackground = tw.div`
-  w-60 h-60 rounded-full bg-[#FAE100]
-  flex justify-center items-center
-`;
+const KakaoBackground = render.div("w-60 h-60 rounded-full bg-[#FAE100] flex justify-center items-center");
 
-const URLCopyBackground = tw.div`
-  w-60 h-60 rounded-full bg-[#B7BEC7]
-  flex justify-center items-center
-`;
+const URLCopyBackground = render.div("w-60 h-60 rounded-full bg-[#B7BEC7] flex justify-center items-center");
 
-const MoreBackground = tw.div`
-  w-60 h-60 rounded-full bg-[#D8DDE5]
-  flex justify-center items-center
-`;
+const MoreBackground = render.div("w-60 h-60 rounded-full bg-[#D8DDE5] flex justify-center items-center");
 
-const ShareOptionText = tw(RaisingText)`
-  text-14 text-gray-70
-`;
+const ShareOptionText = render.extend(RaisingText, "text-[14px] text-gray-70");
 
 const EmptyReviewOverlay = () => {
   return (
@@ -352,100 +326,50 @@ const UserInformationCard = (props: UserInformationCardProps) => {
   );
 };
 
-const UserInformationCardWrapper = tw.section`
-  px-20 pt-20 pb-30 flex flex-col gap-24
-`;
+const UserInformationCardWrapper = render.section("px-20 pt-20 pb-30 flex flex-col gap-24");
 
-const UserInformationCardContent = tw.section`
-  flex flex-row gap-12 items-center
-`;
+const UserInformationCardContent = render.section("flex flex-row gap-12 items-center");
 
-const UserInformationCardContentLeftSection = tw.section`
-  w-64 h-64 rounded-full overflow-hidden
-`;
+const UserInformationCardContentLeftSection = render.section("w-64 h-64 rounded-full overflow-hidden");
 
-const UserInformationCardContentLeftSectionImage = tw.img`
-  w-full h-full object-cover
-`;
+const UserInformationCardContentLeftSectionImage = render.img("w-full h-full object-cover");
 
-const UserInformationCardContentRightSection = tw.section`
-  flex flex-col gap-2
-`;
+const UserInformationCardContentRightSection = render.section("flex flex-col gap-2");
 
-const UserInformationCardContentRightSectionName = tw.section`
-  text-18 font-medium
-`;
+const UserInformationCardContentRightSectionName = render.section("text-[18px] font-medium");
 
-const UserInformationCardContentRightSectionSubName = tw.section`
-  text-14 text-gray-500
-`;
+const UserInformationCardContentRightSectionSubName = render.section("text-[14px] text-gray-500");
 
-const UserInformationDetailContent = tw.section`
-  w-full h-75 bg-[#F9F9F9] flex rounded-8
-`;
+const UserInformationDetailContent = render.section("w-full h-75 bg-[#F9F9F9] flex rounded-[8px]");
 
-const DetailTitle = tw(RaisingText)`
-  text-gray-500
-`;
+const DetailTitle = render.extend(RaisingText, "text-gray-500");
 
-const UserInformationDetailWrapper = tw.section`
-  flex flex-col items-center
-`;
+const UserInformationDetailWrapper = render.section("flex flex-col items-center");
 
-const UserInformationDetailContentSection = tw.section`
-  flex gap-4 items-center justify-center
-  w-full
-`;
+const UserInformationDetailContentSection = render.section("flex gap-4 items-center justify-center w-full");
 
-const LineWrapper = tw.section`
-  py-22
-`;
+const LineWrapper = render.section("py-22");
 
-const BoldLine = tw(Line)`
-  h-8
-`;
+const BoldLine = render.extend(Line, "h-8");
 
-const ReviewToggleText = tw(RaisingText)`
-  text-filter-text
-`;
+const ReviewToggleText = render.extend(RaisingText, "text-filter-text");
 
-const PageWrapper = tw.section`
-  flex flex-col
-  box-border w-full
-`;
+const PageWrapper = render.section("flex flex-col box-border w-full");
 
-const ReviewResultWrapper = tw.section`
-  px-20 pb-20 pt-24
-`;
+const ReviewResultWrapper = render.section("px-20 pb-20 pt-24");
 
-const ReviewResultWrapperHeader = tw.section`
-  flex flex-row justify-between items-center
-`;
+const ReviewResultWrapperHeader = render.section("flex flex-row justify-between items-center");
 
-const ReviewToggleWrapper = tw.section`
-  flex flex-row gap-4 items-center
-`;
+const ReviewToggleWrapper = render.section("flex flex-row gap-4 items-center");
 
 export default UserReviewPage;
 
-const PrivateReviewTitle = tw(RaisingText)`
-  text-black mt-8
-`;
+const PrivateReviewTitle = render.extend(RaisingText, "text-black mt-8");
 
-const PrivateReviewDescription = tw(RaisingText)`
-  text-gray-70 mt-4
-`;
+const PrivateReviewDescription = render.extend(RaisingText, "text-gray-70 mt-4");
 
-const UnavailableReviewOverlay = tw.section`
-  flex flex-col items-center justify-center
-  h-450
-`;
+const UnavailableReviewOverlay = render.section("flex flex-col items-center justify-center h-450");
 
-const RedirectButton = tw.button`
-  w-176 h-44
-  bg-brightOrange rounded-100
-  text-orange
-  border-none
-  cursor-pointer
-  mt-16
-`;
+const RedirectButton = render.button(
+  "w-176 h-44 bg-bright-orange rounded-[100px] text-orange border-none cursor-pointer mt-16",
+);

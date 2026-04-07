@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { IconStar, IconArrowRight } from "@/shared/ui/icon";
-import tw from "twin.macro";
 import emptyReview from "../../assets/images/empty-review.png";
 import ReviewCard from "@/entities/review/ui";
 import { Line } from "@/shared/ui/line";
 import { UserReview } from "@/entities/review/model";
+import render from "@/shared/ui/render";
 
 interface ReviewSectionProps {
   userInformation: { _id: string; nickname: string; email: string; profileImageUrl?: string } | undefined;
@@ -92,96 +92,42 @@ export const ReviewSection = ({
 };
 
 // 스타일 컴포넌트들
-const ReviewWrapper = tw.div`
-  flex flex-col
-  py-32
-`;
+const ReviewWrapper = render.div("flex flex-col py-32");
 
-const ReviewHeader = tw.div`
-  flex flex-col gap-10 items-center
-  px-20
-  mb-32
-`;
+const ReviewHeader = render.div("flex flex-col gap-10 items-center px-20 mb-32");
 
-const ReviewHeaderTitle = tw.div`
-  font-18-r text-black
-  flex items-center
-`;
+const ReviewHeaderTitle = render.div("font-18-r text-black flex items-center");
 
-const ReviewerName = tw.span`
-  text-orange
-`;
+const ReviewerName = render.span("text-orange");
 
-const LargeStarContainer = tw.div`
-  flex gap-2 items-center
-  cursor-pointer
-`;
+const LargeStarContainer = render.div("flex gap-2 items-center cursor-pointer");
 
-const LoginButton = tw.div`
-  mt-16
-  flex w-fit py-10 px-32
-  box-border
-  justify-center items-center
-  font-16-m
-  bg-brightOrange rounded-100 gap-2
-  cursor-pointer
-  text-orange
-`;
+const LoginButton = render.div(
+  "mt-16 flex w-fit py-10 px-32 box-border justify-center items-center font-16-m bg-bright-orange rounded-[100px] gap-2 cursor-pointer text-orange",
+);
 
-const ReviewDivider = tw.div`
-  w-full h-1 bg-divider
-`;
+const ReviewDivider = render.div("w-full h-1 bg-divider");
 
-const ReviewContent = tw.div`
-  flex flex-col
-`;
+const ReviewContent = render.div("flex flex-col");
 
-const ReviewContentTitle = tw.div`
-  font-18-sb text-black pl-20 pt-20
-`;
+const ReviewContentTitle = render.div("font-18-sb text-black pl-20 pt-20");
 
-const EmptyReviewContainer = tw.div`
-  flex flex-col items-center justify-center
-`;
+const EmptyReviewContainer = render.div("flex flex-col items-center justify-center");
 
-const EmptyReviewImage = tw.img`
-  w-80
-  pb-8
-`;
+const EmptyReviewImage = render.img("w-80 pb-8");
 
-const EmptyReviewTitle = tw.div`
-  font-16-r text-black pb-4
-`;
+const EmptyReviewTitle = render.div("font-16-r text-black pb-4");
 
-const EmptyReviewText = tw.span`
-  font-14-r text-gray-700
-`;
+const EmptyReviewText = render.span("font-14-r text-gray-700");
 
-const CreateReviewButton = tw.div`
-  mt-16
-  flex w-fit py-10 px-32
-  box-border
-  justify-center items-center
-  font-16-m
-  bg-brightOrange rounded-100 gap-2
-  cursor-pointer
-  text-orange
-`;
+const CreateReviewButton = render.div(
+  "mt-16 flex w-fit py-10 px-32 box-border justify-center items-center font-16-m bg-bright-orange rounded-[100px] gap-2 cursor-pointer text-orange",
+);
 
-const ReviewCardContainer = tw.div`
-  flex flex-col
-`;
+const ReviewCardContainer = render.div("flex flex-col");
 
-const AllReviewButtonWrapper = tw.div`
-  px-20
-`;
+const AllReviewButtonWrapper = render.div("px-20");
 
-const AllReviewButton = tw.div`
-  mt-10
-  flex w-full py-10
-  box-border
-  justify-center items-center
-  font-14-m text-black
-  bg-border rounded-8 gap-2
-  cursor-pointer
-`;
+const AllReviewButton = render.div(
+  "mt-10 flex w-full py-10 box-border justify-center items-center font-14-m text-black bg-border rounded-[8px] gap-2 cursor-pointer",
+);

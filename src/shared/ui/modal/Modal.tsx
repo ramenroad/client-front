@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import tw from "twin.macro";
+import render from "@/shared/ui/render";
 
 interface ModalProps {
   isOpen: boolean;
@@ -35,16 +35,6 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   );
 };
 
-const Overlay = tw.div`
-  fixed inset-0
-  bg-black/40
-  flex items-center justify-center
-  z-100
-`;
+const Overlay = render.div("fixed inset-0 bg-black/40 flex items-center justify-center z-[100]");
 
-const Wrapper = tw.div`
-  flex flex-col
-  bg-white
-  rounded-12
-  shadow-lg
-`;
+const Wrapper = render.div("flex flex-col bg-white rounded-[12px] shadow-lg");

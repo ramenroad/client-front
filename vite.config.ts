@@ -1,41 +1,25 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
+import tailwindcss from "@tailwindcss/vite";
 import { compression } from "vite-plugin-compression2";
 
 export default defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
   build: {
     emptyOutDir: true,
     minify: true,
     sourcemap: false,
     chunkSizeWarningLimit: 700,
     rollupOptions: {
-      treeshake: "safest",
+      treeshake: true,
     },
   },
 
   plugins: [
-    tsconfigPaths(),
-    react({
-      babel: {
-        plugins: [
-          "babel-plugin-macros",
-          [
-            "auto-import",
-            { declarations: [{ default: "React", path: "react" }] },
-          ],
-          [
-            "@emotion/babel-plugin-jsx-pragmatic",
-            { export: "jsx", import: "__cssprop", module: "@emotion/react" },
-          ],
-          [
-            "@babel/plugin-transform-react-jsx",
-            { pragma: "__cssprop" },
-            "twin.macro",
-          ],
-        ],
-      },
-    }),
+    tailwindcss(),
+    react(),
     compression({
       include: [/\.js$/, /\.css$/],
       threshold: 1400,

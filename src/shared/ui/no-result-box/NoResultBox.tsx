@@ -1,6 +1,7 @@
-import tw from "twin.macro";
+import React from "react";
 import noResultImage from "@/assets/images/no-results.png";
 import { RaisingText } from "@/shared/ui/text";
+import render from "@/shared/ui/render";
 
 interface NoResultBoxProps {
   actionButton?: React.ReactNode;
@@ -25,27 +26,14 @@ const NoResultBox = ({ actionButton }: NoResultBoxProps) => {
   );
 };
 
-const Wrapper = tw.div`
-  flex flex-col items-center justify-center h-full
-  gap-20
-`;
+const Wrapper = render.div("flex flex-col items-center justify-center h-full gap-20");
 
-const NoResultImage = tw.img`
-  w-110 h-70
-`;
+const NoResultImage = render.img("w-110 h-70");
 
-const DescriptionWrapper = tw.div`
-  flex flex-col items-center justify-center
-`;
+const DescriptionWrapper = render.div("flex flex-col items-center justify-center");
 
-const NoResultTitle = tw(RaisingText)`
-  text-gray-800 mb-6
-  text-center
-`;
+const NoResultTitle = render.extend(RaisingText, "text-gray-800 mb-6 text-center");
 
-const NoResultDescription = tw(RaisingText)`
-  text-gray-500
-  text-center
-`;
+const NoResultDescription = render.extend(RaisingText, "text-gray-500 text-center");
 
 export default NoResultBox;

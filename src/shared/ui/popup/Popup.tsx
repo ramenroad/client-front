@@ -1,7 +1,7 @@
 import styled from "@emotion/styled";
 import React from "react";
 import { createPortal } from "react-dom";
-import tw from "twin.macro";
+import render from "@/shared/ui/render";
 
 interface PopupProps {
   isOpen: boolean;
@@ -24,8 +24,22 @@ export const Popup: React.FC<PopupProps> = ({ isOpen, onClose, direction = "cent
 };
 
 const Overlay = styled.div<{ direction: "center" | "bottom" }>(({ direction }) => [
-  tw`fixed inset-0 z-[200] bg-black/40 flex`,
-  direction === "bottom" ? tw`justify-center items-end` : tw`justify-center items-center`,
+  {
+    position: "fixed",
+    inset: 0,
+    zIndex: 200,
+    backgroundColor: "rgb(0 0 0 / 0.4)",
+    display: "flex",
+  },
+  direction === "bottom"
+    ? {
+        justifyContent: "center",
+        alignItems: "flex-end",
+      }
+    : {
+        justifyContent: "center",
+        alignItems: "center",
+      },
 ]);
 
-const PopupWrapper = tw.main``;
+const PopupWrapper = render.main("");

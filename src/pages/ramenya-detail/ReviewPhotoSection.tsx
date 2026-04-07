@@ -1,7 +1,7 @@
 import { IconArrowRight } from "@/shared/ui/icon";
 import { ReviewImage } from "@/entities/review/ui";
-import tw from "twin.macro";
 import emptyImage from "../../assets/images/empty-images.png";
+import render from "@/shared/ui/render";
 
 interface ReviewPhotoSectionProps {
   ramenyaReviewImagesUrls: string[] | undefined;
@@ -51,54 +51,26 @@ export const ReviewPhotoSection = ({
 };
 
 // 스타일 컴포넌트들
-const ImageTitle = tw.div`
-  font-18-sb
-`;
+const ImageTitle = render.div("font-18-sb");
 
-const ImageWrapper = tw.div`
-  flex flex-col gap-16
-  px-20 py-32
-`;
+const ImageWrapper = render.div("flex flex-col gap-16 px-20 py-32");
 
-const ImageContainer = tw.div`
-  flex flex-wrap gap-1
-  w-350
-  rounded-8 overflow-hidden
-`;
+const ImageContainer = render.div("flex flex-wrap gap-1 w-350 rounded-[8px] overflow-hidden");
 
-const ImageBox = tw.div`
-  w-116 h-116
-`;
+const ImageBox = render.div("w-116 h-116");
 
-const MoreImageWrapper = tw.div`
-  relative cursor-pointer
-  w-116 h-116
-`;
+const MoreImageWrapper = render.div("relative cursor-pointer w-116 h-116");
 
-const MoreOverlay = tw.div`
-  absolute top-0 left-0 w-116 h-116
-  bg-black/50
-  flex items-center justify-center
-  rounded-br-8
-`;
+const MoreOverlay = render.div(
+  "absolute top-0 left-0 w-116 h-116 bg-black/50 flex items-center justify-center rounded-br-8",
+);
 
-const MoreText = tw.span`
-  font-14-m text-white
-`;
+const MoreText = render.span("font-14-m text-white");
 
-const EmptyImageContainer = tw.div`
-  flex flex-col items-center justify-center
-`;
+const EmptyImageContainer = render.div("flex flex-col items-center justify-center");
 
-const EmptyImageImage = tw.img`
-  w-80
-  pb-8
-`;
+const EmptyImageImage = render.img("w-80 pb-8");
 
-const EmptyImageTitle = tw.div`
-  font-16-r text-black pb-4
-`;
+const EmptyImageTitle = render.div("font-16-r text-black pb-4");
 
-const EmptyImageText = tw.div`
-  font-14-r text-gray-700
-`;
+const EmptyImageText = render.div("font-14-r text-gray-700");

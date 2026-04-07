@@ -1,13 +1,13 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import TopBar from "@/shared/ui/top-bar";
-import tw from "twin.macro";
 import { useRamenyaReviewImagesQuery } from "@/entities/review/model";
 import { useRamenyaDetailQuery } from "@/entities/ramenya/model";
 import { useEffect } from "react";
 import { useModal } from "@/shared/lib/use-modal";
 import { Modal } from "@/shared/ui/modal";
 import { ImagePopup } from "@/shared/ui/image-popup";
+import render from "@/shared/ui/render";
 
 export const ImagesPage = () => {
   const { id } = useParams();
@@ -52,20 +52,10 @@ export const ImagesPage = () => {
   );
 };
 
-const Wrapper = tw.div`
-    flex flex-col pb-40
-`;
+const Wrapper = render.div("flex flex-col pb-40");
 
-const Header = tw.div`
-    flex flex-col
-    w-full
-    max-w-390
-`;
+const Header = render.div("flex flex-col w-full max-w-390");
 
-const ImageContainer = tw.div`
-    grid grid-cols-3 gap-1
-`;
+const ImageContainer = render.div("grid grid-cols-3 gap-1");
 
-const Image = tw.img`
-    w-full aspect-square object-cover
-`;
+const Image = render.img("w-full aspect-square object-cover");

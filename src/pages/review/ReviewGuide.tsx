@@ -1,5 +1,5 @@
-import tw from "twin.macro";
 import { RaisingText } from "@/shared/ui/text";
+import render from "@/shared/ui/render";
 
 const ReviewGuide = () => {
   return (
@@ -20,19 +20,10 @@ const ReviewGuide = () => {
   );
 };
 
-const ReviewGuideContainer = tw.section`
-  px-20 py-14
-  bg-border
-  flex justify-between
-`;
+const ReviewGuideContainer = render.section("px-20 py-14 bg-border flex justify-between");
 
-const ReviewGuideText = tw(RaisingText)`
-  text-gray-500
-`;
+const ReviewGuideText = render.extend(RaisingText, "text-gray-500");
 
-const ReviewGuideAnchor = tw(RaisingText)`
-  text-[#818181]
-  cursor-pointer underline
-`;
+const ReviewGuideAnchor = render.extend(RaisingText, "text-[#818181] cursor-pointer underline");
 
 export default ReviewGuide;

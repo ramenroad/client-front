@@ -2,7 +2,6 @@ import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import CountUp from "react-countup";
-import tw from "twin.macro";
 import storeImage from "@/assets/images/store.png";
 import { setCurrentLocation, useLocationStore } from "@/entities/location/model";
 import { checkBusinessStatus } from "@/entities/ramenya/lib";
@@ -10,6 +9,7 @@ import { OpenStatus, type Ramenya } from "@/entities/ramenya/model";
 import { calculateDistance } from "@/shared/lib/number";
 import { IconStar } from "@/shared/ui/icon";
 import { RaisingText } from "@/shared/ui/text";
+import render from "@/shared/ui/render";
 
 interface RamenyaCardProps extends Partial<Ramenya> {
   isReview?: boolean;
@@ -129,7 +129,9 @@ const RamenyaCard = ({
               )}
             </RamenyaOpenStatusWrapper>
             <RamenyaTagWrapper>
-              {genre?.map((ramenyaGenre, index) => <RamenyaTag key={index}>{ramenyaGenre}</RamenyaTag>)}
+              {genre?.map((ramenyaGenre, index) => (
+                <RamenyaTag key={index}>{ramenyaGenre}</RamenyaTag>
+              ))}
             </RamenyaTagWrapper>
           </RamenyaCardBottomSection>
         </RamenyaInformationWrapper>
@@ -138,97 +140,77 @@ const RamenyaCard = ({
   );
 };
 
-const RamenyaCardWrapper = styled.section(({ isMapCard }: { isMapCard?: boolean }) => [
-  tw`w-[99%] cursor-pointer box-border px-20 py-20 bg-white`,
-  isMapCard && tw`rounded-12 shadow-lg`,
-]);
+const RamenyaCardWrapper = styled.section<{ isMapCard?: boolean }>(({ isMapCard }) => ({
+  width: "99%",
+  cursor: "pointer",
+  boxSizing: "border-box",
+  padding: "20px",
+  backgroundColor: "#ffffff",
+  ...(isMapCard
+    ? {
+        borderRadius: "12px",
+        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+      }
+    : {}),
+}));
 
-const RamenyaCardLayout = tw.section`
-  w-full flex gap-16 items-center
-`;
+const RamenyaCardLayout = render.section("w-full flex gap-16 items-center");
 
-const RamenyaThumbnail = styled.img(({ isImageExist, isMapCard }: { isImageExist: boolean; isMapCard?: boolean }) => [
-  tw`object-cover rounded-lg flex-shrink-0 border border-solid border-border`,
-  !isImageExist ? tw`object-contain` : tw`object-cover`,
-  isMapCard ? tw`w-110 h-110` : tw`w-100 h-100`,
-]);
+const RamenyaThumbnail = styled.img<{ isImageExist: boolean; isMapCard?: boolean }>(({ isImageExist, isMapCard }) => ({
+  objectFit: isImageExist ? "cover" : "contain",
+  borderRadius: "0.5rem",
+  flexShrink: 0,
+  border: "1px solid #f4f4f5",
+  ...(isMapCard ? { width: "110px", height: "110px" } : { width: "100px", height: "100px" }),
+}));
 
-const RamenyaInformationWrapper = tw.section`
-  flex flex-col h-full min-w-0 w-full justify-center gap-8
-`;
+const RamenyaInformationWrapper = render.section("flex flex-col h-full min-w-0 w-full justify-center gap-8");
 
-const RamenyaDescriptionHeader = tw.section`
-  flex flex-col h-full justify-center
-`;
+const RamenyaDescriptionHeader = render.section("flex flex-col h-full justify-center");
 
-const RamenyaReviewBox = tw.section`
-  flex items-center gap-2 mt-2
-`;
+const RamenyaReviewBox = render.section("flex items-center gap-2 mt-2");
 
-const RamenyaScore = tw.span`
-  font-12-m text-black
-`;
+const RamenyaScore = render.span("font-12-m text-black");
 
-const RamenyaName = tw(RaisingText)`
-  text-black
-`;
+const RamenyaName = render.extend(RaisingText, "text-black");
 
-const RamenyaReviewCount = tw.span`
-  font-12-r text-gray-700
-`;
+const RamenyaReviewCount = render.span("font-12-r text-gray-700");
 
-const RamenyaLocation = tw.section`
-  flex gap-4 items-center mt-2
-`;
+const RamenyaLocation = render.section("flex gap-4 items-center mt-2");
 
-const VerticalLine = tw.span`
-  w-1 h-10 bg-gray-100
-`;
+const VerticalLine = render.span("w-1 h-10 bg-gray-100");
 
-const RamenyaAddress = tw.span`
-  font-14-r text-gray-700 truncate whitespace-nowrap overflow-hidden text-ellipsis flex-1 h-17 leading-17
-`;
+const RamenyaAddress = render.span(
+  "font-14-r text-gray-700 truncate whitespace-nowrap overflow-hidden text-ellipsis flex-1 h-17 leading-17",
+);
 
-const RamenyaOpenStatusWrapper = tw.span`
-  flex gap-2 items-center font-12-r h-14
-`;
+const RamenyaOpenStatusWrapper = render.span("flex gap-2 items-center font-12-r h-14");
 
-export const RamenyaOpenStatus = styled.span(({ status }: { status: OpenStatus }) => [
-  status === OpenStatus.BEFORE_OPEN
-    ? tw`text-gray-700`
-    : status === OpenStatus.OPEN
-      ? tw`text-green`
-      : status === OpenStatus.BREAK
-        ? tw`text-yellow`
-        : status === OpenStatus.DAY_OFF
-          ? tw`text-red`
-          : status === OpenStatus.CLOSED
-            ? tw`text-closed`
-            : tw``,
-]);
+export const RamenyaOpenStatus = styled.span<{ status: OpenStatus }>(({ status }) => ({
+  color:
+    status === OpenStatus.BEFORE_OPEN
+      ? "#585858"
+      : status === OpenStatus.OPEN
+        ? "#59bc12"
+        : status === OpenStatus.BREAK
+          ? "#f3a216"
+          : status === OpenStatus.DAY_OFF
+            ? "#ff5454"
+            : status === OpenStatus.CLOSED
+              ? "#838383"
+              : undefined,
+}));
 
-const RamenyaOpenTime = tw.span`
-  font-12-r
-`;
+const RamenyaOpenTime = render.span("font-12-r");
 
-const RamenyaTagWrapper = tw.section`
-  flex gap-4 flex-wrap
-`;
+const RamenyaTagWrapper = render.section("flex gap-4 flex-wrap");
 
-const RamenyaTag = tw.span`
-  font-10-r text-gray-700 rounded-sm bg-border p-3 leading-10
-`;
+const RamenyaTag = render.span("font-10-r text-gray-700 rounded-sm bg-border p-3 leading-10");
 
-const RamenyaDistance = tw.section`
-  font-14-m text-gray-900 flex items-center h-17
-`;
+const RamenyaDistance = render.section("font-14-m text-gray-900 flex items-center h-17");
 
-const RamenyaCardBottomSection = tw.section`
-  flex flex-col gap-4
-`;
+const RamenyaCardBottomSection = render.section("flex flex-col gap-4");
 
-const Dot = tw.span`
-  w-2 h-2 bg-gray-700 rounded-full
-`;
+const Dot = render.span("w-2 h-2 bg-gray-700 rounded-full");
 
 export default RamenyaCard;

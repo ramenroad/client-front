@@ -1,6 +1,6 @@
 import React from "react";
-import tw from "twin.macro";
 import styled from "@emotion/styled";
+import render from "@/shared/ui/render";
 
 interface ToggleProps {
   checked: boolean;
@@ -13,7 +13,12 @@ interface ToggleProps {
 export const Toggle: React.FC<ToggleProps> = ({ checked, onChange, disabled, onText, offText }) => {
   return (
     <ToggleLabel disabled={disabled}>
-      <ToggleInput type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} disabled={disabled} />
+      <ToggleInput
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        disabled={disabled}
+      />
       <Slider checked={checked} />
       <ToggleText checked={checked}>{checked ? onText : offText}</ToggleText>
     </ToggleLabel>
@@ -21,8 +26,13 @@ export const Toggle: React.FC<ToggleProps> = ({ checked, onChange, disabled, onT
 };
 
 const ToggleText = styled.span<{ checked: boolean }>(({ checked }) => [
-  tw`text-8 absolute text-white leading-12`,
-  checked ? tw`left-4` : tw`right-4`,
+  {
+    position: "absolute",
+    fontSize: "8px",
+    lineHeight: "12px",
+    color: "#ffffff",
+  },
+  checked ? { left: "4px" } : { right: "4px" },
   {
     top: "50%",
     transform: "translateY(-50%)",
@@ -30,24 +40,38 @@ const ToggleText = styled.span<{ checked: boolean }>(({ checked }) => [
 ]);
 
 const ToggleLabel = styled.label<{ disabled?: boolean }>(({ disabled }) => [
-  tw`
-    relative inline-block w-40 h-22
-    rounded-full cursor-pointer transition-all
-    bg-gray-200
-  `,
-  disabled && tw`opacity-50 cursor-not-allowed`,
+  {
+    position: "relative",
+    display: "inline-block",
+    width: "40px",
+    height: "22px",
+    borderRadius: "9999px",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    backgroundColor: "#cfcfcf",
+  },
+  disabled && {
+    opacity: 0.5,
+    cursor: "not-allowed",
+  },
 ]);
 
-const ToggleInput = tw.input`
-  opacity-0 w-0 h-0 absolute
-`;
+const ToggleInput = render.input("opacity-0 w-0 h-0 absolute");
 
 const Slider = styled.span<{ checked: boolean }>(({ checked }) => [
-  tw`
-    absolute top-0 left-0 w-40 h-22 rounded-full transition-all duration-200
-    bg-orange
-  `,
-  !checked && tw`bg-gray-200`,
+  {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "40px",
+    height: "22px",
+    borderRadius: "9999px",
+    transition: "all 0.2s ease",
+    backgroundColor: "#ff5e00",
+  },
+  !checked && {
+    backgroundColor: "#cfcfcf",
+  },
   {
     "::before": {
       content: '""',

@@ -1,10 +1,8 @@
-import tw from "twin.macro";
 import ramenroadLogo from "../../assets/images/logo.png";
+import render from "@/shared/ui/render";
 
 const RamenroadLogo = () => <Logo src={ramenroadLogo} />;
 
 export default RamenroadLogo;
 
-const Logo = tw.img`
-  h-24
-`;
+const Logo = render.img("h-24");

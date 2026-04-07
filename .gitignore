@@ -24,6 +24,7 @@ dist-ssr
 *.sln
 *.sw?
 .cursor/*
+.codex/
 
 tsconfig.node.tsbuildinfo
 tsconfig.app.tsbuildinfo
