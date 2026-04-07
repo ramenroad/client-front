@@ -1,6 +1,4 @@
 export {
-  useRamenyaReviewMutation,
-  useRamenyaReviewEditMutation,
   useRamenyaReviewImagesQuery,
   useUserReviewQuery,
   useMyReviewQuery,
@@ -9,4 +7,4 @@ export {
   useRamenyaReviewDetailQuery,
 } from "./hooks";
 export { ReviewType } from "./types";
-export type { User, UserReview, Review } from "./types";
+export type { User, UserReview } from "./types";

@@ -1,1 +1,1 @@
-export { ReviewListPage as default } from "@/pages/review/ReviewListPage";
+export { ReviewListPage as default } from "./ReviewListPage";

@@ -1,5 +1,5 @@
 import { Navigate, useParams } from "react-router-dom";
-import { ReviewFormPage, type ReviewFormMode } from "./ReviewFormPage";
+import { ReviewFormFeature, type ReviewFormMode } from "@/features/review-form";
 
 const REVIEW_FORM_MODES: ReviewFormMode[] = ["create", "edit"];
 
@@ -14,7 +14,7 @@ const ReviewPage = () => {
     return <Navigate to="/" replace />;
   }
 
-  return <ReviewFormPage mode={mode} />;
+  return <ReviewFormFeature mode={mode} />;
 };
 
 export default ReviewPage;

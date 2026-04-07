@@ -1,35 +1,17 @@
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import {
   deleteReview,
-  editReview,
   getMyReviews,
   getRamenyaReview,
   getReviewDetail,
   getReviewImages,
   getUserReview,
-  postReview,
 } from "@/entities/review/api";
 import { queryKeys } from "@/shared/model/query-keys";
 
-export const useRamenyaReviewMutation = () => {
-  const add = useMutation({
-    mutationFn: postReview,
-  });
-
-  return { add };
-};
-
-export const useRamenyaReviewEditMutation = (reviewId: string) => {
-  const update = useMutation({
-    mutationFn: (data: FormData) => editReview(reviewId, data),
-  });
-
-  return { update };
-};
-
 export const useRamenyaReviewImagesQuery = (reviewId: string) => {
   const ramenyaReviewImagesQuery = useQuery({
-    queryKey: ["ramenyaReviewImages", reviewId],
+    ...queryKeys.review.images(reviewId),
     queryFn: () => getReviewImages(reviewId),
   });
 

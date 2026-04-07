@@ -1,40 +1,39 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import styled from "@emotion/styled";
 import defaultProfile from "@/assets/images/profile-default.png";
 import { ReviewType, type User, type UserReview } from "@/entities/review/model";
-import { useRamenyaReviewDeleteMutation } from "@/entities/review/model";
-import { usePopup } from "@/shared/lib/use-popup";
-import { queryKeys } from "@/shared/model/query-keys";
-import { PopupType } from "@/shared/model/popup";
 import { ImagePopup } from "@/shared/ui/image-popup";
 import { IconArrowRight, IconStar } from "@/shared/ui/icon";
 import { Modal } from "@/shared/ui/modal";
 import { RaisingText } from "@/shared/ui/text";
-import { useToast } from "@/shared/ui/toast";
 import { useModal } from "@/shared/lib/use-modal";
 import render from "@/shared/ui/render";
 
-interface MyReviewCardProps<T extends boolean = false> {
-  review: UserReview<T extends true ? ReviewType.MYPAGE : ReviewType.USER>;
-  mypage?: T;
+interface ReviewCardProps {
+  review: UserReview<ReviewType.MYPAGE> | UserReview<ReviewType.USER>;
+  mypage?: boolean;
   editable: boolean;
+  onDeleteClick?: (reviewId: string) => void;
+  onEditClick?: (reviewId: string) => void;
+  onRamenyaClick?: (ramenyaId: string) => void;
+  onUserClick?: (userId: string) => void;
 }
 
 const MAX_REVIEW_LENGTH = 94;
 
-const ReviewCard = <T extends boolean = false>({ review, ...props }: MyReviewCardProps<T>) => {
-  const navigate = useNavigate();
-  const { openToast } = useToast();
-  const { openPopup, closePopup } = usePopup();
-  const { remove } = useRamenyaReviewDeleteMutation();
-  const { mutate: deleteReview } = remove;
+const ReviewCard = ({
+  review,
+  editable,
+  mypage = false,
+  onDeleteClick,
+  onEditClick,
+  onRamenyaClick,
+  onUserClick,
+}: ReviewCardProps) => {
   const [isReviewExpanded, setIsReviewExpanded] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const { isOpen: isImagePopupOpen, open: openImagePopup, close: closeImagePopup } = useModal();
-  const queryClient = useQueryClient();
   const isReviewLong = review.review.length > MAX_REVIEW_LENGTH;
   const displayReview =
     isReviewLong && !isReviewExpanded ? `${review.review.slice(0, MAX_REVIEW_LENGTH)}...` : review.review;
@@ -53,80 +52,49 @@ const ReviewCard = <T extends boolean = false>({ review, ...props }: MyReviewCar
     <ReviewCardWrapper>
       <ReviewCardHeader>
         <ReviewCardTitle>
-          {props.mypage ? (
-            <div
+          {mypage ? (
+            <RamenyaButton
+              type="button"
               onClick={() =>
-                navigate(`/detail/${isDetailedRamenya(review.ramenyaId) ? review.ramenyaId._id : review.ramenyaId}`)
+                onRamenyaClick?.(isDetailedRamenya(review.ramenyaId) ? review.ramenyaId._id : review.ramenyaId)
               }
             >
               <RaisingText size={16} weight="sb">
                 {isDetailedRamenya(review.ramenyaId) ? review.ramenyaId.name : review.ramenyaId}
               </RaisingText>
               <IconArrowRight />
-            </div>
+            </RamenyaButton>
           ) : (
             hasUserId(review) && (
-              <ReviewNameBox onClick={() => navigate(`/user-review/${review.userId._id}`)}>
-                <ReviewerProfileImage src={review.userId.profileImageUrl || defaultProfile} />
+              <ReviewNameButton type="button" onClick={() => onUserClick?.(review.userId._id)}>
+                <ReviewerProfileImage src={review.userId.profileImageUrl || defaultProfile} alt={review.userId.nickname} />
                 <ReviewerInfoBox>
                   <RaisingText size={14} weight="sb">
                     {review.userId.nickname}
                   </RaisingText>
                   <ReviewerReviewInfo>
-                    <RaisingText size={12} weight="r">
-                      <span>평균 별점 </span>
-                      <RaisingText size={12} weight="m">
-                        {review.userId.avgReviewRating?.toFixed(1)}
-                      </RaisingText>
-                    </RaisingText>
+                    <ReviewerReviewMeta size={12} weight="r">
+                      평균 별점 <ReviewerReviewValue size={12} weight="m">{review.userId.avgReviewRating?.toFixed(1)}</ReviewerReviewValue>
+                    </ReviewerReviewMeta>
                     <ReviewerReviewCountDivider />
-                    <RaisingText size={12} weight="r">
-                      <span>리뷰</span>{" "}
-                      <RaisingText size={12} weight="m">
-                        {review.userId.reviewCount}
-                      </RaisingText>
-                    </RaisingText>
+                    <ReviewerReviewMeta size={12} weight="r">
+                      리뷰 <ReviewerReviewValue size={12} weight="m">{review.userId.reviewCount}</ReviewerReviewValue>
+                    </ReviewerReviewMeta>
                   </ReviewerReviewInfo>
                 </ReviewerInfoBox>
-              </ReviewNameBox>
+              </ReviewNameButton>
             )
           )}
         </ReviewCardTitle>
 
-        {props.editable && (
+        {editable && (
           <ReviewActionWrapper>
-            <ActionButton onClick={() => navigate(`/review/edit/${review._id}`)}>
+            <ActionButton type="button" onClick={() => onEditClick?.(review._id)}>
               <ActionText size={12} weight="r">
                 수정
               </ActionText>
             </ActionButton>
-            <ActionButton
-              onClick={() => {
-                openPopup(PopupType.CONFIRM, {
-                  content: (
-                    <>
-                      작성한 리뷰를 삭제할까요?
-                      <br />내 리뷰 목록에서도 삭제됩니다.
-                    </>
-                  ),
-                  onConfirm: () => {
-                    deleteReview(review._id, {
-                      onSuccess: () => {
-                        queryClient.invalidateQueries({ ...queryKeys.review.userReview(review._id) });
-                        queryClient.invalidateQueries({ ...queryKeys.review.my });
-                        queryClient.invalidateQueries({
-                          ...queryKeys.review.ramenyaReview(
-                            isDetailedRamenya(review.ramenyaId) ? review.ramenyaId._id : review.ramenyaId,
-                          ),
-                        });
-                        openToast("리뷰가 삭제되었습니다.");
-                        closePopup();
-                      },
-                    });
-                  },
-                });
-              }}
-            >
+            <ActionButton type="button" onClick={() => onDeleteClick?.(review._id)}>
               <ActionText size={12} weight="r">
                 삭제
               </ActionText>
@@ -165,14 +133,9 @@ const ReviewCard = <T extends boolean = false>({ review, ...props }: MyReviewCar
         </ReviewCardSubHeaderRightSection>
       </ReviewCardSubHeader>
       <ReviewCardContent>
-        <RaisingText size={14} weight="r">
-          {displayReview.split("\n").map((line, index) => (
-            <span key={index}>
-              {line}
-              {index < displayReview.split("\n").length - 1 && <br />}
-            </span>
-          ))}
-        </RaisingText>
+        <ReviewText size={14} weight="r">
+          {displayReview}
+        </ReviewText>
         {isReviewLong && (
           <MoreButton size={14} weight="m" onClick={() => setIsReviewExpanded(!isReviewExpanded)}>
             {isReviewExpanded ? "접기" : "더보기"}
@@ -210,13 +173,19 @@ const ReviewCard = <T extends boolean = false>({ review, ...props }: MyReviewCar
 
 const ActionText = render.extend(RaisingText, "whitespace-nowrap");
 
-const ReviewNameBox = render.div("flex gap-10 items-center");
+const RamenyaButton = render.button("flex items-center gap-2 cursor-pointer border-none bg-transparent p-0 text-left");
+
+const ReviewNameButton = render.button("flex items-center gap-10 border-none bg-transparent p-0 text-left cursor-pointer");
 
 const ReviewerProfileImage = render.img("w-36 h-36 rounded-full");
 
 const ReviewerInfoBox = render.div("flex flex-col");
 
 const ReviewerReviewInfo = render.div("flex flex-row gap-6 items-center text-gray-70");
+
+const ReviewerReviewMeta = render.extend(RaisingText, "flex items-center gap-2");
+
+const ReviewerReviewValue = render.extend(RaisingText, "");
 
 const ReviewerReviewCountDivider = render.span("w-1 h-10 bg-gray-100");
 
@@ -247,6 +216,8 @@ const MenuSeparator = render.section("w-1 h-10 bg-gray-100");
 const ReviewCardSubHeaderRightSection = render.section("h-18 leading-18");
 
 const ReviewCardContent = render.section("mt-12 leading-21");
+
+const ReviewText = render.extend(RaisingText, "whitespace-pre-line");
 
 const MoreButton = render.extend(RaisingText, "cursor-pointer text-gray-400 ml-4");
 

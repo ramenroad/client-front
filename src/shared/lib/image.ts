@@ -1,20 +1,120 @@
 import EXIF from "exif-js";
 import heic2any from "heic2any";
 
-export const correctImageOrientation = async (file: File): Promise<File> => {
-  if (file.type === "image/heic" || file.name.toLowerCase().endsWith(".heic")) {
-    const convertedBlob = (await heic2any({
-      blob: file,
-      toType: "image/jpeg",
-      quality: 0.95,
-    })) as Blob;
+const MOBILE_DEVICE_REGEX = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+const HEIC_EXTENSION_REGEX = /\.heic$/i;
+const JPEG_MIME_TYPE = "image/jpeg";
 
-    const jpegFile = new File([convertedBlob], file.name.replace(/\.heic$/i, ".jpg"), {
-      type: "image/jpeg",
-      lastModified: file.lastModified,
+interface CompressImageOptions {
+  maxWidth?: number;
+  quality?: number;
+}
+
+interface OptimizeImageOptions extends CompressImageOptions {
+  compressAboveBytes?: number;
+}
+
+export const isMobileDevice = () => {
+  return MOBILE_DEVICE_REGEX.test(navigator.userAgent);
+};
+
+const isHeicFile = (file: File) => file.type.includes("heic") || HEIC_EXTENSION_REGEX.test(file.name);
+
+const createJpegFile = (blob: Blob, file: File, fileName = file.name.replace(HEIC_EXTENSION_REGEX, ".jpg")) => {
+  return new File([blob], fileName, {
+    type: JPEG_MIME_TYPE,
+    lastModified: file.lastModified || Date.now(),
+  });
+};
+
+export const compressImage = async (file: File, options: CompressImageOptions = {}): Promise<File> => {
+  const { maxWidth = 800, quality = 0.8 } = options;
+
+  return new Promise((resolve) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(file);
+    };
+
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+
+      const ratio = Math.min(1, maxWidth / img.width, maxWidth / img.height);
+      canvas.width = img.width * ratio;
+      canvas.height = img.height * ratio;
+
+      if (ctx) {
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = "medium";
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      }
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            resolve(file);
+            return;
+          }
+
+          resolve(
+            new File([blob], file.name, {
+              type: JPEG_MIME_TYPE,
+              lastModified: Date.now(),
+            }),
+          );
+        },
+        JPEG_MIME_TYPE,
+        quality,
+      );
+    };
+
+    img.src = objectUrl;
+  });
+};
+
+export const convertHeicToJpeg = async (file: File): Promise<File> => {
+  if (!isHeicFile(file)) {
+    return file;
+  }
+
+  try {
+    const convertedBlob = await heic2any({
+      blob: file,
+      toType: JPEG_MIME_TYPE,
+      quality: 0.9,
     });
 
-    return correctImageOrientation(jpegFile);
+    const blob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+    return createJpegFile(blob, file, file.name.replace(HEIC_EXTENSION_REGEX, ".jpg"));
+  } catch (error) {
+    const conversionError = new Error("HEIC 파일 변환에 실패했습니다.");
+    Object.assign(conversionError, { cause: error });
+    throw conversionError;
+  }
+};
+
+export const optimizeUploadImage = async (file: File, options: OptimizeImageOptions = {}) => {
+  const { compressAboveBytes = 1024 * 1024, maxWidth = 800, quality = 0.8 } = options;
+
+  let optimizedFile = await convertHeicToJpeg(file);
+
+  if (optimizedFile.size > compressAboveBytes) {
+    optimizedFile = await compressImage(optimizedFile, { maxWidth, quality });
+  }
+
+  return optimizedFile;
+};
+
+export const correctImageOrientation = async (file: File): Promise<File> => {
+  const normalizedFile = isHeicFile(file) ? await convertHeicToJpeg(file) : file;
+
+  if (normalizedFile !== file) {
+    return correctImageOrientation(normalizedFile);
   }
 
   return new Promise((resolve) => {
@@ -80,13 +180,13 @@ export const correctImageOrientation = async (file: File): Promise<File> => {
             }
 
             resolve(
-              new File([blob], file.name, {
-                type: "image/jpeg",
-                lastModified: file.lastModified,
+              new File([blob], normalizedFile.name, {
+                type: JPEG_MIME_TYPE,
+                lastModified: normalizedFile.lastModified,
               }),
             );
           },
-          "image/jpeg",
+          JPEG_MIME_TYPE,
           0.95,
         );
       });
@@ -98,6 +198,6 @@ export const correctImageOrientation = async (file: File): Promise<File> => {
         img.src = event.target.result as string;
       }
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(normalizedFile);
   });
 };
