@@ -2,7 +2,7 @@ import TopBar from "@/shared/ui/top-bar";
 import { Line } from "@/shared/ui/line";
 import { IconCheckbox } from "@/shared/ui/icon";
 import { type ComponentProps, useRef, useState } from "react";
-import { useModal } from "@/shared/lib/use-modal";
+import { useModal } from "@/shared/lib/useModal";
 import { Modal } from "@/shared/ui/modal";
 import { useAuthMutation } from "@/features/auth/model";
 import { useToast } from "@/shared/ui/toast";

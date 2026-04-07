@@ -4,8 +4,8 @@ import { useRamenyaDetailQuery, WEEKDAYS_ORDER, type WeekdaysOrderType } from "@
 import { useRamenyaReviewImagesQuery, useRamenyaReviewQuery } from "@/entities/review/model";
 import { useSignInStore, useUserInformationQuery } from "@/entities/viewer/model";
 import { openUrl } from "@/shared/lib/browser";
-import { useMobileState } from "@/shared/lib/use-mobile-state";
-import { useModal } from "@/shared/lib/use-modal";
+import { useMobileState } from "@/shared/lib/useMobileState";
+import { useModal } from "@/shared/lib/useModal";
 
 type BusinessHour = {
   day: string;

@@ -17,10 +17,10 @@ import {
 } from "@/entities/ramenya/model";
 import { checkBusinessStatus } from "@/entities/ramenya/lib";
 import { useMapSearchResultsQuery } from "@/features/search/model";
-import { useMapLocation } from "@/shared/lib/use-map-location";
-import { useMapSearch } from "@/shared/lib/use-map-search";
+import { useMapLocation } from "@/shared/lib/useMapLocation";
+import { useMapSearch } from "@/shared/lib/useMapSearch";
 import { updateSearchParams } from "@/shared/lib/search-params";
-import { useUserLocation } from "@/shared/lib/use-user-location";
+import { useUserLocation } from "@/shared/lib/useUserLocation";
 import { useToast } from "@/shared/ui/toast";
 
 const dvhToPx = (dvh: string) => {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useRamenyaReviewImagesQuery } from "@/entities/review/model";
 import { useRamenyaDetailQuery } from "@/entities/ramenya/model";
-import { useModal } from "@/shared/lib/use-modal";
+import { useModal } from "@/shared/lib/useModal";
 import { Modal } from "@/shared/ui/modal";
 import { ImagePopup } from "@/shared/ui/image-popup";
 import TopBar from "@/shared/ui/top-bar";

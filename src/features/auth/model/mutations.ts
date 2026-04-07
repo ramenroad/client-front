@@ -9,7 +9,7 @@ import {
   useSignInStore,
 } from "@/entities/viewer/model";
 import { queryClient } from "@/shared/api/query-client";
-import { usePageMemorize } from "@/shared/lib/use-page-memorize";
+import { usePageMemorize } from "@/shared/lib/usePageMemorize";
 import { queryKeys } from "@/shared/model/query-keys";
 import { useToast } from "@/shared/ui/toast";
 

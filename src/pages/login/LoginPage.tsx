@@ -6,7 +6,7 @@ import { authorizeKakaoLogin, getAppleRedirectUrl, redirectToOAuthProvider } fro
 import { SocialLoginButton } from "@/features/auth/ui";
 import { Line } from "@/shared/ui/line";
 import { IconKakao, IconNaver } from "@/shared/ui/icon";
-import { useKakaoSDK } from "@/shared/lib/use-kakao-sdk";
+import { useKakaoSDK } from "@/shared/lib/useKakaoSDK";
 import AppleLogin from "react-apple-login";
 import render from "@/shared/ui/render";
 

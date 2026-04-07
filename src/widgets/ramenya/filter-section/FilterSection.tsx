@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import styled from "@emotion/styled";
 import { FilterOptions, initialFilterOptions, RamenyaType, SortType } from "@/entities/ramenya/model";
-import { usePopup } from "@/shared/lib/use-popup";
+import { usePopup } from "@/shared/lib/usePopup";
 import { IconFilterWithTag } from "@/shared/ui/icon";
 import { Line } from "@/shared/ui/line";
 import render from "@/shared/ui/render";

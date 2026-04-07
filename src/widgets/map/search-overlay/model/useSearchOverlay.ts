@@ -4,7 +4,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { useRamenyaSearchAutoCompleteQuery } from "@/entities/ramenya/model";
 import { useSignInStore } from "@/entities/viewer/model";
 import { useRemoveSearchHistoryMutation, useSearchHistoryQuery } from "@/features/search/model";
-import { useDebounce } from "@/shared/lib/use-debounce";
+import { useDebounce } from "@/shared/lib/useDebounce";
 import { updateSearchParams } from "@/shared/lib/search-params";
 
 interface SearchOverlayModelProps {

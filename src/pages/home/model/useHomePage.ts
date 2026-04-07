@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useRamenyaGroupQuery } from "@/entities/curation/model";
 import { setCurrentLocation } from "@/entities/location/model";
 import { requestLocationPermission } from "@/shared/lib/geolocation";
-import { useUserLocation } from "@/shared/lib/use-user-location";
+import { useUserLocation } from "@/shared/lib/useUserLocation";
 import { useToast } from "@/shared/ui/toast";
 
 const buildMapPath = (params: Record<string, string | number | boolean | undefined>) => {

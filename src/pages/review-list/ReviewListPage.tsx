@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { useParams } from "react-router-dom";
 import { useRamenyaReviewQuery } from "@/entities/review/model";
 import { useUserInformationQuery } from "@/entities/viewer/model";
-import { useIntersectionObserver } from "@/shared/lib/use-intersection-observer";
+import { useIntersectionObserver } from "@/shared/lib/useIntersectionObserver";
 import { Line } from "@/shared/ui/line";
 import TopBar from "@/shared/ui/top-bar";
 import render from "@/shared/ui/render";

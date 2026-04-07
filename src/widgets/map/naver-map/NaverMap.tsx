@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { setCurrentLocation } from "@/entities/location/model";
 import { RAMENYA_LOCATION_LIST } from "@/entities/ramenya/model";
-import { useUserLocation } from "@/shared/lib/use-user-location";
+import { useUserLocation } from "@/shared/lib/useUserLocation";
 import render from "@/shared/ui/render";
 import {
   createMarkerIcon,

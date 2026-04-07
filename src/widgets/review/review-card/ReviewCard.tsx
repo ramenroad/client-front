@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ReviewCard as ReviewEntityCard } from "@/entities/review/ui";
 import { ReviewType, type UserReview, useRamenyaReviewDeleteMutation } from "@/entities/review/model";
 import { queryKeys } from "@/shared/model/query-keys";
-import { usePopup } from "@/shared/lib/use-popup";
+import { usePopup } from "@/shared/lib/usePopup";
 import { useToast } from "@/shared/ui/toast";
 import render from "@/shared/ui/render";
 

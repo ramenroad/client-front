@@ -4,7 +4,7 @@ import type { RefObject } from "react";
 import { useMyReviewQuery, useUserReviewQuery, type UserReview, ReviewType } from "@/entities/review/model";
 import { useUserInformationQuery, useUserMyPageQuery } from "@/entities/viewer/model";
 import { useUserMyPageMutation } from "@/features/profile/model";
-import { useIntersectionObserver } from "@/shared/lib/use-intersection-observer";
+import { useIntersectionObserver } from "@/shared/lib/useIntersectionObserver";
 import { useToast } from "@/shared/ui/toast";
 import { queryClient } from "@/shared/api/query-client";
 import { queryKeys } from "@/shared/model/query-keys";

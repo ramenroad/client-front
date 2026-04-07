@@ -7,7 +7,7 @@ import { ImagePopup } from "@/shared/ui/image-popup";
 import { IconArrowRight, IconStar } from "@/shared/ui/icon";
 import { Modal } from "@/shared/ui/modal";
 import { RaisingText } from "@/shared/ui/text";
-import { useModal } from "@/shared/lib/use-modal";
+import { useModal } from "@/shared/lib/useModal";
 import render from "@/shared/ui/render";
 
 interface ReviewCardProps {

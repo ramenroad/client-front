@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import NoStoreBox from "@/shared/ui/no-store-box";
 import TopBar from "@/shared/ui/top-bar";
-import { useScrollToTop } from "@/shared/lib/use-scroll-to-top";
+import { useScrollToTop } from "@/shared/lib/useScrollToTop";
 import { useRamenyaGroupQuery } from "@/entities/curation/model";
 import { Helmet } from "react-helmet";
 import { RamenyaListView } from "@/widgets/ramenya/list-view";

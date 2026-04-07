@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { usePageMemorize } from "@/shared/lib/use-page-memorize";
+import { usePageMemorize } from "@/shared/lib/usePageMemorize";
 import AppBar from "@/widgets/navigation/app-bar";
 import render from "@/shared/ui/render";
 

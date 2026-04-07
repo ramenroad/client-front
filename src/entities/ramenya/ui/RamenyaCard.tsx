@@ -5,7 +5,7 @@ import storeImage from "@/assets/images/store.png";
 import { setCurrentLocation, useLocationStore } from "@/entities/location/model";
 import { checkBusinessStatus } from "@/entities/ramenya/lib";
 import { OpenStatus, type Ramenya } from "@/entities/ramenya/model";
-import { useUserLocation } from "@/shared/lib/use-user-location";
+import { useUserLocation } from "@/shared/lib/useUserLocation";
 import { calculateDistance } from "@/shared/lib/number";
 import { IconStar } from "@/shared/ui/icon";
 import { RaisingText } from "@/shared/ui/text";

@@ -17,7 +17,7 @@ import { useToast } from "@/shared/ui/toast";
 import { IconMenuBoard, IconArrowRight } from "@/shared/ui/icon";
 
 // Hooks
-import { useModal } from "@/shared/lib/use-modal";
+import { useModal } from "@/shared/lib/useModal";
 import { useMenuBoardMutation } from "@/features/menu-board/model";
 import { queryKeys } from "@/shared/model/query-keys";
 

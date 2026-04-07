@@ -6,7 +6,7 @@ import type { MenuBoard } from "@/entities/menu-board/model";
 import { MenuBoardDetail } from "@/entities/menu-board/ui";
 import { useUserInformationStore } from "@/entities/viewer/model";
 import { useMenuBoardMutation } from "@/features/menu-board/model";
-import { useModal } from "@/shared/lib/use-modal";
+import { useModal } from "@/shared/lib/useModal";
 import { queryKeys } from "@/shared/model/query-keys";
 import { Modal } from "@/shared/ui/modal";
 import { ImagePopup } from "@/shared/ui/image-popup";

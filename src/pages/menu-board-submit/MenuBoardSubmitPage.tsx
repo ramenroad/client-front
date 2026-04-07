@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMenuBoardMutation } from "@/features/menu-board/model";
-import { useImageUpload } from "@/shared/lib/use-image-upload";
+import { useImageUpload } from "@/shared/lib/useImageUpload";
 import { Button } from "@/shared/ui/button";
 import { UploadLoadingOverlay } from "@/shared/ui/image-upload";
 import TopBar from "@/shared/ui/top-bar";
