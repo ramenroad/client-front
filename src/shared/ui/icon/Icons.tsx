@@ -1,8 +1,19 @@
-import { ComponentProps } from "react";
+import type { SVGProps } from "react";
 
-interface IconProps extends ComponentProps<"svg"> {
-  color?: string;
-}
+type IconProps<ExtraProps extends object = object> = SVGProps<SVGSVGElement> &
+  ExtraProps & {
+    color?: string;
+  };
+
+type IconInstagramProps = IconProps<{ footer?: boolean }>;
+type IconStarProps = IconProps<{
+  inactive?: boolean;
+  size?: number;
+  isHalf?: boolean;
+}>;
+type SelectableIconProps = IconProps<{ selected: boolean }>;
+type MapIconProps = IconProps<{ type: "naver" | "kakao" | "google" }>;
+type CheckboxIconProps = IconProps<{ checked: boolean }>;
 
 export const IconSample = ({ color, ...rest }: IconProps) => (
   <svg
@@ -28,7 +39,7 @@ export const IconFilterWithTag = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconInstagram = ({ color, footer = false, ...rest }: IconProps & { footer?: boolean }) =>
+export const IconInstagram = ({ color, footer = false, ...rest }: IconInstagramProps) =>
   footer ? (
     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
       <rect width="40" height="40" rx="20" fill="#EBEBED" />
@@ -276,7 +287,7 @@ export const IconKakao = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconNaver = () => (
+export const IconNaver = (props: IconProps) => (
   <svg
     width="16"
     height="16"
@@ -284,21 +295,13 @@ export const IconNaver = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="none"
+    {...props}
   >
     <path d="M9.49917 7.49L4.30413 0H0V14H4.5124V6.51L9.69587 14H14V0H9.49917V7.49Z" fill="white" />
   </svg>
 );
 
-export const IconStar = ({
-  inactive = false,
-  size = 14,
-  isHalf = false,
-  ...rest
-}: ComponentProps<"svg"> & {
-  inactive?: boolean;
-  size?: number;
-  isHalf?: boolean;
-}) => {
+export const IconStar = ({ inactive = false, size = 14, isHalf = false, ...rest }: IconStarProps) => {
   if (isHalf) {
     return (
       <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
@@ -321,10 +324,10 @@ export const IconStar = ({
   );
 };
 
-export const IconHome = ({ selected }: { selected: boolean }) => {
+export const IconHome = ({ selected, ...rest }: SelectableIconProps) => {
   if (selected) {
     return (
-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
         <path
           fillRule="evenodd"
           clipRule="evenodd"
@@ -336,7 +339,7 @@ export const IconHome = ({ selected }: { selected: boolean }) => {
   }
 
   return (
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -347,10 +350,10 @@ export const IconHome = ({ selected }: { selected: boolean }) => {
   );
 };
 
-export const IconUser = ({ selected }: { selected: boolean }) => {
+export const IconUser = ({ selected, ...rest }: SelectableIconProps) => {
   if (selected) {
     return (
-      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
         <circle cx="13" cy="6" r="4" fill="#292929" />
         <path
           fillRule="evenodd"
@@ -362,7 +365,7 @@ export const IconUser = ({ selected }: { selected: boolean }) => {
     );
   }
   return (
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
       <circle cx="13" cy="6" r="4" fill="#CFCFCF" />
       <path
         fillRule="evenodd"
@@ -426,8 +429,8 @@ export const IconCamera = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconUnSignInUser = () => (
-  <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconUnSignInUser = (props: IconProps) => (
+  <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <circle cx="32" cy="32" r="32" fill="#FFEFE5" />
     <circle cx="32" cy="22" r="6" fill="#FFDFCB" />
     <path
@@ -439,8 +442,8 @@ export const IconUnSignInUser = () => (
   </svg>
 );
 
-export const IconUnSignInUserProfile = () => (
-  <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconUnSignInUserProfile = (props: IconProps) => (
+  <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <circle cx="32" cy="32" r="32" fill="#FF5E00" fillOpacity="0.1" />
     <path
       d="M29.5311 15.9914C30.8702 13.7401 34.1298 13.7401 35.4689 15.9914C36.3552 17.4815 38.2087 18.0837 39.8017 17.3992C42.2083 16.3649 44.8453 18.2809 44.6054 20.8893C44.4466 22.6158 45.5921 24.1925 47.2832 24.575C49.8381 25.1528 50.8454 28.2529 49.1181 30.2221C47.9748 31.5255 47.9748 33.4745 49.1181 34.7779C50.8454 36.7471 49.8381 39.8472 47.2832 40.425C45.5921 40.8075 44.4466 42.3842 44.6054 44.1107C44.8453 46.7191 42.2083 48.6351 39.8017 47.6008C38.2087 46.9163 36.3552 47.5185 35.4689 49.0086C34.1298 51.2599 30.8702 51.2599 29.5311 49.0086C28.6448 47.5185 26.7913 46.9163 25.1983 47.6008C22.7917 48.6351 20.1547 46.7191 20.3946 44.1107C20.5534 42.3842 19.4079 40.8075 17.7168 40.425C15.1619 39.8472 14.1546 36.7471 15.8819 34.7779C17.0252 33.4745 17.0252 31.5255 15.8819 30.2221C14.1546 28.2529 15.1619 25.1528 17.7168 24.575C19.4079 24.1925 20.5534 22.6158 20.3946 20.8893C20.1547 18.2809 22.7917 16.3649 25.1983 17.3992C26.7913 18.0837 28.6448 17.4815 29.5311 15.9914Z"
@@ -460,8 +463,8 @@ export const IconUnSignInUserProfile = () => (
   </svg>
 );
 
-export const IconFilterWithOrder = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconFilterWithOrder = (props: IconProps) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path d="M6 4V11" stroke="#888888" strokeLinecap="round" strokeLinejoin="round" />
     <path d="M10 12V5" stroke="#888888" strokeLinecap="round" strokeLinejoin="round" />
     <path d="M4.5 10L6 12L7.5 10" stroke="#888888" strokeLinecap="round" strokeLinejoin="round" />
@@ -469,8 +472,8 @@ export const IconFilterWithOrder = () => (
   </svg>
 );
 
-export const IconNavLeft = () => (
-  <svg width="21" height="29" viewBox="0 0 21 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconNavLeft = (props: IconProps) => (
+  <svg width="21" height="29" viewBox="0 0 21 29" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g filter="url(#filter0_d_1125_1151)">
       <path
         d="M16 25L4.70711 13.7071C4.31658 13.3166 4.31658 12.6834 4.70711 12.2929L16 1"
@@ -507,8 +510,8 @@ export const IconNavLeft = () => (
   </svg>
 );
 
-export const IconNavRight = () => (
-  <svg width="21" height="29" viewBox="0 0 21 29" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconNavRight = (props: IconProps) => (
+  <svg width="21" height="29" viewBox="0 0 21 29" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g filter="url(#filter0_d_1125_1153)">
       <path
         d="M5 25L16.2929 13.7071C16.6834 13.3166 16.6834 12.6834 16.2929 12.2929L5 1"
@@ -545,14 +548,14 @@ export const IconNavRight = () => (
   </svg>
 );
 
-export const IconCheck = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconCheck = (props: IconProps) => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path d="M4.5 9L8 13L15.5 6.5" stroke="#FF5E00" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
-export const IconPinned = () => (
-  <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconPinned = (props: IconProps) => (
+  <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <mask
       id="mask0_1303_2011"
       style={{ maskType: "alpha" }}
@@ -582,11 +585,10 @@ export const IconPinned = () => (
   </svg>
 );
 
-export const IconMap = (props: { type: "naver" | "kakao" | "google" }) => {
-  const { type } = props;
+export const IconMap = ({ type, ...rest }: MapIconProps) => {
   if (type === "naver") {
     return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
         <rect width="24" height="24" fill="white" />
         <path d="M15.1777 12.025L9.61157 4H5V19H9.83471V10.975L15.3884 19H20V4H15.1777V12.025Z" fill="#03C75A" />
       </svg>
@@ -594,7 +596,7 @@ export const IconMap = (props: { type: "naver" | "kakao" | "google" }) => {
   }
   if (type === "kakao") {
     return (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
         <rect width="24" height="24" fill="white" />
         <path
           d="M12 4C16.9706 4 21 7.18134 21 11.1055C20.9999 15.0295 16.9705 18.2109 12 18.2109C11.4718 18.2109 10.9544 18.1724 10.4512 18.1035L6.9209 20.9492C6.78929 21.0552 6.59391 20.96 6.5957 20.791L6.63672 16.8105C4.43018 15.5157 3.00008 13.4428 3 11.1055C3 7.18134 7.02944 4 12 4Z"
@@ -612,6 +614,7 @@ export const IconMap = (props: { type: "naver" | "kakao" | "google" }) => {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         xmlnsXlink="http://www.w3.org/1999/xlink"
+        {...rest}
       >
         <rect width="24" height="24" fill="white" />
         <rect x="4.14073" y="3" width="16.7185" height="17" fill="url(#pattern0_1303_1733)" />
@@ -632,8 +635,8 @@ export const IconMap = (props: { type: "naver" | "kakao" | "google" }) => {
   }
 };
 
-export const IconReview = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconReview = (props: IconProps) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <rect x="5" y="3" width="14" height="17" rx="2" fill="#FFEADE" />
     <rect x="8" y="8" width="8" height="1" rx="0.5" fill="#FF9252" />
     <path
@@ -666,8 +669,8 @@ export const IconMore = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconLock = () => (
-  <svg width="80" height="62" viewBox="0 0 80 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconLock = (props: IconProps) => (
+  <svg width="80" height="62" viewBox="0 0 80 62" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <rect x="30" y="6" width="20" height="36" rx="10" stroke="#F4F4F5" strokeWidth="6" />
     <rect x="18" y="25" width="44" height="33" rx="8" fill="#F4F4F5" />
     <circle cx="40" cy="38" r="4" fill="#E4E4E4" />
@@ -675,8 +678,8 @@ export const IconLock = () => (
   </svg>
 );
 
-export const IconEmptyReview = () => (
-  <svg width="80" height="62" viewBox="0 0 80 62" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconEmptyReview = (props: IconProps) => (
+  <svg width="80" height="62" viewBox="0 0 80 62" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
       d="M58 55.7929V45.5C58 45.2239 57.7761 45 57.5 45H47.2071C46.7617 45 46.5386 45.5386 46.8536 45.8536L57.1464 56.1464C57.4614 56.4614 58 56.2383 58 55.7929Z"
       fill="#F4F4F5"
@@ -688,10 +691,10 @@ export const IconEmptyReview = () => (
   </svg>
 );
 
-export const IconMapAppBar = ({ selected }: { selected: boolean }) => {
+export const IconMapAppBar = ({ selected, ...rest }: SelectableIconProps) => {
   if (selected) {
     return (
-      <svg width="26" height="27" viewBox="0 0 26 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="26" height="27" viewBox="0 0 26 27" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
         <path
           d="M21 9.48675C20.8633 14.0615 15.5695 19.8858 13.6699 21.8327C13.2981 22.2136 12.7025 22.214 12.3305 21.8333C10.4068 19.8643 5 13.9346 5 9.48675C5 4.89081 8.58172 1.5 13 1.5C17.4183 1.5 21 4.89081 21 9.48675Z"
           fill="#292929"
@@ -702,7 +705,7 @@ export const IconMapAppBar = ({ selected }: { selected: boolean }) => {
   }
 
   return (
-    <svg width="26" height="27" viewBox="0 0 26 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="26" height="27" viewBox="0 0 26 27" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
       <path
         d="M21 9.48675C20.8633 14.0615 15.5695 19.8858 13.6699 21.8327C13.2981 22.2136 12.7025 22.214 12.3305 21.8333C10.4068 19.8643 5 13.9346 5 9.48675C5 4.89081 8.58172 1.5 13 1.5C17.4183 1.5 21 4.89081 21 9.48675Z"
         fill="#CFCFCF"
@@ -712,8 +715,8 @@ export const IconMapAppBar = ({ selected }: { selected: boolean }) => {
   );
 };
 
-export const IconRefresh = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconRefresh = (props: IconProps) => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
       d="M9.35394 2.88676C7.00919 1.56535 3.9809 2.39908 2.59006 4.74895C1.19922 7.09882 1.97252 10.075 4.31726 11.3964C6.66201 12.7178 9.6903 11.8841 11.0811 9.53419C11.4875 8.84759 11.7092 8.10751 11.7608 7.37087"
       stroke="#585858"
@@ -732,8 +735,8 @@ export const IconRefresh = () => (
   </svg>
 );
 
-export const IconMarker = () => (
-  <svg width="38" height="45" viewBox="0 0 38 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconMarker = (props: IconProps) => (
+  <svg width="38" height="45" viewBox="0 0 38 45" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g filter="url(#filter0_d_2082_2994)">
       <path
         d="M19 5.5C24.5287 5.5 28.988 9.73696 28.999 15.5078C28.9216 18.0186 27.5785 20.9563 25.7627 23.7744C23.965 26.5645 21.7963 29.0996 20.2539 30.7715C19.5637 31.5193 18.436 31.5202 17.7441 30.7725C16.1783 29.0799 13.9685 26.5077 12.1562 23.7041C10.32 20.8633 9 17.9468 9 15.5293C9.00001 9.74748 13.4644 5.5 19 5.5Z"
@@ -778,8 +781,8 @@ export const IconSearch = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconComment = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconComment = (props: IconProps) => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <circle cx="16" cy="16" r="11" fill="#F6F6F6" />
     <circle cx="12" cy="16" r="1" fill="#CFCFCF" />
     <circle cx="16" cy="16" r="1" fill="#CFCFCF" />
@@ -787,8 +790,8 @@ export const IconComment = () => (
   </svg>
 );
 
-export const IconEmail = () => (
-  <svg width="110" height="82" viewBox="0 0 110 82" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconEmail = (props: IconProps) => (
+  <svg width="110" height="82" viewBox="0 0 110 82" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <mask id="mask0_2339_4369" maskUnits="userSpaceOnUse" x="14" y="9" width="82" height="60">
       <path
         d="M14 15.8799C14 12.0803 17.0649 9 20.8457 9H89.1543C92.9351 9 96 12.0803 96 15.8799V62.1201C96 65.9197 92.9351 69 89.1543 69H20.8457C17.0649 69 14 65.9198 14 62.1201V15.8799Z"
@@ -818,8 +821,8 @@ export const IconEmail = () => (
   </svg>
 );
 
-export const IconCoordinate = () => (
-  <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconCoordinate = (props: IconProps) => (
+  <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <circle cx="10.5" cy="10" r="5.5" stroke="#FF5E00" />
     <circle cx="10.5" cy="10" r="2.5" fill="#FF5E00" />
     <rect x="10" y="2" width="1" height="3" rx="0.5" fill="#FF5E00" />
@@ -829,8 +832,8 @@ export const IconCoordinate = () => (
   </svg>
 );
 
-export const IconDeleteSearchValue = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconDeleteSearchValue = (props: IconProps) => (
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <rect width="20" height="20" rx="10" fill="#CFCFCF" />
     <rect width="20" height="20" rx="10" fill="#E7E7E7" />
     <path
@@ -844,10 +847,10 @@ export const IconDeleteSearchValue = () => (
   </svg>
 );
 
-export const IconGPS = () => (
-  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const IconGPS = (props: IconProps) => (
+  <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g filter="url(#filter0_d_2730_5366)">
-      <rect x="3" y="1" width="32" height="32" rx="16" fill="white" shape-rendering="crispEdges" />
+      <rect x="3" y="1" width="32" height="32" rx="16" fill="white" shapeRendering="crispEdges" />
       <circle cx="19" cy="17" r="5.5" stroke="#414141" />
       <circle cx="19" cy="17" r="2.5" fill="#414141" />
       <rect x="18.5" y="9" width="1" height="3" rx="0.5" fill="#414141" />
@@ -863,9 +866,9 @@ export const IconGPS = () => (
         width="38"
         height="38"
         filterUnits="userSpaceOnUse"
-        color-interpolation-filters="sRGB"
+        colorInterpolationFilters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood floodOpacity="0" result="BackgroundImageFix" />
         <feColorMatrix
           in="SourceAlpha"
           type="matrix"
@@ -883,11 +886,11 @@ export const IconGPS = () => (
   </svg>
 );
 
-export const IconImageDelete = (props: ComponentProps<"svg">) => {
+export const IconImageDelete = (props: IconProps) => {
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <g filter="url(#filter0_dd_2730_3839)">
-        <rect x="4" y="3" width="24" height="24" rx="12" fill="white" shape-rendering="crispEdges" />
+        <rect x="4" y="3" width="24" height="24" rx="12" fill="white" shapeRendering="crispEdges" />
         <path
           d="M11.6959 19.302C11.4347 19.038 11.4347 18.61 11.6959 18.346L19.263 10.698C19.5242 10.434 19.9477 10.434 20.2089 10.698C20.4701 10.962 20.4701 11.39 20.2089 11.654L12.6418 19.302C12.3806 19.566 11.9571 19.566 11.6959 19.302Z"
           fill="#585858"
@@ -905,9 +908,9 @@ export const IconImageDelete = (props: ComponentProps<"svg">) => {
           width="32"
           height="32"
           filterUnits="userSpaceOnUse"
-          color-interpolation-filters="sRGB"
+          colorInterpolationFilters="sRGB"
         >
-          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
           <feColorMatrix
             in="SourceAlpha"
             type="matrix"
@@ -937,7 +940,7 @@ export const IconImageDelete = (props: ComponentProps<"svg">) => {
   );
 };
 
-export const IconCheckbox = (props: ComponentProps<"svg"> & { checked: boolean }) => {
+export const IconCheckbox = (props: CheckboxIconProps) => {
   const { checked, ...rest } = props;
 
   if (checked)
@@ -946,8 +949,8 @@ export const IconCheckbox = (props: ComponentProps<"svg"> & { checked: boolean }
         <rect width="24" height="24" fill="white" />
         <rect width="24" height="24" rx="12" fill="#292929" />
         <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
+          fillRule="evenodd"
+          clipRule="evenodd"
           d="M17.7077 8.29353C18.0979 8.6844 18.0973 9.31756 17.7065 9.70774L11.1948 16.2077C11.007 16.3952 10.7524 16.5003 10.4871 16.5C10.2217 16.4997 9.96741 16.3939 9.78009 16.2059L6.29172 12.7059C5.90184 12.3148 5.9029 11.6816 6.29407 11.2917C6.68524 10.9018 7.31841 10.9029 7.70828 11.2941L10.4902 14.0852L16.2935 8.29226C16.6844 7.90209 17.3176 7.90265 17.7077 8.29353Z"
           fill="white"
         />
@@ -958,8 +961,8 @@ export const IconCheckbox = (props: ComponentProps<"svg"> & { checked: boolean }
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
       <rect x="0.5" y="0.5" width="23" height="23" rx="11.5" fill="white" stroke="#E7E7E7" />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M17.7077 8.29353C18.0979 8.6844 18.0973 9.31756 17.7065 9.70774L11.1948 16.2077C11.007 16.3952 10.7524 16.5003 10.4871 16.5C10.2217 16.4997 9.96741 16.3939 9.78009 16.2059L6.29172 12.7059C5.90184 12.3148 5.9029 11.6816 6.29407 11.2917C6.68524 10.9018 7.31841 10.9029 7.70828 11.2941L10.4902 14.0852L16.2935 8.29226C16.6844 7.90209 17.3176 7.90265 17.7077 8.29353Z"
         fill="#CFCFCF"
       />
@@ -967,7 +970,7 @@ export const IconCheckbox = (props: ComponentProps<"svg"> & { checked: boolean }
   );
 };
 
-export const IconTooltip = (props: ComponentProps<"svg">) => (
+export const IconTooltip = (props: IconProps) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <circle cx="12" cy="12" r="7.4" fill="white" stroke="#CFCFCF" strokeWidth="1.2" />
     <rect x="11.25" y="10.5" width="1.5" height="5" fill="#CFCFCF" />
@@ -975,7 +978,7 @@ export const IconTooltip = (props: ComponentProps<"svg">) => (
   </svg>
 );
 
-export const IconMenuBoard = (props: ComponentProps<"svg">) => (
+export const IconMenuBoard = (props: IconProps) => (
   <svg width="80" height="62" viewBox="0 0 80 62" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
       d="M19 9.7018C19 8.72081 19.7115 7.88462 20.6799 7.72759L53.6799 2.37624C54.8963 2.17898 56 3.11812 56 4.35045V51C56 52.1046 55.1046 53 54 53H21C19.8954 53 19 52.1046 19 51V9.7018Z"
@@ -991,7 +994,7 @@ export const IconMenuBoard = (props: ComponentProps<"svg">) => (
   </svg>
 );
 
-export const IconMenuBoardRightImage = (props: ComponentProps<"svg">) => (
+export const IconMenuBoardRightImage = (props: IconProps) => (
   <svg width="11" height="8" viewBox="0 0 11 8" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
       d="M0.75 4.25L3.43182 7.25L9.75 0.75"
@@ -1003,7 +1006,7 @@ export const IconMenuBoardRightImage = (props: ComponentProps<"svg">) => (
   </svg>
 );
 
-export const IconMenuBoardWrongImage = (props: ComponentProps<"svg">) => (
+export const IconMenuBoardWrongImage = (props: IconProps) => (
   <svg width="9" height="9" viewBox="0 0 9 9" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
       d="M0.195899 8.80201C-0.0652996 8.53801 -0.0652997 8.11 0.195899 7.84601L7.76298 0.197994C8.02418 -0.0659981 8.44766 -0.065998 8.70886 0.197994C8.97006 0.461987 8.97006 0.890003 8.70886 1.154L1.14178 8.80201C0.880585 9.066 0.457098 9.066 0.195899 8.80201Z"

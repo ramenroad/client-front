@@ -2,7 +2,12 @@ import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import { oAuthLogin, signOut, withdrawUser } from "@/entities/viewer/api";
-import { setUserInformation, type UserInformation, useSignInStore } from "@/entities/viewer/model";
+import {
+  clearUserInformation,
+  setUserInformation,
+  type UserInformation,
+  useSignInStore,
+} from "@/entities/viewer/model";
 import { queryClient } from "@/shared/api/query-client";
 import { usePageMemorize } from "@/shared/lib/use-page-memorize";
 import { queryKeys } from "@/shared/model/query-keys";
@@ -21,7 +26,6 @@ export const useAuthMutation = () => {
     },
     onSuccess: (data) => {
       openToast("로그인 성공 !");
-      sessionStorage.setItem("isAuthenticated", "true");
 
       const decodedToken: UserInformation = jwtDecode(data.accessToken);
 
@@ -46,9 +50,9 @@ export const useAuthMutation = () => {
   const remove = useMutation({
     mutationFn: signOut,
     onSuccess: () => {
-      sessionStorage.removeItem("isAuthenticated");
       clearTokens();
-      queryClient.setQueryData(["user", "information"], null);
+      clearUserInformation();
+      queryClient.setQueryData(queryKeys.user.information.queryKey, null);
       navigate("/");
       openToast("로그아웃 완료");
     },
@@ -57,9 +61,9 @@ export const useAuthMutation = () => {
   const removeAccount = useMutation({
     mutationFn: withdrawUser,
     onSuccess: () => {
-      sessionStorage.removeItem("isAuthenticated");
       clearTokens();
-      queryClient.setQueryData(["user", "information"], null);
+      clearUserInformation();
+      queryClient.setQueryData(queryKeys.user.information.queryKey, null);
     },
   });
 

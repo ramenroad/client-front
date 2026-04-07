@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import styled from "@emotion/styled";
 import { SortType } from "@/entities/ramenya/model";
 import { RaisingText } from "@/shared/ui/text";
 import { IconCheck, IconClose } from "@/shared/ui/icon";
 import type { ModalProps } from "@/shared/model/popup";
-import { BottomPopupLayout } from "./BottomPopupLayout";
+import { BottomPopupLayout } from "@/shared/ui/popup/BottomPopupLayout";
 import render from "@/shared/ui/render";
 
 export interface PopupSortProps extends ModalProps {
@@ -12,7 +12,7 @@ export interface PopupSortProps extends ModalProps {
   onChange: (sortOption: SortType | null) => void;
 }
 
-const PopupSort: React.FC<PopupSortProps> = ({ sortOption, onChange, onClose }) => {
+const PopupSort = ({ sortOption, onChange, onClose }: PopupSortProps) => {
   const [sortOptions, setSortOptions] = useState<SortType>(sortOption);
 
   const handleSortChange = (sort: SortType) => {

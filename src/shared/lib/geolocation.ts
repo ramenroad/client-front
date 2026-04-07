@@ -1,23 +1,16 @@
-export const requestLocationPermission = async (): Promise<boolean> => {
+export const requestLocationPermission = async (): Promise<PermissionState | "unsupported"> => {
   try {
     if (!navigator.geolocation) {
-      return false;
+      return "unsupported";
     }
 
-    if ("permissions" in navigator) {
+    if ("permissions" in navigator && "query" in navigator.permissions) {
       const permission = await navigator.permissions.query({ name: "geolocation" });
-      if (permission.state === "denied") return false;
-      if (permission.state === "granted") return true;
+      return permission.state;
     }
 
-    return new Promise((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        () => resolve(true),
-        () => resolve(false),
-        { enableHighAccuracy: false, timeout: 5000, maximumAge: 0 },
-      );
-    });
-  } catch (_error) {
-    return false;
+    return "prompt";
+  } catch {
+    return "prompt";
   }
 };

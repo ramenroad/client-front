@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import styled from "@emotion/styled";
 import { FilterOptions, RAMENYA_TYPES, SortType } from "@/entities/ramenya/model";
 import { Button } from "@/shared/ui/button";
 import { Toggle } from "@/shared/ui/toggle";
 import { IconClose, IconPinned } from "@/shared/ui/icon";
 import type { ModalProps } from "@/shared/model/popup";
-import { BottomPopupLayout } from "./BottomPopupLayout";
+import { BottomPopupLayout } from "@/shared/ui/popup/BottomPopupLayout";
 import render from "@/shared/ui/render";
 
 export interface PopupFilterProps extends ModalProps {
@@ -15,13 +15,7 @@ export interface PopupFilterProps extends ModalProps {
   onChange: (filterOptions: FilterOptions | null) => void;
 }
 
-const PopupFilter: React.FC<PopupFilterProps> = ({
-  currentFilterOptions,
-  initialFilterOptions,
-  pinned,
-  onChange,
-  onClose,
-}) => {
+const PopupFilter = ({ currentFilterOptions, initialFilterOptions, pinned, onChange, onClose }: PopupFilterProps) => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(currentFilterOptions);
 
   const ramenyaGenre = useMemo(() => {

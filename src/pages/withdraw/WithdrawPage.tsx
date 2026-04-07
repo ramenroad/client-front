@@ -1,13 +1,13 @@
 import TopBar from "@/shared/ui/top-bar";
 import { Line } from "@/shared/ui/line";
 import { IconCheckbox } from "@/shared/ui/icon";
-import { useRef, useState } from "react";
+import { type ComponentProps, useRef, useState } from "react";
 import { useModal } from "@/shared/lib/use-modal";
 import { Modal } from "@/shared/ui/modal";
-import styled from "@emotion/styled";
 import { useAuthMutation } from "@/features/auth/model";
 import { useToast } from "@/shared/ui/toast";
 import { useNavigate } from "react-router-dom";
+import { twMerge } from "tailwind-merge";
 import render from "@/shared/ui/render";
 
 const WithdrawPage = () => {
@@ -37,7 +37,7 @@ const WithdrawPage = () => {
         </WithdrawInformationContainer>
 
         <WithdrawActionContainer>
-          <WithdrawInputContainer onClick={() => setIsConfirmedPolicy(!isConfirmedPolicy)}>
+          <WithdrawInputContainer type="button" onClick={() => setIsConfirmedPolicy(!isConfirmedPolicy)}>
             <WithdrawCheckbox checked={isConfirmedPolicy} />
             <WithdrawCheckboxLabel>유의사항을 모두 확인했어요</WithdrawCheckboxLabel>
           </WithdrawInputContainer>
@@ -58,13 +58,11 @@ const WithdrawPage = () => {
         <Modal isOpen={isWithdrawModalOpen} onClose={closeWithdrawModal}>
           <ModalContent>
             <ModalConfirmWrapper>
-              정말 회원탈퇴하시겠습니까?
-              <br />
-              동의하신다면 아래에
-              <br />
-              <span>
+              <ModalConfirmLine>정말 회원탈퇴하시겠습니까?</ModalConfirmLine>
+              <ModalConfirmLine>동의하신다면 아래에</ModalConfirmLine>
+              <ModalConfirmLine>
                 <ModalConfirmText>“확인했습니다”</ModalConfirmText>를 정확히 입력해주세요
-              </span>
+              </ModalConfirmLine>
             </ModalConfirmWrapper>
 
             <ModalInputWrapper>
@@ -119,7 +117,9 @@ const WithdrawDescription = render.span(
 
 const WithdrawActionContainer = render.div("flex flex-col gap-24");
 
-const WithdrawInputContainer = render.div("flex items-center gap-8 cursor-pointer");
+const WithdrawInputContainer = render.button(
+  "flex items-center gap-8 cursor-pointer border-none bg-transparent p-0 text-left shadow-none outline-none",
+);
 
 const WithdrawCheckbox = render.extend(IconCheckbox, "cursor-pointer");
 
@@ -133,42 +133,53 @@ const ModalContent = render.div("flex flex-col items-center gap-16 box-border fo
 
 const ModalConfirmWrapper = render.div("flex flex-col text-center");
 
+const ModalConfirmLine = render.span("text-inherit");
+
 const ModalConfirmText = render.span("font-semibold");
 
 const ModalInputWrapper = render.div("box-border w-full px-31");
 
-const ModalInput = styled.input<{ active: boolean }>(({ active }) => ({
-  boxSizing: "border-box",
-  width: "100%",
-  height: "56px",
-  boxShadow: "none",
-  outline: "none",
-  backgroundColor: "#f4f4f5",
-  borderRadius: "8px",
-  fontSize: "16px",
-  lineHeight: "24px",
-  fontWeight: 400,
-  color: "#111111",
-  paddingLeft: "16px",
-  paddingRight: "16px",
-  border: active ? "2px solid #59bc12" : "2px solid #ff5454",
-}));
+interface ModalInputProps extends ComponentProps<"input"> {
+  active: boolean;
+}
+
+const ModalInputField = render.input();
+
+const ModalInput = ({ active, className, ...props }: ModalInputProps) => {
+  return (
+    <ModalInputField
+      {...props}
+      className={twMerge(
+        "h-56 w-full box-border rounded-[8px] bg-[#f4f4f5] px-16 font-16-r text-black shadow-none outline-none border-2",
+        active ? "border-[#59bc12]" : "border-[#ff5454]",
+        className ?? "",
+      )}
+    />
+  );
+};
 
 const ModalActionButtonContainer = render.div("flex h-60 w-full");
 
-const ModalActionButton = styled.button<{ variant: "cancel" | "confirm"; disabled?: boolean }>(
-  ({ variant, disabled }) => ({
-    width: "100%",
-    backgroundColor: "transparent",
-    border: "none",
-    outline: "none",
-    boxShadow: "none",
-    cursor: variant === "confirm" && disabled ? "not-allowed" : "pointer",
-    fontSize: "16px",
-    lineHeight: "24px",
-    fontWeight: variant === "confirm" ? 600 : 400,
-    color: variant === "confirm" ? (disabled ? "#cfcfcf" : "#ff5e00") : "#111111",
-  }),
-);
+interface ModalActionButtonProps extends ComponentProps<"button"> {
+  variant: "cancel" | "confirm";
+}
+
+const ModalActionButtonBase = render.button();
+
+const ModalActionButton = ({ variant, disabled, className, ...props }: ModalActionButtonProps) => {
+  return (
+    <ModalActionButtonBase
+      {...props}
+      disabled={disabled}
+      className={twMerge(
+        "w-full bg-transparent border-none shadow-none outline-none font-16-r",
+        variant === "cancel" ? "cursor-pointer text-black" : "",
+        variant === "confirm" && disabled ? "cursor-not-allowed text-[#cfcfcf]" : "",
+        variant === "confirm" && !disabled ? "cursor-pointer font-semibold text-orange" : "",
+        className ?? "",
+      )}
+    />
+  );
+};
 
 export default WithdrawPage;

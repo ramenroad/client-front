@@ -1,9 +1,36 @@
 import axios from "axios";
 import { type QueryClient } from "@tanstack/react-query";
-import { refreshToken } from "@/entities/viewer/api";
-import { useSignInStore } from "@/entities/viewer/model";
-import { executeMutation } from "@/shared/api/execute-mutation";
 import { queryClient } from "@/shared/api/query-client";
+import { queryKeys } from "@/shared/model/query-keys";
+
+interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+interface HttpAuthAdapter {
+  getAccessToken: () => string | null;
+  getRefreshToken: () => string | null;
+  refreshTokens: (refreshToken: string) => Promise<AuthTokens>;
+  setTokens: (tokens: AuthTokens) => void;
+  clearTokens: () => void;
+  onUnauthorized: () => void;
+}
+
+let authAdapter: HttpAuthAdapter | null = null;
+let refreshPromise: Promise<AuthTokens> | null = null;
+
+const shouldSkipTokenRefresh = (url?: string) => {
+  if (!url) {
+    return true;
+  }
+
+  return url.includes("/refresh") || url.includes("/auth/signin");
+};
+
+export const initializeHttpAuth = (adapter: HttpAuthAdapter) => {
+  authAdapter = adapter;
+};
 
 export const createAxiosInstance = (client: QueryClient, versioning = true) => {
   const instance = axios.create({
@@ -15,8 +42,12 @@ export const createAxiosInstance = (client: QueryClient, versioning = true) => {
   });
 
   instance.interceptors.request.use((config) => {
-    const accessToken = useSignInStore.getState().accessToken;
-    if (accessToken) {
+    if (config.headers.Authorization) {
+      return config;
+    }
+
+    const accessToken = authAdapter?.getAccessToken();
+    if (accessToken && config.headers) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
@@ -27,30 +58,46 @@ export const createAxiosInstance = (client: QueryClient, versioning = true) => {
     async (error) => {
       const originalRequest = error.config;
 
-      if (originalRequest.url?.includes("/refresh") && error.response?.status === 401) {
+      if (!originalRequest) {
+        return Promise.reject(error);
+      }
+
+      if (shouldSkipTokenRefresh(originalRequest.url) && error.response?.status === 401) {
         return Promise.reject(error);
       }
 
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
 
+        if (!authAdapter) {
+          return Promise.reject(error);
+        }
+
+        const refreshToken = authAdapter.getRefreshToken();
+        if (!refreshToken) {
+          authAdapter.clearTokens();
+          authAdapter.onUnauthorized();
+          return Promise.reject(error);
+        }
+
         try {
-          useSignInStore.setState({ ...useSignInStore.getState(), accessToken: null, isSignIn: false });
+          refreshPromise ??= authAdapter.refreshTokens(refreshToken);
+          const tokens = await refreshPromise;
+          authAdapter.setTokens(tokens);
+          client.invalidateQueries({ ...queryKeys.user.information });
 
-          const tokens = await executeMutation(refreshToken, useSignInStore.getState().refreshToken as string, {
-            mutationKey: ["auth", "refresh"],
-            retry: 0,
-          });
+          refreshPromise = null;
 
-          useSignInStore.getState().setTokens(tokens);
-          client.invalidateQueries({ queryKey: ["auth"] });
-
-          originalRequest.headers.Authorization = `Bearer ${tokens.accessToken}`;
+          originalRequest.headers = {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${tokens.accessToken}`,
+          };
           return instance(originalRequest);
         } catch (refreshError) {
-          useSignInStore.getState().clearTokens();
-          client.invalidateQueries({ queryKey: ["auth"] });
-          window.location.href = "/login";
+          refreshPromise = null;
+          authAdapter.clearTokens();
+          client.invalidateQueries({ ...queryKeys.user.information });
+          authAdapter.onUnauthorized();
           return Promise.reject(refreshError);
         }
       }

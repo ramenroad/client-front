@@ -1,125 +1,137 @@
+import { Suspense, lazy, type LazyExoticComponent, type ReactNode } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import BannerPage from "@/pages/banner";
-import GroupPage from "@/pages/group";
-import HomePage from "@/pages/home";
-import LoginPage from "@/pages/login";
-import MapSearchPage from "@/pages/map-search";
-import MenuBoardImagesPage from "@/pages/menu-board-images";
-import MenuBoardSubmitPage from "@/pages/menu-board-submit";
-import MyInformationPage from "@/pages/my-information";
-import MyProfilePage from "@/pages/my-profile";
-import OAuthCallbackPage from "@/pages/oauth-callback";
-import RamenyaByGenrePage from "@/pages/ramenya-by-genre";
-import RamenyaByRegionPage from "@/pages/ramenya-by-region";
-import RamenyaDetailPage from "@/pages/ramenya-detail";
-import RegisterNicknamePage from "@/pages/register-nickname";
-import ReviewPage from "@/pages/review";
-import ReviewImagesPage from "@/pages/review-images";
-import ReviewListPage from "@/pages/review-list";
-import UserReviewsPage from "@/pages/user-reviews";
-import WithdrawPage from "@/pages/withdraw";
-import AppBarLayout from "@/widgets/layouts/app-bar-layout";
-import MapLayout from "@/widgets/layouts/map-layout";
-import WithoutAppBarLayout from "@/widgets/layouts/without-app-bar-layout";
+import { RouteLoader } from "./RouteLoader";
+
+type LazyRouteComponent = LazyExoticComponent<() => ReactNode>;
+
+const AppBarLayout = lazy(() => import("@/widgets/layouts/app-bar-layout"));
+const MapLayout = lazy(() => import("@/widgets/layouts/map-layout"));
+const WithoutAppBarLayout = lazy(() => import("@/widgets/layouts/without-app-bar-layout"));
+
+const BannerPage = lazy(() => import("@/pages/banner"));
+const GroupPage = lazy(() => import("@/pages/group"));
+const HomePage = lazy(() => import("@/pages/home"));
+const LoginPage = lazy(() => import("@/pages/login"));
+const MapSearchPage = lazy(() => import("@/pages/map-search"));
+const MenuBoardImagesPage = lazy(() => import("@/pages/menu-board-images"));
+const MenuBoardSubmitPage = lazy(() => import("@/pages/menu-board-submit"));
+const MyInformationPage = lazy(() => import("@/pages/my-information"));
+const MyProfilePage = lazy(() => import("@/pages/my-profile"));
+const OAuthCallbackPage = lazy(() => import("@/pages/oauth-callback"));
+const RamenyaByGenrePage = lazy(() => import("@/pages/ramenya-by-genre"));
+const RamenyaByRegionPage = lazy(() => import("@/pages/ramenya-by-region"));
+const RamenyaDetailPage = lazy(() => import("@/pages/ramenya-detail"));
+const RegisterNicknamePage = lazy(() => import("@/pages/register-nickname"));
+const ReviewPage = lazy(() => import("@/pages/review"));
+const ReviewImagesPage = lazy(() => import("@/pages/review-images"));
+const ReviewListPage = lazy(() => import("@/pages/review-list"));
+const UserReviewsPage = lazy(() => import("@/pages/user-reviews"));
+const WithdrawPage = lazy(() => import("@/pages/withdraw"));
+
+const renderLazyRoute = (Component: LazyRouteComponent) => (
+  <Suspense fallback={<RouteLoader />}>
+    <Component />
+  </Suspense>
+);
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppBarLayout />,
+    element: renderLazyRoute(AppBarLayout),
     children: [
       {
         path: "",
-        element: <HomePage />,
+        element: renderLazyRoute(HomePage),
       },
       {
         path: "location/:location",
-        element: <RamenyaByRegionPage />,
+        element: renderLazyRoute(RamenyaByRegionPage),
       },
       {
         path: "detail/:id",
-        element: <RamenyaDetailPage />,
+        element: renderLazyRoute(RamenyaDetailPage),
       },
       {
         path: "genre/:genre",
-        element: <RamenyaByGenrePage />,
+        element: renderLazyRoute(RamenyaByGenrePage),
       },
       {
         path: "banner",
-        element: <BannerPage />,
+        element: renderLazyRoute(BannerPage),
       },
       {
         path: "group/:id",
-        element: <GroupPage />,
+        element: renderLazyRoute(GroupPage),
       },
       {
         path: "mypage",
-        element: <MyProfilePage />,
+        element: renderLazyRoute(MyProfilePage),
       },
       {
         path: "information",
-        element: <MyInformationPage />,
+        element: renderLazyRoute(MyInformationPage),
       },
       {
         path: "user-review/:id",
-        element: <UserReviewsPage />,
+        element: renderLazyRoute(UserReviewsPage),
       },
       {
         path: "/review/list/:id",
-        element: <ReviewListPage />,
+        element: renderLazyRoute(ReviewListPage),
       },
     ],
   },
   {
     path: "/",
-    element: <WithoutAppBarLayout />,
+    element: renderLazyRoute(WithoutAppBarLayout),
     children: [
       {
         path: "register",
-        element: <RegisterNicknamePage />,
+        element: renderLazyRoute(RegisterNicknamePage),
       },
       {
         path: "menu-board-submit/:id",
-        element: <MenuBoardSubmitPage />,
+        element: renderLazyRoute(MenuBoardSubmitPage),
       },
       {
         path: "menu-board-edit/:id",
-        element: <MenuBoardSubmitPage />,
+        element: renderLazyRoute(MenuBoardSubmitPage),
       },
     ],
   },
   {
     path: "map",
-    element: <MapLayout />,
+    element: renderLazyRoute(MapLayout),
     children: [
       {
         path: "",
-        element: <MapSearchPage />,
+        element: renderLazyRoute(MapSearchPage),
       },
     ],
   },
   {
     path: "login",
-    element: <LoginPage />,
+    element: renderLazyRoute(LoginPage),
   },
   {
     path: "oauth/:id",
-    element: <OAuthCallbackPage />,
+    element: renderLazyRoute(OAuthCallbackPage),
   },
   {
     path: "/review/:mode/:id",
-    element: <ReviewPage />,
+    element: renderLazyRoute(ReviewPage),
   },
   {
     path: "/images/:id",
-    element: <ReviewImagesPage />,
+    element: renderLazyRoute(ReviewImagesPage),
   },
   {
     path: "/menu-board-images/:id",
-    element: <MenuBoardImagesPage />,
+    element: renderLazyRoute(MenuBoardImagesPage),
   },
   {
     path: "withdraw",
-    element: <WithdrawPage />,
+    element: renderLazyRoute(WithdrawPage),
   },
 ]);
 

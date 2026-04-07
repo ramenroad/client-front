@@ -1,43 +1,14 @@
-import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styled from "@emotion/styled";
 import render from "@/shared/ui/render";
 
 interface ToastProps {
   message: string;
-  isOpen: boolean;
-  onClose: () => void;
+  isVisible: boolean;
 }
 
-export const Toast = ({ message, isOpen, onClose }: ToastProps) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const timerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (!isOpen) {
-      setIsVisible(false);
-      return;
-    }
-
-    setIsVisible(true);
-
-    if (timerRef.current) {
-      window.clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = window.setTimeout(() => {
-      setIsVisible(false);
-      window.setTimeout(onClose, 300);
-    }, 2000);
-
-    return () => {
-      if (timerRef.current) {
-        window.clearTimeout(timerRef.current);
-      }
-    };
-  }, [isOpen, message, onClose]);
-
-  if (!isOpen && !isVisible) {
+export const Toast = ({ message, isVisible }: ToastProps) => {
+  if (!message) {
     return null;
   }
 

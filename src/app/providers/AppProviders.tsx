@@ -1,8 +1,10 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { queryClient } from "@/shared/api/query-client";
 import { PopupProvider } from "@/shared/ui/popup";
 import { ToastProvider } from "@/shared/ui/toast";
+import "@/app/providers/initializeHttpAuth";
+import { renderAppPopup } from "./popupRegistry";
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -10,7 +12,7 @@ interface AppProvidersProps {
 
 const AppProviders = ({ children }: AppProvidersProps) => {
   return (
-    <PopupProvider>
+    <PopupProvider renderPopup={renderAppPopup}>
       <ToastProvider>
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       </ToastProvider>

@@ -1,12 +1,5 @@
-import { useEffect, useState } from "react";
+import { isMobileDevice } from "@/shared/lib/image";
 
 export const useMobileState = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-    setIsMobile(regex.test(navigator.userAgent));
-  }, []);
-
-  return { isMobile };
+  return { isMobile: isMobileDevice() };
 };

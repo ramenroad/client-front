@@ -1,9 +1,9 @@
 import TopBar from "@/shared/ui/top-bar";
-import React, { useEffect, useState } from "react";
+import { type ChangeEvent, type ComponentProps, useState } from "react";
 import { useUserInfoMutation } from "@/features/profile/model";
-import styled from "@emotion/styled";
 import { Button } from "@/shared/ui/button";
 import { AxiosError } from "axios";
+import { twMerge } from "tailwind-merge";
 import { RaisingText } from "@/shared/ui/text";
 import render from "@/shared/ui/render";
 
@@ -14,7 +14,7 @@ const RegisterPage = () => {
   const [nickname, setNickname] = useState("");
   const [isNicknameAlreadyExists, setIsNicknameAlreadyExists] = useState(false);
 
-  const [placeholder, setPlaceholder] = useState("최소 2-10자로 설정해주세요");
+  const placeholder = params ?? "최소 2-10자로 설정해주세요";
   const { updateNickname } = useUserInfoMutation();
 
   const handleClick = () => {
@@ -29,18 +29,12 @@ const RegisterPage = () => {
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (isNicknameAlreadyExists) {
       setIsNicknameAlreadyExists(false);
     }
     setNickname(e.target.value);
   };
-
-  useEffect(() => {
-    if (params) {
-      setPlaceholder(params);
-    }
-  }, [params]);
 
   return (
     <Layout>
@@ -49,17 +43,17 @@ const RegisterPage = () => {
         <DescriptionWrapper>
           {!params ? (
             <>
-              <span>앞으로 사용하실</span>
-              <div>
+              <DescriptionLine>앞으로 사용하실</DescriptionLine>
+              <DescriptionHighlightLine>
                 <HighlightText>닉네임</HighlightText>을 설정해주세요
-              </div>
+              </DescriptionHighlightLine>
             </>
           ) : (
             <UpdateNicknameText>새로운 닉네임을 입력해주세요</UpdateNicknameText>
           )}
         </DescriptionWrapper>
         <InputWrapper>
-          <Input
+          <NicknameInput
             placeholder={placeholder}
             value={nickname}
             onChange={handleChange}
@@ -87,37 +81,34 @@ const Wrapper = render.div("flex flex-col w-full h-full px-20 box-border");
 
 const DescriptionWrapper = render.div("flex flex-col w-full font-20-m mt-20 mb-20");
 
+const DescriptionLine = render.span("text-inherit");
+
+const DescriptionHighlightLine = render.div("text-inherit");
+
 const HighlightText = render.span("text-orange");
 
 const UpdateNicknameText = render.span("font-16-m");
 
-const InputWrapper = styled.div`
-  margin-bottom: 394px;
-  height: 44px;
+const InputWrapper = render.div("mb-[394px] h-44 md:mb-40");
 
-  @media (min-width: 768px) {
-    margin-bottom: 40px;
-  }
-`;
+interface NicknameInputProps extends ComponentProps<"input"> {
+  isError?: boolean;
+}
 
-const Input = styled.input<{ isError?: boolean }>(({ isError }) => [
-  {
-    width: "350px",
-    boxSizing: "border-box",
-    backgroundColor: "#f4f4f5",
-    borderRadius: "8px",
-    outline: "none",
-    padding: "10px 20px",
-    color: "#111111",
-    fontSize: "16px",
-    lineHeight: "24px",
-    fontWeight: 500,
-    "::placeholder": {
-      color: "#cfcfcf",
-    },
-  },
-  isError ? { border: "2px solid #ff5454" } : { border: "none" },
-]);
+const InputField = render.input();
+
+const NicknameInput = ({ isError = false, className, ...props }: NicknameInputProps) => {
+  return (
+    <InputField
+      {...props}
+      className={twMerge(
+        "w-350 box-border rounded-[8px] bg-[#f4f4f5] px-20 py-10 font-16-m text-black outline-none placeholder:text-[#cfcfcf]",
+        isError ? "border-2 border-[#ff5454]" : "border-none",
+        className ?? "",
+      )}
+    />
+  );
+};
 
 const ErrorMessage = render.extend(RaisingText, "text-red mt-4");
 

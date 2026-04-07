@@ -17,6 +17,7 @@ const MyPage = () => {
       {userInformationQuery.data ? (
         <>
           <CardLayout
+            type="button"
             onClick={() => {
               if (userInformationQuery.data) {
                 navigate("/information");
@@ -26,7 +27,7 @@ const MyPage = () => {
             <CardLeftSection>
               <WelcomeText>반가워요!</WelcomeText>
               <UserInfoWrapper>
-                <span>{userInformationQuery.data?.nickname}님</span>
+                <UserName>{userInformationQuery.data?.nickname}님</UserName>
                 <IconArrowRight />
               </UserInfoWrapper>
             </CardLeftSection>
@@ -39,7 +40,7 @@ const MyPage = () => {
               )}
             </CardRightSection>
           </CardLayout>
-          <MyReviewContainer onClick={() => navigate(`/user-review/${userInformationQuery.data?._id}`)}>
+          <MyReviewContainer type="button" onClick={() => navigate(`/user-review/${userInformationQuery.data?._id}`)}>
             <IconReview />
             <MyReviewText size={16} weight="m">
               작성한 리뷰
@@ -63,8 +64,8 @@ const MyPage = () => {
 
 const Layout = render.section("flex flex-col items-center gap-20 w-full h-full px-20 box-border");
 
-const CardLayout = render.section(
-  "flex items-center justify-between w-350 h-112 font-20-m border border-solid border-gray-100 rounded-[8px] px-20 box-border cursor-pointer",
+const CardLayout = render.button(
+  "flex h-112 w-350 cursor-pointer items-center justify-between rounded-[8px] border border-solid border-gray-100 bg-white px-20 text-left font-20-m shadow-none outline-none",
 );
 
 const CardLeftSection = render.section("flex flex-col gap-4");
@@ -72,6 +73,8 @@ const CardLeftSection = render.section("flex flex-col gap-4");
 const CardRightSection = render.section("flex flex-col items-center justify-center");
 
 const WelcomeText = render.span("text-orange");
+
+const UserName = render.span("text-inherit");
 
 const UserInfoWrapper = render.section("flex items-center gap-4");
 
@@ -85,8 +88,8 @@ const LoginText = render.span("font-20-m");
 
 const LoginDescription = render.span("font-18-r");
 
-const MyReviewContainer = render.section(
-  "cursor-pointer w-full flex gap-8 items-center box-border px-12 py-20 bg-[#F9F9F9] rounded-[8px]",
+const MyReviewContainer = render.button(
+  "flex w-full cursor-pointer items-center gap-8 rounded-[8px] bg-[#F9F9F9] px-12 py-20 text-left shadow-none outline-none border-none",
 );
 
 const MyReviewText = render.extend(RaisingText, "text-gray-900");

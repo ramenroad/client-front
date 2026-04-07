@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import styled from "@emotion/styled";
 import { FilterOptions, initialFilterOptions, RamenyaType, SortType } from "@/entities/ramenya/model";
-import { PopupType } from "@/shared/model/popup";
 import { usePopup } from "@/shared/lib/use-popup";
 import { IconFilterWithTag } from "@/shared/ui/icon";
 import { Line } from "@/shared/ui/line";
@@ -30,7 +29,7 @@ const FilterSection = ({ filterOptions, onFilterChange, genre }: FilterSectionPr
       <RelativeWrapper>
         <StyledIconFilter
           onClick={() =>
-            openPopup(PopupType.FILTER, {
+            openPopup("FILTER", {
               initialFilterOptions,
               currentFilterOptions: filterOptions,
               pinned: genre,
@@ -61,7 +60,7 @@ const FilterSection = ({ filterOptions, onFilterChange, genre }: FilterSectionPr
       <FilterButton
         active
         onClick={() =>
-          openPopup(PopupType.SORT, {
+          openPopup("SORT", {
             sortOption: filterOptions.sort,
             onChange: (sortOption: SortType | null) => {
               if (sortOption) {

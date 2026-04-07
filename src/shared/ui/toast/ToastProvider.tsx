@@ -1,43 +1,52 @@
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Toast } from "./Toast";
-
-interface ToastContextType {
-  openToast: (message: string) => void;
-}
-
-const ToastContext = createContext<ToastContextType | null>(null);
-
-export const useToast = () => {
-  const context = useContext(ToastContext);
-
-  if (!context) {
-    throw new Error("useToast must be used within a ToastProvider");
-  }
-
-  return context;
-};
+import { ToastContext } from "./context";
 
 interface ToastProviderProps {
   children: ReactNode;
 }
 
 export const ToastProvider = ({ children }: ToastProviderProps) => {
-  const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const closeTimerRef = useRef<number | null>(null);
+  const cleanupTimerRef = useRef<number | null>(null);
 
   const openToast = useCallback((toastMessage: string) => {
     setMessage(toastMessage);
-    setIsOpen(true);
+    setIsVisible(true);
+
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+    if (cleanupTimerRef.current) {
+      window.clearTimeout(cleanupTimerRef.current);
+    }
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setIsVisible(false);
+    }, 2000);
+
+    cleanupTimerRef.current = window.setTimeout(() => {
+      setMessage("");
+    }, 2300);
   }, []);
 
-  const closeToast = useCallback(() => {
-    setIsOpen(false);
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+      }
+      if (cleanupTimerRef.current) {
+        window.clearTimeout(cleanupTimerRef.current);
+      }
+    };
   }, []);
 
   return (
     <ToastContext.Provider value={{ openToast }}>
       {children}
-      <Toast message={message} isOpen={isOpen} onClose={closeToast} />
+      <Toast message={message} isVisible={isVisible} />
     </ToastContext.Provider>
   );
 };

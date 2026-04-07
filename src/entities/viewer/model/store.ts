@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
 import type { Tokens, UserInformation } from "./types";
 
 interface SignInState {
@@ -33,19 +33,48 @@ export const useSignInStore = create<SignInState>()(
     }),
     {
       name: "sign-in-storage",
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(
+        (): StateStorage => ({
+          getItem: (name) => {
+            const localValue = localStorage.getItem(name);
+            if (localValue !== null) {
+              return localValue;
+            }
+
+            const sessionValue = sessionStorage.getItem(name);
+            if (sessionValue !== null) {
+              localStorage.setItem(name, sessionValue);
+              sessionStorage.removeItem(name);
+            }
+
+            return sessionValue;
+          },
+          setItem: (name, value) => {
+            localStorage.setItem(name, value);
+            sessionStorage.removeItem(name);
+          },
+          removeItem: (name) => {
+            localStorage.removeItem(name);
+            sessionStorage.removeItem(name);
+          },
+        }),
+      ),
     },
   ),
 );
 
 interface UserInformationStore {
   userInformation: UserInformation | null;
+  clearUserInformation: () => void;
 }
 
 export const useUserInformationStore = create<UserInformationStore>()(
   persist<UserInformationStore>(
-    () => ({
+    (set) => ({
       userInformation: null,
+      clearUserInformation: () => {
+        set({ userInformation: null });
+      },
     }),
     {
       name: "user-information-storage",
@@ -58,4 +87,8 @@ export const setUserInformation = (userInformation: UserInformation) => {
     state.userInformation = userInformation;
     return state;
   });
+};
+
+export const clearUserInformation = () => {
+  useUserInformationStore.getState().clearUserInformation();
 };

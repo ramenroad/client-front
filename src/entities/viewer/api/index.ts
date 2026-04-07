@@ -18,8 +18,11 @@ export const oAuthLogin = async (id: string, code: string) => {
 };
 
 export const refreshToken = async (refreshToken: string) => {
-  instanceWithNoVersioning.defaults.headers.common.Authorization = `Bearer ${refreshToken}`;
-  const response = await instanceWithNoVersioning.post("/auth/refresh");
+  const response = await instanceWithNoVersioning.post("/auth/refresh", undefined, {
+    headers: {
+      Authorization: `Bearer ${refreshToken}`,
+    },
+  });
 
   return response.data;
 };

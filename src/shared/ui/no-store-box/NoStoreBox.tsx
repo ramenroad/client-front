@@ -1,5 +1,5 @@
-import styled from "@emotion/styled";
 import noStoreImage from "@/assets/images/store.png";
+import { twMerge } from "tailwind-merge";
 import render from "@/shared/ui/render";
 
 interface NoStoreBoxProps {
@@ -9,7 +9,7 @@ interface NoStoreBoxProps {
 const NoStoreBox = ({ type = "list" }: NoStoreBoxProps) => {
   return (
     <Wrapper>
-      <NoStoreImage type={type} src={noStoreImage} />
+      <NoStoreImage type={type} />
       <NoStoreTitle type={type}>찾으시는 가게가 없어요</NoStoreTitle>
       <NoStoreDescription type={type}>다른 조건으로 다시 검색해보세요</NoStoreDescription>
     </Wrapper>
@@ -18,53 +18,35 @@ const NoStoreBox = ({ type = "list" }: NoStoreBoxProps) => {
 
 const Wrapper = render.div("flex flex-col items-center justify-center h-full");
 
-const NoStoreImage = styled.img(({ type }: { type: "map" | "list" }) => [
-  type === "map"
-    ? {
-        width: "80px",
-        marginBottom: "8px",
-      }
-    : {
-        width: "110px",
-        height: "70px",
-        marginBottom: "20px",
-      },
-]);
+const NoStoreImageBase = render.img();
 
-const NoStoreTitle = styled.div(({ type }: { type: "map" | "list" }) => [
-  {
-    color: "#414141",
-  },
-  type === "map"
-    ? {
-        fontSize: "16px",
-        lineHeight: "24px",
-        fontWeight: 600,
-        marginBottom: "2px",
-      }
-    : {
-        fontSize: "20px",
-        lineHeight: "30px",
-        fontWeight: 600,
-        marginBottom: "12px",
-      },
-]);
+const NoStoreImage = ({ type }: { type: "map" | "list" }) => {
+  return (
+    <NoStoreImageBase
+      src={noStoreImage}
+      className={twMerge(type === "map" ? "mb-8 w-80" : "mb-20 h-70 w-110")}
+    />
+  );
+};
 
-const NoStoreDescription = styled.div(({ type }: { type: "map" | "list" }) => [
-  {
-    color: "#888888",
-  },
-  type === "map"
-    ? {
-        fontSize: "14px",
-        lineHeight: "21px",
-        fontWeight: 400,
-      }
-    : {
-        fontSize: "16px",
-        lineHeight: "24px",
-        fontWeight: 400,
-      },
-]);
+const NoStoreTitleBase = render.div("text-[#414141]");
+
+const NoStoreTitle = ({ type, children }: { children: string; type: "map" | "list" }) => {
+  return (
+    <NoStoreTitleBase className={twMerge(type === "map" ? "mb-2 font-16-sb" : "mb-12 font-20-sb")}>
+      {children}
+    </NoStoreTitleBase>
+  );
+};
+
+const NoStoreDescriptionBase = render.div("text-gray-500");
+
+const NoStoreDescription = ({ type, children }: { children: string; type: "map" | "list" }) => {
+  return (
+    <NoStoreDescriptionBase className={twMerge(type === "map" ? "font-14-r" : "font-16-r")}>
+      {children}
+    </NoStoreDescriptionBase>
+  );
+};
 
 export default NoStoreBox;
