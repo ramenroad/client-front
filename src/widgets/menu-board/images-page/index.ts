@@ -1,0 +1,1 @@
+export { MenuBoardImagesPage } from "./MenuBoardImagesPage";
