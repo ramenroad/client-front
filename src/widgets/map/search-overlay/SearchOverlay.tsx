@@ -1,16 +1,11 @@
-import React, { useState, useRef, useMemo, ComponentProps, useEffect } from "react";
-import { RaisingText } from "@/shared/ui/text";
-import { IconBack, IconClose, IconComment, IconDeleteSearchValue, IconLocate, IconSearch } from "@/shared/ui/icon";
-import { useDebounce } from "@/shared/lib/use-debounce";
-import { useSearchHistoryQuery } from "@/features/search/model";
-import { useRemoveSearchHistoryMutation } from "@/features/search/model";
-import { useRamenyaSearchAutoCompleteQuery } from "@/entities/ramenya/model";
-import { useSignInStore } from "@/entities/viewer/model";
-import { useLocalStorage } from "usehooks-ts";
-import { getTextMatch } from "@/shared/lib/text";
+import type { ComponentProps } from "react";
+import { openUrl } from "@/shared/lib/browser";
 import NoResultBox from "@/shared/ui/no-result-box";
-import { useSearchParams } from "react-router-dom";
 import render from "@/shared/ui/render";
+import { SearchOverlayInputBar } from "./ui/SearchOverlayInputBar";
+import { SearchAutoCompleteResults } from "./ui/SearchAutoCompleteResults";
+import { SearchHistorySection } from "./ui/SearchHistorySection";
+import { useSearchOverlay } from "./model/useSearchOverlay";
 
 interface SearchOverlayProps extends ComponentProps<"input"> {
   isSearching?: boolean;
@@ -31,212 +26,72 @@ export const SearchOverlay = ({
   setIsSearchOverlayOpen,
   ...rest
 }: SearchOverlayProps) => {
-  const [isFocused, setIsFocused] = useState(false);
-
-  const [, setSearchParams] = useSearchParams();
-
-  const { value: debouncedSearchValue } = useDebounce<string>(keyword, 300);
-
-  const { searchHistoryQuery } = useSearchHistoryQuery();
-  const { remove: removeSearchHistory } = useRemoveSearchHistoryMutation();
-  const { ramenyaSearchAutoCompleteQuery } = useRamenyaSearchAutoCompleteQuery({ query: debouncedSearchValue });
-
-  const { isSignIn } = useSignInStore((state) => state);
-
-  // localStorage 기반 히스토리 (비회원용)
-  const [signOutKeywordHistory, setSignOutKeywordHistory] = useLocalStorage<string[]>("signOutKeywordHistory", []);
-  const [signOutRamenyaHistory, setSignOutRamenyaHistory] = useLocalStorage<{ _id: string; name: string }[]>(
-    "signOutRamenyaHistory",
-    [],
-  );
-
-  // 히스토리 getter
-  const getKeywordHistory = () => {
-    if (isSignIn) {
-      return searchHistoryQuery.data?.searchKeywords || [];
-    } else {
-      return signOutKeywordHistory.map((keyword, idx) => ({ _id: String(idx), keyword }));
-    }
-  };
-  const getRamenyaHistory = () => {
-    if (isSignIn) {
-      return searchHistoryQuery.data?.ramenyaNames || [];
-    } else {
-      return signOutRamenyaHistory.map((r) => ({ _id: r._id, keyword: r.name }));
-    }
-  };
-
-  // 히스토리 추가/삭제
-  const addKeywordHistory = (keyword: string) => {
-    if (!isSignIn) {
-      setSignOutKeywordHistory((prev) => [keyword, ...prev.filter((k) => k !== keyword)]);
-      return;
-    }
-  };
-  const removeKeywordHistory = (keyword: string) => {
-    if (!isSignIn) {
-      setSignOutKeywordHistory((prev) => prev.filter((k) => k !== keyword));
-      return;
-    }
-  };
-  const clearKeywordHistory = () => {
-    if (!isSignIn) {
-      setSignOutKeywordHistory([]);
-      return;
-    }
-  };
-  const addRamenyaHistory = (ramenya: { _id: string; name: string }) => {
-    if (!isSignIn) {
-      setSignOutRamenyaHistory((prev) => [ramenya, ...prev.filter((r) => r._id !== ramenya._id)]);
-      return;
-    }
-  };
-  const removeRamenyaHistory = (ramenya: { _id: string }) => {
-    if (!isSignIn) {
-      setSignOutRamenyaHistory((prev) => prev.filter((r) => r._id !== ramenya._id));
-      return;
-    }
-  };
-  const clearRamenyaHistory = () => {
-    if (!isSignIn) {
-      setSignOutRamenyaHistory([]);
-      return;
-    }
-  };
-
-  const isTyping = useMemo(() => keyword.length > 0, [keyword]);
-  const isAutoCompleteResultExist = useMemo(() => {
-    return (
-      ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.length !== 0 ||
-      ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.length !== 0
-    );
-  }, [ramenyaSearchAutoCompleteQuery.data]);
-
-  const keywordHistory = getKeywordHistory();
-  const ramenyaHistory = getRamenyaHistory();
-  const isKeywordHistoryExist = keywordHistory.length > 0;
-  const isRamenyaHistoryExist = ramenyaHistory.length > 0;
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => {
-    setIsFocused(false);
-    setIsSearchOverlayOpen?.(false);
-  };
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => setKeyword(e.target.value);
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.nativeEvent.isComposing) return;
-    if (e.key === "Enter") {
-      onSelectKeyword?.(keyword, true);
-      addKeywordHistory(keyword);
-      handleBlur();
-      inputRef.current?.blur();
-    }
-  };
-
-  useEffect(() => {
-    if (isExternal && isSearchOverlayOpen) {
-      inputRef.current?.focus();
-    }
-  }, [isExternal, isSearchOverlayOpen]);
+  const {
+    inputRef,
+    isFocused,
+    isTyping,
+    isOverlayVisible,
+    shouldRenderSearchBox,
+    hasAutoCompleteResults,
+    keywordHistory,
+    ramenyaHistory,
+    keywordResults,
+    ramenyaResults,
+    handleInputFocus,
+    handleInputChange,
+    handleInputKeyDown,
+    handleClearKeyword,
+    handleCloseOverlay,
+    handleKeywordResultClick,
+    handleRamenyaResultClick,
+    handleKeywordHistoryClick,
+    handleRamenyaHistoryClick,
+    handleKeywordHistoryDelete,
+    handleRamenyaHistoryDelete,
+    handleKeywordHistoryClear,
+    handleRamenyaHistoryClear,
+  } = useSearchOverlay({
+    keyword,
+    setKeyword,
+    isExternal,
+    isSearchOverlayOpen,
+    setIsSearchOverlayOpen,
+    onSelectKeyword,
+  });
 
   return (
     <>
-      {isExternal && !isSearchOverlayOpen ? (
-        <></>
-      ) : (
-        <SearchOverlayContainer>
-          {(isFocused || isExternal) && <FocusResetIcon onClick={handleBlur} />}
-          <SearchBox>
-            {!isFocused && (
-              <IconWrapper>
-                <IconSearch />
-              </IconWrapper>
-            )}
-            <SearchInput
-              ref={inputRef}
-              {...rest}
-              type="search"
-              value={keyword}
-              onChange={handleSearchChange}
-              onKeyDown={handleKeyDown}
-              onFocus={handleFocus}
-              placeholder={`${isFocused ? "어떤 라멘을 찾으세요?" : "장르 또는 매장으로 검색해 보세요"}`}
-            />
-            <SearchDeleteIconWrapper
-              onClick={() => {
-                setSearchParams((prev) => {
-                  prev.delete("selectedId");
-                  prev.delete("keyword");
-                  return prev;
-                });
-                setKeyword("");
-              }}
-            >
-              {keyword && keyword.trim() !== "" && <IconDeleteSearchValue />}
-            </SearchDeleteIconWrapper>
-          </SearchBox>
-        </SearchOverlayContainer>
+      {shouldRenderSearchBox && (
+        <SearchOverlayInputBar
+          {...rest}
+          inputRef={inputRef}
+          keyword={keyword}
+          showBackIcon={isFocused || isExternal}
+          showSearchIcon={!isFocused}
+          onClose={handleCloseOverlay}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          onKeyDown={handleInputKeyDown}
+          onClear={handleClearKeyword}
+          placeholder={isFocused ? "어떤 라멘을 찾으세요?" : "장르 또는 매장으로 검색해 보세요"}
+        />
       )}
 
-      {(isFocused || (isExternal && isSearchOverlayOpen)) && (
+      {isOverlayVisible && (
         <FullScreenSearchOverlay>
           {isTyping ? (
-            isAutoCompleteResultExist ? (
-              <AutoCompleteContainer>
-                {ramenyaSearchAutoCompleteQuery.data?.keywordSearchResults?.map((keywordResult) => (
-                  <KeywardWrapper
-                    key={keywordResult._id}
-                    onClick={() => {
-                      onSelectKeyword?.(keywordResult.name);
-                      addKeywordHistory(keywordResult.name);
-                      setIsFocused(false);
-                      setIsSearchOverlayOpen?.(false);
-                    }}
-                  >
-                    <IconLocate />
-                    <span>
-                      <MatchedText size={16} weight="sb">
-                        {getTextMatch({ query: keyword, target: keywordResult.name }).matchedText}
-                      </MatchedText>
-                      <UnMatchedText size={16} weight="sb">
-                        {getTextMatch({ query: keyword, target: keywordResult.name }).unMatchedText}
-                      </UnMatchedText>
-                    </span>
-                  </KeywardWrapper>
-                ))}
-                {ramenyaSearchAutoCompleteQuery.data?.ramenyaSearchResults?.map((ramenyaResult) => (
-                  <KeywardWrapper
-                    key={ramenyaResult._id}
-                    onClick={() => {
-                      onSelectKeyword?.(ramenyaResult.name);
-                      setKeyword(ramenyaResult.name);
-                      addRamenyaHistory({ _id: ramenyaResult._id, name: ramenyaResult.name });
-                      setIsFocused(false);
-                      setIsSearchOverlayOpen?.(false);
-                    }}
-                  >
-                    <IconLocate color={"#A0A0A0"} />
-                    <span>
-                      <MatchedText size={16} weight="sb">
-                        {getTextMatch({ query: keyword, target: ramenyaResult.name }).matchedText}
-                      </MatchedText>
-                      <UnMatchedText size={16} weight="sb">
-                        {getTextMatch({ query: keyword, target: ramenyaResult.name }).unMatchedText}
-                      </UnMatchedText>
-                    </span>
-                  </KeywardWrapper>
-                ))}
-              </AutoCompleteContainer>
+            hasAutoCompleteResults ? (
+              <SearchAutoCompleteResults
+                keyword={keyword}
+                keywordResults={keywordResults}
+                ramenyaResults={ramenyaResults}
+                onKeywordSelect={handleKeywordResultClick}
+                onRamenyaSelect={handleRamenyaResultClick}
+              />
             ) : (
               <NoResultBox
                 actionButton={
-                  <SubmitButton
-                    onClick={() => {
-                      window.open("https://forms.gle/BuqmFWMT2fCd37eK8", "_blank");
-                    }}
-                  >
+                  <SubmitButton type="button" onClick={() => openUrl("https://forms.gle/BuqmFWMT2fCd37eK8")}>
                     제보하기
                   </SubmitButton>
                 }
@@ -244,131 +99,24 @@ export const SearchOverlay = ({
             )
           ) : (
             <>
-              <HistoryContainer>
-                <HistoryHeader>
-                  <RaisingText size={16} weight="sb">
-                    최근 검색어
-                  </RaisingText>
-                  <RemoveText
-                    size={12}
-                    weight="r"
-                    onClick={() => {
-                      if (isSignIn) {
-                        if (searchHistoryQuery.data?.searchKeywords?.length === 0) return;
-                        removeSearchHistory.mutate(
-                          searchHistoryQuery.data?.searchKeywords?.map((keyword) => keyword._id) || [],
-                        );
-                      } else {
-                        if (signOutKeywordHistory.length === 0) return;
-                        clearKeywordHistory();
-                      }
-                    }}
-                  >
-                    전체 삭제
-                  </RemoveText>
-                </HistoryHeader>
-                {isKeywordHistoryExist ? (
-                  <HistoryTagWrapper>
-                    {keywordHistory.map((keyword) => (
-                      <KeywordHistoryTag
-                        key={keyword._id}
-                        onClick={() => {
-                          onSelectKeyword?.(keyword.keyword);
-                          addKeywordHistory(keyword.keyword);
-                          setKeyword(keyword.keyword);
-                          setIsFocused(false);
-                          setIsSearchOverlayOpen?.(false);
-                        }}
-                      >
-                        <RaisingText size={14} weight="r">
-                          {keyword.keyword}
-                        </RaisingText>
-                        <XIcon
-                          color="#A0A0A0"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (isSignIn) {
-                              removeSearchHistory.mutate([keyword._id]);
-                            } else {
-                              removeKeywordHistory(keyword.keyword);
-                            }
-                          }}
-                        />
-                      </KeywordHistoryTag>
-                    ))}
-                  </HistoryTagWrapper>
-                ) : (
-                  <NoHistoryWrapper>
-                    <IconComment />
-                    <NoHistoryText size={16} weight="r">
-                      최근 검색어가 없어요
-                    </NoHistoryText>
-                  </NoHistoryWrapper>
-                )}
-              </HistoryContainer>
-              <HistoryContainer>
-                <HistoryHeader>
-                  <RaisingText size={16} weight="sb">
-                    검색한 매장
-                  </RaisingText>
-                  <RemoveText
-                    size={12}
-                    weight="r"
-                    onClick={() => {
-                      if (isSignIn) {
-                        if (searchHistoryQuery.data?.ramenyaNames?.length === 0) return;
-                        removeSearchHistory.mutate(
-                          searchHistoryQuery.data?.ramenyaNames?.map((ramenya) => ramenya._id) || [],
-                        );
-                      } else {
-                        if (signOutRamenyaHistory.length === 0) return;
-                        clearRamenyaHistory();
-                      }
-                    }}
-                  >
-                    전체 삭제
-                  </RemoveText>
-                </HistoryHeader>
-                <RamenyaHistoryWrapper>
-                  {isRamenyaHistoryExist ? (
-                    ramenyaHistory.map((ramenya) => (
-                      <KeywardWrapper
-                        key={ramenya._id}
-                        onClick={() => {
-                          onSelectKeyword?.(ramenya.keyword);
-                          setKeyword(ramenya.keyword);
-                          addRamenyaHistory({ _id: ramenya._id, name: ramenya.keyword });
-                          setIsFocused(false);
-                          setIsSearchOverlayOpen?.(false);
-                        }}
-                      >
-                        <IconLocate color={"#A0A0A0"} />
-                        <RaisingText size={16} weight="r">
-                          {ramenya.keyword}
-                        </RaisingText>
-                        <RamenyaXIcon
-                          color="#A0A0A0"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (isSignIn) {
-                              removeSearchHistory.mutate([ramenya._id]);
-                            } else {
-                              removeRamenyaHistory({ _id: ramenya._id });
-                            }
-                          }}
-                        />
-                      </KeywardWrapper>
-                    ))
-                  ) : (
-                    <NoHistoryWrapper>
-                      <IconComment />
-                      <NoHistoryText size={16} weight="r">
-                        검색한 매장이 없어요
-                      </NoHistoryText>
-                    </NoHistoryWrapper>
-                  )}
-                </RamenyaHistoryWrapper>
-              </HistoryContainer>
+              <SearchHistorySection
+                title="최근 검색어"
+                items={keywordHistory}
+                emptyMessage="최근 검색어가 없어요"
+                display="chip"
+                onClear={handleKeywordHistoryClear}
+                onSelect={(item) => handleKeywordHistoryClick(item.keyword)}
+                onDelete={(item) => handleKeywordHistoryDelete(item.keyword)}
+              />
+              <SearchHistorySection
+                title="검색한 매장"
+                items={ramenyaHistory}
+                emptyMessage="검색한 매장이 없어요"
+                display="list"
+                onClear={handleRamenyaHistoryClear}
+                onSelect={handleRamenyaHistoryClick}
+                onDelete={(item) => handleRamenyaHistoryDelete(item._id)}
+              />
             </>
           )}
         </FullScreenSearchOverlay>
@@ -377,58 +125,10 @@ export const SearchOverlay = ({
   );
 };
 
-const AutoCompleteContainer = render.div("flex flex-col");
-
 const SubmitButton = render.button(
   "text-orange bg-[#FFE4CE] font-16-m px-32 py-10 rounded-[100px] outline-none border-none cursor-pointer",
-);
-
-const KeywardWrapper = render.div("flex items-center gap-8 h-36 cursor-pointer");
-
-const MatchedText = render.extend(RaisingText, "text-orange");
-
-const UnMatchedText = render.extend(RaisingText, "");
-
-const SearchOverlayContainer = render.figure(
-  "absolute top-16 left-0 right-0 z-[200] m-0 px-20 h-48 box-border flex gap-12 items-center",
-);
-
-const SearchBox = render.div(
-  "flex items-center gap-8 w-full h-full rounded-[8px] box-border border border-solid border-divider bg-white px-16 py-12",
-);
-
-const IconWrapper = render.div("w-24 h-24");
-
-const FocusResetIcon = render.extend(IconBack, "cursor-pointer");
-
-const SearchInput = render.input(
-  "w-full h-24 bg-white border-none font-16-r text-black leading-24 placeholder:text-gray-200 focus:outline-none align-middle",
 );
 
 const FullScreenSearchOverlay = render.main(
   "absolute w-full h-[100dvh] inset-0 bg-white z-[150] flex flex-col gap-32 box-border px-16 py-20 pt-84",
 );
-
-const HistoryContainer = render.div("flex flex-col gap-16");
-
-const HistoryHeader = render.div("flex justify-between items-center w-full");
-
-const RemoveText = render.extend(RaisingText, "text-gray-400 cursor-pointer");
-
-const HistoryTagWrapper = render.div("flex flex-wrap gap-8");
-
-const KeywordHistoryTag = render.div(
-  "flex items-center gap-8 box-border h-33 py-6 px-12 cursor-pointer border border-solid border-gray-200 rounded-[50px] font-14-r text-gray-900",
-);
-
-const RamenyaHistoryWrapper = render.div("flex flex-col");
-
-const NoHistoryWrapper = render.div("flex flex-col items-center gap-8 cursor-pointer mt-12");
-
-const NoHistoryText = render.extend(RaisingText, "text-gray-400");
-
-const RamenyaXIcon = render.extend(IconClose, "ml-auto w-9 h-9 cursor-pointer");
-
-const XIcon = render.extend(IconClose, "w-9 h-9 cursor-pointer");
-
-const SearchDeleteIconWrapper = render.div("cursor-pointer flex h-full items-center");

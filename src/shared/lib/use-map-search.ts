@@ -1,5 +1,6 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
+import { updateSearchParams } from "@/shared/lib/search-params";
 
 export type MapSearchParams = {
   keyword?: string;
@@ -11,8 +12,7 @@ export type MapSearchParams = {
 
 export const useMapSearch = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [keyword, setKeyword] = useState("");
-  const prevKeywordNameRef = useRef<string | null>(null);
+  const [keyword, setKeyword] = useState(() => searchParams.get("keyword") ?? "");
 
   const searchParamsKeyword = useMemo<MapSearchParams>(
     () => ({
@@ -25,26 +25,20 @@ export const useMapSearch = () => {
     [searchParams],
   );
 
-  useEffect(() => {
-    if (!searchParamsKeyword.keyword) {
-      return;
-    }
-
-    if (searchParamsKeyword.keyword !== prevKeywordNameRef.current) {
-      setKeyword(searchParamsKeyword.keyword);
-      prevKeywordNameRef.current = searchParamsKeyword.keyword;
-    }
-  }, [searchParamsKeyword.keyword]);
-
   const handleKeywordClick = useCallback(
     (nextKeyword: string, isNearBy?: boolean) => {
-      setSearchParams((prev) => {
-        prev.set("keyword", nextKeyword);
-        if (isNearBy) {
-          prev.set("nearBy", "true");
-        }
-        return prev;
-      });
+      setSearchParams((prev) =>
+        updateSearchParams(prev, (nextParams) => {
+          nextParams.set("keyword", nextKeyword);
+
+          if (isNearBy) {
+            nextParams.set("nearBy", "true");
+            return;
+          }
+
+          nextParams.delete("nearBy");
+        }),
+      );
     },
     [setSearchParams],
   );

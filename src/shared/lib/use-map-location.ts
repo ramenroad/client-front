@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { updateSearchParams } from "@/shared/lib/search-params";
 
 interface UseMapLocationProps {
   mapInstance: naver.maps.Map | null;
@@ -15,13 +16,18 @@ type CurrentGeolocation = {
 export const useMapLocation = ({ mapInstance }: UseMapLocationProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const setSearchParamsRef = useRef(setSearchParams);
+  const initialGeolocation = {
+    latitude: searchParams.get("latitude") ? Number(searchParams.get("latitude")) : undefined,
+    longitude: searchParams.get("longitude") ? Number(searchParams.get("longitude")) : undefined,
+    level: searchParams.get("level") ? Number(searchParams.get("level")) : undefined,
+    radius: searchParams.get("radius") ? Number(searchParams.get("radius")) : undefined,
+  };
   const [currentGeolocation, setCurrentGeolocation] = useState<CurrentGeolocation>({
-    latitude: undefined,
-    longitude: undefined,
-    level: undefined,
-    radius: undefined,
+    ...initialGeolocation,
   });
-  const [isLocationInitialized, setIsLocationInitialized] = useState(false);
+  const [isLocationInitialized, setIsLocationInitialized] = useState(
+    Boolean(initialGeolocation.latitude && initialGeolocation.longitude && initialGeolocation.radius),
+  );
 
   useEffect(() => {
     setSearchParamsRef.current = setSearchParams;
@@ -48,24 +54,21 @@ export const useMapLocation = ({ mapInstance }: UseMapLocationProps) => {
       const centerInfo = calculateMapCenter(map);
 
       setCurrentGeolocation(centerInfo);
-      setSearchParamsRef.current((prev) => {
-        prev.set("latitude", centerInfo.latitude.toString());
-        prev.set("longitude", centerInfo.longitude.toString());
-        prev.set("level", centerInfo.level.toString());
-        prev.set("radius", centerInfo.radius.toString());
-        return prev;
-      });
+      setIsLocationInitialized(true);
+      setSearchParamsRef.current(
+        (prev) =>
+          updateSearchParams(prev, (nextParams) => {
+            nextParams.set("latitude", centerInfo.latitude.toString());
+            nextParams.set("longitude", centerInfo.longitude.toString());
+            nextParams.set("level", centerInfo.level.toString());
+            nextParams.set("radius", centerInfo.radius.toString());
+          }),
+        { replace: true },
+      );
 
       return centerInfo;
     },
     [calculateMapCenter],
-  );
-
-  const updateLocationDataSafe = useCallback(
-    (map: naver.maps.Map) => {
-      return updateLocationData(map);
-    },
-    [updateLocationData],
   );
 
   const moveMapCenter = useCallback(
@@ -88,31 +91,10 @@ export const useMapLocation = ({ mapInstance }: UseMapLocationProps) => {
     [mapInstance],
   );
 
-  useEffect(() => {
-    if (!mapInstance || isLocationInitialized) {
-      return;
-    }
-
-    if (searchParams.get("latitude") && searchParams.get("longitude") && searchParams.get("radius")) {
-      setCurrentGeolocation({
-        latitude: searchParams.get("latitude") ? Number(searchParams.get("latitude")) : undefined,
-        longitude: searchParams.get("longitude") ? Number(searchParams.get("longitude")) : undefined,
-        level: searchParams.get("level") ? Number(searchParams.get("level")) : undefined,
-        radius: searchParams.get("radius") ? Number(searchParams.get("radius")) : undefined,
-      });
-      setIsLocationInitialized(true);
-      return;
-    }
-
-    updateLocationData(mapInstance);
-    setIsLocationInitialized(true);
-  }, [isLocationInitialized, mapInstance, searchParams, updateLocationData]);
-
   return {
     currentGeolocation,
     isLocationInitialized,
     updateLocationData,
-    updateLocationDataSafe,
     moveMapCenter,
     calculateMapCenter,
   };

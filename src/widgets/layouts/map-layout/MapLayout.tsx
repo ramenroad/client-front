@@ -16,6 +16,6 @@ const MapLayout = () => {
   );
 };
 
-const MapScreen = render.main("w-full h-[calc(100dvh-56px)] relative overflow-hidden pb-56");
+const MapScreen = render.main("relative h-[100dvh] w-full overflow-hidden box-border pb-56");
 
 export default MapLayout;
