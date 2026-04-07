@@ -13,8 +13,7 @@ import RamenyaByGenrePage from "@/pages/ramenya-by-genre";
 import RamenyaByRegionPage from "@/pages/ramenya-by-region";
 import RamenyaDetailPage from "@/pages/ramenya-detail";
 import RegisterNicknamePage from "@/pages/register-nickname";
-import ReviewCreatePage from "@/pages/review-create";
-import ReviewEditPage from "@/pages/review-edit";
+import ReviewPage from "@/pages/review";
 import ReviewImagesPage from "@/pages/review-images";
 import ReviewListPage from "@/pages/review-list";
 import UserReviewsPage from "@/pages/user-reviews";
@@ -107,12 +106,8 @@ const router = createBrowserRouter([
     element: <OAuthCallbackPage />,
   },
   {
-    path: "/review/create/:id",
-    element: <ReviewCreatePage />,
-  },
-  {
-    path: "/review/edit/:id",
-    element: <ReviewEditPage />,
+    path: "/review/:mode/:id",
+    element: <ReviewPage />,
   },
   {
     path: "/images/:id",
