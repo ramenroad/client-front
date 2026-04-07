@@ -9,6 +9,9 @@ const MapLayout = lazy(() => import("@/widgets/layouts/map-layout"));
 const WithoutAppBarLayout = lazy(() => import("@/widgets/layouts/without-app-bar-layout"));
 
 const BannerPage = lazy(() => import("@/pages/banner"));
+const CommunityNotificationsPage = lazy(() => import("@/pages/community-notifications"));
+const CommunityPage = lazy(() => import("@/pages/community"));
+const CommunityWritePage = lazy(() => import("@/pages/community-write"));
 const GroupPage = lazy(() => import("@/pages/group"));
 const HomePage = lazy(() => import("@/pages/home"));
 const LoginPage = lazy(() => import("@/pages/login"));
@@ -112,6 +115,18 @@ const router = createBrowserRouter([
   {
     path: "login",
     element: renderLazyRoute(LoginPage),
+  },
+  {
+    path: "community",
+    element: renderLazyRoute(CommunityPage),
+  },
+  {
+    path: "community/notifications",
+    element: renderLazyRoute(CommunityNotificationsPage),
+  },
+  {
+    path: "community/write",
+    element: renderLazyRoute(CommunityWritePage),
   },
   {
     path: "oauth/:id",

@@ -4,6 +4,20 @@ export const queryKeys = createQueryKeyStore({
   banner: {
     all: null,
   },
+  community: {
+    list: (params: { page?: number; limit?: number; category?: string }) =>
+      [params.page, params.limit, params.category] as const,
+    detail: (boardId: string) => [boardId],
+    comments: (boardId: string) => [boardId],
+  },
+  mypage: {
+    nicknameCheck: (nickname: string) => [nickname],
+    notices: (type: "공지사항" | "패치노트" | "약관") => [type],
+    notice: (noticeId: string) => [noticeId],
+    myPosts: null,
+    myComments: null,
+    recentViewedRamenya: null,
+  },
   ramenya: {
     all: null,
     detail: (id: string) => [id],
