@@ -1,0 +1,1 @@
+export { RamenyaTag } from "./RamenyaTag";
