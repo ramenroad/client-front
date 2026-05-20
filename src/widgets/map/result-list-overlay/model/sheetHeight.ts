@@ -1,0 +1,13 @@
+export const MAP_RESULT_SHEET_HEIGHTS = {
+  COLLAPSED: '8dvh',
+  HALF: '35dvh',
+  EXPANDED: '80dvh',
+} as const
+
+export type MapResultSheetHeight = (typeof MAP_RESULT_SHEET_HEIGHTS)[keyof typeof MAP_RESULT_SHEET_HEIGHTS]
+
+export const MAP_RESULT_SHEET_HEIGHT_VALUES = [
+  MAP_RESULT_SHEET_HEIGHTS.COLLAPSED,
+  MAP_RESULT_SHEET_HEIGHTS.HALF,
+  MAP_RESULT_SHEET_HEIGHTS.EXPANDED,
+] as const
