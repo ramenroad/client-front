@@ -196,10 +196,10 @@ const Grid = render.div("flex flex-row flex-wrap gap-12");
 const HiddenFileInput = render.input("hidden");
 
 const ImagePreviewContainer = render.div(
-  "relative w-96 h-96 rounded-[7px] flex items-center justify-center border border-solid border-border overflow-hidden",
+  "relative w-96 h-96 rounded-7 flex items-center justify-center border border-solid border-border overflow-hidden",
 );
 
-const ImagePreview = render.img("w-full h-full object-cover rounded-[7px]");
+const ImagePreview = render.img("w-full h-full object-cover rounded-7");
 
 const ErrorPlaceholder = render.div("w-full h-full flex flex-col items-center justify-center bg-gray-100 text-center");
 
@@ -210,5 +210,5 @@ const ErrorCaption = render.div("mt-4 text-[10px] text-gray-400");
 const RemoveButton = render.button("absolute top-[-8px] right-[-8px] border-none bg-transparent p-0 cursor-pointer");
 
 const AddButton = render.button(
-  "flex items-center justify-center w-96 h-96 rounded-[8px] bg-border border border-solid border-gray-200 border-dashed cursor-pointer",
+  "flex items-center justify-center w-96 h-96 rounded-8 bg-border border border-solid border-gray-200 border-dashed cursor-pointer",
 );

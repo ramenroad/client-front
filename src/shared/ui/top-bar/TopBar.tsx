@@ -44,7 +44,7 @@ const IconWrapper = render.div("absolute left-20 w-24 h-24");
 
 const StyledIconBack = render.extend(IconBack, "cursor-pointer");
 
-const HeaderTitle = render.span("font-16-sb text-black");
+const HeaderTitle = render.span("font-16-sb text-primary");
 
 const AdditionalIconWrapper = render.div("absolute right-20 w-24 h-24 cursor-pointer");
 

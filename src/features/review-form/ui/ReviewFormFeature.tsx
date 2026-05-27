@@ -1,6 +1,7 @@
 import { Button } from '@/shared/ui/button'
 import { UploadLoadingOverlay } from '@/shared/ui/image-upload'
 import { Modal } from '@/shared/ui/modal'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import TopBar from '@/shared/ui/top-bar'
 import { MAX_REVIEW_IMAGES, MAX_REVIEW_LENGTH, MIN_REVIEW_LENGTH, useReviewForm, type ReviewFormMode } from '../model'
@@ -49,7 +50,7 @@ export const ReviewFormFeature = ({ mode }: ReviewFormFeatureProps) => {
   } = useReviewForm({ mode })
 
   return (
-    <Wrapper>
+    <Wrapper variant="standalone">
       {(isSubmitting || isImageUploading) && <UploadLoadingOverlay />}
       <Header>
         <TopBar title={pageCopy.title} onBackClick={handleBackClick} />
@@ -133,7 +134,7 @@ export const ReviewFormFeature = ({ mode }: ReviewFormFeatureProps) => {
   )
 }
 
-const Wrapper = render.div('flex w-full flex-col pb-40')
+const Wrapper = render.extend(PageLayout, 'pb-40')
 
 const Header = render.div('')
 
@@ -147,7 +148,7 @@ const LoadingWrapper = render.div('flex min-h-200 w-full items-center justify-ce
 
 const LoadingText = render.div('font-16-m text-gray-400')
 
-const ModalContent = render.div('flex w-290 flex-col items-center justify-center gap-16 rounded-[12px] bg-white pt-32')
+const ModalContent = render.div('flex w-290 flex-col items-center justify-center gap-16 rounded-12 bg-white pt-32')
 
 const ModalTextBox = render.div('flex flex-col')
 

@@ -130,11 +130,11 @@ const BannerWrapper = render.div('flex relative')
 const GenrePathContainer = render.div('grid grid-cols-4 gap-x-14 gap-y-12')
 
 const LocationPathBadge = render.button(
-  'flex h-71 w-52 min-w-52 cursor-pointer flex-col items-center justify-center rounded-[50px] border border-solid border-[#F1F1F1] bg-[#F8F8F8] text-gray-800 shadow-none outline-none',
+  'flex h-71 w-52 min-w-52 cursor-pointer flex-col items-center justify-center rounded-full border border-solid border-[#F1F1F1] bg-[#F8F8F8] text-gray-800 shadow-none outline-none',
 )
 
 const MyLocationBadge = render.button(
-  'flex h-71 w-71 min-w-71 cursor-pointer flex-col items-center justify-center rounded-[50px] border border-solid border-[#FFE4D4] bg-[#FFF4EE] text-orange shadow-none outline-none',
+  'flex h-71 w-71 min-w-71 cursor-pointer flex-col items-center justify-center rounded-full border border-solid border-[#FFE4D4] bg-[#FFF4EE] text-orange shadow-none outline-none',
 )
 
 const LocationSwiperContainer = styled.div<{ $isDragging: boolean }>(({ $isDragging }) => ({
@@ -159,7 +159,7 @@ const LocationSwiperContainer = styled.div<{ $isDragging: boolean }>(({ $isDragg
 const GroupSwiperContainer = render.div('w-350')
 
 const SearchInputWrapper = render.button(
-  'mb-[-20px] flex h-48 w-350 cursor-pointer items-center gap-4 rounded-[40px] border-[1.2px] border-solid border-orange bg-white px-16 shadow-none outline-none',
+  'mb-[-20px] flex h-48 w-350 cursor-pointer items-center gap-4 rounded-full border-[1.2px] border-solid border-orange bg-white px-16 shadow-none outline-none',
 )
 
 const SearchPlaceholder = render.span('font-16-r text-gray-400')

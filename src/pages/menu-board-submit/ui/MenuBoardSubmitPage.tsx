@@ -1,5 +1,6 @@
 import { Button } from '@/shared/ui/button'
 import { UploadLoadingOverlay } from '@/shared/ui/image-upload'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import TopBar from '@/shared/ui/top-bar'
 import { useMenuBoardSubmitPage } from '../model/useMenuBoardSubmitPage'
@@ -28,7 +29,7 @@ const MenuBoardSubmitPage = () => {
   } = useMenuBoardSubmitPage()
 
   return (
-    <PageWrapper>
+    <PageWrapper variant="footerOnly">
       {isImageUploading && <UploadLoadingOverlay />}
       <TopBar title="메뉴판 제보하기" />
 
@@ -62,7 +63,7 @@ const MenuBoardSubmitPage = () => {
   )
 }
 
-const PageWrapper = render.section('flex w-full flex-col')
+const PageWrapper = render.extend(PageLayout)
 
 const Form = render.form('box-border flex w-full flex-col')
 

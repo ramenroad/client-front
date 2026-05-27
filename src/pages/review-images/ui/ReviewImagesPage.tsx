@@ -1,6 +1,7 @@
 import { ImagePopup } from '@/shared/ui/image-popup'
 import { LoadingLottie } from '@/shared/ui/lottie'
 import { Modal } from '@/shared/ui/modal'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import TopBar from '@/shared/ui/top-bar'
@@ -11,7 +12,7 @@ const ReviewImagesPage = () => {
     useReviewImagesPage()
 
   return (
-    <Wrapper>
+    <Wrapper variant="standalone">
       <Header>
         <TopBar title={title} />
       </Header>
@@ -63,7 +64,7 @@ const ReviewImagesPage = () => {
   )
 }
 
-const Wrapper = render.div('flex flex-col pb-40')
+const Wrapper = render.extend(PageLayout, 'pb-40')
 
 const Header = render.div('flex w-full max-w-390 flex-col')
 

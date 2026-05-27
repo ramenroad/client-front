@@ -1,6 +1,8 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
   --spacing: 1px;
 
@@ -35,6 +37,20 @@
   --color-filter-active-background: #fff4eb;
   --color-filter-active-text: #ff5e00;
 
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f7f7f7;
+  --color-surface-raised: #ffffff;
+  --color-primary: #111111;
+  --color-secondary: #585858;
+  --color-muted: #888888;
+  --color-subtle: #a0a0a0;
+  --color-disabled: #cfcfcf;
+  --color-outline: #e7e7e7;
+  --color-outline-muted: #f4f4f5;
+  --color-control: #cfcfcf;
+  --color-on-brand: #ffffff;
+
   --font-sans: "Spoqa Han Sans Neo", sans-serif;
   --font-pretendard: "Pretendard", sans-serif;
 
@@ -44,6 +60,15 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+
+  --radius-2: 2px;
+  --radius-4: 4px;
+  --radius-7: 7px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-24: 24px;
 }
 
 @utility flex-center {
@@ -297,11 +322,120 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  :root,
+  :root[data-theme="light"] {
+    --color-background: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f7f7f7;
+    --color-surface-raised: #ffffff;
+    --color-primary: #111111;
+    --color-secondary: #585858;
+    --color-muted: #888888;
+    --color-subtle: #a0a0a0;
+    --color-disabled: #cfcfcf;
+    --color-outline: #e7e7e7;
+    --color-outline-muted: #f4f4f5;
+    --color-control: #cfcfcf;
+    --color-on-brand: #ffffff;
+  }
+
+  :root[data-theme="dark"] {
+    --color-background: #0f0f0f;
+    --color-surface: #181818;
+    --color-surface-muted: #222222;
+    --color-surface-raised: #242424;
+    --color-primary: #f7f7f7;
+    --color-secondary: #d6d6d6;
+    --color-muted: #a8a8a8;
+    --color-subtle: #7a7a7a;
+    --color-disabled: #5f5f5f;
+    --color-outline: #343434;
+    --color-outline-muted: #292929;
+    --color-control: #4a4a4a;
+    --color-on-brand: #ffffff;
+
+    color-scheme: dark;
+    color: var(--color-primary);
+    background-color: var(--color-background);
+  }
+
   body {
     margin: 0;
+    color: var(--color-primary);
+    background-color: var(--color-background);
   }
 
   #root {
     min-height: 100dvh;
+  }
+}
+
+@layer utilities {
+  :root[data-theme="dark"] .bg-white {
+    background-color: var(--color-surface);
+  }
+
+  :root[data-theme="dark"] .bg-white\/90 {
+    background-color: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  }
+
+  :root[data-theme="dark"] .bg-gray-50,
+  :root[data-theme="dark"] .bg-gray-100,
+  :root[data-theme="dark"] .bg-border,
+  :root[data-theme="dark"] .bg-divider,
+  :root[data-theme="dark"] .bg-footer,
+  :root[data-theme="dark"] .bg-filter-background {
+    background-color: var(--color-surface-muted);
+  }
+
+  :root[data-theme="dark"] .bg-gray-200 {
+    background-color: var(--color-control);
+  }
+
+  :root[data-theme="dark"] .bg-gray-700,
+  :root[data-theme="dark"] .bg-gray-800,
+  :root[data-theme="dark"] .bg-gray-900 {
+    background-color: var(--color-surface-raised);
+  }
+
+  :root[data-theme="dark"] .text-black,
+  :root[data-theme="dark"] .text-gray-900 {
+    color: var(--color-primary);
+  }
+
+  :root[data-theme="dark"] .text-gray-70,
+  :root[data-theme="dark"] .text-gray-700,
+  :root[data-theme="dark"] .text-gray-800 {
+    color: var(--color-secondary);
+  }
+
+  :root[data-theme="dark"] .text-gray-400,
+  :root[data-theme="dark"] .text-gray-500,
+  :root[data-theme="dark"] .text-filter-text {
+    color: var(--color-muted);
+  }
+
+  :root[data-theme="dark"] .text-gray-100,
+  :root[data-theme="dark"] .text-gray-200 {
+    color: var(--color-disabled);
+  }
+
+  :root[data-theme="dark"] .border-white {
+    border-color: var(--color-surface);
+  }
+
+  :root[data-theme="dark"] .border-gray-100,
+  :root[data-theme="dark"] .border-gray-200,
+  :root[data-theme="dark"] .border-border,
+  :root[data-theme="dark"] .border-divider {
+    border-color: var(--color-outline);
+  }
+
+  :root[data-theme="dark"] .border-gray-500 {
+    border-color: var(--color-muted);
+  }
+
+  :root[data-theme="dark"] .placeholder\:text-gray-200::placeholder {
+    color: var(--color-subtle);
   }
 }

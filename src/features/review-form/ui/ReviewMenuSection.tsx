@@ -81,7 +81,7 @@ const MenuTab = ({ selected, className, ...props }: MenuTabProps) => {
       {...props}
       type="button"
       className={twMerge(
-        'font-14-r flex h-29 w-fit cursor-pointer items-center rounded-[50px] border-none px-12 py-6 shadow-none outline-none',
+        'font-14-r flex h-29 w-fit cursor-pointer items-center rounded-full border-none px-12 py-6 shadow-none outline-none',
         selected ? 'bg-light-orange text-orange' : 'bg-filter-background text-gray-400',
         className ?? '',
       )}
@@ -94,11 +94,11 @@ const MenuAddWrapper = render.div('mt-16 flex flex-col gap-12')
 const MenuInputContainer = render.div('flex items-center gap-4')
 
 const MenuInput = render.input(
-  'font-16-r box-border h-44 flex-1 rounded-[8px] border border-solid border-transparent bg-border px-12 py-10 text-black outline-none focus:border-orange',
+  'font-16-r box-border h-44 flex-1 rounded-8 border border-solid border-transparent bg-border px-12 py-10 text-black outline-none focus:border-orange',
 )
 
 const MenuAddButton = render.button(
-  'h-43 w-67 cursor-pointer rounded-[8px] border border-solid border-gray-100 bg-white px-10 py-8 text-black shadow-none outline-none',
+  'h-43 w-67 cursor-pointer rounded-8 border border-solid border-gray-100 bg-white px-10 py-8 text-black shadow-none outline-none',
 )
 
 const ErrorMessage = render.div('mt-4 font-12-r text-red')
