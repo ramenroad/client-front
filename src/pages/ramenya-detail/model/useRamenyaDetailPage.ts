@@ -4,10 +4,10 @@ import { useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import {
   getTodayBusinessHour,
   sortBusinessHoursByCurrentDay,
-  type RamenyaDetail,
-  type RamenyaEmbeddedReview,
 } from '@/entities/ramenya/model'
-import { useRamenyaReviewImagesQuery } from '@/entities/review/api'
+import { useRamenyaReviewImagesQuery, useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
+import { useMyInfoQuery } from '@/entities/viewer/api'
+import { useAuthSession } from '@/features/auth'
 import { openUrl } from '@/shared/lib/browser'
 import { isMobileDevice } from '@/shared/lib/image'
 
@@ -19,13 +19,8 @@ type MapButton = {
   label: string
 }
 
-const isEmbeddedReview = (review: unknown): review is RamenyaEmbeddedReview => {
-  return typeof review === 'object' && review !== null && '_id' in review && 'review' in review
-}
-
-const getEmbeddedReviews = (detail?: RamenyaDetail) => {
-  return detail?.reviews?.filter(isEmbeddedReview) ?? []
-}
+const RAISING_MAP_ZOOM = 16
+const RAISING_MAP_RADIUS = 3_000
 
 const getMapButtonUrl = (url?: string, deepLink?: string) => {
   if (isMobileDevice() && deepLink) {
@@ -35,28 +30,68 @@ const getMapButtonUrl = (url?: string, deepLink?: string) => {
   return url
 }
 
+const createRaisingMapUrl = ({
+  id,
+  latitude,
+  longitude,
+}: {
+  id: string
+  latitude?: number
+  longitude?: number
+}) => {
+  if (latitude === undefined || longitude === undefined) {
+    return '/map'
+  }
+
+  const searchParams = new URLSearchParams({
+    latitude: latitude.toString(),
+    longitude: longitude.toString(),
+    radius: RAISING_MAP_RADIUS.toString(),
+    level: RAISING_MAP_ZOOM.toString(),
+    nearBy: 'true',
+    selectedId: id,
+  })
+
+  return `/map?${searchParams.toString()}`
+}
+
+const getReviewCreatedTime = (createdAt?: string) => {
+  return createdAt ? new Date(createdAt).getTime() : 0
+}
+
 export const useRamenyaDetailPage = () => {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  const authSession = useAuthSession()
   const detailQuery = useRamenyaDetailQuery(id)
+  const myInfoQuery = useMyInfoQuery({ enabled: authSession.isSignIn })
+  const reviewsQuery = useRamenyaReviewsInfiniteQuery(
+    { ramenyaId: id, limit: 10 },
+    {
+      enabled: Boolean(id),
+      staleTime: 30_000,
+    },
+  )
   const reviewImagesQuery = useRamenyaReviewImagesQuery(id, {
     staleTime: 30_000,
   })
   const [isTimeExpanded, setIsTimeExpanded] = useState(false)
+  const [selectedRating, setSelectedRating] = useState(0)
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
 
   const detail = detailQuery.data
+  const isSignIn = authSession.isSignIn && myInfoQuery.error?.status !== 401
   const todayBusinessHour = useMemo(() => getTodayBusinessHour(detail?.businessHours ?? []), [detail?.businessHours])
   const sortedBusinessHours = useMemo(
     () => sortBusinessHoursByCurrentDay(detail?.businessHours ?? []),
     [detail?.businessHours],
   )
-  const reviews = useMemo(() => getEmbeddedReviews(detail), [detail])
+  const reviews = useMemo(() => reviewsQuery.data?.pages.flatMap((page) => page.reviews) ?? [], [reviewsQuery.data])
   const topReviews = useMemo(
     () =>
       [...reviews]
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .sort((a, b) => getReviewCreatedTime(b.createdAt) - getReviewCreatedTime(a.createdAt))
         .slice(0, 3),
     [reviews],
   )
@@ -103,8 +138,17 @@ export const useRamenyaDetailPage = () => {
     navigate(`/review/create/${id}?rating=${rating}`)
   }
 
+  const handleStarClick = (rating: number) => {
+    setSelectedRating(rating)
+    handleNavigateReviewCreatePage(rating)
+  }
+
   const handleNavigateAllReviewsPage = () => {
     navigate(`/review/list/${id}`)
+  }
+
+  const handleNavigateLoginPage = () => {
+    navigate('/login')
   }
 
   const handleNavigateMenuBoardSubmitPage = () => {
@@ -123,28 +167,44 @@ export const useRamenyaDetailPage = () => {
     openUrl(url)
   }
 
+  const handleNavigateRaisingMap = () => {
+    navigate(
+      createRaisingMapUrl({
+        id,
+        latitude: detail?.latitude,
+        longitude: detail?.longitude,
+      }),
+    )
+  }
+
   return {
     id,
     detail,
     detailQuery,
+    isSignIn,
+    myInfo: myInfoQuery.data,
     reviewImages,
     reviews: topReviews,
     isTimeExpanded,
     setIsTimeExpanded,
+    selectedRating,
     selectedImageIndex,
     setSelectedImageIndex,
     selectedImages,
     todayBusinessHour,
     sortedBusinessHours,
     mapButtons,
+    handleStarClick,
     handleOpenImagePopup,
     handleCloseImagePopup,
     handleNavigateReviewCreatePage,
     handleNavigateAllReviewsPage,
+    handleNavigateLoginPage,
     handleNavigateMenuBoardSubmitPage,
     handleNavigateMenuBoardImagesPage,
     handleNavigateReviewImagesPage,
     handleOpenMapUrl,
+    handleNavigateRaisingMap,
   }
 }
 
