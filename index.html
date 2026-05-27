@@ -1,12 +1,75 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/_favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>new-ra-ising</title>
+    <meta name="naver-site-verification" content="988646065ee9168e6971dcc97fe2c5919f8d38b2" />
+    <meta name="google-site-verification" content="iVnwCGBjXyv5Gu7iP9uOyTn_YbMutG4VtlocKgt8iVQ" />
+    <meta name="description" content="검증된 다양한 국내외 라멘 맛집 정보를 만나보세요." />
+    <meta name="keywords" content="라멘, 일본 라멘, 라멘 맛집, 라멘 추천, 라멘 리뷰" />
+    <meta name="author" content="ra-ising" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="라이징 - 검증된 라멘 맛집 정보" />
+    <meta property="og:description" content="검증된 다양한 국내외 라멘 맛집 정보를 만나보세요." />
+    <meta property="og:image" content="https://ramenroad.com/og-image.jpg" />
+    <meta property="og:url" content="https://ra-ising.com" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="라이징" />
+    <meta property="og:locale" content="ko_KR" />
+    <link rel="canonical" href="https://ra-ising.com" />
+    <title>라이징</title>
+    <!-- Google Tag Manager -->
+    <script>
+      ;(function (w, d, s, l, i) {
+        w[l] = w[l] || []
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' })
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : ''
+        j.async = true
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl
+        f.parentNode.insertBefore(j, f)
+      })(window, document, 'script', 'dataLayer', 'GTM-PLKLW37H')
+    </script>
+    <!-- End Google Tag Manager -->
+    <script
+      src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js"
+      integrity="sha384-dok87au0gKqJdxs7msEdBPNnKSRT+/mhTVzq+qOhcL464zXwvcrpjeWvyj1kCdq6"
+      crossorigin="anonymous"
+    ></script>
   </head>
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-PLKLW37H"
+        height="0"
+        width="0"
+        style="display: none; visibility: hidden"
+      ></iframe>
+    </noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <script
+      type="text/javascript"
+      src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
+    ></script>
+    <script>
+      (() => {
+        const defaultTheme = 'light'
+
+        try {
+          const storedTheme = window.localStorage.getItem('new-ra-ising-theme')
+          const theme = storedTheme === 'dark' ? 'dark' : defaultTheme
+
+          document.documentElement.dataset.theme = theme
+          document.documentElement.style.colorScheme = theme
+        } catch {
+          document.documentElement.dataset.theme = defaultTheme
+          document.documentElement.style.colorScheme = defaultTheme
+        }
+      })()
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
