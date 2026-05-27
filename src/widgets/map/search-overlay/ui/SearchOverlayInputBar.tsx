@@ -38,7 +38,7 @@ export const SearchOverlayInputBar = ({
         <SearchInput
           ref={inputRef}
           {...rest}
-          type="search"
+          type="text"
           value={keyword}
           onChange={onChange}
           onFocus={onFocus}
@@ -57,7 +57,7 @@ const SearchOverlayContainer = render.figure(
 )
 
 const SearchBox = render.div(
-  'flex items-center gap-8 w-full h-full rounded-[8px] box-border border border-solid border-divider bg-white px-16 py-12',
+  'flex items-center gap-8 w-full h-full rounded-8 box-border border border-solid border-divider bg-white px-16 py-12',
 )
 
 const IconWrapper = render.div('w-24 h-24')

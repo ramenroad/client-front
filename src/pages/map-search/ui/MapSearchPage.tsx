@@ -15,8 +15,16 @@ const MapSearchPage = () => {
     selectedId,
     resultItems,
     markerData,
-    isLoading,
-    resultSheetTitle,
+    filterOptions,
+    setFilterOptions,
+    detail,
+    detailReviews,
+    detailSheetId,
+    isDetailSheetOpen,
+    isDetailLoading,
+    isDetailError,
+    isDetailReviewsLoading,
+    isDetailReviewsError,
     needsRefresh,
     currentLocation,
     focusRequest,
@@ -32,11 +40,13 @@ const MapSearchPage = () => {
     handleKeywordClear,
     handleMarkerClick,
     handleResultClick,
+    handleOpenDetailSheet,
+    handleCloseDetailSheet,
     handleCurrentLocationClick,
   } = useMapSearchPage()
 
   return (
-    <PageContainer>
+    <>
       <SearchOverlay
         keyword={keyword}
         setKeyword={setKeyword}
@@ -73,17 +83,26 @@ const MapSearchPage = () => {
       <ResultListOverlay
         items={resultItems}
         height={resultSheetHeight}
-        title={resultSheetTitle}
         selectedId={selectedId}
-        isLoading={isLoading}
+        currentLocation={currentLocation}
+        filterOptions={filterOptions}
+        detail={detail}
+        detailReviews={detailReviews}
+        detailId={detailSheetId}
+        isDetailOpen={isDetailSheetOpen}
+        isDetailLoading={isDetailLoading}
+        isDetailError={isDetailError}
+        isDetailReviewsLoading={isDetailReviewsLoading}
+        isDetailReviewsError={isDetailReviewsError}
         onHeightChange={setResultSheetHeight}
+        onFilterChange={setFilterOptions}
         onSelect={handleResultClick}
+        onOpenDetail={handleOpenDetailSheet}
+        onCloseDetail={handleCloseDetailSheet}
       />
-    </PageContainer>
+    </>
   )
 }
-
-const PageContainer = render.section('relative h-full w-full overflow-hidden bg-white')
 
 const GPSButton = render.button(
   'absolute left-16 z-40 flex h-38 w-38 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none transition-[bottom] duration-300 ease-out',
