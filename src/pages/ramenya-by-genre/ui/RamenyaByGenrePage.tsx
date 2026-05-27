@@ -1,6 +1,7 @@
 import { IconTooltip } from '@/shared/ui/icon'
 import { LoadingLottie } from '@/shared/ui/lottie'
 import NoStoreBox from '@/shared/ui/no-store-box'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import TopBar from '@/shared/ui/top-bar'
@@ -9,10 +10,11 @@ import { FilterSection, RamenyaListView } from '@/widgets/ramenya'
 import { useRamenyaByGenrePage } from '../model/useRamenyaByGenrePage'
 
 const RamenyaByGenrePage = () => {
-  const { genre, genreDescription, filterOptions, setFilterOptions, ramenyas, isLoading, isError } = useRamenyaByGenrePage()
+  const { genre, genreDescription, filterOptions, setFilterOptions, currentLocation, ramenyas, isLoading, isError } =
+    useRamenyaByGenrePage()
 
   return (
-    <Layout>
+    <Layout variant="appBar">
       <HeaderContainer>
         <TopBar
           title={genre || ''}
@@ -39,13 +41,21 @@ const RamenyaByGenrePage = () => {
           </StateWrapper>
         )}
 
-        {!isLoading && !isError && <RamenyaListView ramenyas={ramenyas} emptyContent={<NoStoreBox />} centered dividerInset />}
+        {!isLoading && !isError && (
+          <RamenyaListView
+            ramenyas={ramenyas}
+            currentLocation={currentLocation}
+            emptyContent={<NoStoreBox />}
+            centered
+            dividerInset
+          />
+        )}
       </InformationWrapper>
     </Layout>
   )
 }
 
-const Layout = render.section('box-border flex min-h-[100dvh] w-full flex-col')
+const Layout = render.extend(PageLayout)
 
 const HeaderContainer = render.section('sticky top-0 z-20 flex w-full flex-col bg-white font-16-sb')
 

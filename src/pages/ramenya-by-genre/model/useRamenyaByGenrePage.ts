@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useRamenyaListQuery } from '@/entities/ramenya/api'
 import {
   filterRamenyas,
   genreDescriptions,
   initialFilterOptions,
+  SortType,
   type FilterOptions,
   type RamenyaType,
 } from '@/entities/ramenya/model'
-import { useRamenyaListQuery } from '@/entities/ramenya/api'
+import { getBrowserCurrentLocation } from '@/shared/lib/geolocation'
+import type { Coordinate } from '@/shared/lib/naver-map'
 
 const GENRE_FILTER_STORAGE_KEY = 'genrePageFilterOptions'
 
@@ -16,8 +19,14 @@ const isFilterOptions = (value: unknown): value is FilterOptions => {
     return false
   }
 
+  const sortValues = Object.values(SortType)
   const candidate = value as Partial<FilterOptions>
-  return typeof candidate.isOpen === 'boolean' && typeof candidate.sort === 'string' && Array.isArray(candidate.genre)
+  return (
+    typeof candidate.isOpen === 'boolean' &&
+    typeof candidate.sort === 'string' &&
+    sortValues.includes(candidate.sort as SortType) &&
+    Array.isArray(candidate.genre)
+  )
 }
 
 const readStoredFilterOptions = () => {
@@ -46,7 +55,22 @@ export const useRamenyaByGenrePage = () => {
   const navigate = useNavigate()
   const { genre = '' } = useParams()
   const [filterOptions, setFilterOptions] = useState(readStoredFilterOptions)
+  const [currentLocation, setCurrentLocation] = useState<Coordinate | null>(null)
   const ramenyaListQuery = useRamenyaListQuery({ genre }, { enabled: Boolean(genre) })
+
+  useEffect(() => {
+    let isCancelled = false
+
+    getBrowserCurrentLocation().then((nextLocation) => {
+      if (!isCancelled) {
+        setCurrentLocation(nextLocation)
+      }
+    })
+
+    return () => {
+      isCancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     writeStoredFilterOptions(filterOptions)
@@ -57,8 +81,8 @@ export const useRamenyaByGenrePage = () => {
   }, [genre])
 
   const ramenyas = useMemo(
-    () => filterRamenyas(ramenyaListQuery.data ?? [], filterOptions),
-    [filterOptions, ramenyaListQuery.data],
+    () => filterRamenyas(ramenyaListQuery.data ?? [], filterOptions, currentLocation),
+    [currentLocation, filterOptions, ramenyaListQuery.data],
   )
 
   return {
@@ -66,6 +90,7 @@ export const useRamenyaByGenrePage = () => {
     genreDescription: genreDescriptions[genre as RamenyaType] ?? '',
     filterOptions,
     setFilterOptions,
+    currentLocation,
     ramenyas,
     isLoading: ramenyaListQuery.isLoading,
     isError: ramenyaListQuery.isError,
