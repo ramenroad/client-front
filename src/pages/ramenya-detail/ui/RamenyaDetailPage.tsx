@@ -1,7 +1,11 @@
 import emptyImage from '@/assets/images/empty-images.png'
 import emptyReview from '@/assets/images/empty-review.png'
 import storeImage from '@/assets/images/store.png'
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useState, type ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useDeleteMenuBoardMutation } from '@/entities/menu-board/api'
+import { MenuBoardDetail } from '@/entities/menu-board/ui'
+import { ramenyaQueryKeys } from '@/entities/ramenya/api'
 import type { BusinessHour, RamenyaDetail, RamenyaMenuBoard } from '@/entities/ramenya/model'
 import { checkBusinessStatus, checkBusinessStatusSpecial, DAY_MAP, OpenStatus } from '@/entities/ramenya/model'
 import { RamenyaOpenStatus } from '@/entities/ramenya/ui'
@@ -31,6 +35,7 @@ import { Modal } from '@/shared/ui/modal'
 import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { TopBar } from '@/shared/ui/top-bar'
+import { useToast } from '@/shared/ui/toast'
 import { formatNumber } from '@/shared/lib/number'
 import { useRamenyaDetailPage, type MapButton } from '../model/useRamenyaDetailPage'
 
@@ -52,6 +57,7 @@ const RamenyaDetailPage = () => {
     selectedImageIndex,
     setSelectedImageIndex,
     selectedImages,
+    isLoginModalOpen,
     todayBusinessHour,
     sortedBusinessHours,
     mapButtons,
@@ -61,6 +67,7 @@ const RamenyaDetailPage = () => {
     handleNavigateReviewCreatePage,
     handleNavigateAllReviewsPage,
     handleNavigateLoginPage,
+    handleCloseLoginModal,
     handleNavigateMenuBoardSubmitPage,
     handleNavigateMenuBoardImagesPage,
     handleNavigateReviewImagesPage,
@@ -99,10 +106,11 @@ const RamenyaDetailPage = () => {
         <Divider />
 
         <MenuBoardSection
+          ramenyaId={id}
           menuBoard={detail.menuBoard ?? []}
+          myInfo={myInfo}
           onNavigateMenuBoardImagesPage={handleNavigateMenuBoardImagesPage}
           onNavigateMenuBoardSubmitPage={handleNavigateMenuBoardSubmitPage}
-          onOpenImagePopup={handleOpenImagePopup}
         />
 
         <Divider />
@@ -147,6 +155,23 @@ const RamenyaDetailPage = () => {
             onIndexChange={setSelectedImageIndex}
           />
         )}
+      </Modal>
+
+      <Modal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal}>
+        <ModalContent>
+          <ModalTextBox>
+            <ModalTitle>로그인이 필요해요</ModalTitle>
+            <ModalText>로그인 하시겠습니까?</ModalText>
+          </ModalTextBox>
+          <ModalButtonBox>
+            <ModalCancelButton type="button" onClick={handleCloseLoginModal}>
+              취소
+            </ModalCancelButton>
+            <ModalConfirmButton type="button" onClick={handleNavigateLoginPage}>
+              확인
+            </ModalConfirmButton>
+          </ModalButtonBox>
+        </ModalContent>
       </Modal>
     </PageWrapper>
   )
@@ -369,53 +394,140 @@ const RecommendedMenuSection = ({ recommendedMenu }: { recommendedMenu: RamenyaD
 }
 
 const MenuBoardSection = ({
+  ramenyaId,
   menuBoard,
+  myInfo,
   onNavigateMenuBoardImagesPage,
   onNavigateMenuBoardSubmitPage,
-  onOpenImagePopup,
 }: {
+  ramenyaId: string
   menuBoard: RamenyaMenuBoard[]
+  myInfo?: MyInfo
   onNavigateMenuBoardImagesPage: () => void
   onNavigateMenuBoardSubmitPage: () => void
-  onOpenImagePopup: (index: number, images: string[]) => void
 }) => {
+  const queryClient = useQueryClient()
+  const { openToast } = useToast()
+  const [selectedMenuBoardIndex, setSelectedMenuBoardIndex] = useState<number | null>(null)
+  const [isRemoveMenuBoardModalOpen, setIsRemoveMenuBoardModalOpen] = useState(false)
   const menuBoardImages = menuBoard.map((menu) => menu.imageUrl)
+  const selectedMenuBoard = selectedMenuBoardIndex === null ? undefined : menuBoard[selectedMenuBoardIndex]
+  const deleteMenuBoardMutation = useDeleteMenuBoardMutation({
+    onSuccess: () => {
+      openToast('메뉴판 삭제 성공')
+      queryClient.invalidateQueries({ queryKey: ramenyaQueryKeys.detail(ramenyaId) })
+      setSelectedMenuBoardIndex((currentIndex) => {
+        if (currentIndex === null) {
+          return null
+        }
+
+        return currentIndex === 0 ? 0 : currentIndex - 1
+      })
+      setIsRemoveMenuBoardModalOpen(false)
+    },
+    onError: () => {
+      openToast('메뉴판 삭제에 실패했습니다.')
+    },
+  })
+
+  const closeImagePopup = () => {
+    setSelectedMenuBoardIndex(null)
+  }
+
+  const closeRemoveMenuBoardModal = () => {
+    if (deleteMenuBoardMutation.isPending) {
+      return
+    }
+
+    setIsRemoveMenuBoardModalOpen(false)
+  }
+
+  const handleRemoveMenuBoard = () => {
+    if (!selectedMenuBoard) {
+      return
+    }
+
+    deleteMenuBoardMutation.mutate({
+      ramenyaId,
+      menuBoardId: selectedMenuBoard._id,
+    })
+  }
 
   return (
-    <SectionWrapper>
-      <SectionHeader>
-        <SectionTitle>메뉴판</SectionTitle>
-        {menuBoard.length > 0 && <SmallActionButton onClick={onNavigateMenuBoardSubmitPage}>등록하기</SmallActionButton>}
-      </SectionHeader>
-      {menuBoard.length === 0 ? (
-        <EmptyBox>
-          <IconMenuBoard />
-          <EmptyTitle>등록된 메뉴판이 없습니다</EmptyTitle>
-          <EmptyDescription>첫 등록의 주인공이 되어주세요!</EmptyDescription>
-          <PrimaryPillButton type="button" onClick={onNavigateMenuBoardSubmitPage}>
-            등록하기
-          </PrimaryPillButton>
-        </EmptyBox>
-      ) : (
-        <MenuBoardContainer>
-          <HorizontalImageList>
-            {menuBoard.slice(0, 10).map((menu, index) => (
-              <MenuBoardImage
-                key={menu._id}
-                src={menu.imageUrl}
-                alt={`${index + 1}번째 메뉴판`}
-                onClick={() => onOpenImagePopup(index, menuBoardImages)}
-              />
-            ))}
-          </HorizontalImageList>
-          <Line />
-          <GrayActionButton type="button" onClick={onNavigateMenuBoardImagesPage}>
-            <ButtonText>전체 메뉴판 보기</ButtonText>
-            <IconArrowRight color="#888888" />
-          </GrayActionButton>
-        </MenuBoardContainer>
-      )}
-    </SectionWrapper>
+    <>
+      <SectionWrapper>
+        <SectionHeader>
+          <SectionTitle>메뉴판</SectionTitle>
+          {menuBoard.length > 0 && <SmallActionButton onClick={onNavigateMenuBoardSubmitPage}>등록하기</SmallActionButton>}
+        </SectionHeader>
+        {menuBoard.length === 0 ? (
+          <EmptyBox>
+            <IconMenuBoard />
+            <EmptyTitle>등록된 메뉴판이 없습니다</EmptyTitle>
+            <EmptyDescription>첫 등록의 주인공이 되어주세요!</EmptyDescription>
+            <PrimaryPillButton type="button" onClick={onNavigateMenuBoardSubmitPage}>
+              등록하기
+            </PrimaryPillButton>
+          </EmptyBox>
+        ) : (
+          <MenuBoardContainer>
+            <HorizontalImageList>
+              {menuBoard.slice(0, 10).map((menu, index) => (
+                <MenuBoardImage
+                  key={menu._id}
+                  src={menu.imageUrl}
+                  alt={`${index + 1}번째 메뉴판`}
+                  onClick={() => setSelectedMenuBoardIndex(index)}
+                />
+              ))}
+            </HorizontalImageList>
+            <Line />
+            <GrayActionButton type="button" onClick={onNavigateMenuBoardImagesPage}>
+              <ButtonText>전체 메뉴판 보기</ButtonText>
+              <IconArrowRight color="#888888" />
+            </GrayActionButton>
+          </MenuBoardContainer>
+        )}
+      </SectionWrapper>
+
+      <Modal isOpen={selectedMenuBoardIndex !== null} onClose={closeImagePopup}>
+        {selectedMenuBoardIndex !== null && selectedMenuBoard && (
+          <ImagePopup
+            isOpen
+            images={menuBoardImages}
+            selectedIndex={selectedMenuBoardIndex}
+            onClose={closeImagePopup}
+            onIndexChange={setSelectedMenuBoardIndex}
+          >
+            <MenuBoardDetail
+              profileImage={selectedMenuBoard.userId.profileImageUrl}
+              nickname={selectedMenuBoard.userId.nickname}
+              createdAt={selectedMenuBoard.createdAt}
+              description={selectedMenuBoard.description}
+              isMine={myInfo?._id === selectedMenuBoard.userId._id}
+              onDelete={() => setIsRemoveMenuBoardModalOpen(true)}
+            />
+          </ImagePopup>
+        )}
+      </Modal>
+
+      <Modal isOpen={isRemoveMenuBoardModalOpen} onClose={closeRemoveMenuBoardModal}>
+        <ModalContent>
+          <ModalTextBox>
+            <ModalTitle>메뉴판 삭제</ModalTitle>
+            <ModalText>메뉴판을 삭제하시겠습니까?</ModalText>
+          </ModalTextBox>
+          <ModalButtonBox>
+            <ModalCancelButton type="button" onClick={closeRemoveMenuBoardModal} disabled={deleteMenuBoardMutation.isPending}>
+              취소
+            </ModalCancelButton>
+            <ModalConfirmButton type="button" onClick={handleRemoveMenuBoard} disabled={deleteMenuBoardMutation.isPending}>
+              확인
+            </ModalConfirmButton>
+          </ModalButtonBox>
+        </ModalContent>
+      </Modal>
+    </>
   )
 }
 
@@ -762,6 +874,20 @@ const ReviewStarButton = render.button('cursor-pointer border-none bg-transparen
 const LoginButton = render.button(
   'mt-16 flex w-fit cursor-pointer items-center justify-center gap-2 rounded-full border-none bg-bright-orange px-32 py-10 font-16-m text-orange shadow-none outline-none',
 )
+
+const ModalContent = render.div('flex w-290 flex-col items-center justify-center gap-16 rounded-12 bg-white pt-32')
+
+const ModalTextBox = render.div('flex flex-col')
+
+const ModalTitle = render.div('text-center font-16-sb text-gray-900')
+
+const ModalText = render.div('text-center font-16-r text-gray-900')
+
+const ModalButtonBox = render.div('flex h-60 w-full')
+
+const ModalCancelButton = render.button('w-full cursor-pointer border-none bg-transparent font-16-r text-black disabled:text-gray-200')
+
+const ModalConfirmButton = render.button('w-full cursor-pointer border-none bg-transparent font-16-r text-orange disabled:text-gray-200')
 
 const ReviewDivider = render.div('h-1 w-full bg-divider')
 

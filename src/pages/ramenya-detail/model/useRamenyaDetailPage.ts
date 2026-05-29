@@ -79,6 +79,7 @@ export const useRamenyaDetailPage = () => {
   const [selectedRating, setSelectedRating] = useState(0)
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
   const detail = detailQuery.data
   const isSignIn = authSession.isSignIn && myInfoQuery.error?.status !== 401
@@ -135,6 +136,11 @@ export const useRamenyaDetailPage = () => {
   }
 
   const handleNavigateReviewCreatePage = (rating = 0) => {
+    if (!isSignIn) {
+      setIsLoginModalOpen(true)
+      return
+    }
+
     navigate(`/review/create/${id}?rating=${rating}`)
   }
 
@@ -148,10 +154,16 @@ export const useRamenyaDetailPage = () => {
   }
 
   const handleNavigateLoginPage = () => {
+    setIsLoginModalOpen(false)
     navigate('/login')
   }
 
   const handleNavigateMenuBoardSubmitPage = () => {
+    if (!isSignIn) {
+      setIsLoginModalOpen(true)
+      return
+    }
+
     navigate(`/menu-board-submit/${id}`)
   }
 
@@ -191,6 +203,7 @@ export const useRamenyaDetailPage = () => {
     selectedImageIndex,
     setSelectedImageIndex,
     selectedImages,
+    isLoginModalOpen,
     todayBusinessHour,
     sortedBusinessHours,
     mapButtons,
@@ -200,6 +213,7 @@ export const useRamenyaDetailPage = () => {
     handleNavigateReviewCreatePage,
     handleNavigateAllReviewsPage,
     handleNavigateLoginPage,
+    handleCloseLoginModal: () => setIsLoginModalOpen(false),
     handleNavigateMenuBoardSubmitPage,
     handleNavigateMenuBoardImagesPage,
     handleNavigateReviewImagesPage,
