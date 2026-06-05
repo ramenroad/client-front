@@ -1,23 +1,8 @@
+import { getApiBaseUrl, resolveEnv } from '@/shared/config'
+
 export type OAuthProvider = 'kakao' | 'naver' | 'google' | 'apple'
 
 const NAVER_OAUTH_STATE = 'ramenroad'
-
-const getEnvValue = (...keys: string[]) => {
-  for (const key of keys) {
-    const value = import.meta.env[key]
-
-    if (typeof value === 'string' && value.length > 0) {
-      return value
-    }
-  }
-
-  return ''
-}
-
-const getApiBaseUrl = () => {
-  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
-  return baseUrl.replace(/\/$/, '')
-}
 
 export const getOAuthCallbackUrl = (provider: Exclude<OAuthProvider, 'apple'>) => {
   return `${window.location.origin}/oauth/${provider}`
@@ -28,13 +13,13 @@ export const getAppleRedirectUrl = () => `${getApiBaseUrl()}/auth/apple`
 export const getOAuthClientId = (provider: OAuthProvider) => {
   switch (provider) {
     case 'kakao':
-      return getEnvValue('VITE_KAKAO_CLIENT_ID')
+      return resolveEnv('VITE_KAKAO_CLIENT_ID')
     case 'naver':
-      return getEnvValue('VITE_NAVER_OAUTH_CLIENT_ID', 'VITE_NAVER_CLIENT_ID')
+      return resolveEnv('VITE_NAVER_CLIENT_ID', 'VITE_NAVER_OAUTH_CLIENT_ID')
     case 'google':
-      return getEnvValue('VITE_GOOGLE_CLIENT_ID')
+      return resolveEnv('VITE_GOOGLE_CLIENT_ID')
     case 'apple':
-      return getEnvValue('VITE_APPLE_CLIENT_ID')
+      return resolveEnv('VITE_APPLE_CLIENT_ID')
   }
 }
 
