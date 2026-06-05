@@ -6,6 +6,8 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios'
 
+import { getApiBaseUrl } from '../config'
+
 export type ApiErrorPayload = {
   message?: string | string[]
   error?: string
@@ -43,15 +45,13 @@ type RetriableRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean
 }
 
-const DEFAULT_API_BASE_URL = 'http://localhost:3000'
-
 let accessToken: string | null = null
 let accessTokenProvider: (() => string | null | undefined) | null = null
 let authAdapter: HttpAuthAdapter | null = null
 let refreshPromise: Promise<AuthTokens> | null = null
 
 const http: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   withCredentials: true,
 })
 
