@@ -13,6 +13,6 @@ export const RouteLoader = () => {
   )
 }
 
-const LoaderScreen = render.section('flex min-h-[100dvh] w-full flex-col items-center justify-center gap-12 bg-white')
+const LoaderScreen = render.section('flex min-h-[100dvh] w-full flex-col items-center justify-center gap-12 bg-background')
 
-const LoaderText = render.extend(RaisingText, 'text-gray-500')
+const LoaderText = render.extend(RaisingText, 'text-muted')

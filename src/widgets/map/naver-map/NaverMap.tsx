@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   getViewportSnapshot,
   loadNaverMapScript,
@@ -17,12 +17,18 @@ export type NaverMapMarker<T> = {
   id: string
   position: Coordinate
   title?: string
+  inactive?: boolean
   data: T
 }
 
 export type NaverMapFocusRequest = {
   id: string
   position: Coordinate
+}
+
+type MarkerInstanceEntry<T> = {
+  instance: NaverMarkerInstance
+  marker: NaverMapMarker<T>
 }
 
 interface NaverMapProps<T> {
@@ -39,6 +45,13 @@ interface NaverMapProps<T> {
 }
 
 const DEFAULT_ZOOM = 14
+const DEFAULT_RAMENYA_MARKER_Z_INDEX = 100
+const CURRENT_LOCATION_MARKER_Z_INDEX = 500
+const SELECTED_RAMENYA_MARKER_Z_INDEX = 1_000
+
+const getRamenyaMarkerZIndex = (markerId: string, selectedMarkerId?: string | null) => {
+  return markerId === selectedMarkerId ? SELECTED_RAMENYA_MARKER_Z_INDEX : DEFAULT_RAMENYA_MARKER_Z_INDEX
+}
 
 export const NaverMap = <T,>({
   initialCenter,
@@ -55,18 +68,59 @@ export const NaverMap = <T,>({
   const mapElementRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<NaverMapInstance | null>(null)
   const mapsRef = useRef<NaverMaps | null>(null)
-  const markerInstancesRef = useRef<NaverMarkerInstance[]>([])
+  const markerInstancesRef = useRef<MarkerInstanceEntry<T>[]>([])
   const markerListenersRef = useRef<NaverMapEventListener[]>([])
+  const markerIconFrameRef = useRef<number | null>(null)
   const currentLocationMarkerRef = useRef<NaverMarkerInstance | null>(null)
   const [status, setStatus] = useState<'error' | 'loading' | 'ready'>('loading')
 
   const markerSnapshotKey = useMemo(
     () =>
       markers
-        .map((marker) => `${marker.id}:${marker.position.latitude}:${marker.position.longitude}:${marker.title ?? ''}`)
+        .map(
+          (marker) =>
+            `${marker.id}:${marker.position.latitude}:${marker.position.longitude}:${marker.title ?? ''}:${marker.inactive ? 'inactive' : 'active'}`,
+        )
         .join('|'),
     [markers],
   )
+
+  const updateRamenyaMarkerIcons = useCallback(() => {
+    const map = mapRef.current
+    const maps = mapsRef.current
+
+    if (!map || !maps) {
+      return
+    }
+
+    const zoom = map.getZoom()
+
+    markerInstancesRef.current.forEach(({ instance, marker }) => {
+      const isSelected = marker.id === selectedMarkerId
+
+      instance.setIcon(
+        createRamenyaMarkerIcon({
+          maps,
+          inactive: marker.inactive,
+          isSelected,
+          title: marker.title,
+          zoom,
+        }),
+      )
+      instance.setZIndex(getRamenyaMarkerZIndex(marker.id, selectedMarkerId))
+    })
+  }, [selectedMarkerId])
+
+  const scheduleRamenyaMarkerIconUpdate = useCallback(() => {
+    if (markerIconFrameRef.current !== null) {
+      window.cancelAnimationFrame(markerIconFrameRef.current)
+    }
+
+    markerIconFrameRef.current = window.requestAnimationFrame(() => {
+      markerIconFrameRef.current = null
+      updateRamenyaMarkerIcons()
+    })
+  }, [updateRamenyaMarkerIcons])
 
   useEffect(() => {
     let isCancelled = false
@@ -117,13 +171,14 @@ export const NaverMap = <T,>({
     }
 
     const idleListener = maps.Event.addListener(map, 'idle', () => {
+      scheduleRamenyaMarkerIconUpdate()
       onMapIdle?.(getViewportSnapshot(map))
     })
 
     return () => {
       maps.Event.removeListener(idleListener)
     }
-  }, [onMapIdle, status])
+  }, [onMapIdle, scheduleRamenyaMarkerIconUpdate, status])
 
   useEffect(() => {
     const map = mapRef.current
@@ -135,8 +190,10 @@ export const NaverMap = <T,>({
 
     markerListenersRef.current.forEach((listener) => maps.Event.removeListener(listener))
     markerListenersRef.current = []
-    markerInstancesRef.current.forEach((marker) => marker.setMap(null))
+    markerInstancesRef.current.forEach(({ instance }) => instance.setMap(null))
     markerInstancesRef.current = []
+
+    const zoom = map.getZoom()
 
     markers.forEach((marker) => {
       const markerInstance = new maps.Marker({
@@ -144,19 +201,51 @@ export const NaverMap = <T,>({
         position: new maps.LatLng(marker.position.latitude, marker.position.longitude),
         icon: createRamenyaMarkerIcon({
           maps,
-          isSelected: marker.id === selectedMarkerId,
+          inactive: marker.inactive,
+          isSelected: false,
+          title: marker.title,
+          zoom,
         }),
         clickable: true,
+        zIndex: DEFAULT_RAMENYA_MARKER_Z_INDEX,
       })
 
       const clickListener = maps.Event.addListener(markerInstance, 'click', () => {
         onMarkerClick?.(marker.data)
       })
 
-      markerInstancesRef.current.push(markerInstance)
+      markerInstancesRef.current.push({
+        instance: markerInstance,
+        marker,
+      })
       markerListenersRef.current.push(clickListener)
     })
-  }, [markerSnapshotKey, markers, onMarkerClick, selectedMarkerId, status])
+  }, [markerSnapshotKey, markers, onMarkerClick, status])
+
+  useEffect(() => {
+    if (!mapsRef.current) {
+      return
+    }
+
+    updateRamenyaMarkerIcons()
+  }, [markerSnapshotKey, status, updateRamenyaMarkerIcons])
+
+  useEffect(() => {
+    const map = mapRef.current
+    const maps = mapsRef.current
+
+    if (!map || !maps) {
+      return
+    }
+
+    const zoomListener = maps.Event.addListener(map, 'zoom_changed', () => {
+      scheduleRamenyaMarkerIconUpdate()
+    })
+
+    return () => {
+      maps.Event.removeListener(zoomListener)
+    }
+  }, [scheduleRamenyaMarkerIconUpdate, status])
 
   useEffect(() => {
     const map = mapRef.current
@@ -176,11 +265,13 @@ export const NaverMap = <T,>({
         position,
         icon: createCurrentLocationMarkerIcon(maps),
         clickable: false,
+        zIndex: CURRENT_LOCATION_MARKER_Z_INDEX,
       })
       return
     }
 
     currentLocationMarkerRef.current.setPosition(position)
+    currentLocationMarkerRef.current.setZIndex(CURRENT_LOCATION_MARKER_Z_INDEX)
   }, [currentLocation, status])
 
   useEffect(() => {
@@ -199,11 +290,15 @@ export const NaverMap = <T,>({
     return () => {
       const maps = mapsRef.current
 
+      if (markerIconFrameRef.current !== null) {
+        window.cancelAnimationFrame(markerIconFrameRef.current)
+      }
+
       if (maps) {
         markerListenersRef.current.forEach((listener) => maps.Event.removeListener(listener))
       }
 
-      markerInstancesRef.current.forEach((marker) => marker.setMap(null))
+      markerInstancesRef.current.forEach(({ instance }) => instance.setMap(null))
       currentLocationMarkerRef.current?.setMap(null)
       mapRef.current?.destroy?.()
     }

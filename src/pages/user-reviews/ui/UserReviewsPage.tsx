@@ -1,4 +1,5 @@
 import { IconShare } from '@/shared/ui/icon'
+import { PageLayout } from '@/shared/ui/page-layout'
 import TopBar from '@/shared/ui/top-bar'
 import { useUserReviewsPage } from '../model/useUserReviewsPage'
 import { UserReviewsContent } from './UserReviewsContent'
@@ -21,7 +22,7 @@ const UserReviewsPage = () => {
   } = useUserReviewsPage()
 
   return (
-    <>
+    <PageLayout variant="appBar">
       <TopBar title="작성한 리뷰" icon={<IconShare />} onIconClick={openSharePopup} />
       <UserReviewsContent
         userInfo={userInfo}
@@ -34,7 +35,7 @@ const UserReviewsPage = () => {
         onNavigateHome={navigateHome}
       />
       <UserReviewsShareModal isOpen={isSharePopupOpen} onClose={closeSharePopup} onShare={handleShare} />
-    </>
+    </PageLayout>
   )
 }
 

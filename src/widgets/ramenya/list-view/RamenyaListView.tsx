@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RamenyaCard, type RamenyaCardItem } from '@/entities/ramenya/ui'
+import type { Coordinate } from '@/shared/lib/naver-map'
 import render from '@/shared/ui/render'
 
 interface RamenyaListViewProps {
@@ -9,6 +10,7 @@ interface RamenyaListViewProps {
   centered?: boolean
   dividerInset?: boolean
   isReview?: boolean
+  currentLocation?: Coordinate | null
   onItemClick?: (ramenya: RamenyaCardItem) => void
 }
 
@@ -18,6 +20,7 @@ export const RamenyaListView = ({
   centered = false,
   dividerInset = false,
   isReview,
+  currentLocation,
   onItemClick,
 }: RamenyaListViewProps) => {
   const navigate = useNavigate()
@@ -37,6 +40,7 @@ export const RamenyaListView = ({
           <RamenyaCard
             {...ramenya}
             isReview={isReview}
+            currentLocation={currentLocation}
             onClick={() => {
               if (onItemClick) {
                 onItemClick(ramenya)

@@ -41,6 +41,7 @@ export type NaverMarkerOptions = {
   icon?: NaverMarkerIcon
   clickable?: boolean
   visible?: boolean
+  zIndex?: number
 }
 
 export type NaverMapEventListener = {
@@ -52,6 +53,7 @@ export type NaverMarkerInstance = {
   setIcon: (icon: NaverMarkerIcon) => void
   setPosition: (position: NaverMapLatLng) => void
   setVisible: (visible: boolean) => void
+  setZIndex: (zIndex: number) => void
 }
 
 export type NaverMapInstance = {

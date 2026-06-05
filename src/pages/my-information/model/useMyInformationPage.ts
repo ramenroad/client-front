@@ -2,14 +2,17 @@ import { useRef, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useMyInfoQuery, viewerQueryKeys } from '@/entities/viewer/api'
-import { authStore, useAuthSession, useSignOutMutation } from '@/features/auth'
+import { authStore, useAuthSession } from '@/entities/session/model'
+import { useSignOutMutation } from '@/features/auth'
 import { useUpdateProfileImageMutation } from '@/features/profile'
+import { useTheme } from '@/shared/model'
 import { useToast } from '@/shared/ui/toast'
 
 export const useMyInformationPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
+  const { isDarkMode, toggleTheme } = useTheme()
   const authSession = useAuthSession()
   const profileImageInputRef = useRef<HTMLInputElement>(null)
   const myInfoQuery = useMyInfoQuery({ enabled: authSession.isSignIn })
@@ -53,6 +56,9 @@ export const useMyInformationPage = () => {
     isLoading: authSession.isSignIn && myInfoQuery.isLoading,
     isError: authSession.isSignIn && myInfoQuery.isError && myInfoQuery.error?.status !== 401,
     isProfileImageUpdating: updateProfileImageMutation.isPending,
+    isDarkMode,
+    isThemeToggleVisible: import.meta.env.DEV,
+    themeModeLabel: isDarkMode ? '다크모드' : '라이트모드',
     profileImageInputRef,
     handleProfileImageButtonClick,
     handleProfileImageChange,
@@ -60,5 +66,6 @@ export const useMyInformationPage = () => {
     handleLoginClick: () => navigate('/login'),
     handleWithdrawClick: () => navigate('/withdraw'),
     handleLogoutClick: () => signOutMutation.mutate(),
+    handleThemeToggle: toggleTheme,
   }
 }

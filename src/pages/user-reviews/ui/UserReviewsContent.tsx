@@ -134,7 +134,7 @@ const PrivateReviewDescription = render.extend(RaisingText, 'mt-4 text-gray-70')
 
 const UnavailableReviewOverlay = render.section('flex h-450 flex-col items-center justify-center')
 
-const RedirectButton = render.button('mt-16 h-44 w-176 cursor-pointer rounded-[100px] border-none bg-bright-orange text-orange')
+const RedirectButton = render.button('mt-16 h-44 w-176 cursor-pointer rounded-full border-none bg-bright-orange text-orange')
 
 const ReviewListWrapper = render.div('flex flex-col')
 

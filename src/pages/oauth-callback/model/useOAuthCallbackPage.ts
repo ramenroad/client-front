@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { viewerQueryKeys } from '@/entities/viewer/api'
+import { authStore } from '@/entities/session/model'
 import {
   getNaverOAuthState,
   redirectToOAuthProvider,
-  authStore,
   type OAuthProvider,
   type SignInResponse,
   type SignInType,

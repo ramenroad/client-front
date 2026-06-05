@@ -155,7 +155,7 @@ const LineWrapper = render.div('pt-20')
 const DescriptionSection = render.div('relative box-border flex flex-col gap-16 px-20')
 
 const TextAreaContainer = render.div(
-  'relative box-border flex flex-col gap-4 rounded-[8px] border border-solid border-transparent bg-border px-12 pb-36 pt-10 outline-none focus-within:border-orange',
+  'relative box-border flex flex-col gap-4 rounded-8 border border-solid border-transparent bg-border px-12 pb-36 pt-10 outline-none focus-within:border-orange',
 )
 
 const DescriptionTextArea = render.textarea(
@@ -168,7 +168,7 @@ const TypedCount = render.span('font-14-r text-black')
 
 const GuideSection = render.div('box-border w-full px-20 pt-20')
 
-const GuideCard = render.div('box-border flex h-190 w-full flex-col items-center rounded-[8px] bg-border pb-27 pt-20')
+const GuideCard = render.div('box-border flex h-190 w-full flex-col items-center rounded-8 bg-border pb-27 pt-20')
 
 const GuideTitle = render.div('font-14-sb text-gray-800')
 
@@ -180,7 +180,7 @@ const GuideImageGrid = render.div('flex flex-row gap-20 pt-16')
 
 const GuideImageItem = render.div('relative')
 
-const GuideImage = render.img('h-86 w-86 rounded-[4px] object-cover')
+const GuideImage = render.img('h-86 w-86 rounded-4 object-cover')
 
 const GuideCaption = render.div('pb-73 pt-14 font-14-m text-gray-500')
 

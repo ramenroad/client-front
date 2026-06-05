@@ -1,5 +1,6 @@
 import { IconClose } from '@/shared/ui/icon'
 import { LoadingLottie } from '@/shared/ui/lottie'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import { useBannerPage } from '../model/useBannerPage'
@@ -8,7 +9,7 @@ const BannerPage = () => {
   const { banners, isLoading, isError, handleBannerClick, handleCloseClick } = useBannerPage()
 
   return (
-    <Wrapper>
+    <Wrapper variant="appBar">
       <Header>
         <Title>전체 보기</Title>
         <CloseButton type="button" onClick={handleCloseClick} aria-label="닫기">
@@ -50,7 +51,7 @@ const BannerPage = () => {
   )
 }
 
-const Wrapper = render.div('flex h-full flex-col items-center')
+const Wrapper = render.extend(PageLayout, 'items-center')
 
 const Header = render.div('relative flex h-44 w-full items-center justify-center')
 
@@ -62,7 +63,7 @@ const BannerListContainer = render.div('flex flex-col items-center justify-cente
 
 const BannerButton = render.button('cursor-pointer border-none bg-transparent p-0')
 
-const BannerImage = render.img('h-200 w-350 rounded-[8px] object-cover')
+const BannerImage = render.img('h-200 w-350 rounded-8 object-cover')
 
 const StateWrapper = render.section('flex min-h-320 flex-col items-center justify-center gap-12 px-20 text-center')
 

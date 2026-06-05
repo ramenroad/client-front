@@ -1,9 +1,8 @@
-export type SignInType = 'signin' | 'signup' | string
+import type { TokenPair } from '@/entities/session/model'
 
-export type TokenPair = {
-  accessToken: string
-  refreshToken: string
-}
+export type { TokenPair }
+
+export type SignInType = 'signin' | 'signup' | string
 
 export type SignInResponse = TokenPair & {
   type: SignInType

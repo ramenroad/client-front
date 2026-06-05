@@ -128,7 +128,7 @@ export const SearchOverlay = ({
 }
 
 const SubmitButton = render.button(
-  'text-orange bg-[#FFE4CE] font-16-m px-32 py-10 rounded-[100px] outline-none border-none cursor-pointer',
+  'text-orange bg-[#FFE4CE] font-16-m px-32 py-10 rounded-full outline-none border-none cursor-pointer',
 )
 
 const FullScreenSearchOverlay = render.main(

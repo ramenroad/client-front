@@ -65,7 +65,7 @@ export const MenuBoardDetail = ({
 }
 
 const MenuBoardDetailWrapper = render.div(
-  'relative box-border flex h-84 w-240 flex-col justify-center gap-10 rounded-[8px] bg-white/10 px-20 py-16 font-14-m text-black',
+  'relative box-border flex h-84 w-240 flex-col justify-center gap-10 rounded-8 bg-white/10 px-20 py-16 font-14-m text-black',
 )
 
 const Header = render.div('flex items-center')
@@ -85,7 +85,7 @@ const CreatedAt = render.div('font-12-l text-gray-400')
 const Description = render.div('truncate font-14-r text-white')
 
 const Tooltip = render.div(
-  'absolute left-[-24px] z-10 mt-4 flex h-37 w-48 items-center justify-center rounded-[8px] bg-gray-700',
+  'absolute left-[-24px] z-10 mt-4 flex h-37 w-48 items-center justify-center rounded-8 bg-gray-700',
 )
 
 const TooltipText = render.div('font-12-m text-gray-200')

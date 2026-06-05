@@ -105,8 +105,6 @@ export const genreDescriptions = {
   [RAMENYA_TYPES.MAZEMEN]: '고기 + 부추 베이스의 비벼먹는 일본식 중화라멘',
 } as const
 
-export const ramenroadEmail = 'zz0905k@naver.com'
-
 export const initialFilterOptions: FilterOptions = {
   isOpen: false,
   sort: SortType.DEFAULT,

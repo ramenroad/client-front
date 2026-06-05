@@ -52,7 +52,7 @@ export const UserReviewsShareModal = ({ isOpen, onClose, onShare }: UserReviewsS
   )
 }
 
-const ModalContent = render.div('flex w-320 flex-col items-center justify-center gap-24 rounded-[12px] bg-white pb-20 pt-16')
+const ModalContent = render.div('flex w-320 flex-col items-center justify-center gap-24 rounded-12 bg-white pb-20 pt-16')
 
 const ModalHeader = render.div('relative flex w-full items-center justify-center')
 

@@ -40,7 +40,7 @@ const Section = render.div('relative mt-36 flex flex-col gap-16')
 const Title = render.div('font-16-m text-black')
 
 const TextAreaContainer = render.div(
-  'relative box-border flex flex-col gap-4 rounded-[8px] border border-solid border-transparent bg-border px-12 pb-36 pt-10 outline-none focus-within:border-orange',
+  'relative box-border flex flex-col gap-4 rounded-8 border border-solid border-transparent bg-border px-12 pb-36 pt-10 outline-none focus-within:border-orange',
 )
 
 const ReviewTextArea = render.textarea(
