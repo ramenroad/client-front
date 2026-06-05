@@ -5,8 +5,8 @@ import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import TopBar from '@/shared/ui/top-bar'
+import { MenuBoardDetail } from '@/entities/menu-board/ui'
 import { useMenuBoardImagesPage } from '../model/useMenuBoardImagesPage'
-import { MenuBoardDetail } from './MenuBoardDetail'
 
 const MenuBoardImagesPage = () => {
   const {
