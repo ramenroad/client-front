@@ -20,7 +20,7 @@ export const SocialLoginButton = ({ className, icon, provider, children, ...prop
     <ButtonRoot
       {...props}
       className={twMerge(
-        'font-18-m flex h-46 w-310 cursor-pointer items-center justify-center gap-8 rounded-[50px] border-none shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-60',
+        'font-18-m flex h-46 w-310 cursor-pointer items-center justify-center gap-8 rounded-full border-none shadow-none outline-none disabled:cursor-not-allowed disabled:opacity-60',
         providerClassNameMap[provider],
         className ?? '',
       )}

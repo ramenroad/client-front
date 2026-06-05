@@ -161,6 +161,7 @@ export const ReviewCard = ({ review, editable, mypage = false }: ReviewCardProps
   }, [isReviewExpanded, isReviewLong, review.review])
   const images = review.reviewImageUrls ?? []
   const menus = review.menus ?? []
+  const reviewImageSizeClassName = images.length <= 3 ? 'h-116 w-116' : 'h-96 w-96'
 
   const handleEdit = () => {
     navigate(`/review/edit/${review._id}`)
@@ -210,7 +211,12 @@ export const ReviewCard = ({ review, editable, mypage = false }: ReviewCardProps
         )}
         <ReviewImages>
           {images.map((image, index) => (
-            <ReviewImageButton key={`${image}-${index}`} type="button" onClick={() => setSelectedImageIndex(index)}>
+            <ReviewImageButton
+              key={`${image}-${index}`}
+              type="button"
+              className={reviewImageSizeClassName}
+              onClick={() => setSelectedImageIndex(index)}
+            >
               <ReviewImage src={image} alt={`리뷰 이미지 ${index + 1}`} />
             </ReviewImageButton>
           ))}
@@ -246,61 +252,65 @@ export const ReviewCard = ({ review, editable, mypage = false }: ReviewCardProps
   )
 }
 
-const ReviewCardWrapper = render.article('box-border flex w-full flex-col px-20 py-20')
+const ReviewCardWrapper = render.article('box-border flex w-full flex-col p-20')
 
-const ReviewCardHeader = render.div('flex min-h-40 items-start justify-between gap-12')
+const ReviewCardHeader = render.div('flex flex-row items-start justify-between gap-12')
 
-const ReviewCardTitle = render.div('min-w-0 flex-1')
+const ReviewCardTitle = render.div('flex min-w-0 flex-1 flex-row items-center gap-2')
 
-const RamenyaButton = render.button('flex cursor-pointer items-center gap-2 border-none bg-transparent p-0 text-left')
+const RamenyaButton = render.button('flex min-w-0 cursor-pointer items-center gap-2 border-none bg-transparent p-0 text-left')
 
-const ReviewNameButton = render.button('flex cursor-pointer items-center gap-8 border-none bg-transparent p-0 text-left')
+const ReviewNameButton = render.button('flex cursor-pointer items-center gap-10 border-none bg-transparent p-0 text-left')
 
-const ReviewerProfileImage = render.img('h-40 w-40 rounded-full object-cover')
+const ReviewerProfileImage = render.img('h-36 w-36 rounded-full object-cover')
 
 const ReviewerInfoBox = render.div('flex min-w-0 flex-col')
 
-const ReviewerReviewInfo = render.div('flex items-center gap-6')
+const ReviewerReviewInfo = render.div('flex flex-row items-center gap-6 text-gray-70')
 
-const ReviewerReviewMeta = render.extend(RaisingText, 'text-gray-500')
+const ReviewerReviewMeta = render.extend(RaisingText, 'flex items-center gap-2')
 
-const ReviewerReviewValue = render.extend(RaisingText, 'text-gray-800')
+const ReviewerReviewValue = render.extend(RaisingText)
 
-const ReviewerReviewCountDivider = render.div('h-10 w-1 bg-gray-100')
+const ReviewerReviewCountDivider = render.span('h-10 w-1 bg-gray-100')
 
-const ReviewActionWrapper = render.div('flex shrink-0 items-center gap-10')
+const ReviewActionWrapper = render.div('flex shrink-0 flex-row gap-6')
 
-const ActionButton = render.button('cursor-pointer border-none bg-transparent p-0')
+const ActionButton = render.button(
+  'h-25 w-41 cursor-pointer rounded-12 border-none bg-border p-0 text-black shadow-none outline-none',
+)
 
-const ActionText = render.extend(RaisingText, 'text-gray-500')
+const ActionText = render.extend(RaisingText, 'whitespace-nowrap')
 
-const ReviewCardSubHeader = render.div('mt-12 flex items-center justify-between gap-12')
+const ReviewCardSubHeader = render.div('mt-10 flex flex-row items-center justify-between gap-2 text-gray-500')
 
-const ReviewCardSubHeaderLeftSection = render.div('flex min-w-0 items-center gap-8')
+const ReviewCardSubHeaderLeftSection = render.div('flex min-w-0 flex-1 flex-row items-center gap-8')
 
 const RatingWrapper = render.div('flex shrink-0 items-center gap-2')
 
-const RamenyaMenuListWrapper = render.div('flex min-w-0 items-center gap-4 overflow-hidden text-gray-500')
+const RamenyaMenuListWrapper = render.div('flex min-w-0 flex-1 flex-row items-center gap-4 overflow-hidden text-gray-500')
 
-const RamenyaMenuWrapper = render.div('flex shrink-0 items-center gap-4 text-gray-500')
+const RamenyaMenuWrapper = render.div('flex shrink-0 flex-row items-center gap-4 leading-18 text-gray-500')
 
-const MenuSeparator = render.div('h-10 w-1 bg-gray-100')
+const MenuSeparator = render.section('h-10 w-1 bg-gray-100')
 
-const ReviewCardSubHeaderRightSection = render.div('shrink-0 text-gray-500')
+const ReviewCardSubHeaderRightSection = render.div('h-18 shrink-0 leading-18 text-gray-500')
 
-const ReviewCardContent = render.div('mt-12 flex flex-col')
+const ReviewCardContent = render.div('mt-12 flex flex-col leading-21')
 
-const ReviewText = render.extend(RaisingText, 'whitespace-pre-line text-gray-800')
+const ReviewText = render.extend(RaisingText, 'whitespace-pre-line')
 
-const MoreButton = render.button('mt-4 w-fit cursor-pointer border-none bg-transparent p-0 font-14-m text-gray-500')
+const MoreButton = render.button('w-fit cursor-pointer border-none bg-transparent p-0 font-14-m text-gray-400')
 
-const ReviewImages = render.div('mt-12 flex gap-8 overflow-x-auto pb-2')
+const ReviewImages = render.div('relative -mr-20 mt-12 flex items-center gap-1 overflow-x-auto')
 
-const ReviewImageButton = render.button('h-80 w-80 shrink-0 cursor-pointer overflow-hidden rounded-[6px] border-none bg-transparent p-0')
+const ReviewImageButton = render.button(
+  'shrink-0 cursor-pointer overflow-hidden border-none bg-transparent p-0 shadow-none outline-none first:rounded-l-8 last:rounded-r-8 only:rounded-8',
+)
 
 const ReviewImage = render.img('h-full w-full object-cover')
 
-const DeleteModalContent = render.div('flex w-290 flex-col items-center justify-center gap-16 rounded-[12px] bg-white pt-32')
+const DeleteModalContent = render.div('flex w-290 flex-col items-center justify-center gap-16 rounded-12 bg-white pt-32')
 
 const DeleteModalText = render.div('whitespace-pre-line text-center font-16-r text-gray-900')
 

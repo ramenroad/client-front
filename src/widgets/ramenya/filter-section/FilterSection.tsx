@@ -1,8 +1,11 @@
 import { useMemo, useState } from 'react'
 import { initialFilterOptions, RAMENYA_TYPES, SortType, type FilterOptions, type RamenyaType } from '@/entities/ramenya/model'
-import { IconFilterWithTag, IconPinned } from '@/shared/ui/icon'
+import { Button } from '@/shared/ui/button'
+import { IconCheck, IconClose, IconFilterWithTag, IconPinned } from '@/shared/ui/icon'
 import { Line } from '@/shared/ui/line'
+import { BottomPopupLayout, Popup } from '@/shared/ui/popup'
 import render from '@/shared/ui/render'
+import { Toggle } from '@/shared/ui/toggle'
 
 interface FilterSectionProps {
   filterOptions: FilterOptions
@@ -10,36 +13,25 @@ interface FilterSectionProps {
   genre?: RamenyaType
 }
 
+type FilterPopupType = 'filter' | 'sort'
+
 const sortOptions = Object.values(SortType)
 
 export const FilterSection = ({ filterOptions, onFilterChange, genre }: FilterSectionProps) => {
-  const [isExpanded, setIsExpanded] = useState(false)
-
-  const ramenyaGenres = useMemo(() => {
-    const filteredTypes = Object.values(RAMENYA_TYPES).filter((type) => type !== genre)
-    return genre ? [genre, ...filteredTypes] : filteredTypes
-  }, [genre])
+  const [popupType, setPopupType] = useState<FilterPopupType | null>(null)
 
   const filterCount = useMemo(() => {
     let count = 0
     if (filterOptions.isOpen) count += 1
     if (filterOptions.sort !== SortType.DEFAULT) count += 1
     if (genre) count += 1
-    count += filterOptions.genre.length
     return count
-  }, [filterOptions.genre.length, filterOptions.isOpen, filterOptions.sort, genre])
+  }, [filterOptions.isOpen, filterOptions.sort, genre])
 
   const handleOpenOnlyClick = () => {
     onFilterChange({
       ...filterOptions,
       isOpen: !filterOptions.isOpen,
-    })
-  }
-
-  const handleSortClick = (sort: SortType) => {
-    onFilterChange({
-      ...filterOptions,
-      sort,
     })
   }
 
@@ -58,15 +50,13 @@ export const FilterSection = ({ filterOptions, onFilterChange, genre }: FilterSe
     })
   }
 
-  const handleResetClick = () => {
-    onFilterChange(initialFilterOptions)
-  }
+  const closePopup = () => setPopupType(null)
 
   return (
     <Wrapper>
       <FilterWrapper>
         <RelativeWrapper>
-          <FilterIconButton type="button" onClick={() => setIsExpanded((prev) => !prev)} aria-label="필터 열기">
+          <FilterIconButton type="button" onClick={() => setPopupType('filter')} aria-label="필터 열기">
             <IconFilterWithTag color={filterCount === 0 ? 'black' : '#FF5E00'} />
           </FilterIconButton>
           {filterCount > 1 && <FilterCount>{filterCount}</FilterCount>}
@@ -76,11 +66,7 @@ export const FilterSection = ({ filterOptions, onFilterChange, genre }: FilterSe
           영업중
         </FilterButton>
 
-        <FilterButton
-          type="button"
-          data-active={filterOptions.sort !== SortType.DEFAULT}
-          onClick={() => setIsExpanded((prev) => !prev)}
-        >
+        <FilterButton type="button" data-active onClick={() => setPopupType('sort')}>
           {filterOptions.sort}
         </FilterButton>
 
@@ -99,44 +85,173 @@ export const FilterSection = ({ filterOptions, onFilterChange, genre }: FilterSe
         ))}
       </FilterWrapper>
 
-      {isExpanded && (
-        <ExpandedPanel>
-          <PanelSection>
-            <SectionTitle>정렬</SectionTitle>
-            <ButtonGroup>
-              {sortOptions.map((sort) => (
-                <FilterButton key={sort} type="button" data-active={filterOptions.sort === sort} onClick={() => handleSortClick(sort)}>
-                  {sort}
-                </FilterButton>
-              ))}
-            </ButtonGroup>
-          </PanelSection>
+      <Popup isOpen={popupType === 'filter'} direction="bottom" onClose={closePopup}>
+        <FilterBottomPopup
+          currentFilterOptions={filterOptions}
+          pinnedGenre={genre}
+          onClose={closePopup}
+          onChange={onFilterChange}
+        />
+      </Popup>
 
-          <PanelSection>
-            <PanelHeader>
-              <SectionTitle>장르</SectionTitle>
-              <ResetButton type="button" onClick={handleResetClick}>
-                초기화
-              </ResetButton>
-            </PanelHeader>
-            <ButtonGroup>
-              {ramenyaGenres.map((ramenyaGenre) => (
-                <FilterButton
-                  key={ramenyaGenre}
-                  type="button"
-                  data-active={ramenyaGenre === genre || filterOptions.genre.includes(ramenyaGenre)}
-                  data-pinned={ramenyaGenre === genre}
-                  onClick={() => handleGenreClick(ramenyaGenre)}
-                >
-                  {ramenyaGenre === genre && <IconPinned />}
-                  {ramenyaGenre}
-                </FilterButton>
-              ))}
-            </ButtonGroup>
-          </PanelSection>
-        </ExpandedPanel>
-      )}
+      <Popup isOpen={popupType === 'sort'} direction="bottom" onClose={closePopup}>
+        <SortBottomPopup
+          sortOption={filterOptions.sort}
+          onClose={closePopup}
+          onChange={(sortOption) => {
+            onFilterChange({
+              ...filterOptions,
+              sort: sortOption,
+            })
+            closePopup()
+          }}
+        />
+      </Popup>
     </Wrapper>
+  )
+}
+
+const FilterBottomPopup = ({
+  currentFilterOptions,
+  pinnedGenre,
+  onClose,
+  onChange,
+}: {
+  currentFilterOptions: FilterOptions
+  pinnedGenre?: RamenyaType
+  onClose: () => void
+  onChange: (filterOptions: FilterOptions) => void
+}) => {
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>(currentFilterOptions)
+  const ramenyaGenres = useMemo(() => {
+    const filteredTypes = Object.values(RAMENYA_TYPES).filter((type) => type !== pinnedGenre)
+    return pinnedGenre ? [pinnedGenre, ...filteredTypes] : filteredTypes
+  }, [pinnedGenre])
+
+  const handleSortClick = (sort: SortType) => {
+    setFilterOptions((prev) => ({
+      ...prev,
+      sort,
+    }))
+  }
+
+  const handleGenreClick = (ramenyaGenre: string) => {
+    if (ramenyaGenre === pinnedGenre) {
+      return
+    }
+
+    setFilterOptions((prev) => ({
+      ...prev,
+      genre: prev.genre.includes(ramenyaGenre)
+        ? prev.genre.filter((selectedGenre) => selectedGenre !== ramenyaGenre)
+        : [...prev.genre, ramenyaGenre],
+    }))
+  }
+
+  const handleResetClick = () => {
+    setFilterOptions(initialFilterOptions)
+    onChange(initialFilterOptions)
+    onClose()
+  }
+
+  const handleApplyClick = () => {
+    onChange(filterOptions)
+    onClose()
+  }
+
+  return (
+    <BottomPopupLayout>
+      <PopupWrapper>
+        <PopupHeader>
+          <PopupTitle>필터</PopupTitle>
+          <CloseButton type="button" onClick={onClose} aria-label="필터 닫기">
+            <IconClose />
+          </CloseButton>
+        </PopupHeader>
+
+        <PopupSection>
+          <PopupRow>
+            <SectionTitle>영업중</SectionTitle>
+            <Toggle
+              checked={filterOptions.isOpen}
+              onChange={(checked) => setFilterOptions((prev) => ({ ...prev, isOpen: checked }))}
+              onText="ON"
+              offText="OFF"
+            />
+          </PopupRow>
+        </PopupSection>
+
+        <PopupSection>
+          <SectionTitle>정렬</SectionTitle>
+          <ButtonGroup>
+            {sortOptions.map((sort) => (
+              <FilterButton key={sort} type="button" data-active={filterOptions.sort === sort} onClick={() => handleSortClick(sort)}>
+                {sort}
+              </FilterButton>
+            ))}
+          </ButtonGroup>
+        </PopupSection>
+
+        <PopupSection>
+          <SectionTitle>장르</SectionTitle>
+          <ButtonGroup>
+            {ramenyaGenres.map((ramenyaGenre) => (
+              <FilterButton
+                key={ramenyaGenre}
+                type="button"
+                data-active={ramenyaGenre === pinnedGenre || filterOptions.genre.includes(ramenyaGenre)}
+                data-pinned={ramenyaGenre === pinnedGenre}
+                onClick={() => handleGenreClick(ramenyaGenre)}
+              >
+                {ramenyaGenre === pinnedGenre && <IconPinned />}
+                {ramenyaGenre}
+              </FilterButton>
+            ))}
+          </ButtonGroup>
+        </PopupSection>
+
+        <PopupButtonRow>
+          <Button type="button" variant="secondary" onClick={handleResetClick}>
+            초기화
+          </Button>
+          <Button type="button" onClick={handleApplyClick}>
+            적용하기
+          </Button>
+        </PopupButtonRow>
+      </PopupWrapper>
+    </BottomPopupLayout>
+  )
+}
+
+const SortBottomPopup = ({
+  sortOption,
+  onClose,
+  onChange,
+}: {
+  sortOption: SortType
+  onClose: () => void
+  onChange: (sortOption: SortType) => void
+}) => {
+  return (
+    <BottomPopupLayout>
+      <SortPopupWrapper>
+        <PopupHeader>
+          <PopupTitle>정렬</PopupTitle>
+          <CloseButton type="button" onClick={onClose} aria-label="정렬 닫기">
+            <IconClose />
+          </CloseButton>
+        </PopupHeader>
+
+        <SortOptionList>
+          {sortOptions.map((sort) => (
+            <SortOptionRow key={sort} type="button" onClick={() => onChange(sort)}>
+              <SortOptionText data-selected={sortOption === sort}>{sort}</SortOptionText>
+              {sortOption === sort && <IconCheck />}
+            </SortOptionRow>
+          ))}
+        </SortOptionList>
+      </SortPopupWrapper>
+    </BottomPopupLayout>
   )
 }
 
@@ -157,17 +272,33 @@ const FilterCount = render.div(
 const Divider = render.extend(Line, 'h-18')
 
 const FilterButton = render.button(
-  'font-14-r flex shrink-0 cursor-pointer items-center gap-2 rounded-[50px] border-0 bg-filter-background px-12 py-4 text-filter-text shadow-none outline-none data-[active=true]:bg-filter-active-background data-[active=true]:text-filter-active-text data-[pinned=true]:pl-8',
+  'font-14-r flex shrink-0 cursor-pointer items-center gap-2 rounded-full border-0 bg-filter-background px-12 py-4 text-filter-text shadow-none outline-none data-[active=true]:bg-filter-active-background data-[active=true]:text-filter-active-text data-[pinned=true]:pl-8',
 )
 
-const ExpandedPanel = render.div('box-border flex w-full flex-col gap-14 border-0 border-t border-border border-solid px-20 py-16')
+const PopupWrapper = render.div('flex w-full flex-col gap-20')
 
-const PanelSection = render.div('flex flex-col gap-8')
+const SortPopupWrapper = render.div('box-border flex w-350 max-w-350 flex-col gap-20')
 
-const PanelHeader = render.div('flex items-center justify-between')
+const PopupHeader = render.div('box-border flex items-center justify-between')
 
-const SectionTitle = render.span('font-16-m text-black')
+const PopupTitle = render.span('font-18-sb text-black')
+
+const CloseButton = render.button('cursor-pointer border-0 bg-transparent p-0 shadow-none outline-none')
+
+const PopupSection = render.div('mb-12 flex flex-col gap-8')
+
+const PopupRow = render.div('flex items-center justify-between gap-8')
+
+const SectionTitle = render.div('mb-4 font-16-m text-black')
 
 const ButtonGroup = render.div('flex flex-wrap gap-8')
 
-const ResetButton = render.button('font-12-m cursor-pointer border-0 bg-transparent p-0 text-gray-500 underline')
+const PopupButtonRow = render.div('flex items-center justify-between gap-8')
+
+const SortOptionList = render.div('box-border flex flex-col gap-20 justify-between')
+
+const SortOptionRow = render.button(
+  'box-border flex cursor-pointer items-center justify-between border-0 bg-transparent p-0 text-left shadow-none outline-none',
+)
+
+const SortOptionText = render.span('font-16-r mb-4 text-gray-400 data-[selected=true]:text-orange')

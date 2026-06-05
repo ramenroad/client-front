@@ -1,6 +1,7 @@
 import { type ComponentProps } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { Button } from '@/shared/ui/button'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import TopBar from '@/shared/ui/top-bar'
@@ -20,7 +21,7 @@ const RegisterNicknamePage = () => {
   const isUpdateMode = Boolean(currentNickname)
 
   return (
-    <Layout>
+    <Layout variant="footerOnly">
       <TopBar title="" navigate={isUpdateMode ? '/mypage' : undefined} />
       <Wrapper>
         <DescriptionWrapper>
@@ -60,7 +61,7 @@ const RegisterNicknamePage = () => {
   )
 }
 
-const Layout = render.section('flex min-h-[100dvh] w-full flex-col')
+const Layout = render.extend(PageLayout)
 
 const Wrapper = render.div('box-border flex min-h-0 w-full flex-1 flex-col px-20')
 
@@ -89,7 +90,7 @@ const NicknameInput = ({ isError = false, className, ...props }: NicknameInputPr
     <InputField
       {...props}
       className={twMerge(
-        'font-16-m box-border w-full rounded-[8px] bg-border px-20 py-10 text-black outline-none placeholder:text-gray-200',
+        'font-16-m box-border w-full rounded-8 bg-border px-20 py-10 text-black outline-none placeholder:text-gray-200',
         isError ? 'border-2 border-red' : 'border-none',
         className ?? '',
       )}

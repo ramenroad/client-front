@@ -37,4 +37,4 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
 
 const Overlay = render.div("fixed inset-0 bg-black/40 flex items-center justify-center z-[100]");
 
-const Wrapper = render.div("flex flex-col bg-white rounded-[12px] shadow-lg");
+const Wrapper = render.div("flex flex-col bg-white rounded-12 shadow-lg");

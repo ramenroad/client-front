@@ -21,7 +21,7 @@ const PopupConfirm = ({ content, confirmText, onClose, onConfirm }: PopupConfirm
 };
 
 const PopupContainer = render.div(
-  "flex flex-col gap-16 w-290 pt-32 items-center justify-center bg-white rounded-[12px]",
+  "flex flex-col gap-16 w-290 pt-32 items-center justify-center bg-white rounded-12",
 );
 
 const PopupTitle = render.div("font-16-r text-gray-900 text-center");

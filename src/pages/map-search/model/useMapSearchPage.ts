@@ -1,10 +1,20 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useNearbyRamenyasQuery } from '@/entities/ramenya/api'
-import { RAMENYA_LOCATION_LIST, type NearbyRamenya } from '@/entities/ramenya/model'
+import { useNearbyRamenyasQuery, useRamenyaDetailQuery } from '@/entities/ramenya/api'
+import {
+  checkBusinessStatus,
+  initialFilterOptions,
+  OpenStatus,
+  RAMENYA_LOCATION_LIST,
+  SortType,
+  type FilterOptions,
+  type NearbyRamenya,
+} from '@/entities/ramenya/model'
+import { useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useSearchResultsQuery } from '@/entities/search/api'
 import type { SearchResult } from '@/entities/search/model'
 import type { Coordinate, MapViewportSnapshot } from '@/shared/lib/naver-map'
+import { calculateDistanceValue } from '@/shared/lib/number'
 import { useToast } from '@/shared/ui/toast'
 import type { NaverMapFocusRequest, NaverMapMarker } from '@/widgets/map/naver-map'
 import { MAP_RESULT_SHEET_HEIGHTS, type MapResultSheetHeight } from '@/widgets/map/result-list-overlay'
@@ -28,6 +38,54 @@ const DEFAULT_CENTER: Coordinate = {
 
 const DEFAULT_ZOOM = 14
 const DEFAULT_RADIUS = 3_000
+const MAP_FILTER_STORAGE_KEY = 'mapPageFilterOptions'
+const MAP_SHEET_BOTTOM_OFFSET = 56
+const MAP_FLOATING_BUTTON_GAP = 16
+const sortValues = Object.values(SortType)
+
+const isFilterOptions = (value: unknown): value is FilterOptions => {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const filterOptions = value as Partial<FilterOptions>
+
+  return (
+    typeof filterOptions.isOpen === 'boolean' &&
+    typeof filterOptions.sort === 'string' &&
+    sortValues.includes(filterOptions.sort as SortType) &&
+    Array.isArray(filterOptions.genre) &&
+    filterOptions.genre.every((genre) => typeof genre === 'string')
+  )
+}
+
+const getInitialFilterOptions = (): FilterOptions => {
+  if (typeof window === 'undefined') {
+    return initialFilterOptions
+  }
+
+  try {
+    const storedFilterOptions = window.sessionStorage.getItem(MAP_FILTER_STORAGE_KEY)
+
+    if (!storedFilterOptions) {
+      return initialFilterOptions
+    }
+
+    const parsedFilterOptions: unknown = JSON.parse(storedFilterOptions)
+
+    return isFilterOptions(parsedFilterOptions) ? parsedFilterOptions : initialFilterOptions
+  } catch {
+    return initialFilterOptions
+  }
+}
+
+const saveFilterOptions = (filterOptions: FilterOptions) => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.sessionStorage.setItem(MAP_FILTER_STORAGE_KEY, JSON.stringify(filterOptions))
+}
 
 const parseNumberParam = (value: string | null) => {
   if (!value) {
@@ -69,7 +127,63 @@ const getInitialCenter = (searchParams: URLSearchParams): Coordinate => {
 
 const getRamenyaId = (ramenya: MapRamenya) => ramenya._id
 
+const getReviewCreatedTime = (createdAt?: string) => {
+  return createdAt ? new Date(createdAt).getTime() : 0
+}
+
 const normalizeSearchText = (value: string) => value.trim().toLowerCase()
+
+const isInactiveRamenya = (ramenya: MapRamenya) => {
+  const { status } = checkBusinessStatus(ramenya.businessHours)
+
+  return status === OpenStatus.CLOSED || status === OpenStatus.DAY_OFF
+}
+
+const matchesOpenFilter = (ramenya: MapRamenya) => {
+  return checkBusinessStatus(ramenya.businessHours).status === OpenStatus.OPEN
+}
+
+const matchesGenreFilter = (ramenya: MapRamenya, genres: string[]) => {
+  return genres.every((selectedGenre) => ramenya.genre.includes(selectedGenre))
+}
+
+const sortByDistance = (ramenyas: MapRamenya[], currentLocation?: Coordinate | null) => {
+  if (!currentLocation) {
+    return ramenyas
+  }
+
+  return [...ramenyas].sort(
+    (a, b) =>
+      calculateDistanceValue(currentLocation, { latitude: a.latitude, longitude: a.longitude }) -
+      calculateDistanceValue(currentLocation, { latitude: b.latitude, longitude: b.longitude }),
+  )
+}
+
+const filterMapRamenyas = (
+  ramenyas: MapRamenya[],
+  filterOptions: FilterOptions,
+  currentLocation?: Coordinate | null,
+) => {
+  let filteredRamenyas = ramenyas
+
+  if (filterOptions.isOpen) {
+    filteredRamenyas = filteredRamenyas.filter(matchesOpenFilter)
+  }
+
+  if (filterOptions.genre.length > 0) {
+    filteredRamenyas = filteredRamenyas.filter((ramenya) => matchesGenreFilter(ramenya, filterOptions.genre))
+  }
+
+  if (filterOptions.sort === SortType.DISTANCE) {
+    return sortByDistance(filteredRamenyas, currentLocation)
+  }
+
+  if (filterOptions.sort === SortType.RATING) {
+    return [...filteredRamenyas].sort((a, b) => (b.rating || 0) - (a.rating || 0))
+  }
+
+  return filteredRamenyas
+}
 
 const findAutoFocusRamenya = ({
   query,
@@ -129,11 +243,37 @@ export const useMapSearchPage = () => {
   const [currentLocation, setCurrentLocation] = useState<Coordinate | null>(null)
   const [focusRequest, setFocusRequest] = useState<NaverMapFocusRequest | null>(null)
   const [resultSheetHeight, setResultSheetHeight] = useState<MapResultSheetHeight>(MAP_RESULT_SHEET_HEIGHTS.HALF)
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>(getInitialFilterOptions)
   const isFirstIdleRef = useRef(true)
   const suppressNextIdleRef = useRef(false)
   const { openToast } = useToast()
 
+  useEffect(() => {
+    let isCancelled = false
+
+    if (!navigator.geolocation) {
+      return
+    }
+
+    getCurrentPosition()
+      .then((nextLocation) => {
+        if (!isCancelled) {
+          setCurrentLocation(nextLocation)
+        }
+      })
+      .catch(() => undefined)
+
+    return () => {
+      isCancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    saveFilterOptions(filterOptions)
+  }, [filterOptions])
+
   const selectedId = searchParams.get('selectedId')
+  const detailSheetId = searchParams.get('sheet') === 'detail' ? selectedId : null
   const trimmedKeyword = searchKeyword.trim()
   const isMapScopedSearch = searchParams.get('nearBy') === 'true'
 
@@ -175,6 +315,17 @@ export const useMapSearchPage = () => {
   const searchQuery = useSearchResultsQuery(searchResultParams, {
     staleTime: 30_000,
   })
+  const detailQuery = useRamenyaDetailQuery(detailSheetId ?? '', {
+    enabled: Boolean(detailSheetId),
+    staleTime: 30_000,
+  })
+  const detailReviewsQuery = useRamenyaReviewsInfiniteQuery(
+    { ramenyaId: detailSheetId ?? '', limit: 3 },
+    {
+      enabled: Boolean(detailSheetId),
+      staleTime: 30_000,
+    },
+  )
   const shouldSearchGloballyAsFallback = Boolean(
     trimmedKeyword && isMapScopedSearch && searchQuery.isSuccess && (searchQuery.data?.length ?? 0) === 0,
   )
@@ -191,7 +342,7 @@ export const useMapSearchPage = () => {
   const isUsingGlobalSearchFallback = shouldSearchGloballyAsFallback
   const isGlobalSearchResult = Boolean(trimmedKeyword && (!isMapScopedSearch || isUsingGlobalSearchFallback))
 
-  const ramenyaList = useMemo<MapRamenya[]>(() => {
+  const rawRamenyaList = useMemo<MapRamenya[]>(() => {
     if (trimmedKeyword) {
       return isUsingGlobalSearchFallback ? (globalFallbackSearchQuery.data ?? []) : (searchQuery.data ?? [])
     }
@@ -204,6 +355,10 @@ export const useMapSearchPage = () => {
     searchQuery.data,
     trimmedKeyword,
   ])
+  const ramenyaList = useMemo(
+    () => filterMapRamenyas(rawRamenyaList, filterOptions, currentLocation),
+    [currentLocation, filterOptions, rawRamenyaList],
+  )
 
   const autoFocusRamenya = useMemo(() => {
     if (!isGlobalSearchResult || selectedId) {
@@ -246,6 +401,7 @@ export const useMapSearchPage = () => {
           longitude: ramenya.longitude,
         },
         title: ramenya.name,
+        inactive: isInactiveRamenya(ramenya),
         data: ramenya,
       })),
     [ramenyaList],
@@ -257,31 +413,33 @@ export const useMapSearchPage = () => {
         id: getRamenyaId(ramenya),
         name: ramenya.name,
         address: ramenya.address,
+        latitude: ramenya.latitude,
+        longitude: ramenya.longitude,
         genre: ramenya.genre,
         thumbnailUrl: ramenya.thumbnailUrl || '',
         rating: ramenya.rating,
         reviewCount: ramenya.reviewCount,
+        businessHours: ramenya.businessHours,
         ramenya,
       })),
     [ramenyaList],
+  )
+  const detailReviews = useMemo(
+    () =>
+      (detailReviewsQuery.data?.pages.flatMap((page) => page.reviews) ?? [])
+        .sort((a, b) => getReviewCreatedTime(b.createdAt) - getReviewCreatedTime(a.createdAt))
+        .slice(0, 3),
+    [detailReviewsQuery.data],
   )
 
   const isLoading = trimmedKeyword
     ? searchQuery.isFetching || (shouldSearchGloballyAsFallback && globalFallbackSearchQuery.isFetching)
     : nearbyQuery.isFetching
-  const resultSheetTitle = (() => {
-    if (!trimmedKeyword) {
-      return '주변 라멘야'
-    }
-
-    if (isUsingGlobalSearchFallback) {
-      return '전체 검색 결과'
-    }
-
-    return isMapScopedSearch ? '현 지도 검색 결과' : '검색 결과'
-  })()
+  const isDetailSheetOpen = Boolean(detailSheetId)
   const shouldShowCurrentLocationButton = resultSheetHeight !== MAP_RESULT_SHEET_HEIGHTS.EXPANDED
-  const currentLocationButtonBottom = `calc(${resultSheetHeight} + 16px)`
+  const currentLocationButtonBottom = `calc(${resultSheetHeight} + ${
+    MAP_SHEET_BOTTOM_OFFSET + MAP_FLOATING_BUTTON_GAP
+  }px)`
 
   const setSelectedRamenya = useCallback(
     (ramenya: MapRamenya) => {
@@ -301,12 +459,47 @@ export const useMapSearchPage = () => {
         (prev) =>
           updateMapSearchParams(prev, (nextParams) => {
             nextParams.set('selectedId', ramenyaId)
+            nextParams.delete('sheet')
           }),
         { replace: true },
       )
     },
     [setSearchParams],
   )
+
+  const openDetailSheet = useCallback(
+    (ramenya: MapRamenya) => {
+      const ramenyaId = getRamenyaId(ramenya)
+
+      suppressNextIdleRef.current = true
+      setResultSheetHeight(MAP_RESULT_SHEET_HEIGHTS.EXPANDED)
+      setFocusRequest({
+        id: `detail-${ramenyaId}-${Date.now()}`,
+        position: {
+          latitude: ramenya.latitude,
+          longitude: ramenya.longitude,
+        },
+      })
+      setSearchParams((prev) =>
+        updateMapSearchParams(prev, (nextParams) => {
+          nextParams.set('selectedId', ramenyaId)
+          nextParams.set('sheet', 'detail')
+        }),
+      )
+    },
+    [setSearchParams],
+  )
+
+  const closeDetailSheet = useCallback(() => {
+    setResultSheetHeight(MAP_RESULT_SHEET_HEIGHTS.HALF)
+    setSearchParams(
+      (prev) =>
+        updateMapSearchParams(prev, (nextParams) => {
+          nextParams.delete('sheet')
+        }),
+      { replace: true },
+    )
+  }, [setSearchParams])
 
   const syncSearchAreaToUrl = useCallback(
     (area: SearchArea, zoom?: number, options?: SyncSearchAreaOptions) => {
@@ -326,6 +519,7 @@ export const useMapSearchPage = () => {
             }
 
             nextParams.delete('selectedId')
+            nextParams.delete('sheet')
           }),
         { replace: true },
       )
@@ -397,6 +591,7 @@ export const useMapSearchPage = () => {
             }
 
             nextParams.delete('selectedId')
+            nextParams.delete('sheet')
           }),
         { replace: true },
       )
@@ -421,6 +616,7 @@ export const useMapSearchPage = () => {
         updateMapSearchParams(prev, (nextParams) => {
           nextParams.delete('keyword')
           nextParams.delete('selectedId')
+          nextParams.delete('sheet')
           nextParams.set('nearBy', 'true')
 
           if (!nextArea) {
@@ -482,7 +678,16 @@ export const useMapSearchPage = () => {
     selectedRamenya,
     markerData,
     isLoading,
-    resultSheetTitle,
+    filterOptions,
+    setFilterOptions,
+    detail: detailQuery.data,
+    detailReviews,
+    detailSheetId,
+    isDetailSheetOpen,
+    isDetailLoading: detailQuery.isFetching,
+    isDetailError: detailQuery.isError,
+    isDetailReviewsLoading: detailReviewsQuery.isFetching,
+    isDetailReviewsError: detailReviewsQuery.isError,
     needsRefresh,
     currentLocation,
     focusRequest: mapFocusRequest,
@@ -498,6 +703,8 @@ export const useMapSearchPage = () => {
     handleKeywordClear,
     handleMarkerClick: setSelectedRamenya,
     handleResultClick: setSelectedRamenya,
+    handleOpenDetailSheet: openDetailSheet,
+    handleCloseDetailSheet: closeDetailSheet,
     handleCurrentLocationClick,
   }
 }

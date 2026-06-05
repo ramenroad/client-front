@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import { IconCheckbox } from '@/shared/ui/icon'
 import { Line } from '@/shared/ui/line'
 import { Modal } from '@/shared/ui/modal'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import TopBar from '@/shared/ui/top-bar'
 import { useWithdrawPage } from '../model/useWithdrawPage'
@@ -24,7 +25,7 @@ const WithdrawPage = () => {
   } = useWithdrawPage()
 
   return (
-    <Layout>
+    <Layout variant="standalone">
       <TopBar title="회원탈퇴" />
       <PageContainer>
         <WithdrawInformationContainer>
@@ -87,7 +88,7 @@ const WithdrawPage = () => {
   )
 }
 
-const Layout = render.section('box-border flex min-h-[100dvh] w-full flex-col')
+const Layout = render.extend(PageLayout)
 
 const PageContainer = render.div('box-border flex min-h-0 w-full flex-1 flex-col px-20 pb-20 pt-10 text-black')
 
@@ -108,7 +109,7 @@ const WithdrawCheckbox = render.extend(IconCheckbox, 'cursor-pointer')
 const WithdrawCheckboxLabel = render.span('font-16-m text-gray-800')
 
 const WithdrawButton = render.button(
-  'font-16-sb h-48 w-full cursor-pointer rounded-[8px] border-none bg-gray-900 py-12 leading-24 tracking-[-2%] text-white shadow-none outline-none disabled:cursor-not-allowed disabled:bg-gray-200',
+  'font-16-sb h-48 w-full cursor-pointer rounded-8 border-none bg-gray-900 py-12 leading-24 tracking-[-2%] text-white shadow-none outline-none disabled:cursor-not-allowed disabled:bg-gray-200',
 )
 
 const ModalContent = render.div('font-16-r box-border flex w-290 flex-col items-center gap-16 pt-32 text-gray-900')
@@ -132,7 +133,7 @@ const ModalInput = ({ active, className, ...props }: ModalInputProps) => {
     <ModalInputField
       {...props}
       className={twMerge(
-        'font-16-r box-border h-56 w-full rounded-[8px] border-2 bg-border px-16 text-black shadow-none outline-none',
+        'font-16-r box-border h-56 w-full rounded-8 border-2 bg-border px-16 text-black shadow-none outline-none',
         active ? 'border-green' : 'border-red',
         className ?? '',
       )}

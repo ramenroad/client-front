@@ -93,7 +93,7 @@ const RemoveText = render.extend(RaisingText, 'text-gray-400 cursor-pointer')
 const HistoryTagWrapper = render.div('flex flex-wrap gap-8')
 
 const KeywordHistoryTag = render.button(
-  'flex items-center gap-8 box-border h-33 py-6 px-12 cursor-pointer border border-solid border-gray-200 rounded-[50px] font-14-r text-gray-900 bg-transparent',
+  'flex items-center gap-8 box-border h-33 py-6 px-12 cursor-pointer border border-solid border-gray-200 rounded-full font-14-r text-gray-900 bg-transparent',
 )
 
 const RamenyaHistoryWrapper = render.div('flex flex-col')

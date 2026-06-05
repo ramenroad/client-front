@@ -51,7 +51,7 @@ const Wrapper = render.div('relative flex w-full overflow-hidden')
 
 const SwiperWrapper = render.div('w-350 h-140 relative')
 
-const BannerImage = render.img('w-full h-full object-cover rounded-[8px] cursor-pointer')
+const BannerImage = render.img('w-full h-full object-cover rounded-8 cursor-pointer')
 
 const BannerButtonWrapper = render.div(
   'flex items-center justify-center absolute bottom-12 right-12 bg-black/50 rounded-full pl-6 pr-4 z-10 cursor-pointer',

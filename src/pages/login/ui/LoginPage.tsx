@@ -4,6 +4,7 @@ import IconGoogleImageSource from '@/assets/images/google/icon.png'
 import { SocialLoginButton } from '@/features/auth'
 import { IconKakao, IconNaver } from '@/shared/ui/icon'
 import { Line } from '@/shared/ui/line'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import TopBar from '@/shared/ui/top-bar'
 import { useLoginPage } from '../model/useLoginPage'
@@ -12,7 +13,7 @@ const LoginPage = () => {
   const { handleLogin, handleBack } = useLoginPage()
 
   return (
-    <Layout>
+    <Layout variant="standalone">
       <TopBar title="" onBackClick={handleBack} />
       <LogoWrapper>
         <LogoImage src={RamenroadMainLogo} alt="ramenroad-main-logo" />
@@ -51,7 +52,7 @@ const LoginPage = () => {
   )
 }
 
-const Layout = render.section('flex min-h-[100dvh] w-full flex-col items-center')
+const Layout = render.extend(PageLayout, 'items-center')
 
 const LogoWrapper = render.div('mt-200 flex flex-col items-center justify-center gap-8')
 

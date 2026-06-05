@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { Line } from '@/shared/ui/line'
 import { LoadingLottie } from '@/shared/ui/lottie'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import TopBar from '@/shared/ui/top-bar'
@@ -11,7 +12,7 @@ const ReviewListPage = () => {
   const { reviews, myUserId, observerRef, isLoading, isError } = useReviewListPage()
 
   return (
-    <Wrapper>
+    <Wrapper variant="appBar">
       <TopBar title="리뷰 목록" />
       <Container>
         <ReviewListTitle>고객 리뷰</ReviewListTitle>
@@ -53,7 +54,7 @@ const ReviewListPage = () => {
   )
 }
 
-const Wrapper = render.div('flex w-full flex-col pb-20')
+const Wrapper = render.extend(PageLayout, 'pb-20')
 
 const Container = render.div('flex flex-col')
 

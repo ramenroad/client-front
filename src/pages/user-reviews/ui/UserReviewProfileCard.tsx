@@ -77,7 +77,7 @@ const ProfileSubName = render.section('text-[14px] text-gray-500')
 
 const ProfileSubValue = render.extend(RaisingText, '')
 
-const DetailContent = render.section('flex h-75 w-full rounded-[8px] bg-[#F9F9F9]')
+const DetailContent = render.section('flex h-75 w-full rounded-8 bg-[#F9F9F9]')
 
 const DetailTitle = render.extend(RaisingText, 'text-gray-500')
 

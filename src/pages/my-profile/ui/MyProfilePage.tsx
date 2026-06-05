@@ -1,6 +1,7 @@
 import { Button } from '@/shared/ui/button'
 import { IconArrowRight, IconReview, IconUnSignInUser, IconUnSignInUserProfile } from '@/shared/ui/icon'
 import { LoadingLottie } from '@/shared/ui/lottie'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import TopBar from '@/shared/ui/top-bar'
@@ -10,7 +11,7 @@ const MyProfilePage = () => {
   const { profile, isSignedIn, isLoading, isError, handleProfileClick, handleLoginClick, handleReviewClick } = useMyProfilePage()
 
   return (
-    <Layout>
+    <Layout variant="appBar">
       <TopBar title="마이페이지" navigate="/" />
 
       {isLoading && (
@@ -74,12 +75,12 @@ const MyProfilePage = () => {
   )
 }
 
-const Layout = render.section('box-border flex min-h-[100dvh] w-full flex-col items-center gap-20 px-20')
+const Layout = render.extend(PageLayout, 'items-center gap-20 px-20')
 
 const SignedInContent = render.section('flex w-full flex-col items-center gap-20')
 
 const CardLayout = render.button(
-  'font-20-m flex h-112 w-full cursor-pointer items-center justify-between rounded-[8px] border border-solid border-gray-100 bg-white px-20 text-left shadow-none outline-none',
+  'font-20-m flex h-112 w-full cursor-pointer items-center justify-between rounded-8 border border-solid border-gray-100 bg-white px-20 text-left shadow-none outline-none',
 )
 
 const CardLeftSection = render.section('flex flex-col gap-4')
@@ -103,7 +104,7 @@ const LoginText = render.span('font-20-m')
 const LoginDescription = render.span('font-18-r')
 
 const MyReviewContainer = render.button(
-  'flex w-full cursor-pointer items-center gap-8 rounded-[8px] border-0 bg-[#F9F9F9] px-12 py-20 text-left shadow-none outline-none',
+  'flex w-full cursor-pointer items-center gap-8 rounded-8 border-0 bg-[#F9F9F9] px-12 py-20 text-left shadow-none outline-none',
 )
 
 const MyReviewText = render.extend(RaisingText, 'text-gray-900')

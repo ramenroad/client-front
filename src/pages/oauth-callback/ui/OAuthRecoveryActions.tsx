@@ -29,5 +29,5 @@ export const OAuthRecoveryActions = ({ onBack, onLogin }: OAuthRecoveryActionsPr
 const ActionsWrapper = render.div('flex w-full flex-col items-center justify-center gap-12')
 
 const BackButton = render.button(
-  'flex h-46 w-310 cursor-pointer items-center justify-center gap-8 rounded-[50px] border border-solid border-gray-100 bg-white py-11 text-black shadow-none outline-none',
+  'flex h-46 w-310 cursor-pointer items-center justify-center gap-8 rounded-full border border-solid border-gray-100 bg-white py-11 text-black shadow-none outline-none',
 )

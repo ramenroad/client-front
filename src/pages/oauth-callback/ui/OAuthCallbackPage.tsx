@@ -1,5 +1,6 @@
 import EmailImage from '@/assets/images/email/email.png'
 import { LoadingLottie } from '@/shared/ui/lottie'
+import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import { OAuthRecoveryActions } from './OAuthRecoveryActions'
@@ -10,7 +11,7 @@ const OAuthCallbackPage = () => {
 
   if (status === 'loading') {
     return (
-      <Wrapper>
+      <Wrapper variant="standalone">
         <LoadingLottie />
         <LoadingText size={16} weight="m">
           로그인 작업 진행 중이에요
@@ -21,7 +22,7 @@ const OAuthCallbackPage = () => {
 
   if (status === 'email_conflict') {
     return (
-      <Wrapper>
+      <Wrapper variant="standalone">
         <EmailIllustration src={EmailImage} alt="email" />
 
         <AlertContainer>
@@ -50,7 +51,7 @@ const OAuthCallbackPage = () => {
 
   if (status === 'withdrawn') {
     return (
-      <Wrapper>
+      <Wrapper variant="standalone">
         <WithdrawInformationWrapper>
           <WithdrawTitle>이미 탈퇴한 계정입니다</WithdrawTitle>
           <WithdrawDescription>
@@ -67,7 +68,7 @@ const OAuthCallbackPage = () => {
   }
 
   return (
-    <Wrapper>
+    <Wrapper variant="standalone">
       <ErrorInformationWrapper>
         <WithdrawTitle>로그인에 실패했어요</WithdrawTitle>
         <WithdrawDescription>
@@ -81,7 +82,7 @@ const OAuthCallbackPage = () => {
   )
 }
 
-const Wrapper = render.section('flex min-h-[100dvh] w-full flex-col items-center justify-center')
+const Wrapper = render.extend(PageLayout, 'items-center justify-center')
 
 const LoadingText = render.extend(RaisingText, 'mt-12 text-gray-500')
 
@@ -95,7 +96,7 @@ const SubText = render.extend(RaisingText, 'text-gray-400')
 
 const AlertContainer = render.div('mt-20 flex w-full flex-col items-center justify-center gap-6')
 
-const EmailBox = render.div('mt-32 flex h-90 w-350 items-center justify-center rounded-[8px] bg-[#f9f9f9]')
+const EmailBox = render.div('mt-32 flex h-90 w-350 items-center justify-center rounded-8 bg-[#f9f9f9]')
 
 const WithdrawButtonWrapper = render.div('mb-154 flex w-full flex-col items-center justify-center gap-12')
 
