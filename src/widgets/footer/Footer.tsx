@@ -1,4 +1,4 @@
-import { ramenroadEmail } from '@/entities/ramenya/model'
+import { ramenroadEmail } from '@/shared/config'
 import { IconInstagram } from '@/shared/ui/icon'
 import { Line } from '@/shared/ui/line'
 import render from '@/shared/ui/render'
