@@ -98,6 +98,26 @@ type DetailContent = {
 
 const RATING_STARS = [1, 2, 3, 4, 5] as const
 
+const MAP_RESULT_SCROLL_STORAGE_KEY = 'mapResultListScrollTop'
+
+const getStoredScrollTop = (): number => {
+  if (typeof window === 'undefined') {
+    return 0
+  }
+
+  const storedScrollTop = Number(window.sessionStorage.getItem(MAP_RESULT_SCROLL_STORAGE_KEY))
+
+  return Number.isFinite(storedScrollTop) ? storedScrollTop : 0
+}
+
+const saveScrollTop = (scrollTop: number) => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.sessionStorage.setItem(MAP_RESULT_SCROLL_STORAGE_KEY, String(scrollTop))
+}
+
 export const ResultListOverlay = <T,>({
   FilterSection,
   ReviewCard,
@@ -122,7 +142,8 @@ export const ResultListOverlay = <T,>({
 }: ResultListOverlayProps<T>) => {
   const navigate = useNavigate()
   const listContentRef = useRef<HTMLElement | null>(null)
-  const listScrollTopRef = useRef(0)
+  const initialScrollTop = useMemo(() => getStoredScrollTop(), [])
+  const listScrollTopRef = useRef(initialScrollTop)
   const itemIds = useMemo(() => items.map((item) => item.id), [items])
   const selectedItem = useMemo(
     () => items.find((item) => item.id === (detailId ?? selectedId)) ?? null,
@@ -141,6 +162,7 @@ export const ResultListOverlay = <T,>({
     }
 
     listScrollTopRef.current = listContentRef.current.scrollTop
+    saveScrollTop(listScrollTopRef.current)
   }, [])
 
   const handleListContentRef = useCallback((node: unknown) => {
