@@ -39,6 +39,7 @@ const DEFAULT_CENTER: Coordinate = {
 const DEFAULT_ZOOM = 14
 const DEFAULT_RADIUS = 3_000
 const MAP_FILTER_STORAGE_KEY = 'mapPageFilterOptions'
+const MAP_SHEET_HEIGHT_STORAGE_KEY = 'mapPageSheetHeight'
 const MAP_SHEET_BOTTOM_OFFSET = 56
 const MAP_FLOATING_BUTTON_GAP = 16
 const sortValues = Object.values(SortType)
@@ -85,6 +86,29 @@ const saveFilterOptions = (filterOptions: FilterOptions) => {
   }
 
   window.sessionStorage.setItem(MAP_FILTER_STORAGE_KEY, JSON.stringify(filterOptions))
+}
+
+const sheetHeightValues = Object.values(MAP_RESULT_SHEET_HEIGHTS)
+
+const isSheetHeight = (value: unknown): value is MapResultSheetHeight =>
+  typeof value === 'string' && sheetHeightValues.includes(value as MapResultSheetHeight)
+
+const getInitialSheetHeight = (): MapResultSheetHeight => {
+  if (typeof window === 'undefined') {
+    return MAP_RESULT_SHEET_HEIGHTS.HALF
+  }
+
+  const storedSheetHeight = window.sessionStorage.getItem(MAP_SHEET_HEIGHT_STORAGE_KEY)
+
+  return isSheetHeight(storedSheetHeight) ? storedSheetHeight : MAP_RESULT_SHEET_HEIGHTS.HALF
+}
+
+const saveSheetHeight = (sheetHeight: MapResultSheetHeight) => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.sessionStorage.setItem(MAP_SHEET_HEIGHT_STORAGE_KEY, sheetHeight)
 }
 
 const parseNumberParam = (value: string | null) => {
@@ -242,7 +266,7 @@ export const useMapSearchPage = () => {
   const [needsRefresh, setNeedsRefresh] = useState(false)
   const [currentLocation, setCurrentLocation] = useState<Coordinate | null>(null)
   const [focusRequest, setFocusRequest] = useState<NaverMapFocusRequest | null>(null)
-  const [resultSheetHeight, setResultSheetHeight] = useState<MapResultSheetHeight>(MAP_RESULT_SHEET_HEIGHTS.HALF)
+  const [resultSheetHeight, setResultSheetHeight] = useState<MapResultSheetHeight>(getInitialSheetHeight)
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(getInitialFilterOptions)
   const isFirstIdleRef = useRef(true)
   const suppressNextIdleRef = useRef(false)
@@ -271,6 +295,10 @@ export const useMapSearchPage = () => {
   useEffect(() => {
     saveFilterOptions(filterOptions)
   }, [filterOptions])
+
+  useEffect(() => {
+    saveSheetHeight(resultSheetHeight)
+  }, [resultSheetHeight])
 
   const selectedId = searchParams.get('selectedId')
   const detailSheetId = searchParams.get('sheet') === 'detail' ? selectedId : null
