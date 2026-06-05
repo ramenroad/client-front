@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useMyInfoQuery } from '@/entities/viewer/api'
-import { useAuthSession } from '@/features/auth'
+import { useAuthSession } from '@/entities/session/model'
 
 export const useMyProfilePage = () => {
   const navigate = useNavigate()

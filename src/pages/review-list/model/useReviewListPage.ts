@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useMyInfoQuery } from '@/entities/viewer/api'
-import { useAuthSession } from '@/features/auth'
+import { useAuthSession } from '@/entities/session/model'
 import { useIntersectionObserver } from '@/shared/lib/useIntersectionObserver'
 
 export const useReviewListPage = () => {

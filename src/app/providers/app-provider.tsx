@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
-import { authApi, authStore } from '@/features/auth'
+import { authStore } from '@/entities/session/model'
+import { authApi } from '@/features/auth'
 import { initializeHttpAuth } from '@/shared/api'
 import { ThemeProvider } from '@/shared/model'
 import { PopupProvider } from '@/shared/ui/popup'

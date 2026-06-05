@@ -8,7 +8,7 @@ import {
   useReviewDetailQuery,
   useUpdateReviewMutation,
 } from '@/entities/review/api'
-import { useAuthSession } from '@/features/auth'
+import { useAuthSession } from '@/entities/session/model'
 import { useImageUpload } from '@/shared/lib/useImageUpload'
 import { useToast } from '@/shared/ui/toast'
 import { MAX_REVIEW_IMAGES, MIN_REVIEW_LENGTH, REVIEW_FORM_COPY } from './constants'

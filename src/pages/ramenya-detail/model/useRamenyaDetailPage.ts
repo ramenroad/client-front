@@ -7,7 +7,7 @@ import {
 } from '@/entities/ramenya/model'
 import { useRamenyaReviewImagesQuery, useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useMyInfoQuery } from '@/entities/viewer/api'
-import { useAuthSession } from '@/features/auth'
+import { useAuthSession } from '@/entities/session/model'
 import { openUrl } from '@/shared/lib/browser'
 import { isMobileDevice } from '@/shared/lib/image'
 
