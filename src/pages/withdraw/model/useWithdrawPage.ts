@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { authStore, useAuthSession, useWithdrawMutation } from '@/features/auth'
+import { authStore, useAuthSession } from '@/entities/session/model'
+import { useWithdrawMutation } from '@/features/auth'
 import { useToast } from '@/shared/ui/toast'
 
 const WITHDRAW_CONFIRM_TEXT = '확인했습니다'

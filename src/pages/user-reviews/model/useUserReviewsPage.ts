@@ -6,7 +6,7 @@ import {
   useUserReviewsInfiniteQuery,
 } from '@/entities/review/api'
 import { useMyInfoQuery, useUserInfoQuery, viewerQueryKeys } from '@/entities/viewer/api'
-import { useAuthSession } from '@/features/auth'
+import { useAuthSession } from '@/entities/session/model'
 import { useUpdateIsPublicMutation } from '@/features/profile'
 import { useIntersectionObserver } from '@/shared/lib/useIntersectionObserver'
 import { useToast } from '@/shared/ui/toast'

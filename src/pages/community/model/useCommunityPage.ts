@@ -8,7 +8,7 @@ import {
   type CommunityBoardListTabKey,
 } from '@/entities/community/model'
 import { getCommunityBoardPopularityScore } from '@/entities/community/lib'
-import { useAuthSession } from '@/features/auth'
+import { useAuthSession } from '@/entities/session/model'
 import { useIntersectionObserver } from '@/shared/lib/useIntersectionObserver'
 import { useToast } from '@/shared/ui/toast'
 

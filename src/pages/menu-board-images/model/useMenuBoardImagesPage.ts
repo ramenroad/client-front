@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 import { useDeleteMenuBoardMutation } from '@/entities/menu-board/api'
 import { ramenyaQueryKeys, useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import { useMyInfoQuery } from '@/entities/viewer/api'
-import { useAuthSession } from '@/features/auth'
+import { useAuthSession } from '@/entities/session/model'
 import { useToast } from '@/shared/ui/toast'
 
 export const useMenuBoardImagesPage = () => {

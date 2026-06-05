@@ -7,7 +7,7 @@ import {
   MAX_COMMUNITY_IMAGE_COUNT,
   type CommunityBoardFilterCategory,
 } from '@/entities/community/model'
-import { useAuthSession } from '@/features/auth'
+import { useAuthSession } from '@/entities/session/model'
 import { useImageUpload, type UploadImageValue } from '@/shared/lib/useImageUpload'
 import { useToast } from '@/shared/ui/toast'
 
