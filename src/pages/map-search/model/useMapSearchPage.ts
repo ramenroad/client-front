@@ -136,7 +136,7 @@ const normalizeSearchText = (value: string) => value.trim().toLowerCase()
 const isInactiveRamenya = (ramenya: MapRamenya) => {
   const { status } = checkBusinessStatus(ramenya.businessHours)
 
-  return status === OpenStatus.CLOSED || status === OpenStatus.DAY_OFF
+  return status !== OpenStatus.OPEN
 }
 
 const matchesOpenFilter = (ramenya: MapRamenya) => {
