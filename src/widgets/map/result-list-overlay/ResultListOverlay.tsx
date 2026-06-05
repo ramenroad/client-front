@@ -1,5 +1,5 @@
 import storeImage from '@/assets/images/store.png'
-import { Fragment, useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Fragment, useCallback, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   checkBusinessStatus,
@@ -32,8 +32,6 @@ import { Line } from '@/shared/ui/line'
 import { NoStoreBox } from '@/shared/ui/no-store-box'
 import render from '@/shared/ui/render'
 import { TopBar } from '@/shared/ui/top-bar'
-import { FilterSection } from '@/widgets/ramenya'
-import { ReviewCard } from '@/widgets/review'
 import { useResultListOverlay } from './model/useResultListOverlay'
 import type { MapResultSheetHeight } from './model/sheetHeight'
 
@@ -51,7 +49,19 @@ export interface ResultListItem<T> {
   ramenya: T
 }
 
+type FilterSectionComponent = ComponentType<{
+  filterOptions: FilterOptions
+  onFilterChange: (filterOptions: FilterOptions) => void
+}>
+
+type ReviewCardComponent = ComponentType<{
+  review: Review
+  editable: boolean
+}>
+
 interface ResultListOverlayProps<T> {
+  FilterSection: FilterSectionComponent
+  ReviewCard: ReviewCardComponent
   items: ResultListItem<T>[]
   height: MapResultSheetHeight
   selectedId?: string | null
@@ -89,6 +99,8 @@ type DetailContent = {
 const RATING_STARS = [1, 2, 3, 4, 5] as const
 
 export const ResultListOverlay = <T,>({
+  FilterSection,
+  ReviewCard,
   height,
   items,
   selectedId,
@@ -167,6 +179,7 @@ export const ResultListOverlay = <T,>({
       {isDetailOpen ? (
         <MapDetailSheetContent
           key={detailId ?? selectedItem?.id ?? 'detail'}
+          ReviewCard={ReviewCard}
           id={detailId ?? selectedItem?.id ?? ''}
           selectedItem={selectedItem}
           detail={detail}
@@ -256,6 +269,7 @@ const createDetailContent = <T,>({
 }
 
 const MapDetailSheetContent = <T,>({
+  ReviewCard,
   id,
   selectedItem,
   detail,
@@ -267,6 +281,7 @@ const MapDetailSheetContent = <T,>({
   onBack,
   onDetailPageOpen,
 }: {
+  ReviewCard: ReviewCardComponent
   id: string
   selectedItem?: ResultListItem<T> | null
   detail?: RamenyaDetail | null
@@ -453,6 +468,7 @@ const MapDetailSheetContent = <T,>({
         <Divider />
 
         <MapReviewSection
+          ReviewCard={ReviewCard}
           reviews={reviews}
           reviewCount={content.reviewCount ?? 0}
           isLoading={isReviewsLoading}
@@ -475,11 +491,13 @@ const MapDetailSheetContent = <T,>({
 }
 
 const MapReviewSection = ({
+  ReviewCard,
   reviews,
   reviewCount,
   isLoading,
   isError,
 }: {
+  ReviewCard: ReviewCardComponent
   reviews: Review[]
   reviewCount: number
   isLoading: boolean

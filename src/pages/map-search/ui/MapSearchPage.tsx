@@ -4,6 +4,8 @@ import { SearchOverlay } from '@/widgets/map/search-overlay'
 import { NaverMap } from '@/widgets/map/naver-map'
 import { RefreshOverlay } from '@/widgets/map/refresh-overlay'
 import { ResultListOverlay } from '@/widgets/map/result-list-overlay'
+import { FilterSection } from '@/widgets/ramenya'
+import { ReviewCard } from '@/widgets/review'
 import { useMapSearchPage } from '../model/useMapSearchPage'
 
 const MapSearchPage = () => {
@@ -81,6 +83,8 @@ const MapSearchPage = () => {
       )}
 
       <ResultListOverlay
+        FilterSection={FilterSection}
+        ReviewCard={ReviewCard}
         items={resultItems}
         height={resultSheetHeight}
         selectedId={selectedId}
