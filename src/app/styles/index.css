@@ -132,6 +132,21 @@
   scrollbar-width: none;
 }
 
+@utility thin-scrollbar {
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d9d9d9;
+    border-radius: 3px;
+  }
+}
+
 @utility font-10-r {
   font-size: 10px;
   line-height: 15px;

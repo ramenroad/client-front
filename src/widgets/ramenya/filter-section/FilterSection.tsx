@@ -185,7 +185,7 @@ const FilterBottomPopup = ({
           <SectionTitle>정렬</SectionTitle>
           <ButtonGroup>
             {sortOptions.map((sort) => (
-              <FilterButton key={sort} type="button" data-active={filterOptions.sort === sort} onClick={() => handleSortClick(sort)}>
+              <FilterButton key={sort} type="button" data-popup data-active={filterOptions.sort === sort} onClick={() => handleSortClick(sort)}>
                 {sort}
               </FilterButton>
             ))}
@@ -199,6 +199,7 @@ const FilterBottomPopup = ({
               <FilterButton
                 key={ramenyaGenre}
                 type="button"
+                data-popup
                 data-active={ramenyaGenre === pinnedGenre || filterOptions.genre.includes(ramenyaGenre)}
                 data-pinned={ramenyaGenre === pinnedGenre}
                 onClick={() => handleGenreClick(ramenyaGenre)}
@@ -272,7 +273,7 @@ const FilterCount = render.div(
 const Divider = render.extend(Line, 'h-18')
 
 const FilterButton = render.button(
-  'font-14-r flex shrink-0 cursor-pointer items-center gap-2 rounded-full border-0 bg-filter-background px-12 py-4 text-filter-text shadow-none outline-none data-[active=true]:bg-filter-active-background data-[active=true]:text-filter-active-text data-[pinned=true]:pl-8',
+  'font-14-r flex shrink-0 cursor-pointer items-center gap-2 rounded-full border-0 bg-filter-background px-12 py-4 text-filter-text shadow-none outline-none data-[active=true]:bg-filter-active-background data-[active=true]:text-filter-active-text data-[pinned=true]:pl-8 data-[popup=true]:py-6',
 )
 
 const PopupWrapper = render.div('flex w-full flex-col gap-20')

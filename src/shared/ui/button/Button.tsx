@@ -16,7 +16,7 @@ export const Button = ({ variant = "primary", ...props }: ButtonProps) => {
         variant === "secondary" ? "bg-surface text-secondary border border-solid border-muted" : "",
         variant === "gray" ? "bg-surface-muted text-primary" : "",
         variant === "gray-outline" ? "bg-transparent text-muted border border-solid border-outline-muted" : "",
-        props.disabled ? "bg-disabled cursor-not-allowed text-muted" : "",
+        props.disabled ? "bg-disabled cursor-not-allowed" : "",
         props.className ?? "",
       )}
     />

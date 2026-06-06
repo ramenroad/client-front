@@ -455,7 +455,7 @@ const MenuBoardSection = ({
 
   return (
     <>
-      <SectionWrapper>
+      <SectionWrapper className="gap-14">
         <SectionHeader>
           <SectionTitle>메뉴판</SectionTitle>
           {menuBoard.length > 0 && <SmallActionButton onClick={onNavigateMenuBoardSubmitPage}>등록하기</SmallActionButton>}
@@ -463,7 +463,7 @@ const MenuBoardSection = ({
         {menuBoard.length === 0 ? (
           <EmptyBox>
             <IconMenuBoard />
-            <EmptyTitle>등록된 메뉴판이 없습니다</EmptyTitle>
+            <EmptyTitle className="pt-8">등록된 메뉴판이 없습니다</EmptyTitle>
             <EmptyDescription>첫 등록의 주인공이 되어주세요!</EmptyDescription>
             <PrimaryPillButton type="button" onClick={onNavigateMenuBoardSubmitPage}>
               등록하기
@@ -482,10 +482,10 @@ const MenuBoardSection = ({
               ))}
             </HorizontalImageList>
             <Line />
-            <GrayActionButton type="button" onClick={onNavigateMenuBoardImagesPage}>
+            <MenuBoardViewAllButton type="button" onClick={onNavigateMenuBoardImagesPage}>
               <ButtonText>전체 메뉴판 보기</ButtonText>
               <IconArrowRight color="#888888" />
-            </GrayActionButton>
+            </MenuBoardViewAllButton>
           </MenuBoardContainer>
         )}
       </SectionWrapper>
@@ -813,21 +813,21 @@ const EmptyDescription = render.div('font-14-r text-gray-700')
 
 const RecommendMenuContainer = render.div('flex flex-col gap-14')
 
-const RecommendMenuBox = render.div('flex flex-col gap-2')
+const RecommendMenuBox = render.div('flex flex-col')
 
 const RecommendMenuName = render.div('font-14-m text-black')
 
 const RecommendMenuPrice = render.div('font-14-sb text-black')
 
 const SmallActionButton = render.button(
-  'flex h-22 cursor-pointer items-center justify-center rounded-full border border-solid border-border bg-transparent px-10 font-12-m text-gray-500 shadow-none outline-none',
+  'flex h-18 w-61 cursor-pointer items-center justify-center rounded-full border border-solid border-border bg-transparent font-12-m text-gray-500 shadow-none outline-none',
 )
 
 const EmptyBox = render.div('flex flex-col items-center justify-center text-center')
 
 const EmptyStateImage = render.img('w-80 pb-8')
 
-const EmptyTitle = render.div('pt-8 pb-4 font-16-r text-black')
+const EmptyTitle = render.div('pb-4 font-16-r text-black')
 
 const PrimaryPillButton = render.button(
   'mt-16 flex w-fit cursor-pointer items-center justify-center gap-2 rounded-full border-none bg-bright-orange px-32 py-10 font-16-m text-orange shadow-none outline-none',
@@ -841,6 +841,10 @@ const MenuBoardImage = render.img('h-110 w-110 cursor-pointer rounded-8 object-c
 
 const GrayActionButton = render.button(
   'flex w-full cursor-pointer items-center justify-center gap-2 rounded-8 border-none bg-border py-10 font-14-m text-black shadow-none outline-none',
+)
+
+const MenuBoardViewAllButton = render.button(
+  'flex h-48 w-full cursor-pointer items-center justify-center gap-2 rounded-8 border-none bg-border py-12 font-16-sb text-gray-900 shadow-none outline-none',
 )
 
 const ButtonText = render.span('text-inherit')

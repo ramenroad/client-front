@@ -22,7 +22,7 @@ export const RefreshOverlay = ({ onRefresh }: RefreshOverlayProps) => {
 const Container = render.div('absolute-center-x absolute top-80 z-10')
 
 const RefreshButton = render.button(
-  'z-10 flex h-34 w-125 cursor-pointer items-center gap-4 rounded-full border-none bg-white px-14 py-8 shadow outline-none',
+  'z-10 flex h-34 w-125 cursor-pointer items-center gap-4 rounded-full border-none bg-white pl-14 pr-16 py-8 shadow outline-none',
 )
 
 const RefreshText = render.extend(RaisingText, 'whitespace-nowrap text-gray-700')

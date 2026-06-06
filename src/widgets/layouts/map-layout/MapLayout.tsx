@@ -13,6 +13,6 @@ const MapLayout = () => {
   )
 }
 
-const MapScreen = render.main('relative h-[100dvh] w-full overflow-hidden box-border pb-56')
+const MapScreen = render.main('relative h-[calc(100dvh-56px)] w-full overflow-hidden box-border pb-56')
 
 export default MapLayout

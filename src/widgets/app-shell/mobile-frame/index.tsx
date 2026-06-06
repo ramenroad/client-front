@@ -16,7 +16,7 @@ const MobileFrame = ({ children }: MobileFrameProps) => {
 const Screen = render.section('box-border flex min-h-[100dvh] justify-center overflow-hidden bg-background')
 
 const View = render.main(
-  'relative box-border flex min-h-[100dvh] w-390 flex-col items-center border-0 border-x border-solid border-outline bg-surface text-primary',
+  'relative box-border flex min-h-[100dvh] w-390 flex-col items-center border-0 border-x border-solid border-outline-muted bg-surface text-primary',
 )
 
 export default MobileFrame
