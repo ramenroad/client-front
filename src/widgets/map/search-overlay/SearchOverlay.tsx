@@ -13,6 +13,7 @@ interface SearchOverlayProps extends ComponentProps<'input'> {
   keyword: string
   setKeyword: (value: string) => void
   isExternal?: boolean
+  isHidden?: boolean
   isSearchOverlayOpen?: boolean
   setIsSearchOverlayOpen?: (value: boolean) => void
 }
@@ -23,6 +24,7 @@ export const SearchOverlay = ({
   keyword,
   setKeyword,
   isExternal = false,
+  isHidden = false,
   isSearchOverlayOpen = false,
   setIsSearchOverlayOpen,
   ...rest
@@ -68,6 +70,7 @@ export const SearchOverlay = ({
           {...rest}
           inputRef={inputRef}
           keyword={keyword}
+          isHidden={isHidden && !isFocused}
           showBackIcon={isFocused || isExternal}
           showSearchIcon={!isFocused}
           onClose={handleCloseOverlay}

@@ -7,6 +7,7 @@ interface SearchOverlayInputBarProps extends Omit<ComponentPropsWithoutRef<'inpu
   keyword: string
   showBackIcon: boolean
   showSearchIcon: boolean
+  isHidden?: boolean
   onClose: () => void
   onChange: (event: ChangeEvent<HTMLInputElement>) => void
   onFocus: () => void
@@ -19,6 +20,7 @@ export const SearchOverlayInputBar = ({
   keyword,
   showBackIcon,
   showSearchIcon,
+  isHidden = false,
   onClose,
   onChange,
   onFocus,
@@ -27,7 +29,7 @@ export const SearchOverlayInputBar = ({
   ...rest
 }: SearchOverlayInputBarProps) => {
   return (
-    <SearchOverlayContainer>
+    <SearchOverlayContainer data-hidden={isHidden}>
       {showBackIcon && <FocusResetIcon onClick={onClose} />}
       <SearchBox>
         {showSearchIcon && (
@@ -53,7 +55,7 @@ export const SearchOverlayInputBar = ({
 }
 
 const SearchOverlayContainer = render.figure(
-  'absolute top-16 left-0 right-0 z-[200] m-0 px-20 h-48 box-border flex gap-12 items-center',
+  'absolute top-16 left-0 right-0 z-[200] m-0 px-20 h-48 box-border flex gap-12 items-center transition-[transform,opacity] duration-300 ease-out data-[hidden=true]:pointer-events-none data-[hidden=true]:-translate-y-[200%] data-[hidden=true]:opacity-0',
 )
 
 const SearchBox = render.div(

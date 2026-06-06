@@ -34,6 +34,9 @@ const MapSearchPage = () => {
     setResultSheetHeight,
     shouldShowCurrentLocationButton,
     currentLocationButtonBottom,
+    isSearchBarHidden,
+    searchBarBottomPx,
+    handleSearchBarOverlapChange,
     handleMapReady,
     handleMapIdle,
     handleMapFocusMove,
@@ -52,6 +55,7 @@ const MapSearchPage = () => {
       <SearchOverlay
         keyword={keyword}
         setKeyword={setKeyword}
+        isHidden={isSearchBarHidden}
         onSelectKeyword={handleKeywordSelect}
         onClearKeyword={handleKeywordClear}
       />
@@ -98,7 +102,9 @@ const MapSearchPage = () => {
         isDetailError={isDetailError}
         isDetailReviewsLoading={isDetailReviewsLoading}
         isDetailReviewsError={isDetailReviewsError}
+        searchBarBottomPx={searchBarBottomPx}
         onHeightChange={setResultSheetHeight}
+        onSearchBarOverlapChange={handleSearchBarOverlapChange}
         onFilterChange={setFilterOptions}
         onSelect={handleResultClick}
         onOpenDetail={handleOpenDetailSheet}
