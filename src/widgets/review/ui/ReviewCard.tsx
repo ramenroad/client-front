@@ -296,13 +296,13 @@ const MenuSeparator = render.section('h-10 w-1 bg-gray-100')
 
 const ReviewCardSubHeaderRightSection = render.div('h-18 shrink-0 leading-18 text-gray-500')
 
-const ReviewCardContent = render.div('mt-12 flex flex-col leading-21')
+const ReviewCardContent = render.div('mt-12 leading-21')
 
 const ReviewText = render.extend(RaisingText, 'whitespace-pre-line')
 
-const MoreButton = render.button('w-fit cursor-pointer border-none bg-transparent p-0 font-14-m text-gray-400')
+const MoreButton = render.button('ml-4 cursor-pointer border-none bg-transparent p-0 font-14-m text-gray-400')
 
-const ReviewImages = render.div('relative -mr-20 mt-12 flex items-center gap-1 overflow-x-auto')
+const ReviewImages = render.div('relative -mr-20 mt-12 flex items-center gap-1 overflow-x-auto scrollbar-hide')
 
 const ReviewImageButton = render.button(
   'shrink-0 cursor-pointer overflow-hidden border-none bg-transparent p-0 shadow-none outline-none first:rounded-l-8 last:rounded-r-8 only:rounded-8',
