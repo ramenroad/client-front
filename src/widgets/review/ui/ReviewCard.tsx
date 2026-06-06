@@ -277,7 +277,7 @@ const ReviewerReviewCountDivider = render.span('h-10 w-1 bg-gray-100')
 const ReviewActionWrapper = render.div('flex shrink-0 flex-row gap-6')
 
 const ActionButton = render.button(
-  'h-25 w-41 cursor-pointer rounded-12 border-none bg-border p-0 text-black shadow-none outline-none',
+  'flex h-25 w-41 cursor-pointer items-center justify-center rounded-12 border-none bg-border p-0 text-black shadow-none outline-none',
 )
 
 const ActionText = render.extend(RaisingText, 'whitespace-nowrap')
