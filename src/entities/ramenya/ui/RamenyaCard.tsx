@@ -226,9 +226,9 @@ const RamenyaDistance = render.section('font-14-m flex h-17 shrink-0 items-cente
 
 const VerticalLine = render.span('h-10 w-1 shrink-0 bg-gray-100')
 
-const RamenyaAddress = render.span('font-14-r h-17 min-w-0 flex-1 truncate text-gray-700')
+const RamenyaAddress = render.span('font-14-r leading-17 h-17 min-w-0 flex-1 truncate text-gray-700')
 
-const RamenyaOpenStatusWrapper = render.span('font-12-r flex h-18 items-center gap-2')
+const RamenyaOpenStatusWrapper = render.span('font-12-r flex h-14 items-center gap-2')
 
 const RamenyaOpenTime = render.span('font-12-r text-gray-700')
 

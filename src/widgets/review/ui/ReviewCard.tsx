@@ -89,7 +89,7 @@ const ReviewHeader = ({ review, mypage, editable, onEdit, onDelete }: {
             {review.userId.profileImageUrl ? (
               <ReviewerProfileImage src={review.userId.profileImageUrl} alt={review.userId.nickname} />
             ) : (
-              <IconUnSignInUserProfile />
+              <IconUnSignInUserProfile width={36} height={36} />
             )}
             <ReviewerInfoBox>
               <RaisingText size={14} weight="sb">
@@ -258,7 +258,7 @@ const ReviewCardHeader = render.div('flex flex-row items-start justify-between g
 
 const ReviewCardTitle = render.div('flex min-w-0 flex-1 flex-row items-center gap-2')
 
-const RamenyaButton = render.button('flex min-w-0 cursor-pointer items-center gap-2 border-none bg-transparent p-0 text-left')
+const RamenyaButton = render.button('flex min-w-0 cursor-pointer items-center border-none bg-transparent p-0 text-left')
 
 const ReviewNameButton = render.button('flex cursor-pointer items-center gap-10 border-none bg-transparent p-0 text-left')
 
@@ -268,7 +268,7 @@ const ReviewerInfoBox = render.div('flex min-w-0 flex-col')
 
 const ReviewerReviewInfo = render.div('flex flex-row items-center gap-6 text-gray-70')
 
-const ReviewerReviewMeta = render.extend(RaisingText, 'flex items-center gap-2')
+const ReviewerReviewMeta = render.extend(RaisingText)
 
 const ReviewerReviewValue = render.extend(RaisingText)
 

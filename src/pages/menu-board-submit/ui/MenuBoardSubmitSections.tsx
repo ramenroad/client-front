@@ -159,7 +159,7 @@ const TextAreaContainer = render.div(
 )
 
 const DescriptionTextArea = render.textarea(
-  'font-14-r h-110 w-full resize-none border-none bg-transparent font-pretendard text-black outline-none',
+  'font-14-r h-110 w-full resize-none border-none bg-transparent font-pretendard text-black outline-none thin-scrollbar',
 )
 
 const CharacterCount = render.div('absolute bottom-14 right-12 font-14-r text-gray-400')

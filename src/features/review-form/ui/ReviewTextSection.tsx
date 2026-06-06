@@ -44,7 +44,7 @@ const TextAreaContainer = render.div(
 )
 
 const ReviewTextArea = render.textarea(
-  'font-16-r h-214 w-full resize-none border-none bg-transparent font-pretendard text-black outline-none scrollbar-thin',
+  'font-16-r h-214 w-full resize-none border-none bg-transparent font-pretendard text-black outline-none thin-scrollbar',
 )
 
 const CharacterCount = render.div('absolute bottom-14 right-12 font-14-r text-gray-400')

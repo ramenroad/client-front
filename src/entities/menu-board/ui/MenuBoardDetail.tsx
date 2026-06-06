@@ -65,7 +65,7 @@ export const MenuBoardDetail = ({
 }
 
 const MenuBoardDetailWrapper = render.div(
-  'relative box-border flex h-84 w-240 flex-col justify-center gap-10 rounded-8 bg-white/10 px-20 py-16 font-14-m text-black',
+  'relative box-border flex h-84 w-240 flex-col justify-center gap-10 rounded-8 bg-white/[0.12] px-20 py-16 font-14-m text-black',
 )
 
 const Header = render.div('flex items-center')
