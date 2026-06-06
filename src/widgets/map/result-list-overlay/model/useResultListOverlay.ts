@@ -8,13 +8,20 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from 'react'
-import { MAP_RESULT_SHEET_HEIGHT_VALUES, MAP_RESULT_SHEET_HEIGHTS, type MapResultSheetHeight } from './sheetHeight'
+import {
+  clampSheetDvh,
+  MAP_RESULT_SHEET_CONTENT_MIN_DVH,
+  MAP_RESULT_SHEET_MAX_DVH,
+  MAP_RESULT_SHEET_MIN_DVH,
+  parseSheetDvh,
+  toSheetDvh,
+} from './sheetHeight'
 
 interface UseResultListOverlayParams {
-  currentHeight: MapResultSheetHeight
+  currentHeight: string
   itemIds: string[]
   selectedId?: string | null
-  onHeightChange: (height: MapResultSheetHeight) => void
+  onHeightChange: (height: string) => void
 }
 
 type DragStart = {
@@ -23,46 +30,14 @@ type DragStart = {
   startHeightPx: number
 }
 
+// 키보드 화살표 1회당 높이 변화량(dvh)
+const KEYBOARD_STEP_DVH = 10
+
 const getViewportHeight = () => window.visualViewport?.height || window.innerHeight
 
-const dvhToPx = (dvh: string) => {
-  const dvhValue = parseFloat(dvh.replace('dvh', ''))
-  return (dvhValue / 100) * getViewportHeight()
-}
+const dvhToPx = (dvh: number) => (dvh / 100) * getViewportHeight()
 
-const pxToDvh = (px: number) => `${(px / getViewportHeight()) * 100}dvh`
-
-const clampSheetHeightPx = (heightPx: number) => {
-  const minHeightPx = dvhToPx(MAP_RESULT_SHEET_HEIGHTS.COLLAPSED)
-  const maxHeightPx = dvhToPx(MAP_RESULT_SHEET_HEIGHTS.EXPANDED)
-
-  return Math.max(minHeightPx, Math.min(maxHeightPx, heightPx))
-}
-
-const getClosestSheetHeight = (heightPx: number) => {
-  const closestHeight = MAP_RESULT_SHEET_HEIGHT_VALUES.reduce((closest, height) => {
-    const closestDistance = Math.abs(dvhToPx(closest) - heightPx)
-    const nextDistance = Math.abs(dvhToPx(height) - heightPx)
-
-    return nextDistance < closestDistance ? height : closest
-  }, MAP_RESULT_SHEET_HEIGHTS.COLLAPSED)
-
-  return closestHeight
-}
-
-const getNextHeight = (currentHeight: MapResultSheetHeight) => {
-  const currentIndex = MAP_RESULT_SHEET_HEIGHT_VALUES.indexOf(currentHeight)
-  const nextIndex = Math.min(currentIndex + 1, MAP_RESULT_SHEET_HEIGHT_VALUES.length - 1)
-
-  return MAP_RESULT_SHEET_HEIGHT_VALUES[nextIndex]
-}
-
-const getPreviousHeight = (currentHeight: MapResultSheetHeight) => {
-  const currentIndex = MAP_RESULT_SHEET_HEIGHT_VALUES.indexOf(currentHeight)
-  const nextIndex = Math.max(currentIndex - 1, 0)
-
-  return MAP_RESULT_SHEET_HEIGHT_VALUES[nextIndex]
-}
+const pxToDvh = (px: number) => (px / getViewportHeight()) * 100
 
 export const useResultListOverlay = ({
   currentHeight,
@@ -73,17 +48,18 @@ export const useResultListOverlay = ({
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map())
   const dragStartRef = useRef<DragStart | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [dragHeight, setDragHeight] = useState<MapResultSheetHeight | string>(currentHeight)
+  const [dragHeightDvh, setDragHeightDvh] = useState(() => parseSheetDvh(currentHeight))
 
   const itemIdsKey = useMemo(() => itemIds.join('|'), [itemIds])
-  const activeHeight = isDragging ? dragHeight : currentHeight
+  const activeHeightDvh = isDragging ? dragHeightDvh : parseSheetDvh(currentHeight)
+  const isContentCollapsed = activeHeightDvh <= MAP_RESULT_SHEET_CONTENT_MIN_DVH
 
   const containerStyle = useMemo<CSSProperties>(
     () => ({
-      height: activeHeight,
+      height: `${activeHeightDvh}dvh`,
       transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     }),
-    [activeHeight, isDragging],
+    [activeHeightDvh, isDragging],
   )
 
   const registerItemRef = useCallback((id: string) => {
@@ -98,12 +74,12 @@ export const useResultListOverlay = ({
   }, [])
 
   const finishDrag = useCallback(
-    (heightPx: number) => {
-      const closestHeight = getClosestSheetHeight(heightPx)
+    (heightDvh: number) => {
+      const clampedDvh = clampSheetDvh(heightDvh)
 
       setIsDragging(false)
-      setDragHeight(closestHeight)
-      onHeightChange(closestHeight)
+      setDragHeightDvh(clampedDvh)
+      onHeightChange(toSheetDvh(clampedDvh))
       dragStartRef.current = null
     },
     [onHeightChange],
@@ -117,11 +93,11 @@ export const useResultListOverlay = ({
       dragStartRef.current = {
         pointerId: event.pointerId,
         startY: event.clientY,
-        startHeightPx: dvhToPx(currentHeight),
+        startHeightPx: dvhToPx(parseSheetDvh(currentHeight)),
       }
 
       setIsDragging(true)
-      setDragHeight(currentHeight)
+      setDragHeightDvh(parseSheetDvh(currentHeight))
     },
     [currentHeight],
   )
@@ -133,8 +109,8 @@ export const useResultListOverlay = ({
       return
     }
 
-    const nextHeightPx = clampSheetHeightPx(dragStart.startHeightPx + dragStart.startY - event.clientY)
-    setDragHeight(pxToDvh(nextHeightPx))
+    const nextHeightPx = dragStart.startHeightPx + dragStart.startY - event.clientY
+    setDragHeightDvh(clampSheetDvh(pxToDvh(nextHeightPx)))
   }, [])
 
   const handlePointerUp = useCallback(
@@ -149,8 +125,8 @@ export const useResultListOverlay = ({
         event.currentTarget.releasePointerCapture(event.pointerId)
       }
 
-      const nextHeightPx = clampSheetHeightPx(dragStart.startHeightPx + dragStart.startY - event.clientY)
-      finishDrag(nextHeightPx)
+      const nextHeightPx = dragStart.startHeightPx + dragStart.startY - event.clientY
+      finishDrag(pxToDvh(nextHeightPx))
     },
     [finishDrag],
   )
@@ -167,7 +143,7 @@ export const useResultListOverlay = ({
         event.currentTarget.releasePointerCapture(event.pointerId)
       }
 
-      finishDrag(dragStart.startHeightPx)
+      finishDrag(pxToDvh(dragStart.startHeightPx))
     },
     [finishDrag],
   )
@@ -176,12 +152,12 @@ export const useResultListOverlay = ({
     (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'ArrowUp') {
         event.preventDefault()
-        onHeightChange(getNextHeight(currentHeight))
+        onHeightChange(toSheetDvh(clampSheetDvh(parseSheetDvh(currentHeight) + KEYBOARD_STEP_DVH)))
       }
 
       if (event.key === 'ArrowDown') {
         event.preventDefault()
-        onHeightChange(getPreviousHeight(currentHeight))
+        onHeightChange(toSheetDvh(clampSheetDvh(parseSheetDvh(currentHeight) - KEYBOARD_STEP_DVH)))
       }
     },
     [currentHeight, onHeightChange],
@@ -215,10 +191,16 @@ export const useResultListOverlay = ({
 
   return {
     containerStyle,
+    activeHeightDvh,
+    isContentCollapsed,
     dragHandleProps: {
-      role: 'button',
+      role: 'slider',
       tabIndex: 0,
       'aria-label': '검색 결과 시트 높이 조절',
+      'aria-orientation': 'vertical' as const,
+      'aria-valuemin': MAP_RESULT_SHEET_MIN_DVH,
+      'aria-valuemax': MAP_RESULT_SHEET_MAX_DVH,
+      'aria-valuenow': Math.round(activeHeightDvh),
       onKeyDown: handleKeyDown,
       onPointerCancel: handlePointerCancel,
       onPointerDown: handlePointerDown,

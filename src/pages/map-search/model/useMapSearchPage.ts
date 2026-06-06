@@ -17,7 +17,13 @@ import type { Coordinate, MapViewportSnapshot } from '@/shared/lib/naver-map'
 import { calculateDistanceValue } from '@/shared/lib/number'
 import { useToast } from '@/shared/ui/toast'
 import type { NaverMapFocusRequest, NaverMapMarker } from '@/widgets/map/naver-map'
-import { MAP_RESULT_SHEET_HEIGHTS, type MapResultSheetHeight } from '@/widgets/map/result-list-overlay'
+import {
+  MAP_RESULT_SHEET_HEIGHTS,
+  MAP_RESULT_SHEET_CONTENT_MIN_DVH,
+  MAP_RESULT_SHEET_MAX_DVH,
+  MAP_RESULT_SHEET_MIN_DVH,
+  parseSheetDvh,
+} from '@/widgets/map/result-list-overlay'
 
 type MapRamenya = NearbyRamenya | SearchResult
 
@@ -40,8 +46,13 @@ const DEFAULT_ZOOM = 14
 const DEFAULT_RADIUS = 3_000
 const MAP_FILTER_STORAGE_KEY = 'mapPageFilterOptions'
 const MAP_SHEET_HEIGHT_STORAGE_KEY = 'mapPageSheetHeight'
-const MAP_SHEET_BOTTOM_OFFSET = 56
+// 시트는 앱바 바로 위(bottom-0)에 붙으므로 추가 하단 오프셋 없음.
+const MAP_SHEET_BOTTOM_OFFSET = 0
 const MAP_FLOATING_BUTTON_GAP = 16
+// 검색창(top-16 h-48 => 하단 64px) + 여유 12px. 시트 상단이 이 지점보다 위로 올라오면 검색창을 숨긴다.
+const MAP_SEARCH_BAR_BOTTOM_PX = 76
+// 이 높이(dvh) 이상에서는 현재 위치 버튼을 숨긴다(시트가 화면 상단까지 올라온 상태).
+const MAP_CURRENT_LOCATION_BUTTON_HIDE_DVH = 70
 const sortValues = Object.values(SortType)
 
 const isFilterOptions = (value: unknown): value is FilterOptions => {
@@ -88,22 +99,26 @@ const saveFilterOptions = (filterOptions: FilterOptions) => {
   window.sessionStorage.setItem(MAP_FILTER_STORAGE_KEY, JSON.stringify(filterOptions))
 }
 
-const sheetHeightValues = Object.values(MAP_RESULT_SHEET_HEIGHTS)
+const isStoredSheetHeight = (value: unknown): value is string => {
+  if (typeof value !== 'string' || !value.endsWith('dvh')) {
+    return false
+  }
 
-const isSheetHeight = (value: unknown): value is MapResultSheetHeight =>
-  typeof value === 'string' && sheetHeightValues.includes(value as MapResultSheetHeight)
+  const dvh = parseFloat(value)
+  return Number.isFinite(dvh) && dvh >= MAP_RESULT_SHEET_MIN_DVH && dvh <= MAP_RESULT_SHEET_MAX_DVH
+}
 
-const getInitialSheetHeight = (): MapResultSheetHeight => {
+const getInitialSheetHeight = (): string => {
   if (typeof window === 'undefined') {
     return MAP_RESULT_SHEET_HEIGHTS.HALF
   }
 
   const storedSheetHeight = window.sessionStorage.getItem(MAP_SHEET_HEIGHT_STORAGE_KEY)
 
-  return isSheetHeight(storedSheetHeight) ? storedSheetHeight : MAP_RESULT_SHEET_HEIGHTS.HALF
+  return isStoredSheetHeight(storedSheetHeight) ? storedSheetHeight : MAP_RESULT_SHEET_HEIGHTS.HALF
 }
 
-const saveSheetHeight = (sheetHeight: MapResultSheetHeight) => {
+const saveSheetHeight = (sheetHeight: string) => {
   if (typeof window === 'undefined') {
     return
   }
@@ -266,7 +281,8 @@ export const useMapSearchPage = () => {
   const [needsRefresh, setNeedsRefresh] = useState(false)
   const [currentLocation, setCurrentLocation] = useState<Coordinate | null>(null)
   const [focusRequest, setFocusRequest] = useState<NaverMapFocusRequest | null>(null)
-  const [resultSheetHeight, setResultSheetHeight] = useState<MapResultSheetHeight>(getInitialSheetHeight)
+  const [resultSheetHeight, setResultSheetHeight] = useState<string>(getInitialSheetHeight)
+  const [isSearchBarHidden, setIsSearchBarHidden] = useState(false)
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(getInitialFilterOptions)
   const isFirstIdleRef = useRef(true)
   const suppressNextIdleRef = useRef(false)
@@ -464,17 +480,21 @@ export const useMapSearchPage = () => {
     ? searchQuery.isFetching || (shouldSearchGloballyAsFallback && globalFallbackSearchQuery.isFetching)
     : nearbyQuery.isFetching
   const isDetailSheetOpen = Boolean(detailSheetId)
-  const shouldShowCurrentLocationButton = resultSheetHeight !== MAP_RESULT_SHEET_HEIGHTS.EXPANDED
+  const shouldShowCurrentLocationButton = parseSheetDvh(resultSheetHeight) < MAP_CURRENT_LOCATION_BUTTON_HIDE_DVH
   const currentLocationButtonBottom = `calc(${resultSheetHeight} + ${
     MAP_SHEET_BOTTOM_OFFSET + MAP_FLOATING_BUTTON_GAP
   }px)`
+
+  const handleSearchBarOverlapChange = useCallback((overlapping: boolean) => {
+    setIsSearchBarHidden(overlapping)
+  }, [])
 
   const setSelectedRamenya = useCallback(
     (ramenya: MapRamenya) => {
       const ramenyaId = getRamenyaId(ramenya)
       suppressNextIdleRef.current = true
       setResultSheetHeight((prev) =>
-        prev === MAP_RESULT_SHEET_HEIGHTS.COLLAPSED ? MAP_RESULT_SHEET_HEIGHTS.HALF : prev,
+        parseSheetDvh(prev) <= MAP_RESULT_SHEET_CONTENT_MIN_DVH ? MAP_RESULT_SHEET_HEIGHTS.HALF : prev,
       )
       setFocusRequest({
         id: `${ramenyaId}-${Date.now()}`,
@@ -723,6 +743,9 @@ export const useMapSearchPage = () => {
     setResultSheetHeight,
     shouldShowCurrentLocationButton,
     currentLocationButtonBottom,
+    isSearchBarHidden,
+    searchBarBottomPx: MAP_SEARCH_BAR_BOTTOM_PX,
+    handleSearchBarOverlapChange,
     handleMapReady,
     handleMapIdle,
     handleMapFocusMove,
