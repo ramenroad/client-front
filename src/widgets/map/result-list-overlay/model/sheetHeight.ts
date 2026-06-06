@@ -16,8 +16,9 @@ export const MAP_RESULT_SHEET_HEIGHT_VALUES = [
 export const MAP_RESULT_SHEET_MIN_DVH = 8
 export const MAP_RESULT_SHEET_MAX_DVH = 80
 
-// 이 높이(dvh) 이하에서는 내부 콘텐츠를 숨기고 상단 핸들바만 노출한다(최소 높이 영역).
-export const MAP_RESULT_SHEET_CONTENT_MIN_DVH = 20
+// 시트를 최하단(최소 높이)까지 내렸을 때만 내부 콘텐츠를 숨기고 상단 핸들바만 노출한다.
+// 클램프가 정확히 MIN 값을 만들지만 부동소수 여유를 위해 1dvh 톨러런스를 둔다.
+export const MAP_RESULT_SHEET_COLLAPSE_DVH = MAP_RESULT_SHEET_MIN_DVH + 1
 
 export const parseSheetDvh = (height: string) => {
   const parsed = parseFloat(height)

@@ -19,7 +19,7 @@ import { useToast } from '@/shared/ui/toast'
 import type { NaverMapFocusRequest, NaverMapMarker } from '@/widgets/map/naver-map'
 import {
   MAP_RESULT_SHEET_HEIGHTS,
-  MAP_RESULT_SHEET_CONTENT_MIN_DVH,
+  MAP_RESULT_SHEET_COLLAPSE_DVH,
   MAP_RESULT_SHEET_MAX_DVH,
   MAP_RESULT_SHEET_MIN_DVH,
   parseSheetDvh,
@@ -494,7 +494,7 @@ export const useMapSearchPage = () => {
       const ramenyaId = getRamenyaId(ramenya)
       suppressNextIdleRef.current = true
       setResultSheetHeight((prev) =>
-        parseSheetDvh(prev) <= MAP_RESULT_SHEET_CONTENT_MIN_DVH ? MAP_RESULT_SHEET_HEIGHTS.HALF : prev,
+        parseSheetDvh(prev) <= MAP_RESULT_SHEET_COLLAPSE_DVH ? MAP_RESULT_SHEET_HEIGHTS.HALF : prev,
       )
       setFocusRequest({
         id: `${ramenyaId}-${Date.now()}`,

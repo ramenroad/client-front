@@ -10,7 +10,7 @@ import {
 } from 'react'
 import {
   clampSheetDvh,
-  MAP_RESULT_SHEET_CONTENT_MIN_DVH,
+  MAP_RESULT_SHEET_COLLAPSE_DVH,
   MAP_RESULT_SHEET_MAX_DVH,
   MAP_RESULT_SHEET_MIN_DVH,
   parseSheetDvh,
@@ -52,7 +52,7 @@ export const useResultListOverlay = ({
 
   const itemIdsKey = useMemo(() => itemIds.join('|'), [itemIds])
   const activeHeightDvh = isDragging ? dragHeightDvh : parseSheetDvh(currentHeight)
-  const isContentCollapsed = activeHeightDvh <= MAP_RESULT_SHEET_CONTENT_MIN_DVH
+  const isContentCollapsed = activeHeightDvh <= MAP_RESULT_SHEET_COLLAPSE_DVH
 
   const containerStyle = useMemo<CSSProperties>(
     () => ({
