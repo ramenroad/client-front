@@ -38,6 +38,8 @@ interface NaverMapProps<T> {
   selectedMarkerId?: string | null
   currentLocation?: Coordinate | null
   focusRequest?: NaverMapFocusRequest | null
+  // 포커스 이동 시 대상을 화면 중앙보다 이 비율(뷰포트 높이 대비)만큼 위로 올린다. 0이면 정중앙.
+  focusOffsetRatio?: number
   onMapReady?: (viewport: MapViewportSnapshot) => void
   onMapIdle?: (viewport: MapViewportSnapshot) => void
   onFocusMove?: () => void
@@ -48,6 +50,17 @@ const DEFAULT_ZOOM = 14
 const DEFAULT_RAMENYA_MARKER_Z_INDEX = 100
 const CURRENT_LOCATION_MARKER_Z_INDEX = 500
 const SELECTED_RAMENYA_MARKER_Z_INDEX = 1_000
+
+// 하단시트가 쓰는 기준과 동일하게 동적 뷰포트 높이를 사용한다.
+const getViewportHeight = () => window.visualViewport?.height || window.innerHeight
+
+// 화면 수직 픽셀 거리를 위도 차이로 환산한다(웹 메르카토르 근사, 줌이 클수록 1px당 위도 차가 작다).
+const EQUATOR_METERS_PER_PIXEL_AT_ZOOM_0 = 156543.03392
+const METERS_PER_LATITUDE_DEGREE = 111_320
+const pixelsToLatitudeDelta = (latitude: number, pixels: number, zoom: number) => {
+  const metersPerPixel = (EQUATOR_METERS_PER_PIXEL_AT_ZOOM_0 * Math.cos((latitude * Math.PI) / 180)) / 2 ** zoom
+  return (pixels * metersPerPixel) / METERS_PER_LATITUDE_DEGREE
+}
 
 const getRamenyaMarkerZIndex = (markerId: string, selectedMarkerId?: string | null) => {
   return markerId === selectedMarkerId ? SELECTED_RAMENYA_MARKER_Z_INDEX : DEFAULT_RAMENYA_MARKER_Z_INDEX
@@ -60,6 +73,7 @@ export const NaverMap = <T,>({
   selectedMarkerId,
   currentLocation,
   focusRequest,
+  focusOffsetRatio = 0,
   onMapReady,
   onMapIdle,
   onFocusMove,
@@ -72,6 +86,7 @@ export const NaverMap = <T,>({
   const markerListenersRef = useRef<NaverMapEventListener[]>([])
   const markerIconFrameRef = useRef<number | null>(null)
   const currentLocationMarkerRef = useRef<NaverMarkerInstance | null>(null)
+  const focusOffsetRatioRef = useRef(focusOffsetRatio)
   const [status, setStatus] = useState<'error' | 'loading' | 'ready'>('loading')
 
   const markerSnapshotKey = useMemo(
@@ -274,6 +289,12 @@ export const NaverMap = <T,>({
     currentLocationMarkerRef.current.setZIndex(CURRENT_LOCATION_MARKER_Z_INDEX)
   }, [currentLocation, status])
 
+  // 최신 오프셋 비율만 클로저로 읽어, 시트 드래그로 비율이 바뀔 때마다 포커스가 재실행돼
+  // 지도가 튀는 것을 막는다(포커스 effect 의존성에는 focusOffsetRatio를 넣지 않는다).
+  useEffect(() => {
+    focusOffsetRatioRef.current = focusOffsetRatio
+  }, [focusOffsetRatio])
+
   useEffect(() => {
     const map = mapRef.current
     const maps = mapsRef.current
@@ -283,7 +304,13 @@ export const NaverMap = <T,>({
     }
 
     onFocusMove?.()
-    map.panTo(new maps.LatLng(focusRequest.position.latitude, focusRequest.position.longitude))
+
+    const { latitude, longitude } = focusRequest.position
+    // 하단시트에 가려지지 않도록 중심을 대상보다 남쪽으로 옮겨, 대상이 화면 중앙보다 위에 오게 한다.
+    // 위경도를 직접 옮기므로 단일 panTo로 부드럽게 이동하고, 북쪽 기준(회전 없음) 지도라 방향이 보장된다.
+    const offsetPx = getViewportHeight() * focusOffsetRatioRef.current
+    const latitudeShift = offsetPx > 0 ? pixelsToLatitudeDelta(latitude, offsetPx, map.getZoom()) : 0
+    map.panTo(new maps.LatLng(latitude - latitudeShift, longitude))
   }, [focusRequest, onFocusMove, status])
 
   useEffect(() => {

@@ -34,6 +34,7 @@ const MapSearchPage = () => {
     setResultSheetHeight,
     shouldShowCurrentLocationButton,
     currentLocationButtonBottom,
+    focusOffsetRatio,
     isSearchBarHidden,
     searchBarBottomPx,
     handleSearchBarOverlapChange,
@@ -67,6 +68,7 @@ const MapSearchPage = () => {
         selectedMarkerId={selectedId}
         currentLocation={currentLocation}
         focusRequest={focusRequest}
+        focusOffsetRatio={focusOffsetRatio}
         onMapReady={handleMapReady}
         onMapIdle={handleMapIdle}
         onFocusMove={handleMapFocusMove}
