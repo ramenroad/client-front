@@ -53,6 +53,8 @@ const MAP_FLOATING_BUTTON_GAP = 16
 const MAP_SEARCH_BAR_BOTTOM_PX = 76
 // 이 높이(dvh) 이상에서는 현재 위치 버튼을 숨긴다(시트가 화면 상단까지 올라온 상태).
 const MAP_CURRENT_LOCATION_BUTTON_HIDE_DVH = 70
+// 매장 포커스 시 하단시트에 가려지지 않도록 시트 높이의 절반만큼 화면 위로 올린다(보이는 지도 영역의 중앙 정렬).
+const MAP_FOCUS_LIFT_SHEET_FRACTION = 0.5
 const sortValues = Object.values(SortType)
 
 const isFilterOptions = (value: unknown): value is FilterOptions => {
@@ -484,6 +486,8 @@ export const useMapSearchPage = () => {
   const currentLocationButtonBottom = `calc(${resultSheetHeight} + ${
     MAP_SHEET_BOTTOM_OFFSET + MAP_FLOATING_BUTTON_GAP
   }px)`
+  // 포커스 좌표를 화면 중앙에서 위로 올릴 비율(뷰포트 높이 대비). NaverMap이 px로 환산해 적용한다.
+  const focusOffsetRatio = (parseSheetDvh(resultSheetHeight) / 100) * MAP_FOCUS_LIFT_SHEET_FRACTION
 
   const handleSearchBarOverlapChange = useCallback((overlapping: boolean) => {
     setIsSearchBarHidden(overlapping)
@@ -743,6 +747,7 @@ export const useMapSearchPage = () => {
     setResultSheetHeight,
     shouldShowCurrentLocationButton,
     currentLocationButtonBottom,
+    focusOffsetRatio,
     isSearchBarHidden,
     searchBarBottomPx: MAP_SEARCH_BAR_BOTTOM_PX,
     handleSearchBarOverlapChange,
