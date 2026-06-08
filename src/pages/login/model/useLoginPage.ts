@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { isOAuthProviderConfigured, redirectToOAuthProvider, type OAuthProvider } from '@/features/auth'
+import { isOAuthProviderConfigured, startOAuthLogin, type OAuthProvider } from '@/features/auth'
 import { useToast } from '@/shared/ui/toast'
 
 export const useLoginPage = () => {
@@ -8,15 +8,15 @@ export const useLoginPage = () => {
   const { openToast } = useToast()
 
   const handleLogin = useCallback(
-    (provider: OAuthProvider) => {
+    async (provider: OAuthProvider) => {
       if (!isOAuthProviderConfigured(provider)) {
-        openToast('로그인 설정이 비어있어요. OAuth Client ID를 확인해주세요.')
+        openToast('로그인 설정이 비어있어요. OAuth 설정을 확인해주세요.')
         return
       }
 
-      const redirected = redirectToOAuthProvider(provider)
+      const started = await startOAuthLogin(provider)
 
-      if (!redirected) {
+      if (!started) {
         openToast('로그인 페이지로 이동하지 못했어요.')
       }
     },

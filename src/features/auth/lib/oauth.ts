@@ -1,8 +1,14 @@
 import { getApiBaseUrl, resolveEnv } from '@/shared/config'
+import { ensureKakaoInitialized, isKakaoSdkConfigured } from '@/shared/lib/kakao-sdk'
 
 export type OAuthProvider = 'kakao' | 'naver' | 'google' | 'apple'
 
 const NAVER_OAUTH_STATE = 'ramenroad'
+
+// Kakao login is started through the JavaScript SDK so that mobile users get the
+// KakaoTalk app simple-login flow (throughTalk). The redirect still lands on
+// /oauth/kakao with ?code=, so the callback exchange is unchanged.
+const KAKAO_LOGIN_THROUGH_TALK = true
 
 export const getOAuthCallbackUrl = (provider: Exclude<OAuthProvider, 'apple'>) => {
   return `${window.location.origin}/oauth/${provider}`
@@ -23,7 +29,8 @@ export const getOAuthClientId = (provider: OAuthProvider) => {
   }
 }
 
-export const isOAuthProviderConfigured = (provider: OAuthProvider) => Boolean(getOAuthClientId(provider))
+export const isOAuthProviderConfigured = (provider: OAuthProvider) =>
+  provider === 'kakao' ? isKakaoSdkConfigured() : Boolean(getOAuthClientId(provider))
 
 export const getOAuthAuthorizationUrl = (provider: OAuthProvider) => {
   const clientId = getOAuthClientId(provider)
@@ -33,6 +40,9 @@ export const getOAuthAuthorizationUrl = (provider: OAuthProvider) => {
   }
 
   switch (provider) {
+    // Kakao login goes through startOAuthLogin -> SDK (throughTalk). This REST
+    // branch is retained only to keep the switch exhaustive; it is not used by
+    // the live login flow and keys on VITE_KAKAO_CLIENT_ID, not the SDK app key.
     case 'kakao':
       return `https://kauth.kakao.com/oauth/authorize?${new URLSearchParams({
         client_id: clientId,
@@ -75,6 +85,34 @@ export const redirectToOAuthProvider = (provider: OAuthProvider) => {
 
   window.location.href = authorizationUrl
   return true
+}
+
+// Starts Kakao login via the JavaScript SDK (KakaoTalk app simple login).
+// Returns false when the SDK key is missing or the script failed to load.
+export const loginWithKakaoSdk = async (): Promise<boolean> => {
+  const kakao = await ensureKakaoInitialized()
+
+  if (!kakao) {
+    return false
+  }
+
+  kakao.Auth.authorize({
+    redirectUri: getOAuthCallbackUrl('kakao'),
+    throughTalk: KAKAO_LOGIN_THROUGH_TALK,
+  })
+
+  return true
+}
+
+// Unified login entry point. Kakao goes through the SDK; the others use a plain
+// OAuth authorization redirect. Both login and re-login screens call this so the
+// call sites stay consistent.
+export const startOAuthLogin = async (provider: OAuthProvider): Promise<boolean> => {
+  if (provider === 'kakao') {
+    return loginWithKakaoSdk()
+  }
+
+  return redirectToOAuthProvider(provider)
 }
 
 export const getNaverOAuthState = () => NAVER_OAUTH_STATE

@@ -5,7 +5,7 @@ import { viewerQueryKeys } from '@/entities/viewer/api'
 import { authStore } from '@/entities/session/model'
 import {
   getNaverOAuthState,
-  redirectToOAuthProvider,
+  startOAuthLogin,
   type OAuthProvider,
   type SignInResponse,
   type SignInType,
@@ -172,7 +172,7 @@ export const useOAuthCallbackPage = () => {
   }, [deferStatus, googleSignIn, handleSignInSuccess, kakaoSignIn, naverSignIn, provider])
 
   const handleLogin = (loginType: 'kakao' | 'naver') => {
-    redirectToOAuthProvider(loginType)
+    void startOAuthLogin(loginType)
   }
 
   const handleBack = () => {
