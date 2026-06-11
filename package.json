@@ -17,6 +17,7 @@
     "@tailwindcss/vite": "^4.3.0",
     "@tanstack/react-query": "^5.100.11",
     "axios": "^1.16.1",
+    "express": "^4.22.2",
     "heic2any": "0.0.4",
     "lottie-react": "^2.4.1",
     "react": "^19.2.6",
