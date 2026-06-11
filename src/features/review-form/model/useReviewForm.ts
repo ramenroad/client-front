@@ -233,6 +233,7 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
       setHasSubmitted(true)
 
       if (!isFormValid) {
+        openToast('입력하지 않은 항목이 있어요')
         return
       }
 

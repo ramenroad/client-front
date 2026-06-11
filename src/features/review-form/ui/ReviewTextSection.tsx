@@ -1,5 +1,6 @@
 import { type ChangeEvent } from 'react'
 import render from '@/shared/ui/render'
+import { ReviewFieldError } from './ReviewFieldError'
 
 interface ReviewTextSectionProps {
   review: string
@@ -19,18 +20,20 @@ export const ReviewTextSection = ({
   return (
     <Section>
       <Title>어떤 점이 좋았나요?</Title>
-      <TextAreaContainer>
-        <ReviewTextArea
-          value={review}
-          placeholder={`최소 ${minLength}자 이상 입력해주세요`}
-          maxLength={maxLength}
-          onChange={onReviewChange}
-        />
-        <CharacterCount>
-          <TypedCount>{review.length}</TypedCount>/{maxLength}
-        </CharacterCount>
-      </TextAreaContainer>
-      {hasError && <ErrorMessage>최소 {minLength}자 이상 입력해주세요</ErrorMessage>}
+      <FieldBody>
+        <TextAreaContainer className={hasError ? 'border-red/50' : undefined}>
+          <ReviewTextArea
+            value={review}
+            placeholder={`최소 ${minLength}자 이상 입력해주세요`}
+            maxLength={maxLength}
+            onChange={onReviewChange}
+          />
+          <CharacterCount>
+            <TypedCount>{review.length}</TypedCount>/{maxLength}
+          </CharacterCount>
+        </TextAreaContainer>
+        {hasError && <ReviewFieldError>최소 {minLength}자 이상 입력해주세요</ReviewFieldError>}
+      </FieldBody>
     </Section>
   )
 }
@@ -38,6 +41,8 @@ export const ReviewTextSection = ({
 const Section = render.div('relative mt-36 flex flex-col gap-16')
 
 const Title = render.div('font-16-m text-black')
+
+const FieldBody = render.div('flex flex-col gap-4')
 
 const TextAreaContainer = render.div(
   'relative box-border flex flex-col gap-4 rounded-8 border border-solid border-transparent bg-border px-12 pb-36 pt-10 outline-none focus-within:border-orange',
@@ -50,5 +55,3 @@ const ReviewTextArea = render.textarea(
 const CharacterCount = render.div('absolute bottom-14 right-12 font-14-r text-gray-400')
 
 const TypedCount = render.span('font-14-r text-black')
-
-const ErrorMessage = render.div('font-12-r text-red')
