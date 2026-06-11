@@ -36,11 +36,19 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-RUN npm install -g serve
+# 런타임 메타 주입 서버가 매장 상세 API를 호출할 때 사용 (빌드 시 build-arg로 주입)
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL \
+    NODE_ENV=production \
+    PORT=3000
+
+# 정적 SPA 서빙(serve) 대신 메타 주입 Node 서버 사용. 런타임 의존성은 express만 설치.
+RUN npm install --no-save --no-package-lock express@4
 
 COPY --from=builder /app/dist ./dist
+COPY server ./server
 
 EXPOSE 3000
 
-# SPA 정적 서빙 (deploy.yml이 -p 5010:3000 으로 연결)
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# /detail/:id 요청 시 OG 메타를 주입하는 Node 서버 (deploy.yml이 -p 5010:3000 으로 연결)
+CMD ["node", "server/index.js"]
