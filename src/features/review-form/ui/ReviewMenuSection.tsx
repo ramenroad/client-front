@@ -1,6 +1,7 @@
 import { type ChangeEvent, type ComponentProps, type KeyboardEvent } from 'react'
 import { twMerge } from 'tailwind-merge'
 import render from '@/shared/ui/render'
+import { ReviewFieldError } from './ReviewFieldError'
 
 interface ReviewMenuSectionProps {
   menuList: string[]
@@ -39,21 +40,24 @@ export const ReviewMenuSection = ({
             ))}
           </MenuTabContainer>
         )}
-        {hasError && <ErrorMessage>메뉴를 선택해주세요</ErrorMessage>}
       </MenuWrapper>
 
       <MenuAddWrapper>
-        <MenuInputContainer>
-          <MenuInput
-            value={customMenuInput}
-            onChange={onCustomMenuInputChange}
-            onKeyDown={onCustomMenuKeyDown}
-            placeholder="메뉴명을 입력해주세요"
-          />
-          <MenuAddButton type="button" onClick={onCustomMenuAdd}>
-            추가
-          </MenuAddButton>
-        </MenuInputContainer>
+        <FieldBody>
+          <MenuInputContainer>
+            <MenuInput
+              className={hasError ? 'border-red/50' : undefined}
+              value={customMenuInput}
+              onChange={onCustomMenuInputChange}
+              onKeyDown={onCustomMenuKeyDown}
+              placeholder="메뉴명을 입력해주세요"
+            />
+            <MenuAddButton type="button" onClick={onCustomMenuAdd}>
+              추가
+            </MenuAddButton>
+          </MenuInputContainer>
+          {hasError && <ReviewFieldError>메뉴를 선택해주세요</ReviewFieldError>}
+        </FieldBody>
       </MenuAddWrapper>
     </>
   )
@@ -66,6 +70,8 @@ const MenuTitleBox = render.div('flex items-center gap-4')
 const MenuTitle = render.div('font-16-m text-black')
 
 const MenuSubTitle = render.div('font-12-r text-gray-400')
+
+const FieldBody = render.div('flex flex-col gap-4')
 
 const MenuTabContainer = render.div('flex flex-wrap gap-8')
 
@@ -100,5 +106,3 @@ const MenuInput = render.input(
 const MenuAddButton = render.button(
   'h-43 w-67 cursor-pointer rounded-8 border border-solid border-gray-100 bg-white px-10 py-8 text-black shadow-none outline-none',
 )
-
-const ErrorMessage = render.div('mt-4 font-12-r text-red')

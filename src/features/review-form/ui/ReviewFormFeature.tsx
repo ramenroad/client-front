@@ -36,7 +36,6 @@ export const ReviewFormFeature = ({ mode }: ReviewFormFeatureProps) => {
     handleStarClick,
     handleSubmitReview,
     isBackModalOpen,
-    isFormValid,
     isImageUploading,
     isLoading,
     isLoginModalOpen,
@@ -93,7 +92,7 @@ export const ReviewFormFeature = ({ mode }: ReviewFormFeatureProps) => {
               onRemoveImage={handleRemoveImage}
             />
 
-            <SubmitButton type="submit" variant="primary" disabled={!isFormValid || isSubmitting} className="mt-32 font-16-m">
+            <SubmitButton type="submit" variant="primary" disabled={isSubmitting} className="mt-32 font-16-m">
               {isSubmitting ? pageCopy.submitting : pageCopy.submit}
             </SubmitButton>
           </ContentsWrapper>
