@@ -9,6 +9,7 @@ const MapLayout = lazy(() => import('@/widgets/layouts/map-layout'))
 const WithoutAppBarLayout = lazy(() => import('@/widgets/layouts/without-app-bar-layout'))
 
 const BannerPage = lazy(() => import('@/pages/banner'))
+const CommunityDetailPage = lazy(() => import('@/pages/community-detail'))
 const CommunityNotificationsPage = lazy(() => import('@/pages/community-notifications'))
 const CommunityPage = lazy(() => import('@/pages/community'))
 const CommunityWritePage = lazy(() => import('@/pages/community-write'))
@@ -127,6 +128,10 @@ const router = createBrowserRouter([
   {
     path: 'community/write',
     element: renderLazyRoute(CommunityWritePage),
+  },
+  {
+    path: 'community/:id',
+    element: renderLazyRoute(CommunityDetailPage),
   },
   {
     path: 'oauth/:id',
