@@ -16,6 +16,7 @@ import {
   IconEdit,
   IconHeart,
   IconMoreMenu,
+  IconReply,
   IconReport,
   IconShare,
   IconTrash,
@@ -30,6 +31,7 @@ import { useCommunityDetailPage } from "../model/useCommunityDetailPage";
 type CommentActions = {
   myId: string;
   boardAuthorId?: string;
+  onProfileClick: (userId: string) => void;
   editingId: string | null;
   editingValue: string;
   openMenuId: string | null;
@@ -105,6 +107,7 @@ const CommunityDetailPage = () => {
     onSubmitEdit,
     onCancelEdit,
     onDeleteComment,
+    onProfileClick,
     onBack,
   } = useCommunityDetailPage();
 
@@ -116,6 +119,7 @@ const CommunityDetailPage = () => {
   const commentActions: CommentActions = {
     myId,
     boardAuthorId: board?.userId?._id,
+    onProfileClick,
     editingId,
     editingValue,
     openMenuId: openCommentMenuId,
@@ -153,7 +157,11 @@ const CommunityDetailPage = () => {
             <Category>{board.category}</Category>
 
             <AuthorRow>
-              <AuthorLeft>
+              <AuthorLeft
+                onClick={() =>
+                  board.userId?._id && onProfileClick(board.userId._id)
+                }
+              >
                 <Avatar>
                   {board.userId?.profileImageUrl ? (
                     <AvatarImg
@@ -334,7 +342,7 @@ const CommentItem = ({
 }) => {
   const name = comment.userId?.nickname ?? "알 수 없는 사용자";
   const isMine = Boolean(actions.myId) && comment.userId?._id === actions.myId;
-  const isLiked = comment.likeUserIds.includes(actions.myId);
+  const isLiked = comment.isLiked;
   const isAuthor =
     Boolean(actions.boardAuthorId) &&
     comment.userId?._id === actions.boardAuthorId;
@@ -350,17 +358,25 @@ const CommentItem = ({
         <CommentMain>
           <CommentTop>
             <CommentHeadLeft>
-              <CommentAvatar>
-                {comment.userId?.profileImageUrl ? (
-                  <AvatarImg
-                    src={comment.userId.profileImageUrl}
-                    alt={`${name} 프로필`}
-                  />
-                ) : (
-                  <IconUnSignInUserProfile />
-                )}
-              </CommentAvatar>
-              <CommentName>{name}</CommentName>
+              {depth > 0 && <IconReply className="shrink-0" />}
+              <CommentProfile
+                onClick={() =>
+                  comment.userId?._id &&
+                  actions.onProfileClick(comment.userId._id)
+                }
+              >
+                <CommentAvatar>
+                  {comment.userId?.profileImageUrl ? (
+                    <AvatarImg
+                      src={comment.userId.profileImageUrl}
+                      alt={`${name} 프로필`}
+                    />
+                  ) : (
+                    <IconUnSignInUserProfile />
+                  )}
+                </CommentAvatar>
+                <CommentName>{name}</CommentName>
+              </CommentProfile>
               <Time>{getRelativeTimeLabel(comment.createdAt)}</Time>
               {isAuthor && <AuthorBadge>작성자</AuthorBadge>}
             </CommentHeadLeft>
@@ -488,7 +504,7 @@ const Category = render.div(
 
 const AuthorRow = render.div("mt-14 flex items-center justify-between");
 
-const AuthorLeft = render.div("flex items-center gap-8");
+const AuthorLeft = render.div("flex cursor-pointer items-center gap-8");
 
 const Avatar = render.div(
   "flex h-36 w-36 items-center justify-center overflow-hidden rounded-full bg-border",
@@ -563,6 +579,8 @@ const CommentMain = render.div("flex flex-col gap-8 mb-10");
 const CommentTop = render.div("flex items-start justify-between");
 
 const CommentHeadLeft = render.div("flex items-center gap-6");
+
+const CommentProfile = render.div("flex cursor-pointer items-center gap-6");
 
 const CommentAvatar = render.div(
   "flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-border",

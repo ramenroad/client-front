@@ -27,6 +27,7 @@ export type CommunityBoardListResponse = {
 
 export type CommunityBoardDetail = CommunityBoardSummary & {
   likeUserIds: Id[]
+  isLiked: boolean
   createdAt: ISODateString
   updatedAt: ISODateString
 }
@@ -61,6 +62,7 @@ export type CommunityCommentNode = {
   body: string
   likeCount: number
   likeUserIds: Id[]
+  isLiked: boolean
   parentCommentId: Id | null
   depth: number
   isDeleted: boolean

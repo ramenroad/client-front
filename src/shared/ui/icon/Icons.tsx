@@ -592,6 +592,22 @@ export const IconUnSignInUser = (props: IconProps) => (
   </svg>
 );
 
+export const IconReply = (props: IconProps) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M6 3C6.55228 3 7 3.44772 7 4V9H12C12.5523 9 13 9.44772 13 10V11C13 11.5523 12.5523 12 12 12H5C4.44772 12 4 11.5523 4 11V4C4 3.44772 4.44772 3 5 3H6Z"
+      fill="#EBEBED"
+    />
+  </svg>
+);
+
 export const IconUnSignInUserProfile = (props: IconProps) => (
   <svg
     width="64"
