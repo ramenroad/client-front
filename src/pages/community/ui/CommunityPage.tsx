@@ -1,4 +1,5 @@
-import { CommunityBellIcon, CommunityBoardCard, CommunityWriteIcon } from '@/entities/community/ui'
+import { CommunityBoardCard } from '@/entities/community/ui'
+import { IconNotification, IconWriteButton } from '@/shared/ui/icon'
 import render from '@/shared/ui/render'
 import AppBar from '@/widgets/navigation/app-bar'
 import { useCommunityPage } from '../model/useCommunityPage'
@@ -25,7 +26,7 @@ const CommunityPage = () => {
           <Header>
             <Title>커뮤니티</Title>
             <IconButton type="button" onClick={handleNotificationClick} aria-label="알림 페이지로 이동">
-              <CommunityBellIcon hasBadge={hasUnreadNotifications} />
+              <IconNotification indicator={hasUnreadNotifications} />
             </IconButton>
           </Header>
           <TabList>
@@ -70,7 +71,7 @@ const CommunityPage = () => {
 
         <FloatingWriteLayer>
           <FloatingWriteButton type="button" onClick={handleWriteClick} aria-label="게시글 작성">
-            <CommunityWriteIcon />
+            <IconWriteButton />
           </FloatingWriteButton>
         </FloatingWriteLayer>
 
@@ -113,10 +114,11 @@ const SkeletonBody = render.div('mt-8 h-18 w-full rounded-8 bg-border')
 
 const StatusBox = render.div('px-20 py-80 text-center font-16-r text-gray-500')
 
-const FloatingWriteLayer = render.div('fixed bottom-82 left-1/2 z-30 flex w-390 -translate-x-1/2 justify-end px-20')
+// 버튼 SVG에 그림자용 10px 여백이 내장돼 있어, 우측 패딩 10px이면 원이 우측 20px에 위치.
+const FloatingWriteLayer = render.div('fixed bottom-82 left-1/2 z-30 flex w-390 -translate-x-1/2 justify-end pr-10')
 
 const FloatingWriteButton = render.button(
-  'flex h-56 w-56 cursor-pointer items-center justify-center rounded-full border-none bg-orange p-0 shadow-[0px_4px_10px_rgba(0,0,0,0.16)]',
+  'flex cursor-pointer items-center justify-center border-none bg-transparent p-0 transition-transform hover:scale-105',
 )
 
 const ObserverTarget = render.div('h-1')

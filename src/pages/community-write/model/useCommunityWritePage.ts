@@ -1,11 +1,11 @@
-import { useMemo, useState, type ChangeEvent } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { communityQueryKeys, useCreateCommunityBoardMutation } from '@/entities/community/api'
 import {
   COMMUNITY_BOARD_CATEGORIES,
   MAX_COMMUNITY_IMAGE_COUNT,
-  type CommunityBoardFilterCategory,
+  type CommunityBoardCategory,
 } from '@/entities/community/model'
 import { useAuthSession } from '@/entities/session/model'
 import { useImageUpload, type UploadImageValue } from '@/shared/lib/useImageUpload'
@@ -16,15 +16,14 @@ export const useCommunityWritePage = () => {
   const queryClient = useQueryClient()
   const { isSignIn } = useAuthSession()
   const { openToast } = useToast()
-  const [category, setCategory] = useState<CommunityBoardFilterCategory | null>(null)
+  const [category, setCategory] = useState<CommunityBoardCategory | null>(null)
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [images, setImages] = useState<UploadImageValue[]>([])
   const [isCategoryPopupOpen, setIsCategoryPopupOpen] = useState(false)
-  const categoryOptions = useMemo(
-    () => COMMUNITY_BOARD_CATEGORIES.filter((option): option is CommunityBoardFilterCategory => option !== '전체'),
-    [],
-  )
+  const [isImageLimitOpen, setIsImageLimitOpen] = useState(false)
+  // 유효 카테고리는 서버 검증 없이 클라이언트 하드코딩(COMMUNITY_BOARD_CATEGORIES) 기준.
+  const categoryOptions = COMMUNITY_BOARD_CATEGORIES
 
   const createBoardMutation = useCreateCommunityBoardMutation({
     onSuccess: () => {
@@ -41,7 +40,7 @@ export const useCommunityWritePage = () => {
     images,
     maxImages: MAX_COMMUNITY_IMAGE_COUNT,
     onImagesChange: setImages,
-    onLimitExceeded: (maxImages) => openToast(`이미지는 최대 ${maxImages}장까지 올릴 수 있어요.`),
+    onLimitExceeded: () => setIsImageLimitOpen(true),
     onUploadError: () => openToast('이미지를 처리하지 못했어요. 다시 시도해주세요.'),
   })
 
@@ -88,8 +87,10 @@ export const useCommunityWritePage = () => {
     isSubmitDisabled,
     isSubmitting: createBoardMutation.isPending,
     isCategoryPopupOpen,
+    isImageLimitOpen,
     setCategory,
     setIsCategoryPopupOpen,
+    setIsImageLimitOpen,
     handleTitleChange,
     handleBodyChange,
     handleImageClick,

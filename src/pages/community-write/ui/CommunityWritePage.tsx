@@ -1,8 +1,8 @@
 import { memo, useEffect, useMemo } from 'react'
 import { MAX_COMMUNITY_IMAGE_COUNT } from '@/entities/community/model'
-import { IconBack, IconCamera, IconDropDown, IconImageDelete } from '@/shared/ui/icon'
+import { IconBack, IconCheck, IconClose, IconDropDown, IconImageDelete, IconPicture } from '@/shared/ui/icon'
 import { UploadLoadingOverlay } from '@/shared/ui/image-upload'
-import { BottomPopupLayout, Popup } from '@/shared/ui/popup'
+import { BottomPopupLayout, Popup, PopupAlert } from '@/shared/ui/popup'
 import render from '@/shared/ui/render'
 import { useCommunityWritePage } from '../model/useCommunityWritePage'
 
@@ -18,8 +18,10 @@ const CommunityWritePage = () => {
     isSubmitDisabled,
     isSubmitting,
     isCategoryPopupOpen,
+    isImageLimitOpen,
     setCategory,
     setIsCategoryPopupOpen,
+    setIsImageLimitOpen,
     handleTitleChange,
     handleBodyChange,
     handleImageClick,
@@ -64,7 +66,7 @@ const CommunityWritePage = () => {
           ) : null}
           <ImageScrollArea>
             <AddImageButton type="button" onClick={handleImageClick} aria-label="게시글 이미지 추가">
-              <IconCamera color="#A0A0A0" />
+              <IconPicture />
             </AddImageButton>
 
             {images.map((image, index) => (
@@ -77,22 +79,46 @@ const CommunityWritePage = () => {
 
       <Popup isOpen={isCategoryPopupOpen} onClose={() => setIsCategoryPopupOpen(false)} direction="bottom">
         <BottomPopupLayout>
-          <PopupTitle>게시글 주제를 선택해주세요</PopupTitle>
+          <PopupHeader>
+            <PopupTitle>게시글 주제 선택</PopupTitle>
+            <PopupCloseButton type="button" onClick={() => setIsCategoryPopupOpen(false)} aria-label="닫기">
+              <IconClose color="#111111" />
+            </PopupCloseButton>
+          </PopupHeader>
           <CategoryOptionList>
-            {categoryOptions.map((option) => (
-              <CategoryOptionButton
-                key={option}
-                type="button"
-                onClick={() => {
-                  setCategory(option)
-                  setIsCategoryPopupOpen(false)
-                }}
-              >
-                {option}
-              </CategoryOptionButton>
-            ))}
+            {categoryOptions.map((option) => {
+              const isSelected = category === option
+              return (
+                <CategoryOptionButton
+                  key={option}
+                  type="button"
+                  onClick={() => {
+                    setCategory(option)
+                    setIsCategoryPopupOpen(false)
+                  }}
+                >
+                  <CategoryOptionLabel className={isSelected ? 'text-orange' : 'text-gray-200'}>
+                    {option}
+                  </CategoryOptionLabel>
+                  {isSelected ? <IconCheck /> : null}
+                </CategoryOptionButton>
+              )
+            })}
           </CategoryOptionList>
         </BottomPopupLayout>
+      </Popup>
+
+      <Popup isOpen={isImageLimitOpen} onClose={() => setIsImageLimitOpen(false)} direction="center">
+        <PopupAlert
+          content={
+            <>
+              이미지는 최대 {MAX_COMMUNITY_IMAGE_COUNT}장까지
+              <br />
+              첨부할 수 있어요
+            </>
+          }
+          onClose={() => setIsImageLimitOpen(false)}
+        />
       </Popup>
     </>
   )
@@ -173,7 +199,7 @@ const CurrentCount = render.span('text-black')
 
 const ImageScrollArea = render.div('flex items-center gap-12 overflow-x-auto hide-scrollbar')
 
-const AddImageButton = render.button('flex h-36 w-36 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-gray-100 p-0')
+const AddImageButton = render.button('flex h-36 w-36 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0')
 
 const HiddenFileInput = render.input('hidden')
 
@@ -183,12 +209,20 @@ const PreviewImage = render.img('h-full w-full object-cover')
 
 const RemoveImageButton = render.button('absolute right-[-6px] top-[-6px] flex h-24 w-24 cursor-pointer items-center justify-center border-none bg-transparent p-0')
 
-const PopupTitle = render.div('font-16-sb text-black')
+const PopupHeader = render.div('flex items-center justify-between')
 
-const CategoryOptionList = render.div('mt-20 flex flex-col')
+const PopupTitle = render.div('font-18-sb text-black')
+
+const PopupCloseButton = render.button(
+  'flex h-24 w-24 cursor-pointer items-center justify-center border-none bg-transparent p-0',
+)
+
+const CategoryOptionList = render.div('mt-12 flex flex-col')
 
 const CategoryOptionButton = render.button(
-  'flex h-52 cursor-pointer items-center border-0 border-b border-solid border-border bg-transparent px-0 text-left font-16-r text-gray-800 last:border-b-0',
+  'flex h-56 w-full cursor-pointer items-center justify-between border-none bg-transparent px-0 text-left',
 )
+
+const CategoryOptionLabel = render.span('font-18-m')
 
 export default CommunityWritePage
