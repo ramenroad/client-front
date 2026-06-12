@@ -1,7 +1,7 @@
-import { createContext } from "react";
+import { createContext, type ReactNode } from "react";
 
 export interface ToastContextType {
-  openToast: (message: string) => void;
+  openToast: (message: string, action?: ReactNode) => void;
 }
 
 export const ToastContext = createContext<ToastContextType | null>(null);
