@@ -19,8 +19,10 @@ const LoginPage = lazy(() => import('@/pages/login'))
 const MapSearchPage = lazy(() => import('@/pages/map-search'))
 const MenuBoardImagesPage = lazy(() => import('@/pages/menu-board-images'))
 const MenuBoardSubmitPage = lazy(() => import('@/pages/menu-board-submit'))
+const MyActivityPage = lazy(() => import('@/pages/my-activity'))
 const MyInformationPage = lazy(() => import('@/pages/my-information'))
 const MyProfilePage = lazy(() => import('@/pages/my-profile'))
+const MySearchPage = lazy(() => import('@/pages/my-search'))
 const OAuthCallbackPage = lazy(() => import('@/pages/oauth-callback'))
 const RamenyaByGenrePage = lazy(() => import('@/pages/ramenya-by-genre'))
 const RamenyaByRegionPage = lazy(() => import('@/pages/ramenya-by-region'))
@@ -70,6 +72,14 @@ const router = createBrowserRouter([
       {
         path: 'mypage',
         element: renderLazyRoute(MyProfilePage),
+      },
+      {
+        path: 'my-activity',
+        element: renderLazyRoute(MyActivityPage),
+      },
+      {
+        path: 'my-search',
+        element: renderLazyRoute(MySearchPage),
       },
       {
         path: 'information',
