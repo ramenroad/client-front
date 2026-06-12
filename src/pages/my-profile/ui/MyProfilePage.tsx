@@ -1,5 +1,18 @@
 import { Button } from '@/shared/ui/button'
-import { IconArrowRight, IconReview, IconUnSignInUser, IconUnSignInUserProfile } from '@/shared/ui/icon'
+import {
+  IconArrowRight,
+  IconFeedback,
+  IconMyComment,
+  IconMyPost,
+  IconMyReview,
+  IconNotice,
+  IconPatchNote,
+  IconPolicy,
+  IconRecentStore,
+  IconSavedPost,
+  IconUnSignInUser,
+  IconUnSignInUserProfile,
+} from '@/shared/ui/icon'
 import { LoadingLottie } from '@/shared/ui/lottie'
 import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
@@ -8,7 +21,31 @@ import TopBar from '@/shared/ui/top-bar'
 import { useMyProfilePage } from '../model/useMyProfilePage'
 
 const MyProfilePage = () => {
-  const { profile, isSignedIn, isLoading, isError, handleProfileClick, handleLoginClick, handleReviewClick } = useMyProfilePage()
+  const {
+    profile,
+    isSignedIn,
+    isLoading,
+    isError,
+    handleProfileClick,
+    handleLoginClick,
+    handleReviewClick,
+    handleNotReady,
+  } = useMyProfilePage()
+
+  const activityItems = [
+    { label: '작성한 리뷰', icon: <IconMyReview />, onClick: handleReviewClick },
+    { label: '작성한 게시글', icon: <IconMyPost />, onClick: handleNotReady },
+    { label: '작성한 댓글', icon: <IconMyComment />, onClick: handleNotReady },
+    { label: '저장한 글', icon: <IconSavedPost />, onClick: handleNotReady },
+    { label: '최근 본 매장', icon: <IconRecentStore />, onClick: handleNotReady },
+  ]
+
+  const supportItems = [
+    { label: '공지사항', icon: <IconNotice />, onClick: handleNotReady },
+    { label: '패치노트', icon: <IconPatchNote />, onClick: handleNotReady },
+    { label: '의견 남기기', icon: <IconFeedback />, onClick: handleNotReady },
+    { label: '약관 및 정책', icon: <IconPolicy />, onClick: handleNotReady },
+  ]
 
   return (
     <Layout variant="appBar">
@@ -33,31 +70,50 @@ const MyProfilePage = () => {
 
       {!isLoading && !isError && isSignedIn && profile && (
         <SignedInContent>
-          <CardLayout type="button" onClick={handleProfileClick}>
-            <CardLeftSection>
+          <ProfileCard type="button" onClick={handleProfileClick}>
+            <CardLeft>
               <WelcomeText>반가워요!</WelcomeText>
-              <UserInfoWrapper>
+              <NameRow>
                 <UserName>{profile.nickname}님</UserName>
                 <IconArrowRight />
-              </UserInfoWrapper>
-            </CardLeftSection>
-
-            <CardRightSection>
+              </NameRow>
+            </CardLeft>
+            <CardRight>
               {profile.profileImageUrl ? (
                 <UserProfileImage src={profile.profileImageUrl} alt={`${profile.nickname} 프로필`} />
               ) : (
                 <IconUnSignInUserProfile />
               )}
-            </CardRightSection>
-          </CardLayout>
+            </CardRight>
+          </ProfileCard>
 
-          <MyReviewContainer type="button" onClick={handleReviewClick}>
-            <IconReview />
-            <MyReviewText size={16} weight="m">
-              작성한 리뷰
-            </MyReviewText>
-            <ArrowRightForReview />
-          </MyReviewContainer>
+          <Section>
+            <SectionLabel>내 활동</SectionLabel>
+            <MenuList>
+              {activityItems.map((item) => (
+                <MenuItemButton key={item.label} type="button" onClick={item.onClick}>
+                  <MenuIcon>{item.icon}</MenuIcon>
+                  <MenuLabel>{item.label}</MenuLabel>
+                  <MenuChevron />
+                </MenuItemButton>
+              ))}
+            </MenuList>
+          </Section>
+
+          <SectionDivider />
+
+          <Section>
+            <SectionLabel>고객지원</SectionLabel>
+            <MenuList>
+              {supportItems.map((item) => (
+                <MenuItemButton key={item.label} type="button" onClick={item.onClick}>
+                  <MenuIcon>{item.icon}</MenuIcon>
+                  <MenuLabel>{item.label}</MenuLabel>
+                  <MenuChevron />
+                </MenuItemButton>
+              ))}
+            </MenuList>
+          </Section>
         </SignedInContent>
       )}
 
@@ -77,23 +133,41 @@ const MyProfilePage = () => {
 
 const Layout = render.extend(PageLayout, 'items-center gap-20 px-20')
 
-const SignedInContent = render.section('flex w-full flex-col items-center gap-20')
+const SignedInContent = render.section('flex w-full flex-col pb-32')
 
-const CardLayout = render.button(
-  'font-20-m flex h-112 w-full cursor-pointer items-center justify-between rounded-8 border border-solid border-gray-100 bg-white px-20 text-left shadow-none outline-none',
+const ProfileCard = render.button(
+  'flex h-112 w-full cursor-pointer items-center justify-between rounded-12 border border-solid border-gray-100 bg-white px-20 text-left shadow-none outline-none',
 )
 
-const CardLeftSection = render.section('flex flex-col gap-4')
+const CardLeft = render.section('flex flex-col gap-4')
 
-const CardRightSection = render.section('flex flex-col items-center justify-center')
+const CardRight = render.section('flex items-center justify-center')
 
-const WelcomeText = render.span('text-orange')
+const WelcomeText = render.span('font-18-m text-orange')
 
-const UserName = render.span('text-inherit')
+const NameRow = render.section('flex items-center gap-4')
 
-const UserInfoWrapper = render.section('flex items-center gap-4')
+const UserName = render.span('font-20-m text-gray-900')
 
 const UserProfileImage = render.img('h-64 w-64 rounded-full object-cover')
+
+const Section = render.section('mt-24 flex w-full flex-col')
+
+const SectionLabel = render.span('mb-4 font-14-r text-gray-400')
+
+const MenuList = render.div('flex flex-col')
+
+const MenuItemButton = render.button(
+  'flex h-56 w-full cursor-pointer items-center gap-12 border-none bg-transparent px-0 text-left shadow-none outline-none',
+)
+
+const MenuIcon = render.div('flex h-24 w-24 shrink-0 items-center justify-center')
+
+const MenuLabel = render.span('font-16-m text-gray-900')
+
+const MenuChevron = render.extend(IconArrowRight, 'ml-auto')
+
+const SectionDivider = render.div('mt-24 h-1 w-full bg-gray-100')
 
 const SignInWrapper = render.section('mt-20 flex h-full w-full flex-col items-center')
 
@@ -102,14 +176,6 @@ const SignInDescription = render.section('mb-40 mt-24 flex flex-col items-center
 const LoginText = render.span('font-20-m')
 
 const LoginDescription = render.span('font-18-r')
-
-const MyReviewContainer = render.button(
-  'flex w-full cursor-pointer items-center gap-8 rounded-8 border-0 bg-[#F9F9F9] px-12 py-20 text-left shadow-none outline-none',
-)
-
-const MyReviewText = render.extend(RaisingText, 'text-gray-900')
-
-const ArrowRightForReview = render.extend(IconArrowRight, 'ml-auto')
 
 const StateWrapper = render.section('flex min-h-320 flex-col items-center justify-center gap-12 px-20 text-center')
 
