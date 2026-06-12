@@ -26,3 +26,6 @@ storybook-static
 *.njsproj
 *.sln
 *.sw?
+
+# Figma REST 덤프 산출물
+figma-dump.json
