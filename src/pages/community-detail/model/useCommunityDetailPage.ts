@@ -101,7 +101,7 @@ export const useCommunityDetailPage = () => {
   }, [])
 
   const board = boardQuery.data
-  const isBoardLiked = Boolean(myId) && Boolean(board?.likeUserIds.includes(myId))
+  const isBoardLiked = Boolean(board?.isLiked)
   const isMyBoard = Boolean(myId) && board?.userId?._id === myId
 
   const handleToggleBoardLike = () => {
@@ -206,7 +206,7 @@ export const useCommunityDetailPage = () => {
     if (!requireSignIn()) {
       return
     }
-    const liked = comment.likeUserIds.includes(myId)
+    const liked = comment.isLiked
     const mutation = liked ? deleteCommentLike : addCommentLike
     mutation.mutate({ boardId: id, commentId: comment._id }, { onSuccess: invalidateComments })
   }
@@ -300,6 +300,7 @@ export const useCommunityDetailPage = () => {
     onSubmitEdit: handleSubmitEdit,
     onCancelEdit: handleCancelEdit,
     onDeleteComment: handleDeleteComment,
+    onProfileClick: (userId: string) => navigate(`/user-review/${userId}`),
     onBack: () => navigate(-1),
   }
 }
