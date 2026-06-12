@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCommunityBoardsInfiniteQuery } from '@/entities/community/api'
 import {
@@ -7,7 +7,6 @@ import {
   COMMUNITY_NOTIFICATION_READ_STORAGE_KEY,
   type CommunityBoardListTabKey,
 } from '@/entities/community/model'
-import { getCommunityBoardPopularityScore } from '@/entities/community/lib'
 import { useAuthSession } from '@/entities/session/model'
 import { useIntersectionObserver } from '@/shared/lib/useIntersectionObserver'
 import { useToast } from '@/shared/ui/toast'
@@ -29,7 +28,6 @@ export const useCommunityPage = () => {
   const navigate = useNavigate()
   const { isSignIn } = useAuthSession()
   const { openToast } = useToast()
-  const popularHintShownRef = useRef(false)
   const [selectedTabKey, setSelectedTabKey] = useState<CommunityBoardListTabKey>('all')
   const selectedTab = COMMUNITY_BOARD_LIST_TABS.find((tab) => tab.key === selectedTabKey) ?? COMMUNITY_BOARD_LIST_TABS[0]
   const communityBoardListQuery = useCommunityBoardsInfiniteQuery({
@@ -37,23 +35,10 @@ export const useCommunityPage = () => {
     category: selectedTab.category,
   })
 
-  const boards = useMemo(
+  const displayedBoards = useMemo(
     () => communityBoardListQuery.data?.pages.flatMap((page) => page.boards) ?? [],
     [communityBoardListQuery.data],
   )
-
-  const displayedBoards = useMemo(() => {
-    if (!selectedTab.isUiOnly) {
-      return boards
-    }
-
-    return [...boards].sort((left, right) => {
-      return (
-        getCommunityBoardPopularityScore(right) - getCommunityBoardPopularityScore(left) ||
-        new Date(right.createdAt ?? 0).getTime() - new Date(left.createdAt ?? 0).getTime()
-      )
-    })
-  }, [boards, selectedTab.isUiOnly])
 
   const observerRef = useIntersectionObserver({
     enabled: Boolean(communityBoardListQuery.hasNextPage && !communityBoardListQuery.isFetchingNextPage),
@@ -64,13 +49,6 @@ export const useCommunityPage = () => {
   })
 
   const handleTabClick = (tabKey: CommunityBoardListTabKey) => {
-    const nextTab = COMMUNITY_BOARD_LIST_TABS.find((tab) => tab.key === tabKey)
-
-    if (nextTab?.isUiOnly && !popularHintShownRef.current) {
-      openToast('인기순은 현재 불러온 게시글 기준으로만 정렬돼요.')
-      popularHintShownRef.current = true
-    }
-
     setSelectedTabKey(tabKey)
   }
 
@@ -86,7 +64,6 @@ export const useCommunityPage = () => {
 
   return {
     tabs: COMMUNITY_BOARD_LIST_TABS,
-    selectedTab,
     selectedTabKey,
     displayedBoards,
     hasUnreadNotifications: hasUnreadCommunityNotifications(),
@@ -95,6 +72,7 @@ export const useCommunityPage = () => {
     observerRef,
     handleTabClick,
     handleWriteClick,
-    handleNotificationClick: () => navigate('/community/notifications'),
+    // 알림은 아직 서버 미구현(클라 목업)이라 진입 대신 안내 토스트만 노출한다.
+    handleNotificationClick: () => openToast('알림 기능은 개발 예정이에요.'),
   }
 }

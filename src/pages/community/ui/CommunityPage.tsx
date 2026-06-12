@@ -7,7 +7,6 @@ import { useCommunityPage } from '../model/useCommunityPage'
 const CommunityPage = () => {
   const {
     tabs,
-    selectedTab,
     selectedTabKey,
     displayedBoards,
     hasUnreadNotifications,
@@ -42,8 +41,6 @@ const CommunityPage = () => {
             ))}
           </TabList>
         </StickyHeader>
-
-        {selectedTab.isUiOnly ? <PopularHint>현재는 UI 기준 인기 정렬만 지원해요.</PopularHint> : null}
 
         <BoardList>
           {isLoading ? (
@@ -97,8 +94,6 @@ const TabList = render.div('flex items-center border-0 border-b border-solid bor
 const TabButton = render.button(
   'h-44 cursor-pointer border-0 border-b-[1.2px] border-solid border-transparent bg-transparent px-12 font-16-r text-gray-500',
 )
-
-const PopularHint = render.div('mx-20 mt-12 rounded-8 bg-light-orange px-12 py-8 font-12-r text-orange')
 
 const BoardList = render.div('flex flex-col pb-24')
 

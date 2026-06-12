@@ -1,5 +1,3 @@
-import type { CommunityBoardSummary } from '@/entities/community/model'
-
 const MINUTE_MS = 60 * 1000
 const HOUR_MS = 60 * MINUTE_MS
 const DAY_MS = 24 * HOUR_MS
@@ -42,14 +40,4 @@ export const getRelativeTimeLabel = (dateString?: string) => {
   }
 
   return formatDateLabel(new Date(targetTime))
-}
-
-export const getCommunityBoardPopularityScore = (
-  board: Pick<CommunityBoardSummary, 'viewCount' | 'likeCount' | 'commentCount' | 'createdAt'>,
-) => {
-  const createdTime = board.createdAt ? new Date(board.createdAt).getTime() : Date.now()
-  const diffDays = Math.floor((Date.now() - createdTime) / DAY_MS)
-  const freshness = Math.max(1, 30 - diffDays)
-
-  return board.commentCount * 12 + board.likeCount * 8 + board.viewCount + freshness
 }
