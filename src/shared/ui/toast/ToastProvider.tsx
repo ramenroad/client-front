@@ -8,12 +8,14 @@ interface ToastProviderProps {
 
 export const ToastProvider = ({ children }: ToastProviderProps) => {
   const [message, setMessage] = useState("");
+  const [action, setAction] = useState<ReactNode>(null);
   const [isVisible, setIsVisible] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
   const cleanupTimerRef = useRef<number | null>(null);
 
-  const openToast = useCallback((toastMessage: string) => {
+  const openToast = useCallback((toastMessage: string, toastAction?: ReactNode) => {
     setMessage(toastMessage);
+    setAction(toastAction ?? null);
     setIsVisible(true);
 
     if (closeTimerRef.current) {
@@ -29,6 +31,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
 
     cleanupTimerRef.current = window.setTimeout(() => {
       setMessage("");
+      setAction(null);
     }, 2300);
   }, []);
 
@@ -46,7 +49,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
   return (
     <ToastContext.Provider value={{ openToast }}>
       {children}
-      <Toast message={message} isVisible={isVisible} />
+      <Toast message={message} action={action} isVisible={isVisible} />
     </ToastContext.Provider>
   );
 };
