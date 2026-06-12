@@ -289,6 +289,7 @@ export const useCommunityDetailPage = () => {
     onCloseConfirmDialog: closeConfirmDialog,
     onConfirmDialog: runConfirmDialog,
     onToggleBoardLike: handleToggleBoardLike,
+    onEditBoard: () => navigate(`/community/write/${id}`),
     onDeleteBoard: handleDeleteBoard,
     onSaveBoard: handleSaveBoard,
     onReportBoard: handleReportBoard,

@@ -8,6 +8,7 @@ import { useCommunityWritePage } from '../model/useCommunityWritePage'
 
 const CommunityWritePage = () => {
   const {
+    isEditMode,
     category,
     categoryOptions,
     title,
@@ -39,9 +40,9 @@ const CommunityWritePage = () => {
           <BackButton type="button" onClick={handleBack} aria-label="이전 페이지로 이동">
             <IconBack />
           </BackButton>
-          <HeaderTitle>게시글 작성</HeaderTitle>
+          <HeaderTitle>{isEditMode ? '게시글 수정' : '게시글 작성'}</HeaderTitle>
           <SubmitButton type="button" disabled={isSubmitDisabled} onClick={handleSubmit}>
-            {isSubmitting ? '등록 중' : '등록'}
+            {isSubmitting ? (isEditMode ? '수정 중' : '등록 중') : isEditMode ? '수정' : '등록'}
           </SubmitButton>
         </Header>
 
@@ -190,7 +191,7 @@ const BodyTextarea = render.textarea(
 )
 
 const BottomTray = render.div(
-  'fixed bottom-0 left-1/2 z-20 flex w-390 -translate-x-1/2 flex-col gap-10 border-0 border-t border-solid border-border bg-white px-20 py-12',
+  'fixed bottom-0 left-1/2 z-20 flex w-390 -translate-x-1/2 flex-col gap-10 border-0 border-x border-t border-solid border-outline-muted bg-white px-20 py-12',
 )
 
 const ImageCount = render.div('font-12-m text-gray-400')

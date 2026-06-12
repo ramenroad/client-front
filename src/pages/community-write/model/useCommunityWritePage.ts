@@ -1,7 +1,12 @@
-import { useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
-import { communityQueryKeys, useCreateCommunityBoardMutation } from '@/entities/community/api'
+import { useNavigate, useParams } from 'react-router-dom'
+import {
+  communityQueryKeys,
+  useCommunityBoardDetailQuery,
+  useCreateCommunityBoardMutation,
+  useUpdateCommunityBoardMutation,
+} from '@/entities/community/api'
 import {
   COMMUNITY_BOARD_CATEGORIES,
   MAX_COMMUNITY_IMAGE_COUNT,
@@ -14,6 +19,8 @@ import { useToast } from '@/shared/ui/toast'
 export const useCommunityWritePage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { id } = useParams<{ id: string }>()
+  const isEditMode = Boolean(id)
   const { isSignIn } = useAuthSession()
   const { openToast } = useToast()
   const [category, setCategory] = useState<CommunityBoardCategory | null>(null)
@@ -24,6 +31,22 @@ export const useCommunityWritePage = () => {
   const [isImageLimitOpen, setIsImageLimitOpen] = useState(false)
   // 유효 카테고리는 서버 검증 없이 클라이언트 하드코딩(COMMUNITY_BOARD_CATEGORIES) 기준.
   const categoryOptions = COMMUNITY_BOARD_CATEGORIES
+
+  // 수정 모드: 기존 게시글을 불러와 폼을 1회만 prefill 한다(사용자 편집 덮어쓰기 방지).
+  const boardQuery = useCommunityBoardDetailQuery(id ?? '', { enabled: isEditMode })
+  const prefilledRef = useRef(false)
+
+  useEffect(() => {
+    if (!isEditMode || prefilledRef.current || !boardQuery.data) {
+      return
+    }
+    const board = boardQuery.data
+    setCategory(board.category as CommunityBoardCategory)
+    setTitle(board.title)
+    setBody(board.body)
+    setImages(board.ImageUrls ?? [])
+    prefilledRef.current = true
+  }, [isEditMode, boardQuery.data])
 
   const createBoardMutation = useCreateCommunityBoardMutation({
     onSuccess: () => {
@@ -36,6 +59,17 @@ export const useCommunityWritePage = () => {
     },
   })
 
+  const updateBoardMutation = useUpdateCommunityBoardMutation({
+    onSuccess: () => {
+      openToast('게시글을 수정했어요.')
+      queryClient.invalidateQueries({ queryKey: communityQueryKeys.all })
+      navigate(`/community/${id}`, { replace: true })
+    },
+    onError: () => {
+      openToast('게시글 수정에 실패했어요.')
+    },
+  })
+
   const { fileInputRef, isUploading, handleImageClick, handleImageUpload, handleRemoveImage } = useImageUpload({
     images,
     maxImages: MAX_COMMUNITY_IMAGE_COUNT,
@@ -44,9 +78,10 @@ export const useCommunityWritePage = () => {
     onUploadError: () => openToast('이미지를 처리하지 못했어요. 다시 시도해주세요.'),
   })
 
+  const isSubmitting = createBoardMutation.isPending || updateBoardMutation.isPending
   const trimmedTitle = title.trim()
   const trimmedBody = body.trim()
-  const isSubmitDisabled = !category || trimmedTitle.length === 0 || trimmedBody.length === 0 || createBoardMutation.isPending
+  const isSubmitDisabled = !category || trimmedTitle.length === 0 || trimmedBody.length === 0 || isSubmitting
 
   const handleSubmit = () => {
     if (!isSignIn) {
@@ -60,11 +95,28 @@ export const useCommunityWritePage = () => {
       return
     }
 
+    const newImages = images.filter((image): image is File => image instanceof File)
+
+    if (isEditMode && id) {
+      updateBoardMutation.mutate({
+        boardId: id,
+        data: {
+          category,
+          title: trimmedTitle,
+          body: trimmedBody,
+          // 남겨둔 기존 이미지(url)는 유지하고, 새로 추가한 파일만 업로드한다.
+          imageUrls: images.filter((image): image is string => typeof image === 'string'),
+          images: newImages,
+        },
+      })
+      return
+    }
+
     createBoardMutation.mutate({
       category,
       title: trimmedTitle,
       body: trimmedBody,
-      images: images.filter((image): image is File => image instanceof File),
+      images: newImages,
     })
   }
 
@@ -77,6 +129,7 @@ export const useCommunityWritePage = () => {
   }
 
   return {
+    isEditMode,
     category,
     categoryOptions,
     title,
@@ -85,7 +138,7 @@ export const useCommunityWritePage = () => {
     fileInputRef,
     isUploading,
     isSubmitDisabled,
-    isSubmitting: createBoardMutation.isPending,
+    isSubmitting,
     isCategoryPopupOpen,
     isImageLimitOpen,
     setCategory,

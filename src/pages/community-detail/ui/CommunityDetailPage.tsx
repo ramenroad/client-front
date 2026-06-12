@@ -97,6 +97,7 @@ const CommunityDetailPage = () => {
     onCloseConfirmDialog,
     onConfirmDialog,
     onToggleBoardLike,
+    onEditBoard,
     onDeleteBoard,
     onReportBoard,
     onReportComment,
@@ -190,16 +191,28 @@ const CommunityDetailPage = () => {
                 {isPostMenuOpen && (
                   <Menu>
                     {isMyBoard ? (
-                      <MenuItem
-                        type="button"
-                        onClick={() => {
-                          setIsPostMenuOpen(false);
-                          onDeleteBoard();
-                        }}
-                      >
-                        <MenuLabel>삭제</MenuLabel>
-                        <IconTrash />
-                      </MenuItem>
+                      <>
+                        <MenuItem
+                          type="button"
+                          onClick={() => {
+                            setIsPostMenuOpen(false);
+                            onEditBoard();
+                          }}
+                        >
+                          <MenuLabel>수정</MenuLabel>
+                          <IconEdit />
+                        </MenuItem>
+                        <MenuItem
+                          type="button"
+                          onClick={() => {
+                            setIsPostMenuOpen(false);
+                            onDeleteBoard();
+                          }}
+                        >
+                          <MenuLabel>삭제</MenuLabel>
+                          <IconTrash />
+                        </MenuItem>
+                      </>
                     ) : (
                       <MenuItem
                         type="button"
@@ -372,7 +385,7 @@ const CommentItem = ({
                       alt={`${name} 프로필`}
                     />
                   ) : (
-                    <IconUnSignInUserProfile />
+                    <IconUnSignInUserProfile width={24} height={24} />
                   )}
                 </CommentAvatar>
                 <CommentName>{name}</CommentName>
@@ -518,14 +531,14 @@ const AuthorName = render.div(
   "text-[14px] font-medium leading-[21px] text-gray-700",
 );
 
-const Time = render.div("text-[13px] font-normal leading-[20px] text-gray-400");
+const Time = render.div("font-12-r text-gray-400");
 
 const Title = render.div(
   "mt-16 text-[20px] font-medium leading-[30px] text-gray-900",
 );
 
 const Body = render.div(
-  "mt-10 whitespace-pre-wrap break-words text-[16px] font-normal leading-[24px] text-gray-900",
+  "mt-10 whitespace-pre-wrap break-words text-[16px] font-normal leading-[24px] text-gray-800",
 );
 
 const Images = render.div("mt-16 flex flex-col gap-8");
@@ -583,16 +596,14 @@ const CommentHeadLeft = render.div("flex items-center gap-6");
 const CommentProfile = render.div("flex cursor-pointer items-center gap-6");
 
 const CommentAvatar = render.div(
-  "flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-border",
+  "flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-border",
 );
 
 const CommentName = render.div(
-  "text-[14px] font-medium leading-[21px] text-gray-700",
+  "text-[14px] font-medium leading-[21px] text-gray-500",
 );
 
-const AuthorBadge = render.span(
-  "text-[13px] font-medium leading-[20px] text-orange",
-);
+const AuthorBadge = render.span("font-12-m text-orange");
 
 const ConfirmBody = render.div("flex flex-col items-center gap-4");
 
@@ -601,7 +612,7 @@ const ConfirmTitle = render.div("font-16-sb text-gray-900");
 const ConfirmMessage = render.div("font-16-r text-gray-500");
 
 const CommentText = render.div(
-  "whitespace-pre-wrap break-words font-14-r text-gray-900",
+  "whitespace-pre-wrap break-words font-16-r text-gray-900",
 );
 
 const CommentActionsRow = render.div("flex items-center gap-12");

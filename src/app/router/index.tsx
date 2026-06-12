@@ -145,6 +145,10 @@ const router = createBrowserRouter([
     element: renderLazyRoute(CommunityWritePage),
   },
   {
+    path: 'community/write/:id',
+    element: renderLazyRoute(CommunityWritePage),
+  },
+  {
     path: 'community/:id',
     element: renderLazyRoute(CommunityDetailPage),
   },
