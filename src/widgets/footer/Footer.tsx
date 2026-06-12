@@ -1,13 +1,12 @@
-import { ramenroadEmail } from '@/shared/config'
+import { EXTERNAL_LINKS, ramenroadEmail } from '@/shared/config'
 import { IconInstagram } from '@/shared/ui/icon'
 import { Line } from '@/shared/ui/line'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 
-const SERVICE_TERMS_URL = 'https://kim-junseo.notion.site/21649b91c9c580318d75e7941d6def9c'
-const PRIVACY_POLICY_URL = 'https://kim-junseo.notion.site/21849b91c9c580d18097dfe035e990c2?source=copy_link'
-const LOCATION_POLICY_URL =
-  'https://kim-junseo.notion.site/2025-08-9-24949b91c9c580b48549e8dc5195cdff?source=copy_link'
+const SERVICE_TERMS_URL = EXTERNAL_LINKS.serviceTerms
+const PRIVACY_POLICY_URL = EXTERNAL_LINKS.privacyPolicy
+const LOCATION_POLICY_URL = EXTERNAL_LINKS.locationPolicy
 const INSTAGRAM_URL = 'https://www.instagram.com/ra.ising/'
 
 export const Footer = () => {

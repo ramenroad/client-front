@@ -1,8 +1,9 @@
 import { type MouseEvent } from 'react'
+import { EXTERNAL_LINKS } from '@/shared/config'
 import { openUrl } from '@/shared/lib/browser'
 import render from '@/shared/ui/render'
 
-const REVIEW_FORM_GUIDE_URL = 'https://kim-junseo.notion.site/23a49b91c9c58027bce1f6ad0cee5989?pvs=74'
+const REVIEW_FORM_GUIDE_URL = EXTERNAL_LINKS.reviewGuide
 
 export const ReviewFormGuide = () => {
   const handleGuideClick = (event: MouseEvent<HTMLAnchorElement>) => {
