@@ -1,6 +1,7 @@
 import { IconStar } from '@/shared/ui/icon'
 import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
+import { RamenyaTag } from '@/shared/ui/tag'
 import TopBar from '@/shared/ui/top-bar'
 import { useMySearchPage } from '../model/useMySearchPage'
 
@@ -27,7 +28,13 @@ const MySearchPage = () => {
                 {store.thumbnailUrl ? <ThumbnailImage src={store.thumbnailUrl} alt={store.name} /> : null}
               </Thumbnail>
               <StoreName>{store.name}</StoreName>
-              {store.genre.length > 0 ? <StoreGenre>{store.genre.join('  ')}</StoreGenre> : null}
+              {store.genre.length > 0 ? (
+                <TagWrapper>
+                  {store.genre.map((genre) => (
+                    <RamenyaTag key={genre}>{genre}</RamenyaTag>
+                  ))}
+                </TagWrapper>
+              ) : null}
               <RatingRow>
                 <IconStar size={14} />
                 <RatingValue>{store.rating.toFixed(1)}</RatingValue>
@@ -50,19 +57,21 @@ const StateText = render.div('flex min-h-200 items-center justify-center font-16
 
 const EmptyText = render.div('flex min-h-200 items-center justify-center font-14-r text-gray-400')
 
-const Grid = render.div('grid grid-cols-2 gap-x-12 gap-y-20 px-20 py-8')
+const Grid = render.div('grid grid-cols-2 gap-12 px-20 py-8')
 
-const StoreCard = render.button('flex cursor-pointer flex-col border-none bg-transparent p-0 text-left')
+const StoreCard = render.button(
+  'flex cursor-pointer flex-col rounded-12 border-none bg-[#FAFAFA] p-10 text-left',
+)
 
-const Thumbnail = render.div('aspect-square w-full overflow-hidden rounded-12 bg-border')
+const Thumbnail = render.div('aspect-square w-full overflow-hidden rounded-8 bg-border')
 
 const ThumbnailImage = render.img('h-full w-full object-cover')
 
-const StoreName = render.div('mt-8 truncate font-16-m text-gray-900')
+const StoreName = render.div('mt-8 truncate font-16-sb text-gray-900')
 
-const StoreGenre = render.div('mt-2 truncate font-12-r text-gray-400')
+const TagWrapper = render.div('mt-6 flex flex-wrap gap-4')
 
-const RatingRow = render.div('mt-4 flex items-center gap-2')
+const RatingRow = render.div('mt-8 flex items-center gap-2')
 
 const RatingValue = render.div('font-12-m text-gray-700')
 
