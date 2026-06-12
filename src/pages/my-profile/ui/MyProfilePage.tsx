@@ -28,22 +28,27 @@ const MyProfilePage = () => {
     isError,
     handleProfileClick,
     handleLoginClick,
-    handleReviewClick,
+    handleActivityClick,
+    handleSearchClick,
+    handleFeedbackClick,
     handleNotReady,
   } = useMyProfilePage()
 
   const activityItems = [
-    { label: '작성한 리뷰', icon: <IconMyReview />, onClick: handleReviewClick },
-    { label: '작성한 게시글', icon: <IconMyPost />, onClick: handleNotReady },
-    { label: '작성한 댓글', icon: <IconMyComment />, onClick: handleNotReady },
+    { label: '작성한 리뷰', icon: <IconMyReview />, onClick: () => handleActivityClick('review') },
+    { label: '작성한 게시글', icon: <IconMyPost />, onClick: () => handleActivityClick('post') },
+    { label: '작성한 댓글', icon: <IconMyComment />, onClick: () => handleActivityClick('comment') },
+  ]
+
+  const searchItems = [
     { label: '저장한 글', icon: <IconSavedPost />, onClick: handleNotReady },
-    { label: '최근 본 매장', icon: <IconRecentStore />, onClick: handleNotReady },
+    { label: '최근 본 매장', icon: <IconRecentStore />, onClick: handleSearchClick },
   ]
 
   const supportItems = [
     { label: '공지사항', icon: <IconNotice />, onClick: handleNotReady },
     { label: '패치노트', icon: <IconPatchNote />, onClick: handleNotReady },
-    { label: '의견 남기기', icon: <IconFeedback />, onClick: handleNotReady },
+    { label: '의견 남기기', icon: <IconFeedback />, onClick: handleFeedbackClick },
     { label: '약관 및 정책', icon: <IconPolicy />, onClick: handleNotReady },
   ]
 
@@ -91,6 +96,19 @@ const MyProfilePage = () => {
             <SectionLabel>내 활동</SectionLabel>
             <MenuList>
               {activityItems.map((item) => (
+                <MenuItemButton key={item.label} type="button" onClick={item.onClick}>
+                  <MenuIcon>{item.icon}</MenuIcon>
+                  <MenuLabel>{item.label}</MenuLabel>
+                  <MenuChevron />
+                </MenuItemButton>
+              ))}
+            </MenuList>
+          </Section>
+
+          <Section>
+            <SectionLabel>내 탐색</SectionLabel>
+            <MenuList>
+              {searchItems.map((item) => (
                 <MenuItemButton key={item.label} type="button" onClick={item.onClick}>
                   <MenuIcon>{item.icon}</MenuIcon>
                   <MenuLabel>{item.label}</MenuLabel>
