@@ -455,6 +455,26 @@ export const IconHome = ({ selected, ...rest }: SelectableIconProps) => {
   );
 };
 
+export const IconCommunity = ({ selected, ...rest }: SelectableIconProps) => (
+  <svg
+    width="26"
+    height="26"
+    viewBox="0 0 26 26"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...rest}
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M13.2029 1.5C18.7335 1.50001 23.2166 5.83331 23.2166 11.1787C23.2166 16.3595 19.0053 20.5891 13.7107 20.8447C13.6761 20.8522 13.6401 20.8584 13.6023 20.8584H2.50077C2.04115 20.8584 1.82532 20.2899 2.16874 19.9844L5.33671 17.165C3.99278 15.5176 3.18925 13.4394 3.18925 11.1787C3.18927 5.8333 7.67238 1.5 13.2029 1.5Z"
+      fill={selected ? "#292929" : "#CFCFCF"}
+    />
+    <rect x="8" y="8.5" width="11" height="1" rx="0.5" fill="white" />
+    <rect x="8" y="12.5" width="7" height="1" rx="0.5" fill="white" />
+  </svg>
+);
+
 export const IconUser = ({ selected, ...rest }: SelectableIconProps) => {
   if (selected) {
     return (

@@ -1,10 +1,10 @@
 import styled from '@emotion/styled'
-import { IconHome, IconMapAppBar, IconUser } from '@/shared/ui/icon'
+import { IconCommunity, IconHome, IconMapAppBar, IconUser } from '@/shared/ui/icon'
 import render from '@/shared/ui/render'
 import { useAppBar } from './model/useAppBar'
 
 const AppBar = () => {
-  const { selected, handleHomeClick, handleMapClick, handleMyClick } = useAppBar()
+  const { selected, handleHomeClick, handleMapClick, handleCommunityClick, handleMyClick } = useAppBar()
 
   return (
     <AppBarWrapper role="navigation" aria-label="하단 내비게이션">
@@ -27,6 +27,16 @@ const AppBar = () => {
         >
           <IconMapAppBar selected={selected.map} />
           <ItemText selected={selected.map}>지도</ItemText>
+        </AppBarItem>
+
+        <AppBarItem
+          type="button"
+          onClick={handleCommunityClick}
+          aria-label="커뮤니티로 이동"
+          aria-current={selected.community ? 'page' : undefined}
+        >
+          <IconCommunity selected={selected.community} />
+          <ItemText selected={selected.community}>커뮤니티</ItemText>
         </AppBarItem>
 
         <AppBarItem

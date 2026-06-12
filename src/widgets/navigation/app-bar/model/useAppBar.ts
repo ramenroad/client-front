@@ -13,6 +13,7 @@ export const useAppBar = () => {
     () => ({
       home: currentPath === '',
       map: currentPath === 'map',
+      community: currentPath === 'community',
       my: currentPath === 'mypage' || currentPath === 'user-review',
     }),
     [currentPath],
@@ -26,6 +27,10 @@ export const useAppBar = () => {
     navigate('/map')
   }, [navigate])
 
+  const handleCommunityClick = useCallback(() => {
+    navigate('/community')
+  }, [navigate])
+
   const handleMyClick = useCallback(() => {
     navigate(isSignIn ? '/mypage' : '/login')
   }, [isSignIn, navigate])
@@ -34,6 +39,7 @@ export const useAppBar = () => {
     selected,
     handleHomeClick,
     handleMapClick,
+    handleCommunityClick,
     handleMyClick,
   }
 }
