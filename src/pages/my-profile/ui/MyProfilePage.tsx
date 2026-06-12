@@ -5,8 +5,6 @@ import {
   IconMyComment,
   IconMyPost,
   IconMyReview,
-  IconNotice,
-  IconPatchNote,
   IconPolicy,
   IconRecentStore,
   IconSavedPost,
@@ -31,6 +29,7 @@ const MyProfilePage = () => {
     handleActivityClick,
     handleSearchClick,
     handleFeedbackClick,
+    handlePolicyClick,
     handleNotReady,
   } = useMyProfilePage()
 
@@ -46,10 +45,9 @@ const MyProfilePage = () => {
   ]
 
   const supportItems = [
-    { label: '공지사항', icon: <IconNotice />, onClick: handleNotReady },
-    { label: '패치노트', icon: <IconPatchNote />, onClick: handleNotReady },
+    // 공지사항/패치노트는 서버에 작성 기능이 없어 임시로 숨김.
     { label: '의견 남기기', icon: <IconFeedback />, onClick: handleFeedbackClick },
-    { label: '약관 및 정책', icon: <IconPolicy />, onClick: handleNotReady },
+    { label: '약관 및 정책', icon: <IconPolicy />, onClick: handlePolicyClick },
   ]
 
   return (

@@ -15,6 +15,7 @@ const CommunityPage = lazy(() => import('@/pages/community'))
 const CommunityWritePage = lazy(() => import('@/pages/community-write'))
 const GroupPage = lazy(() => import('@/pages/group'))
 const HomePage = lazy(() => import('@/pages/home'))
+const InquiryPage = lazy(() => import('@/pages/inquiry'))
 const LoginPage = lazy(() => import('@/pages/login'))
 const MapSearchPage = lazy(() => import('@/pages/map-search'))
 const MenuBoardImagesPage = lazy(() => import('@/pages/menu-board-images'))
@@ -23,7 +24,11 @@ const MyActivityPage = lazy(() => import('@/pages/my-activity'))
 const MyInformationPage = lazy(() => import('@/pages/my-information'))
 const MyProfilePage = lazy(() => import('@/pages/my-profile'))
 const MySearchPage = lazy(() => import('@/pages/my-search'))
+const NoticeDetailPage = lazy(() => import('@/pages/notice-detail'))
+const NoticePage = lazy(() => import('@/pages/notice'))
 const OAuthCallbackPage = lazy(() => import('@/pages/oauth-callback'))
+const PatchNotePage = lazy(() => import('@/pages/patch-note'))
+const PolicyPage = lazy(() => import('@/pages/policy'))
 const RamenyaByGenrePage = lazy(() => import('@/pages/ramenya-by-genre'))
 const RamenyaByRegionPage = lazy(() => import('@/pages/ramenya-by-region'))
 const RamenyaDetailPage = lazy(() => import('@/pages/ramenya-detail'))
@@ -162,6 +167,30 @@ const router = createBrowserRouter([
   {
     path: 'withdraw',
     element: renderLazyRoute(WithdrawPage),
+  },
+  {
+    path: 'notice',
+    element: renderLazyRoute(NoticePage),
+  },
+  {
+    path: 'notice/:id',
+    element: renderLazyRoute(NoticeDetailPage),
+  },
+  {
+    path: 'patch-note',
+    element: renderLazyRoute(PatchNotePage),
+  },
+  {
+    path: 'patch-note/:id',
+    element: renderLazyRoute(NoticeDetailPage),
+  },
+  {
+    path: 'inquiry',
+    element: renderLazyRoute(InquiryPage),
+  },
+  {
+    path: 'policy',
+    element: renderLazyRoute(PolicyPage),
   },
 ])
 

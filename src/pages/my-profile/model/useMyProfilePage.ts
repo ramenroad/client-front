@@ -1,11 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useMyInfoQuery } from '@/entities/viewer/api'
 import { useAuthSession } from '@/entities/session/model'
-import { openUrl } from '@/shared/lib/browser'
 import { useToast } from '@/shared/ui/toast'
-
-const FEEDBACK_FORM_URL =
-  'https://docs.google.com/forms/d/e/1FAIpQLSeUSPlPBD_EEePZwNbeqlwnCup81c0i5LK_57ZgrxKunIvgnQ/viewform?usp=send_form'
 
 export const useMyProfilePage = () => {
   const navigate = useNavigate()
@@ -25,7 +21,10 @@ export const useMyProfilePage = () => {
     handleLoginClick: () => navigate('/login'),
     handleActivityClick: (tab: 'review' | 'post' | 'comment') => navigate(`/my-activity?tab=${tab}`),
     handleSearchClick: () => navigate('/my-search'),
-    handleFeedbackClick: () => openUrl(FEEDBACK_FORM_URL),
+    handleNoticeClick: () => navigate('/notice'),
+    handlePatchNoteClick: () => navigate('/patch-note'),
+    handleFeedbackClick: () => navigate('/inquiry'),
+    handlePolicyClick: () => navigate('/policy'),
     // 아직 클라이언트 라우트/기능이 없는 메뉴는 안내 토스트로 대체.
     handleNotReady: () => openToast('준비 중인 기능입니다.'),
   }
