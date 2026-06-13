@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { authStore, useAuthSession } from '@/entities/session/model'
+import { authStore, useRequireSignInRedirect } from '@/entities/session/model'
 import { useWithdrawMutation } from '@/features/auth'
 import { useToast } from '@/shared/ui/toast'
 
@@ -11,7 +11,7 @@ export const useWithdrawPage = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
-  const authSession = useAuthSession()
+  useRequireSignInRedirect()
   const inputRef = useRef<HTMLInputElement>(null)
   const [isConfirmedPolicy, setIsConfirmedPolicy] = useState(false)
   const [confirmText, setConfirmText] = useState('')
@@ -28,12 +28,6 @@ export const useWithdrawPage = () => {
       openToast(error.message || '회원탈퇴에 실패했어요.')
     },
   })
-
-  useEffect(() => {
-    if (!authSession.isSignIn) {
-      navigate('/login')
-    }
-  }, [authSession.isSignIn, navigate])
 
   const openWithdrawModal = () => {
     setConfirmText('')

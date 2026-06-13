@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthSession } from '@/entities/session/model'
+import { useRequireSignInRedirect } from '@/entities/session/model'
 import { useCreateInquiryMutation } from '@/features/inquiry'
 import { useToast } from '@/shared/ui/toast'
 
 export const useInquiryPage = () => {
   const navigate = useNavigate()
   const { openToast } = useToast()
-  const authSession = useAuthSession()
+
+  // 의견 남기기는 로그인이 필요하다. 비로그인 상태로 진입하면 로그인 화면으로 보낸다.
+  useRequireSignInRedirect()
+
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
   const [isBackConfirmOpen, setIsBackConfirmOpen] = useState(false)
@@ -23,13 +26,6 @@ export const useInquiryPage = () => {
       openToast(error.message || '의견 등록에 실패했어요.')
     },
   })
-
-  // 의견 남기기는 로그인이 필요하다. 비로그인 상태로 진입하면 로그인 화면으로 보낸다.
-  useEffect(() => {
-    if (!authSession.isSignIn) {
-      navigate('/login')
-    }
-  }, [authSession.isSignIn, navigate])
 
   const isValid = title.trim().length > 0 && body.trim().length > 0
   const isDirty = title.length > 0 || body.length > 0
