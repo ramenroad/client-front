@@ -177,7 +177,14 @@ export const useCommunityDetailPage = () => {
     } else if (type === 'url') {
       await handleCopyLink()
     } else {
-      await handleShareMore()
+      try {
+        await handleShareMore()
+      } catch (error) {
+        // 사용자가 네이티브 공유 시트를 닫으면 AbortError가 발생하는데, 취소는 실패가 아니므로 무시한다.
+        if (!(error instanceof DOMException && error.name === 'AbortError')) {
+          openToast('공유에 실패했습니다.')
+        }
+      }
     }
     setIsSharePopupOpen(false)
   }

@@ -1,14 +1,8 @@
+import { formatFullDate } from '@/shared/lib/date'
+
 const MINUTE_MS = 60 * 1000
 const HOUR_MS = 60 * MINUTE_MS
 const DAY_MS = 24 * HOUR_MS
-
-const formatDateLabel = (date: Date) => {
-  const year = date.getFullYear()
-  const month = `${date.getMonth() + 1}`.padStart(2, '0')
-  const day = `${date.getDate()}`.padStart(2, '0')
-
-  return `${year}.${month}.${day}`
-}
 
 export const getRelativeTimeLabel = (dateString?: string) => {
   if (!dateString) {
@@ -39,5 +33,5 @@ export const getRelativeTimeLabel = (dateString?: string) => {
     return `${Math.floor(diff / DAY_MS)}일 전`
   }
 
-  return formatDateLabel(new Date(targetTime))
+  return formatFullDate(dateString)
 }
