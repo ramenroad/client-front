@@ -1,14 +1,13 @@
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
-import type { ApiError } from '@/shared/api'
+import { useApiQuery, type ApiQueryOptions } from '@/shared/api'
 import type { NearbyRamenyaParams, NearbyRamenyasResponse, RamenyaDetail, RamenyaListParams, RamenyaSummary } from '../model'
 import { ramenyaQueryKeys } from './query-keys'
 import { ramenyaApi } from './requests'
 
 export function useNearbyRamenyasQuery(
   params: NearbyRamenyaParams | null,
-  options?: Omit<UseQueryOptions<NearbyRamenyasResponse, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: ApiQueryOptions<NearbyRamenyasResponse>,
 ) {
-  return useQuery<NearbyRamenyasResponse, ApiError>({
+  return useApiQuery<NearbyRamenyasResponse>({
     queryKey: ramenyaQueryKeys.nearby(params),
     queryFn: () => {
       if (!params) {
@@ -22,22 +21,16 @@ export function useNearbyRamenyasQuery(
   })
 }
 
-export function useRamenyaListQuery(
-  params?: RamenyaListParams,
-  options?: Omit<UseQueryOptions<RamenyaSummary[], ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<RamenyaSummary[], ApiError>({
+export function useRamenyaListQuery(params?: RamenyaListParams, options?: ApiQueryOptions<RamenyaSummary[]>) {
+  return useApiQuery<RamenyaSummary[]>({
     queryKey: ramenyaQueryKeys.list(params),
     queryFn: () => ramenyaApi.getAll(params),
     ...options,
   })
 }
 
-export function useRamenyaDetailQuery(
-  id: string,
-  options?: Omit<UseQueryOptions<RamenyaDetail, ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<RamenyaDetail, ApiError>({
+export function useRamenyaDetailQuery(id: string, options?: ApiQueryOptions<RamenyaDetail>) {
+  return useApiQuery<RamenyaDetail>({
     queryKey: ramenyaQueryKeys.detail(id),
     queryFn: () => ramenyaApi.getById(id),
     enabled: Boolean(id),
@@ -45,10 +38,8 @@ export function useRamenyaDetailQuery(
   })
 }
 
-export function useRamenyaRegionsQuery(
-  options?: Omit<UseQueryOptions<string[], ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<string[], ApiError>({
+export function useRamenyaRegionsQuery(options?: ApiQueryOptions<string[]>) {
+  return useApiQuery<string[]>({
     queryKey: ramenyaQueryKeys.regions(),
     queryFn: ramenyaApi.getRegions,
     ...options,

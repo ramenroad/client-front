@@ -1,6 +1,9 @@
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
-import { useApiInfiniteQuery, type ApiInfiniteQueryOptions } from '@/shared/api'
-import type { ApiError } from '@/shared/api'
+import {
+  useApiInfiniteQuery,
+  useApiQuery,
+  type ApiInfiniteQueryOptions,
+  type ApiQueryOptions,
+} from '@/shared/api'
 import type { PaginationParams } from '@/shared/model'
 import type {
   MyReviewsResponse,
@@ -51,11 +54,8 @@ export function useUserReviewsInfiniteQuery(
   })
 }
 
-export function useRamenyaReviewImagesQuery(
-  ramenyaId: string,
-  options?: Omit<UseQueryOptions<RamenyaReviewImagesResponse, ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<RamenyaReviewImagesResponse, ApiError>({
+export function useRamenyaReviewImagesQuery(ramenyaId: string, options?: ApiQueryOptions<RamenyaReviewImagesResponse>) {
+  return useApiQuery<RamenyaReviewImagesResponse>({
     queryKey: reviewQueryKeys.images(ramenyaId),
     queryFn: () => reviewApi.getRamenyaReviewImages(ramenyaId),
     enabled: Boolean(ramenyaId),
@@ -63,11 +63,8 @@ export function useRamenyaReviewImagesQuery(
   })
 }
 
-export function useReviewDetailQuery(
-  reviewId: string,
-  options?: Omit<UseQueryOptions<ReviewDetail, ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<ReviewDetail, ApiError>({
+export function useReviewDetailQuery(reviewId: string, options?: ApiQueryOptions<ReviewDetail>) {
+  return useApiQuery<ReviewDetail>({
     queryKey: reviewQueryKeys.detail(reviewId),
     queryFn: () => reviewApi.getById(reviewId),
     enabled: Boolean(reviewId),

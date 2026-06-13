@@ -1,5 +1,9 @@
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
-import { useApiInfiniteQuery, type ApiError, type ApiInfiniteQueryOptions } from '@/shared/api'
+import {
+  useApiInfiniteQuery,
+  useApiQuery,
+  type ApiInfiniteQueryOptions,
+  type ApiQueryOptions,
+} from '@/shared/api'
 import type {
   CommunityBoardDetail,
   CommunityBoardListResponse,
@@ -22,11 +26,8 @@ export function useCommunityBoardsInfiniteQuery(
   })
 }
 
-export function useCommunityBoardDetailQuery(
-  boardId: string,
-  options?: Omit<UseQueryOptions<CommunityBoardDetail, ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<CommunityBoardDetail, ApiError>({
+export function useCommunityBoardDetailQuery(boardId: string, options?: ApiQueryOptions<CommunityBoardDetail>) {
+  return useApiQuery<CommunityBoardDetail>({
     queryKey: communityQueryKeys.boardDetail(boardId),
     queryFn: () => communityApi.getBoardDetail(boardId),
     enabled: Boolean(boardId),
@@ -34,11 +35,8 @@ export function useCommunityBoardDetailQuery(
   })
 }
 
-export function useCommunityCommentsQuery(
-  boardId: string,
-  options?: Omit<UseQueryOptions<CommunityCommentNode[], ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<CommunityCommentNode[], ApiError>({
+export function useCommunityCommentsQuery(boardId: string, options?: ApiQueryOptions<CommunityCommentNode[]>) {
+  return useApiQuery<CommunityCommentNode[]>({
     queryKey: communityQueryKeys.comments(boardId),
     queryFn: () => communityApi.getComments(boardId),
     enabled: Boolean(boardId),

@@ -1,33 +1,26 @@
-import { useQuery, type UseQueryOptions } from '@tanstack/react-query'
-import type { ApiError } from '@/shared/api'
+import { useApiQuery, type ApiQueryOptions } from '@/shared/api'
 import type { MyComment, MyPost, RecentViewedRamenya } from '../model'
 import { activityQueryKeys } from './query-keys'
 import { activityApi } from './requests'
 
-export function useMyPostsQuery(
-  options?: Omit<UseQueryOptions<MyPost[], ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<MyPost[], ApiError>({
+export function useMyPostsQuery(options?: ApiQueryOptions<MyPost[]>) {
+  return useApiQuery<MyPost[]>({
     queryKey: activityQueryKeys.myPosts(),
     queryFn: activityApi.getMyPosts,
     ...options,
   })
 }
 
-export function useMyCommentsQuery(
-  options?: Omit<UseQueryOptions<MyComment[], ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<MyComment[], ApiError>({
+export function useMyCommentsQuery(options?: ApiQueryOptions<MyComment[]>) {
+  return useApiQuery<MyComment[]>({
     queryKey: activityQueryKeys.myComments(),
     queryFn: activityApi.getMyComments,
     ...options,
   })
 }
 
-export function useRecentViewedRamenyaQuery(
-  options?: Omit<UseQueryOptions<RecentViewedRamenya[], ApiError>, 'queryKey' | 'queryFn'>,
-) {
-  return useQuery<RecentViewedRamenya[], ApiError>({
+export function useRecentViewedRamenyaQuery(options?: ApiQueryOptions<RecentViewedRamenya[]>) {
+  return useApiQuery<RecentViewedRamenya[]>({
     queryKey: activityQueryKeys.recentViewedRamenya(),
     queryFn: activityApi.getRecentViewedRamenya,
     ...options,

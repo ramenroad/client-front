@@ -1,13 +1,21 @@
 import {
   useInfiniteQuery as useTanStackInfiniteQuery,
   useMutation as useTanStackMutation,
+  useQuery as useTanStackQuery,
   type InfiniteData,
   type QueryKey,
   type UseInfiniteQueryOptions,
   type UseMutationOptions,
+  type UseQueryOptions,
 } from '@tanstack/react-query'
 import type { PaginationParams } from '@/shared/model'
 import type { ApiError } from './http'
+
+export type ApiQueryOptions<
+  TQueryFnData,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> = Omit<UseQueryOptions<TQueryFnData, ApiError, TData, TQueryKey>, 'queryKey' | 'queryFn'>
 
 export type ApiMutationOptions<
   TData,
@@ -41,6 +49,14 @@ type ApiInfiniteQueryConfig<
   params?: WithoutPage<TParams>
   initialPageParam?: number
   options?: ApiInfiniteQueryOptions<TPageData, TData, TQueryKey>
+}
+
+export function useApiQuery<
+  TQueryFnData,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+>(options: UseQueryOptions<TQueryFnData, ApiError, TData, TQueryKey>) {
+  return useTanStackQuery<TQueryFnData, ApiError, TData, TQueryKey>(options)
 }
 
 export function useApiMutation<TData = unknown, TVariables = void, TOnMutateResult = unknown>(
