@@ -31,7 +31,7 @@ export const Toast = ({ message, action, isVisible }: ToastProps) => {
   );
 };
 
-const ToastContainer = render.div("fixed bottom-68 z-[150] flex w-full items-center justify-center px-20");
+const ToastContainer = render.div("fixed bottom-92 z-[150] flex w-full items-center justify-center px-20");
 
 const ToastWrapper = styled.div<{ isVisible: boolean }>(({ isVisible }) => [
   {

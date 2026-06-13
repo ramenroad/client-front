@@ -72,6 +72,9 @@ export const useRamenyaBookmarks = () => {
 
   const addBookmarkMutation = useAddBookmarkMutation<BookmarkSnapshot>({
     onMutate: (ramenyaId) => applyOptimisticBookmark(ramenyaId, true),
+    onSuccess: () => {
+      openToast('저장되었습니다')
+    },
     onError: (_error, _ramenyaId, previousBookmarks) => {
       rollbackBookmarks(previousBookmarks)
       openToast('매장 저장에 실패했습니다.')
