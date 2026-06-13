@@ -28,6 +28,35 @@ const isRecord = (value: unknown): value is Record<string, unknown> => typeof va
 
 const normalizeToken = (token: unknown) => (typeof token === 'string' && token.length > 0 ? token : null)
 
+// 시계 오차 30초는 만료로 보지 않는다(조기 로그아웃 방지).
+const TOKEN_CLOCK_SKEW_MS = 30_000
+
+// access 토큰(JWT)이 '명확히' 만료됐는지만 판정한다.
+// JWT가 아니거나 exp가 없거나 파싱 실패 시 false(=만료로 단정하지 않음)로, 확실할 때만 로그아웃되게 한다.
+const isAccessTokenExpired = (token: string | null): boolean => {
+  if (!token) {
+    return false
+  }
+
+  const segments = token.split('.')
+
+  if (segments.length !== 3) {
+    return false
+  }
+
+  try {
+    const payload: unknown = JSON.parse(atob(segments[1].replace(/-/g, '+').replace(/_/g, '/')))
+
+    if (!isRecord(payload) || typeof payload.exp !== 'number') {
+      return false
+    }
+
+    return payload.exp * 1000 + TOKEN_CLOCK_SKEW_MS < Date.now()
+  } catch {
+    return false
+  }
+}
+
 export const parseAuthStorageSnapshot = (storageValue: string | null): AuthSessionState => {
   if (!storageValue) {
     return emptySession
@@ -43,7 +72,11 @@ export const parseAuthStorageSnapshot = (storageValue: string | null): AuthSessi
 
     const accessToken = normalizeToken(state.accessToken)
     const refreshToken = normalizeToken(state.refreshToken)
-    const isSignIn = state.isSignIn === true || Boolean(accessToken) || Boolean(refreshToken)
+    // refresh 토큰이 있으면 access 만료 시 재발급으로 세션 유지가 가능하므로 로그인으로 본다.
+    // refresh 토큰이 없고 access가 명확히 만료됐다면, 살릴 수 없는 세션이므로 비로그인으로 판정해
+    // 죽은 토큰으로 인증 요청을 날리는 것(=401 유발)을 막는다.
+    const hasUsableAccess = Boolean(accessToken) && !isAccessTokenExpired(accessToken)
+    const isSignIn = hasUsableAccess || Boolean(refreshToken)
 
     return {
       isSignIn,
