@@ -12,6 +12,7 @@ import { useRamenyaBookmarks } from '@/features/bookmark'
 import { openUrl } from '@/shared/lib/browser'
 import { getReviewCreatedTime } from '@/shared/lib/date'
 import { isMobileDevice } from '@/shared/lib/image'
+import { useShare } from '@/shared/lib/useShare'
 
 type MapButtonType = 'google' | 'kakao' | 'naver'
 
@@ -83,6 +84,11 @@ export const useRamenyaDetailPage = () => {
   const detail = detailQuery.data
   const isSignIn = authSession.isSignIn && myInfoQuery.error?.status !== 401
   const isBookmarked = bookmarkedIds.has(id)
+  const share = useShare({
+    title: detail?.name ?? '라이징',
+    description: detail?.ramenroadReview?.oneLineReview ?? detail?.genre?.join(', ') ?? '',
+    text: detail?.name ? `${detail.name} - 라이징에서 확인해보세요!` : '라이징에서 확인해보세요!',
+  })
   const todayBusinessHour = useMemo(() => getTodayBusinessHour(detail?.businessHours ?? []), [detail?.businessHours])
   const sortedBusinessHours = useMemo(
     () => sortBusinessHoursByCurrentDay(detail?.businessHours ?? []),
@@ -205,6 +211,10 @@ export const useRamenyaDetailPage = () => {
     isSignIn,
     isBookmarked,
     handleBookmarkClick,
+    isShareOpen: share.isShareOpen,
+    openShare: share.openShare,
+    closeShare: share.closeShare,
+    handleShare: share.handleShare,
     myInfo: myInfoQuery.data,
     reviewImages,
     reviews: topReviews,

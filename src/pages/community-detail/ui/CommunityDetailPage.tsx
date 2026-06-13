@@ -11,7 +11,6 @@ import {
   CommunityEyeIcon,
   CommunityHeartIcon,
 } from "@/entities/community/ui";
-import { UserReviewsShareModal } from "@/pages/user-reviews/ui/UserReviewsShareModal";
 import {
   IconEdit,
   IconHeart,
@@ -25,6 +24,7 @@ import {
 import { PageLayout } from "@/shared/ui/page-layout";
 import { Popup, PopupConfirm } from "@/shared/ui/popup";
 import render from "@/shared/ui/render";
+import { ShareModal } from "@/shared/ui/share-modal";
 import TopBar from "@/shared/ui/top-bar";
 import { useCommunityDetailPage } from "../model/useCommunityDetailPage";
 
@@ -315,7 +315,7 @@ const CommunityDetailPage = () => {
         </CommentBar>
       </CommentArea>
 
-      <UserReviewsShareModal
+      <ShareModal
         isOpen={isSharePopupOpen}
         onClose={onCloseShare}
         onShare={onShare}

@@ -1,9 +1,9 @@
 import { IconShare } from '@/shared/ui/icon'
 import { PageLayout } from '@/shared/ui/page-layout'
+import { ShareModal } from '@/shared/ui/share-modal'
 import TopBar from '@/shared/ui/top-bar'
 import { useUserReviewsPage } from '../model/useUserReviewsPage'
 import { UserReviewsContent } from './UserReviewsContent'
-import { UserReviewsShareModal } from './UserReviewsShareModal'
 
 const UserReviewsPage = () => {
   const {
@@ -34,7 +34,7 @@ const UserReviewsPage = () => {
         onReviewVisibilityChange={handleReviewVisibilityChange}
         onNavigateHome={navigateHome}
       />
-      <UserReviewsShareModal isOpen={isSharePopupOpen} onClose={closeSharePopup} onShare={handleShare} />
+      <ShareModal isOpen={isSharePopupOpen} onClose={closeSharePopup} onShare={handleShare} />
     </PageLayout>
   )
 }

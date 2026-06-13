@@ -25,6 +25,7 @@ import {
   IconLocate,
   IconMap,
   IconMenuBoard,
+  IconShare,
   IconStar,
   IconTag,
   IconTime,
@@ -36,6 +37,7 @@ import { Modal } from '@/shared/ui/modal'
 import { PageLayout } from '@/shared/ui/page-layout'
 import { RatingStars } from '@/shared/ui/rating'
 import render from '@/shared/ui/render'
+import { ShareModal } from '@/shared/ui/share-modal'
 import { TopBar } from '@/shared/ui/top-bar'
 import { useToast } from '@/shared/ui/toast'
 import { formatNumber } from '@/shared/lib/number'
@@ -52,6 +54,10 @@ const RamenyaDetailPage = () => {
     isSignIn,
     isBookmarked,
     handleBookmarkClick,
+    isShareOpen,
+    openShare,
+    closeShare,
+    handleShare,
     myInfo,
     reviewImages,
     reviews,
@@ -91,16 +97,14 @@ const RamenyaDetailPage = () => {
     <PageWrapper variant="appBar">
       <PageContainer>
         <HeaderBox>
-          <TopBar
-            title={detail.name}
-            icon={<IconBookmark active={isBookmarked} />}
-            onIconClick={handleBookmarkClick}
-          />
+          <TopBar title={detail.name} icon={<IconShare />} onIconClick={openShare} />
           <ThumbnailSection detail={detail} />
         </HeaderBox>
 
         <InformationSection
           detail={detail}
+          isBookmarked={isBookmarked}
+          onBookmarkClick={handleBookmarkClick}
           isTimeExpanded={isTimeExpanded}
           setIsTimeExpanded={setIsTimeExpanded}
           sortedBusinessHours={sortedBusinessHours}
@@ -164,6 +168,8 @@ const RamenyaDetailPage = () => {
           />
         )}
       </Modal>
+
+      <ShareModal isOpen={isShareOpen} onClose={closeShare} onShare={handleShare} />
 
       <Modal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal}>
         <ModalContent>
@@ -231,12 +237,16 @@ const DetailIconTag = ({ icon, text }: { icon: ReactNode; text: string }) => {
 
 const InformationSection = ({
   detail,
+  isBookmarked,
+  onBookmarkClick,
   isTimeExpanded,
   setIsTimeExpanded,
   sortedBusinessHours,
   todayBusinessHour,
 }: {
   detail: RamenyaDetail
+  isBookmarked: boolean
+  onBookmarkClick: () => void
   isTimeExpanded: boolean
   setIsTimeExpanded: (expanded: boolean) => void
   sortedBusinessHours: BusinessHour[]
@@ -250,7 +260,17 @@ const InformationSection = ({
 
   return (
     <InformationWrapper>
-      <MarketDetailTitle>{detail.name}</MarketDetailTitle>
+      <MarketDetailTitleRow>
+        <MarketDetailTitle>{detail.name}</MarketDetailTitle>
+        <BookmarkButton
+          type="button"
+          aria-pressed={isBookmarked}
+          aria-label={isBookmarked ? `${detail.name} 저장 해제` : `${detail.name} 저장`}
+          onClick={onBookmarkClick}
+        >
+          <IconBookmark active={isBookmarked} size={28} />
+        </BookmarkButton>
+      </MarketDetailTitleRow>
       <MarketDetailBoxContainer>
         <MarketDetailBox>
           <DetailIconTag icon={<IconStar inactive />} text="평점" />
@@ -738,7 +758,13 @@ const StateText = render.span('font-16-r text-gray-500')
 
 const InformationWrapper = render.section('flex flex-col gap-16 px-20 pt-20 pb-32')
 
-const MarketDetailTitle = render.h1('m-0 font-22-sb text-black')
+const MarketDetailTitleRow = render.div('flex items-start justify-between gap-12')
+
+const MarketDetailTitle = render.h1('m-0 min-w-0 flex-1 font-22-sb text-black')
+
+const BookmarkButton = render.button(
+  'flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none',
+)
 
 const MarketDetailBoxContainer = render.div('flex flex-col gap-12')
 

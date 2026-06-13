@@ -7,13 +7,29 @@ type KakaoAuthorizeParams = {
   scope?: string
 }
 
-// Minimal surface of the Kakao JavaScript SDK that login relies on.
+export type KakaoShareDefaultPayload = {
+  objectType: 'feed'
+  content: {
+    title: string
+    description: string
+    link: {
+      mobileWebUrl: string
+      webUrl: string
+    }
+    imageUrl?: string
+  }
+}
+
+// Minimal surface of the Kakao JavaScript SDK that login/share rely on.
 // The SDK script is loaded synchronously in index.html (Kakao share also uses it).
 export type KakaoSdk = {
   isInitialized: () => boolean
   init: (appKey: string) => void
   Auth: {
     authorize: (params: KakaoAuthorizeParams) => void
+  }
+  Share?: {
+    sendDefault: (payload: KakaoShareDefaultPayload) => void
   }
 }
 

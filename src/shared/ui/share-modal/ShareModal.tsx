@@ -1,15 +1,16 @@
-import { Modal } from '@/shared/ui/modal'
+import type { ShareType } from '@/shared/lib/useShare'
 import { IconClose, IconKakao, IconMore } from '@/shared/ui/icon'
+import { Modal } from '@/shared/ui/modal'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 
-interface UserReviewsShareModalProps {
+interface ShareModalProps {
   isOpen: boolean
   onClose: () => void
-  onShare: (type: 'kakao' | 'url' | 'more') => void | Promise<void>
+  onShare: (type: ShareType) => void | Promise<void>
 }
 
-export const UserReviewsShareModal = ({ isOpen, onClose, onShare }: UserReviewsShareModalProps) => {
+export const ShareModal = ({ isOpen, onClose, onShare }: ShareModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>

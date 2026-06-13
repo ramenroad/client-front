@@ -25,6 +25,7 @@ import {
   IconDropDownSelected,
   IconInstagram,
   IconLocate,
+  IconShare,
   IconStar,
   IconTag,
   IconTime,
@@ -33,7 +34,9 @@ import { Line } from '@/shared/ui/line'
 import { NoStoreBox } from '@/shared/ui/no-store-box'
 import { RatingStars } from '@/shared/ui/rating'
 import render from '@/shared/ui/render'
+import { ShareModal } from '@/shared/ui/share-modal'
 import { TopBar } from '@/shared/ui/top-bar'
+import { useShare } from '@/shared/lib/useShare'
 import { useResultListOverlay } from './model/useResultListOverlay'
 
 export interface ResultListItem<T> {
@@ -389,6 +392,12 @@ const MapDetailSheetContent = <T,>({
 }) => {
   const [isTimeExpanded, setIsTimeExpanded] = useState(false)
   const content = useMemo(() => createDetailContent({ id, selectedItem, detail }), [detail, id, selectedItem])
+  // 미니 상세뷰는 자체 URL이 없어, 공유는 해당 매장의 상세 페이지(/detail/:id)를 가리킨다.
+  const share = useShare({
+    title: content?.name ?? '라이징',
+    url: content ? `${window.location.origin}/detail/${content.id}` : undefined,
+    text: content?.name ? `${content.name} - 라이징에서 확인해보세요!` : undefined,
+  })
 
   if (!content) {
     return (
@@ -418,12 +427,9 @@ const MapDetailSheetContent = <T,>({
 
   return (
     <>
-      <TopBar
-        title={content.name}
-        onBackClick={onBack}
-        icon={onBookmarkToggle && <IconBookmark active={Boolean(bookmarkedIds?.has(content.id))} />}
-        onIconClick={onBookmarkToggle ? () => onBookmarkToggle(content.id) : undefined}
-      />
+      <TopBar title={content.name} onBackClick={onBack} icon={<IconShare />} onIconClick={share.openShare} />
+
+      <ShareModal isOpen={share.isShareOpen} onClose={share.closeShare} onShare={share.handleShare} />
 
       <DetailContentArea>
         <ThumbnailContainer>
@@ -435,7 +441,19 @@ const MapDetailSheetContent = <T,>({
         </ThumbnailContainer>
 
         <InformationWrapper>
-          <MarketDetailTitle>{content.name}</MarketDetailTitle>
+          <MarketDetailTitleRow>
+            <MarketDetailTitle>{content.name}</MarketDetailTitle>
+            {onBookmarkToggle && (
+              <BookmarkButton
+                type="button"
+                aria-pressed={Boolean(bookmarkedIds?.has(content.id))}
+                aria-label={bookmarkedIds?.has(content.id) ? `${content.name} 저장 해제` : `${content.name} 저장`}
+                onClick={() => onBookmarkToggle(content.id)}
+              >
+                <IconBookmark active={Boolean(bookmarkedIds?.has(content.id))} size={28} />
+              </BookmarkButton>
+            )}
+          </MarketDetailTitleRow>
           <MarketDetailBoxContainer>
             <MarketDetailBox>
               <DetailIconTag icon={<IconStar inactive />} text="평점" />
@@ -670,7 +688,13 @@ const DetailContentArea = render.div('hide-scrollbar flex-1 overflow-y-auto')
 
 const InformationWrapper = render.section('flex flex-col gap-16 px-20 pt-20 pb-32')
 
-const MarketDetailTitle = render.h1('m-0 font-22-sb text-black')
+const MarketDetailTitleRow = render.div('flex items-start justify-between gap-12')
+
+const MarketDetailTitle = render.h1('m-0 min-w-0 flex-1 font-22-sb text-black')
+
+const BookmarkButton = render.button(
+  'flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none',
+)
 
 const MarketDetailBoxContainer = render.div('flex flex-col gap-12')
 
