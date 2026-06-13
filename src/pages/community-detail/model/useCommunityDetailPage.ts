@@ -40,6 +40,8 @@ export const useCommunityDetailPage = () => {
     title: boardQuery.data?.title ?? '라이징',
     description: boardQuery.data?.body ?? '',
     text: boardQuery.data?.title ?? '라이징 커뮤니티 게시글을 확인해보세요!',
+    imageUrl: boardQuery.data?.ImageUrls?.[0],
+    buttonTitle: '게시글 보러가기',
   })
   const [confirmDialog, setConfirmDialog] = useState<{
     title: string

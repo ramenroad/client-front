@@ -397,6 +397,8 @@ const MapDetailSheetContent = <T,>({
     title: content?.name ?? '라이징',
     url: content ? `${window.location.origin}/detail/${content.id}` : undefined,
     text: content?.name ? `${content.name} - 라이징에서 확인해보세요!` : undefined,
+    imageUrl: content?.thumbnailUrl,
+    buttonTitle: '매장 보러가기',
   })
 
   if (!content) {

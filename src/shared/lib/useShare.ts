@@ -4,6 +4,9 @@ import { ensureKakaoInitialized } from './kakao-sdk'
 
 export type ShareType = 'kakao' | 'url' | 'more'
 
+// index.html의 og:image와 동일. 콘텐츠 대표 이미지가 없을 때 트위터 카드처럼 보이도록 폴백으로 쓴다.
+const DEFAULT_SHARE_IMAGE_URL = 'https://ra-ising.com/og-image.png'
+
 export type ShareContent = {
   /** 카카오/네이티브 공유 제목 */
   title: string
@@ -13,6 +16,10 @@ export type ShareContent = {
   url?: string
   /** 네이티브 공유(navigator.share) 본문. 기본값은 description. */
   text?: string
+  /** 카카오 카드 대표 이미지(절대 URL). 없으면 서비스 기본 OG 이미지로 폴백. */
+  imageUrl?: string
+  /** 카카오 카드 하단 버튼 문구. 기본값은 '라이징에서 보기'. */
+  buttonTitle?: string
 }
 
 /**
@@ -55,16 +62,29 @@ export const useShare = (content: ShareContent) => {
       return
     }
 
+    const link = {
+      mobileWebUrl: getUrl(),
+      webUrl: getUrl(),
+    }
+    const isDefaultImage = !content.imageUrl
+
+    // 트위터 summary_large_image와 유사한 리치 카드: 대표 이미지 + 제목 + 설명 + CTA 버튼
     kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
         title: content.title,
         description: content.description ?? '',
-        link: {
-          mobileWebUrl: getUrl(),
-          webUrl: getUrl(),
-        },
+        imageUrl: content.imageUrl || DEFAULT_SHARE_IMAGE_URL,
+        // 기본 OG 이미지는 1200x630(와이드)이라 큰 이미지 카드로 보이도록 크기를 명시한다.
+        ...(isDefaultImage ? { imageWidth: 1200, imageHeight: 630 } : {}),
+        link,
       },
+      buttons: [
+        {
+          title: content.buttonTitle ?? '라이징에서 보기',
+          link,
+        },
+      ],
     })
   }
 

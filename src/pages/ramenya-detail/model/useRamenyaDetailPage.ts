@@ -88,6 +88,8 @@ export const useRamenyaDetailPage = () => {
     title: detail?.name ?? '라이징',
     description: detail?.ramenroadReview?.oneLineReview ?? detail?.genre?.join(', ') ?? '',
     text: detail?.name ? `${detail.name} - 라이징에서 확인해보세요!` : '라이징에서 확인해보세요!',
+    imageUrl: detail?.thumbnailUrl,
+    buttonTitle: '매장 보러가기',
   })
   const todayBusinessHour = useMemo(() => getTodayBusinessHour(detail?.businessHours ?? []), [detail?.businessHours])
   const sortedBusinessHours = useMemo(
