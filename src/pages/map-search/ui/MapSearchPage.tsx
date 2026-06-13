@@ -1,4 +1,4 @@
-import { IconGPS } from '@/shared/ui/icon'
+import { IconBookmark, IconGPS } from '@/shared/ui/icon'
 import { Modal } from '@/shared/ui/modal'
 import render from '@/shared/ui/render'
 import { SearchOverlay } from '@/widgets/map/search-overlay'
@@ -39,8 +39,10 @@ const MapSearchPage = () => {
     isSearchBarHidden,
     searchBarBottomPx,
     bookmarkedIds,
+    isSavedMode,
     isLoginModalOpen,
     handleBookmarkToggle,
+    handleToggleSavedMode,
     handleCloseLoginModal,
     handleNavigateLoginPage,
     handleSearchBarOverlapChange,
@@ -92,6 +94,19 @@ const MapSearchPage = () => {
         >
           <IconGPS />
         </GPSButton>
+      )}
+
+      {shouldShowCurrentLocationButton && (
+        <SavedFilterButton
+          type="button"
+          data-active={isSavedMode}
+          onClick={handleToggleSavedMode}
+          style={{ bottom: currentLocationButtonBottom }}
+          aria-pressed={isSavedMode}
+          aria-label="저장한 매장만 보기"
+        >
+          <IconBookmark active={isSavedMode} size={20} />
+        </SavedFilterButton>
       )}
 
       <ResultListOverlay
@@ -157,6 +172,10 @@ const ModalConfirmButton = render.button('w-full cursor-pointer border-none bg-t
 
 const GPSButton = render.button(
   'absolute left-16 z-40 flex h-38 w-38 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none transition-[bottom] duration-300 ease-out',
+)
+
+const SavedFilterButton = render.button(
+  'absolute right-16 z-40 flex h-38 w-38 cursor-pointer items-center justify-center rounded-full border border-solid border-gray-100 bg-white p-0 shadow-[0_2px_8px_rgba(0,0,0,0.15)] outline-none transition-[bottom] duration-300 ease-out data-[active=true]:border-orange',
 )
 
 export default MapSearchPage

@@ -1,3 +1,4 @@
+import type { BusinessHour } from '@/entities/ramenya/model'
 import type { Id, ISODateString } from '@/shared/model'
 
 export type BookmarkedRamenya = {
@@ -7,6 +8,10 @@ export type BookmarkedRamenya = {
   thumbnailUrl?: string
   rating: number
   reviewCount: number
+  address?: string
+  latitude?: number
+  longitude?: number
+  businessHours?: BusinessHour[]
 }
 
 export type MyBookmark = {

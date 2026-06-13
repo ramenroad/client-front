@@ -39,6 +39,12 @@ export const useRamenyaBookmarks = () => {
     [myBookmarksQuery.data],
   )
 
+  // 저장한 매장 목록(최신순). 낙관적 추가 stub은 위치 정보가 없어 지도/목록 소비처에서 걸러진다.
+  const bookmarkedRamenyas = useMemo(
+    () => (myBookmarksQuery.data ?? []).map((bookmark) => bookmark.ramenya),
+    [myBookmarksQuery.data],
+  )
+
   const applyOptimisticBookmark = async (ramenyaId: string, nextBookmarked: boolean) => {
     await queryClient.cancelQueries({ queryKey: bookmarkQueryKeys.my() })
     const previousBookmarks = queryClient.getQueryData<MyBookmark[]>(bookmarkQueryKeys.my())
@@ -99,6 +105,8 @@ export const useRamenyaBookmarks = () => {
   return {
     isSignIn,
     bookmarkedIds,
+    bookmarkedRamenyas,
+    isBookmarksLoading: myBookmarksQuery.isLoading,
     toggleBookmark,
   }
 }

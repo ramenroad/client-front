@@ -13,7 +13,7 @@ import {
 import { useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useSearchResultsQuery } from '@/entities/search/api'
 import type { SearchResult } from '@/entities/search/model'
-import { useRamenyaBookmarks } from '@/features/bookmark'
+import { useRamenyaBookmarks, type BookmarkedRamenya } from '@/features/bookmark'
 import { getReviewCreatedTime } from '@/shared/lib/date'
 import type { Coordinate, MapViewportSnapshot } from '@/shared/lib/naver-map'
 import { calculateDistanceValue } from '@/shared/lib/number'
@@ -170,6 +170,26 @@ const getInitialCenter = (searchParams: URLSearchParams): Coordinate => {
 
 const getRamenyaId = (ramenya: MapRamenya) => ramenya._id
 
+// 저장한 매장(BookmarkedRamenya)을 지도 리스트/마커가 쓰는 MapRamenya 형태로 변환한다.
+// 좌표는 서버가 내려줄 때만 있으므로, 없으면 NaN으로 두고 리스트에는 그대로 노출한다.
+// (마커는 별도로 유효 좌표만 거른다.) 위치 정보가 없는 stub도 리스트에는 보여 '위치 무관' 요구를 만족시킨다.
+const toSavedMapRamenya = (ramenya: BookmarkedRamenya): MapRamenya => ({
+  _id: ramenya._id,
+  name: ramenya.name,
+  genre: ramenya.genre,
+  address: ramenya.address ?? '',
+  latitude: typeof ramenya.latitude === 'number' ? ramenya.latitude : NaN,
+  longitude: typeof ramenya.longitude === 'number' ? ramenya.longitude : NaN,
+  businessHours: ramenya.businessHours ?? [],
+  thumbnailUrl: ramenya.thumbnailUrl ?? '',
+  menus: [],
+  rating: ramenya.rating,
+  reviewCount: ramenya.reviewCount,
+})
+
+const hasValidCoords = (ramenya: { latitude: number; longitude: number }) =>
+  Number.isFinite(ramenya.latitude) && Number.isFinite(ramenya.longitude)
+
 const normalizeSearchText = (value: string) => value.trim().toLowerCase()
 
 const isInactiveRamenya = (ramenya: MapRamenya) => {
@@ -286,10 +306,17 @@ export const useMapSearchPage = () => {
   const [isSearchBarHidden, setIsSearchBarHidden] = useState(false)
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(getInitialFilterOptions)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  const [isSavedMode, setIsSavedMode] = useState(false)
   const isFirstIdleRef = useRef(true)
   const suppressNextIdleRef = useRef(false)
+  // handleMapIdle(빈 deps 콜백)에서 최신 저장모드 값을 읽기 위한 ref
+  const isSavedModeRef = useRef(false)
   const { openToast } = useToast()
-  const { isSignIn, bookmarkedIds, toggleBookmark } = useRamenyaBookmarks()
+  const { isSignIn, bookmarkedIds, bookmarkedRamenyas, toggleBookmark } = useRamenyaBookmarks()
+
+  useEffect(() => {
+    isSavedModeRef.current = isSavedMode
+  }, [isSavedMode])
 
   useEffect(() => {
     let isCancelled = false
@@ -325,12 +352,12 @@ export const useMapSearchPage = () => {
   const isMapScopedSearch = searchParams.get('nearBy') === 'true'
 
   const nearbyParams = useMemo(() => {
-    if (trimmedKeyword || !searchArea) {
+    if (isSavedMode || trimmedKeyword || !searchArea) {
       return null
     }
 
     return searchArea
-  }, [searchArea, trimmedKeyword])
+  }, [isSavedMode, searchArea, trimmedKeyword])
 
   const searchResultParams = useMemo(() => {
     if (!trimmedKeyword) {
@@ -389,13 +416,25 @@ export const useMapSearchPage = () => {
   const isUsingGlobalSearchFallback = shouldSearchGloballyAsFallback
   const isGlobalSearchResult = Boolean(trimmedKeyword && (!isMapScopedSearch || isUsingGlobalSearchFallback))
 
+  // 저장 모드: 위치/검색과 무관하게 내가 저장한 모든 매장을 보여준다(좌표 유무와 관계없이 리스트에 노출).
+  const savedRamenyaList = useMemo<MapRamenya[]>(
+    () => bookmarkedRamenyas.map(toSavedMapRamenya),
+    [bookmarkedRamenyas],
+  )
+
   const rawRamenyaList = useMemo<MapRamenya[]>(() => {
+    if (isSavedMode) {
+      return savedRamenyaList
+    }
+
     if (trimmedKeyword) {
       return isUsingGlobalSearchFallback ? (globalFallbackSearchQuery.data ?? []) : (searchQuery.data ?? [])
     }
 
     return nearbyQuery.data?.ramenyas ?? []
   }, [
+    isSavedMode,
+    savedRamenyaList,
     globalFallbackSearchQuery.data,
     isUsingGlobalSearchFallback,
     nearbyQuery.data?.ramenyas,
@@ -441,7 +480,8 @@ export const useMapSearchPage = () => {
 
   const markerData = useMemo<NaverMapMarker<MapRamenya>[]>(
     () =>
-      ramenyaList.map((ramenya) => ({
+      // 좌표가 없는(저장 모드의 좌표 미제공) 매장은 지도에 찍을 수 없어 마커에서 제외한다.
+      ramenyaList.filter(hasValidCoords).map((ramenya) => ({
         id: getRamenyaId(ramenya),
         position: {
           latitude: ramenya.latitude,
@@ -460,8 +500,9 @@ export const useMapSearchPage = () => {
         id: getRamenyaId(ramenya),
         name: ramenya.name,
         address: ramenya.address,
-        latitude: ramenya.latitude,
-        longitude: ramenya.longitude,
+        // 좌표가 없으면 거리 계산을 건너뛰도록 undefined로 넘긴다.
+        latitude: Number.isFinite(ramenya.latitude) ? ramenya.latitude : undefined,
+        longitude: Number.isFinite(ramenya.longitude) ? ramenya.longitude : undefined,
         genre: ramenya.genre,
         thumbnailUrl: ramenya.thumbnailUrl || '',
         rating: ramenya.rating,
@@ -501,13 +542,16 @@ export const useMapSearchPage = () => {
       setResultSheetHeight((prev) =>
         parseSheetDvh(prev) <= MAP_RESULT_SHEET_COLLAPSE_DVH ? MAP_RESULT_SHEET_HEIGHTS.HALF : prev,
       )
-      setFocusRequest({
-        id: `${ramenyaId}-${Date.now()}`,
-        position: {
-          latitude: ramenya.latitude,
-          longitude: ramenya.longitude,
-        },
-      })
+      // 좌표가 있는 매장만 지도 포커스를 이동한다(저장 모드의 좌표 미제공 매장 보호).
+      if (hasValidCoords(ramenya)) {
+        setFocusRequest({
+          id: `${ramenyaId}-${Date.now()}`,
+          position: {
+            latitude: ramenya.latitude,
+            longitude: ramenya.longitude,
+          },
+        })
+      }
       setSearchParams(
         (prev) =>
           updateMapSearchParams(prev, (nextParams) => {
@@ -526,13 +570,15 @@ export const useMapSearchPage = () => {
 
       suppressNextIdleRef.current = true
       setResultSheetHeight(MAP_RESULT_SHEET_HEIGHTS.EXPANDED)
-      setFocusRequest({
-        id: `detail-${ramenyaId}-${Date.now()}`,
-        position: {
-          latitude: ramenya.latitude,
-          longitude: ramenya.longitude,
-        },
-      })
+      if (hasValidCoords(ramenya)) {
+        setFocusRequest({
+          id: `detail-${ramenyaId}-${Date.now()}`,
+          position: {
+            latitude: ramenya.latitude,
+            longitude: ramenya.longitude,
+          },
+        })
+      }
       setSearchParams((prev) =>
         updateMapSearchParams(prev, (nextParams) => {
           nextParams.set('selectedId', ramenyaId)
@@ -598,6 +644,11 @@ export const useMapSearchPage = () => {
       return
     }
 
+    // 저장 모드에선 위치 기반 '이 지역 재검색' 안내를 띄우지 않는다.
+    if (isSavedModeRef.current) {
+      return
+    }
+
     setNeedsRefresh(true)
   }, [])
 
@@ -607,6 +658,7 @@ export const useMapSearchPage = () => {
     }
 
     const nextArea = createSearchAreaFromViewport(viewport)
+    setIsSavedMode(false)
     setSearchArea(nextArea)
     setNeedsRefresh(false)
     setFocusRequest(null)
@@ -619,6 +671,7 @@ export const useMapSearchPage = () => {
     (nextKeyword: string, isNearBy?: boolean) => {
       const normalizedKeyword = nextKeyword.trim()
 
+      setIsSavedMode(false)
       setKeyword(normalizedKeyword)
       setSearchKeyword(normalizedKeyword)
       setNeedsRefresh(false)
@@ -703,6 +756,7 @@ export const useMapSearchPage = () => {
       }
 
       suppressNextIdleRef.current = true
+      setIsSavedMode(false)
       setCurrentLocation(nextLocation)
       setSearchArea(nextArea)
       setNeedsRefresh(false)
@@ -731,6 +785,45 @@ export const useMapSearchPage = () => {
     },
     [isSignIn, toggleBookmark],
   )
+
+  const handleToggleSavedMode = useCallback(() => {
+    if (!isSignIn) {
+      setIsLoginModalOpen(true)
+      return
+    }
+
+    const nextSavedMode = !isSavedModeRef.current
+    setIsSavedMode(nextSavedMode)
+    setNeedsRefresh(false)
+    setFocusRequest(null)
+
+    if (nextSavedMode) {
+      // 저장 모드 진입: 위치/검색 상태를 정리하고 시트를 반쯤 올려 리스트를 보여준다.
+      suppressNextIdleRef.current = true
+      setKeyword('')
+      setSearchKeyword('')
+      setResultSheetHeight((current) =>
+        parseSheetDvh(current) <= MAP_RESULT_SHEET_COLLAPSE_DVH ? MAP_RESULT_SHEET_HEIGHTS.HALF : current,
+      )
+      setSearchParams(
+        (prevParams) =>
+          updateMapSearchParams(prevParams, (nextParams) => {
+            nextParams.delete('keyword')
+            nextParams.delete('selectedId')
+            nextParams.delete('sheet')
+          }),
+        { replace: true },
+      )
+      return
+    }
+
+    // 저장 모드 해제: 지금 보고 있는 지도 영역 기준으로 주변 매장을 다시 검색한다.
+    if (viewport) {
+      const nextArea = createSearchAreaFromViewport(viewport)
+      setSearchArea(nextArea)
+      syncSearchAreaToUrl(nextArea, viewport.zoom, { enableMapScopedSearch: true })
+    }
+  }, [isSignIn, setSearchParams, syncSearchAreaToUrl, viewport])
 
   const handleCloseLoginModal = useCallback(() => {
     setIsLoginModalOpen(false)
@@ -762,7 +855,7 @@ export const useMapSearchPage = () => {
     isDetailError: detailQuery.isError,
     isDetailReviewsLoading: detailReviewsQuery.isFetching,
     isDetailReviewsError: detailReviewsQuery.isError,
-    needsRefresh,
+    needsRefresh: needsRefresh && !isSavedMode,
     currentLocation,
     focusRequest: mapFocusRequest,
     resultSheetHeight,
@@ -773,8 +866,10 @@ export const useMapSearchPage = () => {
     isSearchBarHidden,
     searchBarBottomPx: MAP_SEARCH_BAR_BOTTOM_PX,
     bookmarkedIds,
+    isSavedMode,
     isLoginModalOpen,
     handleBookmarkToggle,
+    handleToggleSavedMode,
     handleCloseLoginModal,
     handleNavigateLoginPage,
     handleSearchBarOverlapChange,
