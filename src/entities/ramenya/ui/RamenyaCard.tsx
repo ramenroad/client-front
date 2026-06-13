@@ -1,4 +1,4 @@
-import { type ComponentType, useEffect, useMemo, useState } from 'react'
+import { type ComponentType, type KeyboardEvent, type ReactNode, useEffect, useMemo, useState } from 'react'
 import CountUpModule, { type CountUpProps } from 'react-countup'
 import storeImage from '@/assets/images/store.png'
 import { checkBusinessStatus, OpenStatus, type BusinessHour } from '@/entities/ramenya/model'
@@ -85,6 +85,8 @@ interface RamenyaCardProps extends RamenyaCardItem {
   isSelected?: boolean
   currentLocation?: Coordinate | null
   width?: number | string
+  /** 카드 우측 상단(매장명 행)에 표시할 액션 영역. 클릭 이벤트는 슬롯에서 stopPropagation으로 차단해야 한다. */
+  actionSlot?: ReactNode
   onClick?: () => void
 }
 
@@ -104,6 +106,7 @@ export const RamenyaCard = ({
   isSelected,
   currentLocation,
   width,
+  actionSlot,
   onClick,
 }: RamenyaCardProps) => {
   const businessStatus = useMemo(() => checkBusinessStatus(businessHours ?? []), [businessHours])
@@ -127,13 +130,25 @@ export const RamenyaCard = ({
   const hasRating = typeof rating === 'number' && rating > 0
   const shouldShowReview = isReview !== false
 
+  // actionSlot에 버튼이 들어갈 수 있어 래퍼는 button 대신 role="button" div를 사용한다(중첩 버튼 방지).
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!onClick || (event.key !== 'Enter' && event.key !== ' ')) {
+      return
+    }
+
+    event.preventDefault()
+    onClick()
+  }
+
   return (
     <RamenyaCardWrapper
-      type="button"
+      role="button"
+      tabIndex={onClick ? 0 : undefined}
       data-clickable={Boolean(onClick)}
       data-map-card={Boolean(isMapCard)}
       data-selected={Boolean(isSelected)}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
       style={width ? { width } : undefined}
       aria-label={name ? `${name} 상세보기` : '라멘야 상세보기'}
       data-id={_id}
@@ -147,9 +162,12 @@ export const RamenyaCard = ({
         />
         <RamenyaInformationWrapper>
           <RamenyaDescriptionHeader>
-            <RamenyaName size={16} weight="sb">
-              {name}
-            </RamenyaName>
+            <RamenyaNameRow>
+              <RamenyaName size={16} weight="sb">
+                {name}
+              </RamenyaName>
+              {actionSlot && <RamenyaActionSlot>{actionSlot}</RamenyaActionSlot>}
+            </RamenyaNameRow>
             {shouldShowReview && (
               <RamenyaReviewBox>
                 <IconStar inactive={!hasRating} />
@@ -198,7 +216,7 @@ export const RamenyaCard = ({
   )
 }
 
-const RamenyaCardWrapper = render.button(
+const RamenyaCardWrapper = render.div(
   'box-border w-full cursor-default border-0 bg-white p-20 text-left shadow-none outline-none transition-colors data-[clickable=true]:cursor-pointer data-[map-card=true]:rounded-12 data-[map-card=true]:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1),0_4px_6px_-4px_rgba(0,0,0,0.1)] data-[selected=true]:bg-[#FFF8F3]',
 )
 
@@ -216,7 +234,11 @@ const RamenyaReviewBox = render.section('mt-2 flex items-center gap-2')
 
 const RamenyaScore = render.span('font-12-m text-black')
 
-const RamenyaName = render.extend(RaisingText, 'truncate text-black')
+const RamenyaNameRow = render.div('flex items-start justify-between gap-8')
+
+const RamenyaName = render.extend(RaisingText, 'min-w-0 flex-1 truncate text-black')
+
+const RamenyaActionSlot = render.div('flex shrink-0 items-center')
 
 const RamenyaReviewCount = render.span('font-12-r text-gray-700')
 

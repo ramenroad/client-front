@@ -1,4 +1,5 @@
 import { IconGPS } from '@/shared/ui/icon'
+import { Modal } from '@/shared/ui/modal'
 import render from '@/shared/ui/render'
 import { SearchOverlay } from '@/widgets/map/search-overlay'
 import { NaverMap } from '@/widgets/map/naver-map'
@@ -37,6 +38,11 @@ const MapSearchPage = () => {
     focusOffsetRatio,
     isSearchBarHidden,
     searchBarBottomPx,
+    bookmarkedIds,
+    isLoginModalOpen,
+    handleBookmarkToggle,
+    handleCloseLoginModal,
+    handleNavigateLoginPage,
     handleSearchBarOverlapChange,
     handleMapReady,
     handleMapIdle,
@@ -105,16 +111,49 @@ const MapSearchPage = () => {
         isDetailReviewsLoading={isDetailReviewsLoading}
         isDetailReviewsError={isDetailReviewsError}
         searchBarBottomPx={searchBarBottomPx}
+        bookmarkedIds={bookmarkedIds}
         onHeightChange={setResultSheetHeight}
         onSearchBarOverlapChange={handleSearchBarOverlapChange}
         onFilterChange={setFilterOptions}
         onSelect={handleResultClick}
         onOpenDetail={handleOpenDetailSheet}
         onCloseDetail={handleCloseDetailSheet}
+        onBookmarkToggle={handleBookmarkToggle}
       />
+
+      <Modal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal}>
+        <ModalContent>
+          <ModalTextBox>
+            <ModalTitle>로그인이 필요해요</ModalTitle>
+            <ModalText>로그인 하시겠습니까?</ModalText>
+          </ModalTextBox>
+          <ModalButtonBox>
+            <ModalCancelButton type="button" onClick={handleCloseLoginModal}>
+              취소
+            </ModalCancelButton>
+            <ModalConfirmButton type="button" onClick={handleNavigateLoginPage}>
+              확인
+            </ModalConfirmButton>
+          </ModalButtonBox>
+        </ModalContent>
+      </Modal>
     </>
   )
 }
+
+const ModalContent = render.div('flex w-290 flex-col items-center justify-center gap-16 rounded-12 bg-white pt-32')
+
+const ModalTextBox = render.div('flex flex-col')
+
+const ModalTitle = render.div('text-center font-16-sb text-gray-900')
+
+const ModalText = render.div('text-center font-16-r text-gray-900')
+
+const ModalButtonBox = render.div('flex h-60 w-full')
+
+const ModalCancelButton = render.button('w-full cursor-pointer border-none bg-transparent font-16-r text-black')
+
+const ModalConfirmButton = render.button('w-full cursor-pointer border-none bg-transparent font-16-r text-orange')
 
 const GPSButton = render.button(
   'absolute left-16 z-40 flex h-38 w-38 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none transition-[bottom] duration-300 ease-out',

@@ -95,4 +95,5 @@ export type RamenyaDetail = Omit<RamenyaSummary, 'ramenroadReview'> & {
   googleMapUrl?: string
   googleMapDeepLink?: string
   menuBoard?: RamenyaMenuBoard[]
+  isBookmarked?: boolean
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useNearbyRamenyasQuery, useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import {
   checkBusinessStatus,
@@ -13,6 +13,8 @@ import {
 import { useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useSearchResultsQuery } from '@/entities/search/api'
 import type { SearchResult } from '@/entities/search/model'
+import { useRamenyaBookmarks } from '@/features/bookmark'
+import { getReviewCreatedTime } from '@/shared/lib/date'
 import type { Coordinate, MapViewportSnapshot } from '@/shared/lib/naver-map'
 import { calculateDistanceValue } from '@/shared/lib/number'
 import { useToast } from '@/shared/ui/toast'
@@ -168,10 +170,6 @@ const getInitialCenter = (searchParams: URLSearchParams): Coordinate => {
 
 const getRamenyaId = (ramenya: MapRamenya) => ramenya._id
 
-const getReviewCreatedTime = (createdAt?: string) => {
-  return createdAt ? new Date(createdAt).getTime() : 0
-}
-
 const normalizeSearchText = (value: string) => value.trim().toLowerCase()
 
 const isInactiveRamenya = (ramenya: MapRamenya) => {
@@ -272,6 +270,7 @@ const getCurrentPosition = () => {
 }
 
 export const useMapSearchPage = () => {
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const initialCenter = useMemo(() => getInitialCenter(searchParams), [searchParams])
   const initialZoom = useMemo(() => parseNumberParam(searchParams.get('level')) ?? DEFAULT_ZOOM, [searchParams])
@@ -286,9 +285,11 @@ export const useMapSearchPage = () => {
   const [resultSheetHeight, setResultSheetHeight] = useState<string>(getInitialSheetHeight)
   const [isSearchBarHidden, setIsSearchBarHidden] = useState(false)
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(getInitialFilterOptions)
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const isFirstIdleRef = useRef(true)
   const suppressNextIdleRef = useRef(false)
   const { openToast } = useToast()
+  const { isSignIn, bookmarkedIds, toggleBookmark } = useRamenyaBookmarks()
 
   useEffect(() => {
     let isCancelled = false
@@ -719,6 +720,27 @@ export const useMapSearchPage = () => {
     suppressNextIdleRef.current = true
   }, [])
 
+  const handleBookmarkToggle = useCallback(
+    (ramenyaId: string) => {
+      if (!isSignIn) {
+        setIsLoginModalOpen(true)
+        return
+      }
+
+      toggleBookmark(ramenyaId)
+    },
+    [isSignIn, toggleBookmark],
+  )
+
+  const handleCloseLoginModal = useCallback(() => {
+    setIsLoginModalOpen(false)
+  }, [])
+
+  const handleNavigateLoginPage = useCallback(() => {
+    setIsLoginModalOpen(false)
+    navigate('/login')
+  }, [navigate])
+
   return {
     initialCenter,
     initialZoom,
@@ -750,6 +772,11 @@ export const useMapSearchPage = () => {
     focusOffsetRatio,
     isSearchBarHidden,
     searchBarBottomPx: MAP_SEARCH_BAR_BOTTOM_PX,
+    bookmarkedIds,
+    isLoginModalOpen,
+    handleBookmarkToggle,
+    handleCloseLoginModal,
+    handleNavigateLoginPage,
     handleSearchBarOverlapChange,
     handleMapReady,
     handleMapIdle,

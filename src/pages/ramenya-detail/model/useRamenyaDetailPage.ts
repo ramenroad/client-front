@@ -8,7 +8,9 @@ import {
 import { useRamenyaReviewImagesQuery, useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useMyInfoQuery } from '@/entities/viewer/api'
 import { useAuthSession } from '@/entities/session/model'
+import { useRamenyaBookmarks } from '@/features/bookmark'
 import { openUrl } from '@/shared/lib/browser'
+import { getReviewCreatedTime } from '@/shared/lib/date'
 import { isMobileDevice } from '@/shared/lib/image'
 
 type MapButtonType = 'google' | 'kakao' | 'naver'
@@ -55,10 +57,6 @@ const createRaisingMapUrl = ({
   return `/map?${searchParams.toString()}`
 }
 
-const getReviewCreatedTime = (createdAt?: string) => {
-  return createdAt ? new Date(createdAt).getTime() : 0
-}
-
 export const useRamenyaDetailPage = () => {
   const { id = '' } = useParams()
   const navigate = useNavigate()
@@ -80,9 +78,11 @@ export const useRamenyaDetailPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  const { bookmarkedIds, toggleBookmark } = useRamenyaBookmarks()
 
   const detail = detailQuery.data
   const isSignIn = authSession.isSignIn && myInfoQuery.error?.status !== 401
+  const isBookmarked = bookmarkedIds.has(id)
   const todayBusinessHour = useMemo(() => getTodayBusinessHour(detail?.businessHours ?? []), [detail?.businessHours])
   const sortedBusinessHours = useMemo(
     () => sortBusinessHoursByCurrentDay(detail?.businessHours ?? []),
@@ -189,11 +189,22 @@ export const useRamenyaDetailPage = () => {
     )
   }
 
+  const handleBookmarkClick = () => {
+    if (!isSignIn) {
+      setIsLoginModalOpen(true)
+      return
+    }
+
+    toggleBookmark(id)
+  }
+
   return {
     id,
     detail,
     detailQuery,
     isSignIn,
+    isBookmarked,
+    handleBookmarkClick,
     myInfo: myInfoQuery.data,
     reviewImages,
     reviews: topReviews,

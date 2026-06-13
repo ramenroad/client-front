@@ -16,6 +16,10 @@ export const formatShortDate = (date?: string) => {
   return `${year}.${month}.${day}`
 }
 
+export const getReviewCreatedTime = (createdAt?: string) => {
+  return createdAt ? new Date(createdAt).getTime() : 0
+}
+
 export const formatFullDate = (date?: string) => {
   if (!date) {
     return ''

@@ -14,20 +14,7 @@ type IconStarProps = IconProps<{
 type SelectableIconProps = IconProps<{ selected: boolean }>;
 type MapIconProps = IconProps<{ type: "naver" | "kakao" | "google" }>;
 type CheckboxIconProps = IconProps<{ checked: boolean }>;
-
-export const IconSample = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 20 20"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <path d="" fill={color ?? "#000"} />
-  </svg>
-);
+type IconBookmarkProps = IconProps<{ active?: boolean; size?: number }>;
 
 export const IconFilterWithTag = ({ color, ...rest }: IconProps) => (
   <svg
@@ -314,26 +301,6 @@ export const IconArrowRight = ({ color, ...rest }: IconProps) => (
   </svg>
 );
 
-export const IconTalk = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <rect x="1" y="2" width="14" height="10" rx="1" fill="#CFCFCF" />
-    <path
-      d="M4 14.5172V11.2C4 11.0895 4.08954 11 4.2 11H7.51716C7.69534 11 7.78457 11.2154 7.65858 11.3414L4.34142 14.6586C4.21543 14.7846 4 14.6953 4 14.5172Z"
-      fill={color ?? "#CFCFCF"}
-    />
-    <rect x="5" y="5" width="6" height="1" rx="0.5" fill="#F5F5F5" />
-    <rect x="5" y="8" width="6" height="1" rx="0.5" fill="#F5F5F5" />
-  </svg>
-);
-
 export const IconKakao = ({ color, ...rest }: IconProps) => (
   <svg
     width="16"
@@ -535,27 +502,6 @@ export const IconAdd = ({ color, ...rest }: IconProps) => (
       rx="1"
       transform="rotate(90 29 17)"
       fill={color ?? "#CFCFCF"}
-    />
-  </svg>
-);
-
-export const IconDelete = ({ color, ...rest }: IconProps) => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 12 12"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-    {...rest}
-  >
-    <path
-      d="M1.6959 10.302C1.4347 10.038 1.4347 9.61 1.6959 9.34601L9.26298 1.69799C9.52418 1.434 9.94766 1.434 10.2089 1.69799C10.4701 1.96199 10.4701 2.39 10.2089 2.654L2.64178 10.302C2.38058 10.566 1.9571 10.566 1.6959 10.302Z"
-      fill={color ?? "#585858"}
-    />
-    <path
-      d="M10.3041 10.302C10.5653 10.038 10.5653 9.61 10.3041 9.34601L2.73702 1.69799C2.47582 1.434 2.05234 1.434 1.79114 1.69799C1.52994 1.96199 1.52994 2.39 1.79114 2.654L9.35822 10.302C9.61941 10.566 10.0429 10.566 10.3041 10.302Z"
-      fill={color ?? "#585858"}
     />
   </svg>
 );
@@ -1463,57 +1409,6 @@ export const IconComment = (props: IconProps) => (
   </svg>
 );
 
-export const IconEmail = (props: IconProps) => (
-  <svg
-    width="110"
-    height="82"
-    viewBox="0 0 110 82"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    <mask
-      id="mask0_2339_4369"
-      maskUnits="userSpaceOnUse"
-      x="14"
-      y="9"
-      width="82"
-      height="60"
-    >
-      <path
-        d="M14 15.8799C14 12.0803 17.0649 9 20.8457 9H89.1543C92.9351 9 96 12.0803 96 15.8799V62.1201C96 65.9197 92.9351 69 89.1543 69H20.8457C17.0649 69 14 65.9198 14 62.1201V15.8799Z"
-        fill="#2C958F"
-      />
-    </mask>
-    <g mask="url(#mask0_2339_4369)">
-      <path
-        d="M21.0825 69.0155H87.95L14 9.12283V61.8976C14 65.8287 17.1709 69.0155 21.0825 69.0155Z"
-        fill="#FFDAAF"
-      />
-      <path
-        d="M89.1325 69.0155H22.265L96.215 9.12283V61.8976C96.215 65.8287 93.0441 69.0155 89.1325 69.0155Z"
-        fill="#FFDAAF"
-      />
-      <path
-        d="M87.6344 69.0528H21.9048L51.0311 41.399C53.1431 39.3937 56.4457 39.395 58.5561 41.4019L87.6344 69.0528Z"
-        fill="#FFD19D"
-      />
-      <path
-        d="M96 9H14L49.879 44.5708C52.6289 47.2971 57.0453 47.3061 59.8062 44.5912L96 9Z"
-        fill="#FFE8CE"
-      />
-    </g>
-    <circle cx="90.5" cy="61.5" r="15.5" fill="#5FCBA7" />
-    <path
-      d="M84 62.1538L88.1364 66L97 58"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export const IconCoordinate = (props: IconProps) => (
   <svg
     width="21"
@@ -1880,6 +1775,30 @@ export const IconMenuBoardWrongImage = (props: IconProps) => (
     <path
       d="M8.8041 8.80201C9.0653 8.53801 9.0653 8.11 8.8041 7.84601L1.23702 0.197994C0.975823 -0.0659981 0.552336 -0.065998 0.291137 0.197994C0.0299385 0.461987 0.0299383 0.890003 0.291137 1.154L7.85822 8.80201C8.11942 9.066 8.5429 9.066 8.8041 8.80201Z"
       fill="white"
+    />
+  </svg>
+);
+
+export const IconBookmark = ({
+  active = false,
+  size = 24,
+  color,
+  ...rest
+}: IconBookmarkProps) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...rest}
+  >
+    <path
+      d="M6.75 4.5C6.75 4.08579 7.08579 3.75 7.5 3.75H16.5C16.9142 3.75 17.25 4.08579 17.25 4.5V19.7322C17.25 20.1573 16.7546 20.3897 16.4285 20.1169L12 16.4118L7.57151 20.1169C7.24537 20.3897 6.75 20.1573 6.75 19.7322V4.5Z"
+      fill={active ? color ?? "#FF5E00" : "none"}
+      stroke={active ? color ?? "#FF5E00" : color ?? "#888888"}
+      strokeWidth="1.5"
+      strokeLinejoin="round"
     />
   </svg>
 );

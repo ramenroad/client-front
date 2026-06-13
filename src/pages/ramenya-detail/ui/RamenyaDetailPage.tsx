@@ -17,6 +17,7 @@ import { ReviewCard } from '@/widgets/review'
 import {
   IconArrowRight,
   IconBar,
+  IconBookmark,
   IconCall,
   IconDropDown,
   IconDropDownSelected,
@@ -33,6 +34,7 @@ import { Line } from '@/shared/ui/line'
 import { LoadingLottie } from '@/shared/ui/lottie'
 import { Modal } from '@/shared/ui/modal'
 import { PageLayout } from '@/shared/ui/page-layout'
+import { RatingStars } from '@/shared/ui/rating'
 import render from '@/shared/ui/render'
 import { TopBar } from '@/shared/ui/top-bar'
 import { useToast } from '@/shared/ui/toast'
@@ -48,6 +50,8 @@ const RamenyaDetailPage = () => {
     detail,
     detailQuery,
     isSignIn,
+    isBookmarked,
+    handleBookmarkClick,
     myInfo,
     reviewImages,
     reviews,
@@ -87,7 +91,11 @@ const RamenyaDetailPage = () => {
     <PageWrapper variant="appBar">
       <PageContainer>
         <HeaderBox>
-          <TopBar title={detail.name} />
+          <TopBar
+            title={detail.name}
+            icon={<IconBookmark active={isBookmarked} />}
+            onIconClick={handleBookmarkClick}
+          />
           <ThumbnailSection detail={detail} />
         </HeaderBox>
 
@@ -211,23 +219,6 @@ const ThumbnailSection = ({ detail }: { detail: RamenyaDetail }) => {
   )
 }
 
-const RatingStars = ({ rating, size = 14 }: { rating: number; size?: number }) => {
-  return (
-    <StarContainer>
-      {REVIEW_RATING.map((star) => {
-        if (rating >= star) {
-          return <IconStar key={star} size={size} />
-        }
-
-        if (rating >= star - 0.5) {
-          return <IconStar key={star} size={size} isHalf />
-        }
-
-        return <IconStar key={star} size={size} inactive />
-      })}
-    </StarContainer>
-  )
-}
 
 const DetailIconTag = ({ icon, text }: { icon: ReactNode; text: string }) => {
   return (
@@ -760,8 +751,6 @@ const DetailIconWrapper = render.div('flex items-center justify-center')
 const DetailIconText = render.div('w-60 whitespace-nowrap font-14-r text-gray-400')
 
 const MarketDetailReviewBox = render.div('flex items-center gap-4')
-
-const StarContainer = render.div('flex items-center gap-2')
 
 const MarketDetailReviewScore = render.div('font-14-r text-black')
 

@@ -19,6 +19,7 @@ import { formatNumber } from '@/shared/lib/number'
 import {
   IconArrowRight,
   IconBar,
+  IconBookmark,
   IconCall,
   IconDropDown,
   IconDropDownSelected,
@@ -30,6 +31,7 @@ import {
 } from '@/shared/ui/icon'
 import { Line } from '@/shared/ui/line'
 import { NoStoreBox } from '@/shared/ui/no-store-box'
+import { RatingStars } from '@/shared/ui/rating'
 import render from '@/shared/ui/render'
 import { TopBar } from '@/shared/ui/top-bar'
 import { useResultListOverlay } from './model/useResultListOverlay'
@@ -75,12 +77,14 @@ interface ResultListOverlayProps<T> {
   isDetailReviewsLoading?: boolean
   isDetailReviewsError?: boolean
   searchBarBottomPx?: number
+  bookmarkedIds?: ReadonlySet<string>
   onHeightChange: (height: string) => void
   onSearchBarOverlapChange?: (overlapping: boolean) => void
   onFilterChange: (filterOptions: FilterOptions) => void
   onSelect: (item: T) => void
   onOpenDetail: (item: T) => void
   onCloseDetail: () => void
+  onBookmarkToggle?: (ramenyaId: string) => void
 }
 
 type DetailContent = {
@@ -96,8 +100,6 @@ type DetailContent = {
   instagramProfile?: string
   recommendedMenu?: RamenyaDetail['recommendedMenu']
 }
-
-const RATING_STARS = [1, 2, 3, 4, 5] as const
 
 const MAP_RESULT_SCROLL_STORAGE_KEY = 'mapResultListScrollTop'
 
@@ -136,12 +138,14 @@ export const ResultListOverlay = <T,>({
   isDetailReviewsLoading = false,
   isDetailReviewsError = false,
   searchBarBottomPx = 0,
+  bookmarkedIds,
   onHeightChange,
   onSearchBarOverlapChange,
   onFilterChange,
   onSelect,
   onOpenDetail,
   onCloseDetail,
+  onBookmarkToggle,
 }: ResultListOverlayProps<T>) => {
   const navigate = useNavigate()
   const overlayRef = useRef<HTMLElement | null>(null)
@@ -257,8 +261,10 @@ export const ResultListOverlay = <T,>({
           isError={isDetailError}
           isReviewsLoading={isDetailReviewsLoading}
           isReviewsError={isDetailReviewsError}
+          bookmarkedIds={bookmarkedIds}
           onBack={onCloseDetail}
           onDetailPageOpen={handleDetailPageOpen}
+          onBookmarkToggle={onBookmarkToggle}
         />
       ) : (
         <>
@@ -280,6 +286,21 @@ export const ResultListOverlay = <T,>({
                   businessHours={item.businessHours}
                   isSelected={selectedId === item.id}
                   currentLocation={currentLocation}
+                  actionSlot={
+                    onBookmarkToggle && (
+                      <BookmarkToggleButton
+                        type="button"
+                        aria-pressed={Boolean(bookmarkedIds?.has(item.id))}
+                        aria-label={bookmarkedIds?.has(item.id) ? `${item.name} 저장 해제` : `${item.name} 저장`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          onBookmarkToggle(item.id)
+                        }}
+                      >
+                        <IconBookmark active={Boolean(bookmarkedIds?.has(item.id))} />
+                      </BookmarkToggleButton>
+                    )
+                  }
                   onClick={() => handleItemClick(item)}
                 />
                 <LineWrapper>
@@ -347,8 +368,10 @@ const MapDetailSheetContent = <T,>({
   isError,
   isReviewsLoading,
   isReviewsError,
+  bookmarkedIds,
   onBack,
   onDetailPageOpen,
+  onBookmarkToggle,
 }: {
   ReviewCard: ReviewCardComponent
   id: string
@@ -359,8 +382,10 @@ const MapDetailSheetContent = <T,>({
   isError: boolean
   isReviewsLoading: boolean
   isReviewsError: boolean
+  bookmarkedIds?: ReadonlySet<string>
   onBack: () => void
   onDetailPageOpen: (id: string) => void
+  onBookmarkToggle?: (ramenyaId: string) => void
 }) => {
   const [isTimeExpanded, setIsTimeExpanded] = useState(false)
   const content = useMemo(() => createDetailContent({ id, selectedItem, detail }), [detail, id, selectedItem])
@@ -393,7 +418,12 @@ const MapDetailSheetContent = <T,>({
 
   return (
     <>
-      <TopBar title={content.name} onBackClick={onBack} />
+      <TopBar
+        title={content.name}
+        onBackClick={onBack}
+        icon={onBookmarkToggle && <IconBookmark active={Boolean(bookmarkedIds?.has(content.id))} />}
+        onIconClick={onBookmarkToggle ? () => onBookmarkToggle(content.id) : undefined}
+      />
 
       <DetailContentArea>
         <ThumbnailContainer>
@@ -598,23 +628,6 @@ const MapReviewSection = ({
   )
 }
 
-const RatingStars = ({ rating }: { rating: number }) => {
-  return (
-    <RatingStarRow>
-      {RATING_STARS.map((star) => {
-        if (rating >= star) {
-          return <IconStar key={star} size={14} />
-        }
-
-        if (rating >= star - 0.5) {
-          return <IconStar key={star} size={14} isHalf />
-        }
-
-        return <IconStar key={star} size={14} inactive />
-      })}
-    </RatingStarRow>
-  )
-}
 
 const DetailIconTag = ({ icon, text }: { icon: ReactNode; text: string }) => {
   return (
@@ -638,6 +651,10 @@ const Handle = render.div('h-4 w-36 rounded-full bg-divider')
 const ListContentArea = render.div('hide-scrollbar flex-1 overflow-y-auto')
 
 const ListItem = render.div('')
+
+const BookmarkToggleButton = render.button(
+  'flex h-24 w-24 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none',
+)
 
 const LineWrapper = render.div('px-20')
 
@@ -666,8 +683,6 @@ const DetailIconWrapper = render.div('flex items-center justify-center')
 const DetailIconText = render.div('w-60 whitespace-nowrap font-14-r text-gray-400')
 
 const MarketDetailReviewBox = render.div('flex items-center gap-4')
-
-const RatingStarRow = render.div('flex items-center gap-2')
 
 const MarketDetailReviewScore = render.div('font-14-r text-black')
 

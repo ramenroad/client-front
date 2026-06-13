@@ -5,9 +5,10 @@ import { ramenyaQueryKeys } from '@/entities/ramenya/api'
 import { reviewQueryKeys, useDeleteReviewMutation } from '@/entities/review/api'
 import type { MyReview, Review, ReviewRamenyaInfo, UserReview } from '@/entities/review/model'
 import { formatShortDate } from '@/shared/lib/date'
-import { IconArrowRight, IconStar, IconUnSignInUserProfile } from '@/shared/ui/icon'
+import { IconArrowRight, IconUnSignInUserProfile } from '@/shared/ui/icon'
 import { ImagePopup } from '@/shared/ui/image-popup'
 import { Modal } from '@/shared/ui/modal'
+import { RatingStars } from '@/shared/ui/rating'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import { useToast } from '@/shared/ui/toast'
@@ -21,7 +22,6 @@ interface ReviewCardProps {
 }
 
 const MAX_REVIEW_LENGTH = 94
-const REVIEW_RATING_STARS = [1, 2, 3, 4, 5]
 
 const isDetailedRamenya = (ramenyaId: ReviewItem['ramenyaId']): ramenyaId is ReviewRamenyaInfo => {
   return typeof ramenyaId === 'object' && ramenyaId !== null && '_id' in ramenyaId
@@ -39,22 +39,6 @@ const getRamenyaName = (review: ReviewItem) => {
   return isDetailedRamenya(review.ramenyaId) ? review.ramenyaId.name : review.ramenyaId
 }
 
-const RatingStars = ({ rating }: { rating: number }) => {
-  return (
-    <RatingWrapper>
-      {REVIEW_RATING_STARS.map((star) => {
-        const isFullStar = star <= rating
-        const isHalfStar = star - 0.5 <= rating && rating < star
-
-        if (isHalfStar) {
-          return <IconStar key={star} inactive={!isFullStar} isHalf />
-        }
-
-        return <IconStar key={star} inactive={star > rating} />
-      })}
-    </RatingWrapper>
-  )
-}
 
 const ReviewHeader = ({ review, mypage, editable, onEdit, onDelete }: {
   review: ReviewItem
@@ -182,7 +166,7 @@ export const ReviewCard = ({ review, editable, mypage = false }: ReviewCardProps
       />
       <ReviewCardSubHeader>
         <ReviewCardSubHeaderLeftSection>
-          <RatingStars rating={review.rating} />
+          <RatingStars rating={review.rating} className="shrink-0" />
           <RamenyaMenuListWrapper>
             {menus.map((menu, index) => (
               <RamenyaMenuWrapper key={`${menu}-${index}`}>
@@ -285,8 +269,6 @@ const ActionText = render.extend(RaisingText, 'whitespace-nowrap')
 const ReviewCardSubHeader = render.div('mt-10 flex flex-row items-center justify-between gap-2 text-gray-500')
 
 const ReviewCardSubHeaderLeftSection = render.div('flex min-w-0 flex-1 flex-row items-center gap-8')
-
-const RatingWrapper = render.div('flex shrink-0 items-center gap-2')
 
 const RamenyaMenuListWrapper = render.div('flex min-w-0 flex-1 flex-row items-center gap-4 overflow-hidden text-gray-500')
 
