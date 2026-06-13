@@ -1,20 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { useBannerQuery } from '@/entities/curation/api'
-import type { Banner } from '@/entities/curation/model'
-import { isExternalUrl, openUrl } from '@/shared/lib/browser'
+import { useBannerNavigation } from '@/entities/curation/model'
 
 export const useBannerPage = () => {
   const navigate = useNavigate()
   const { bannerQuery } = useBannerQuery()
-
-  const handleBannerClick = (banner: Banner) => {
-    if (isExternalUrl(banner.redirectUrl)) {
-      openUrl(banner.redirectUrl)
-      return
-    }
-
-    navigate(banner.redirectUrl)
-  }
+  const handleBannerClick = useBannerNavigation()
 
   return {
     banners: bannerQuery.data ?? [],
