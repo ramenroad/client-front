@@ -1,6 +1,7 @@
 import { Button } from '@/shared/ui/button'
 import {
   IconArrowRight,
+  IconBookmark,
   IconFeedback,
   IconMyComment,
   IconMyPost,
@@ -27,6 +28,7 @@ const MyProfilePage = () => {
     handleProfileClick,
     handleLoginClick,
     handleActivityClick,
+    handleSavedStoreClick,
     handleSearchClick,
     handleFeedbackClick,
     handlePolicyClick,
@@ -41,6 +43,7 @@ const MyProfilePage = () => {
 
   const searchItems = [
     { label: '저장한 글', icon: <IconSavedPost />, onClick: handleNotReady },
+    { label: '저장한 매장', icon: <IconBookmark active size={22} />, onClick: handleSavedStoreClick },
     { label: '최근 본 매장', icon: <IconRecentStore />, onClick: handleSearchClick },
   ]
 
