@@ -66,7 +66,10 @@ export const useShare = (content: ShareContent) => {
       mobileWebUrl: getUrl(),
       webUrl: getUrl(),
     }
-    const isDefaultImage = !content.imageUrl
+    const usingDefaultImage = !content.imageUrl
+    // 카카오 이미지 스크래퍼는 URL에 인코딩 안 된 한글 등 비ASCII가 있으면 이미지를 못 가져온다.
+    // encodeURI로 감싸 안전하게 만든다(이미 인코딩된 URL에는 영향 없음).
+    const imageUrl = encodeURI(content.imageUrl || DEFAULT_SHARE_IMAGE_URL)
 
     // 트위터 summary_large_image와 유사한 리치 카드: 대표 이미지 + 제목 + 설명 + CTA 버튼
     kakao.Share.sendDefault({
@@ -74,9 +77,9 @@ export const useShare = (content: ShareContent) => {
       content: {
         title: content.title,
         description: content.description ?? '',
-        imageUrl: content.imageUrl || DEFAULT_SHARE_IMAGE_URL,
+        imageUrl,
         // 기본 OG 이미지는 1200x630(와이드)이라 큰 이미지 카드로 보이도록 크기를 명시한다.
-        ...(isDefaultImage ? { imageWidth: 1200, imageHeight: 630 } : {}),
+        ...(usingDefaultImage ? { imageWidth: 1200, imageHeight: 630 } : {}),
         link,
       },
       buttons: [

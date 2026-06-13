@@ -86,8 +86,8 @@ export const useRamenyaDetailPage = () => {
   const isBookmarked = bookmarkedIds.has(id)
   const share = useShare({
     title: detail?.name ?? '라이징',
-    description: detail?.ramenroadReview?.oneLineReview ?? detail?.genre?.join(', ') ?? '',
-    text: detail?.name ? `${detail.name} - 라이징에서 확인해보세요!` : '라이징에서 확인해보세요!',
+    description: detail?.address ?? '',
+    text: detail?.address ?? '',
     imageUrl: detail?.thumbnailUrl,
     buttonTitle: '매장 보러가기',
   })

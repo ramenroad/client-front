@@ -396,7 +396,8 @@ const MapDetailSheetContent = <T,>({
   const share = useShare({
     title: content?.name ?? '라이징',
     url: content ? `${window.location.origin}/detail/${content.id}` : undefined,
-    text: content?.name ? `${content.name} - 라이징에서 확인해보세요!` : undefined,
+    description: content?.address ?? '',
+    text: content?.address ?? '',
     imageUrl: content?.thumbnailUrl,
     buttonTitle: '매장 보러가기',
   })
