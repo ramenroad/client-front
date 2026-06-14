@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import render from "@/shared/ui/render";
 
 interface ModalProps {
@@ -28,13 +29,14 @@ export const Modal = ({ isOpen, onClose, children }: ModalProps) => {
     return null;
   }
 
-  return (
+  return createPortal(
     <Overlay onClick={onClose}>
       <Wrapper onClick={(event) => event.stopPropagation()}>{children}</Wrapper>
-    </Overlay>
+    </Overlay>,
+    document.body,
   );
 };
 
-const Overlay = render.div("fixed inset-0 bg-black/40 flex items-center justify-center z-[100]");
+const Overlay = render.div("fixed inset-0 bg-black/40 flex items-center justify-center z-[300]");
 
 const Wrapper = render.div("flex flex-col bg-white rounded-12 shadow-lg");
