@@ -1108,6 +1108,15 @@ export const IconCheckCircle = (props: IconProps) => (
   </svg>
 );
 
+export const IconRamenCalendar = (props: IconProps) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <rect x="7.5" y="4" width="1.5" height="4" rx="0.75" fill="#FF5E00" />
+    <rect x="15" y="4" width="1.5" height="4" rx="0.75" fill="#FF5E00" />
+    <path d="M4 10V8A2 2 0 0 1 6 6H18A2 2 0 0 1 20 8V10Z" fill="#FF5E00" />
+    <path d="M4 11H20V18A2 2 0 0 1 18 20H6A2 2 0 0 1 4 18Z" fill="#FF5E00" />
+  </svg>
+);
+
 export const IconMyReview = (props: IconProps) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <rect x="5" y="4" width="14" height="17" rx="2" fill="#FF5E00" />

@@ -14,6 +14,7 @@ import {
 } from '@/entities/ramenya/model'
 import { RamenyaCard, RamenyaOpenStatus } from '@/entities/ramenya/ui'
 import type { Review } from '@/entities/review/model'
+import { createSiteUrl } from '@/shared/config'
 import type { Coordinate } from '@/shared/lib/naver-map'
 import { formatNumber } from '@/shared/lib/number'
 import {
@@ -395,7 +396,7 @@ const MapDetailSheetContent = <T,>({
   // 미니 상세뷰는 자체 URL이 없어, 공유는 해당 매장의 상세 페이지(/detail/:id)를 가리킨다.
   const share = useShare({
     title: content?.name ?? '라이징',
-    url: content ? `${window.location.origin}/detail/${content.id}` : undefined,
+    url: content ? createSiteUrl(`/detail/${content.id}`) : undefined,
     description: content?.address ?? '',
     text: content?.address ?? '',
     imageUrl: content?.thumbnailUrl,

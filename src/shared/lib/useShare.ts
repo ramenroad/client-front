@@ -1,11 +1,9 @@
 import { useState } from 'react'
+import { createSiteUrl, DEFAULT_SHARE_IMAGE_URL } from '@/shared/config'
 import { useToast } from '@/shared/ui/toast'
 import { ensureKakaoInitialized } from './kakao-sdk'
 
 export type ShareType = 'kakao' | 'url' | 'more'
-
-// index.html의 og:image와 동일. 콘텐츠 대표 이미지가 없을 때 트위터 카드처럼 보이도록 폴백으로 쓴다.
-const DEFAULT_SHARE_IMAGE_URL = 'https://ra-ising.com/og-image.png'
 
 export type ShareContent = {
   /** 카카오/네이티브 공유 제목 */
@@ -30,7 +28,8 @@ export const useShare = (content: ShareContent) => {
   const { openToast } = useToast()
   const [isShareOpen, setIsShareOpen] = useState(false)
 
-  const getUrl = () => content.url ?? window.location.href
+  const getCurrentPath = () => `${window.location.pathname}${window.location.search}${window.location.hash}`
+  const getUrl = () => createSiteUrl(content.url ?? getCurrentPath())
 
   const handleCopyLink = async () => {
     try {

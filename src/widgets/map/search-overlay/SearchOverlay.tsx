@@ -36,6 +36,7 @@ export const SearchOverlay = ({
     isOverlayVisible,
     shouldRenderSearchBox,
     hasAutoCompleteResults,
+    isAutocompleteLoading,
     keywordHistory,
     ramenyaHistory,
     keywordResults,
@@ -93,7 +94,7 @@ export const SearchOverlay = ({
                 onKeywordSelect={handleKeywordResultClick}
                 onRamenyaSelect={handleRamenyaResultClick}
               />
-            ) : (
+            ) : isAutocompleteLoading ? null : (
               <NoResultBox
                 actionButton={
                   <SubmitButton type="button" onClick={() => openUrl('https://forms.gle/BuqmFWMT2fCd37eK8')}>
