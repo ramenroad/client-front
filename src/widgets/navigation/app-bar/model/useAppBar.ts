@@ -1,22 +1,24 @@
 import { useCallback, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthSession } from '@/entities/session/model'
+import { resolveActiveTab } from '@/shared/app-env'
 
 export const useAppBar = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { isSignIn } = useAuthSession()
 
-  const currentPath = useMemo(() => location.pathname.split('/')[1] ?? '', [location.pathname])
+  // 활성 탭은 resolveActiveTab 단일 소스로 산출(§2.9.3) — ROUTE_CHANGED 발신부와 매핑 일치.
+  const activeTab = useMemo(() => resolveActiveTab(location.pathname), [location.pathname])
 
   const selected = useMemo(
     () => ({
-      home: currentPath === '',
-      map: currentPath === 'map',
-      community: currentPath === 'community',
-      my: currentPath === 'mypage' || currentPath === 'user-review',
+      home: activeTab === 'home',
+      map: activeTab === 'map',
+      community: activeTab === 'community',
+      my: activeTab === 'my',
     }),
-    [currentPath],
+    [activeTab],
   )
 
   const handleHomeClick = useCallback(() => {

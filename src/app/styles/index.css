@@ -335,6 +335,24 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    /* 앱/웹 공용 레이아웃 변수 (W3). 기본=웹 기존값. is-app에서 오버라이드. */
+    --app-bar-space: 62px; /* 웹 하단 AppBar 높이. 앱은 네이티브 탭바가 WebView 밖이라 0 */
+    --page-offset-appbar: 267px; /* PageLayout: AppBar+Footer 예약(웹 기존값 유지, 7px 정정은 G11 보류) */
+    --page-offset-footer: 212px; /* PageLayout: Footer만 */
+    --native-tab-bar-height: 0px;
+    --safe-top: 0px; /* 잔여 인셋(§2.7.1) — SAFE_AREA_INSETS로 갱신. 앱 기본형 0 */
+    --safe-bottom: 0px;
+    --safe-left: 0px;
+    --safe-right: 0px;
+    --keyboard-height: 0px; /* KEYBOARD 이벤트로 갱신(W6). 레이아웃 소비는 G3/T2 후(이중보정 회피) */
+  }
+
+  :root.is-app {
+    /* 앱: 웹 AppBar/Footer 미렌더(W2) → 예약 높이 0. 하단은 네이티브 탭바가 처리. */
+    --app-bar-space: 0px;
+    --page-offset-appbar: 0px;
+    --page-offset-footer: 0px;
   }
 
   :root,

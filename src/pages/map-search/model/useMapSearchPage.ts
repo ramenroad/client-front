@@ -18,6 +18,7 @@ import { getReviewCreatedTime } from '@/shared/lib/date'
 import type { Coordinate, MapViewportSnapshot } from '@/shared/lib/naver-map'
 import { calculateDistanceValue } from '@/shared/lib/number'
 import { useToast } from '@/shared/ui/toast'
+import { useAppEnv } from '@/shared/app-env'
 import type { NaverMapFocusRequest, NaverMapMarker } from '@/widgets/map/naver-map'
 import {
   MAP_RESULT_SHEET_HEIGHTS,
@@ -311,6 +312,7 @@ const getCurrentPosition = () => {
 
 export const useMapSearchPage = () => {
   const navigate = useNavigate()
+  const { safeTop } = useAppEnv() // 지도 풀블리드 시 상단 잔여 인셋(W8) — 검색바 하단 겹침 기준 보정
   const [searchParams, setSearchParams] = useSearchParams()
   const initialCenter = useMemo(() => getInitialCenter(searchParams), [searchParams])
   const initialZoom = useMemo(() => parseNumberParam(searchParams.get('level')) ?? DEFAULT_ZOOM, [searchParams])
@@ -909,7 +911,7 @@ export const useMapSearchPage = () => {
     currentLocationButtonBottom,
     focusOffsetRatio,
     isSearchBarHidden,
-    searchBarBottomPx: MAP_SEARCH_BAR_BOTTOM_PX,
+    searchBarBottomPx: MAP_SEARCH_BAR_BOTTOM_PX + safeTop,
     bookmarkedIds,
     isSavedMode,
     isLoginModalOpen,

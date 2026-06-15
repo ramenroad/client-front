@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { BridgeTopics, emit } from '@/shared/bridge'
 import { RamenCalendarAddEntry } from '@/features/ramen-calendar-add-entry'
 import { IconBookmark, IconGPS } from '@/shared/ui/icon'
 import { Modal } from '@/shared/ui/modal'
@@ -64,6 +66,16 @@ const MapSearchPage = () => {
     handleCloseDetailSheet,
     handleCurrentLocationClick,
   } = useMapSearchPage()
+
+  // 지도 진입: 상단 풀블리드(네이티브 상단 스페이서 접기) + 지도용 상태바. 이탈 시 inset 원복(멱등, W5/§2.7.1).
+  // emit은 앱에서만 동작(순수 웹 no-op)이라 웹 회귀 없음.
+  useEffect(() => {
+    emit(BridgeTopics.setSafeAreaMode, { mode: 'edge-to-edge', edges: ['top'] })
+    emit(BridgeTopics.setStatusBar, { style: 'dark-content' })
+    return () => {
+      emit(BridgeTopics.setSafeAreaMode, { mode: 'inset' })
+    }
+  }, [])
 
   return (
     <>

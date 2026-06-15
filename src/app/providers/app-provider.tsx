@@ -7,6 +7,9 @@ import { PopupProvider } from '@/shared/ui/popup'
 import { ToastProvider } from '@/shared/ui/toast'
 import { queryClient } from './query-client'
 import { AppQueryProvider } from './query-provider'
+import { BridgeTopics, emit, installBridge, isInApp, on } from '@/shared/bridge'
+import { applyAppEnvToDom, readAppEnv, resolveActiveTab, setSafeInsets } from '@/shared/app-env'
+import { router } from '@/app/router'
 
 export const AppProviders = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
@@ -43,6 +46,69 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
       initializeHttpAuth(null)
       window.removeEventListener('storage', syncAuthStore)
       window.removeEventListener('focus', syncAuthStore)
+    }
+  }, [])
+
+  // 네이티브 브리지 동기화 (W1/W4). 순수 웹에선 applyAppEnvToDom만 하고 즉시 종료.
+  useEffect(() => {
+    installBridge()
+    applyAppEnvToDom(readAppEnv())
+    if (!isInApp()) {
+      return
+    }
+
+    const tabRoots: Record<string, string> = {
+      home: '/',
+      map: '/map',
+      community: '/community',
+      my: '/mypage',
+    }
+
+    const sendRouteChanged = () => {
+      const path = router.state.location.pathname
+      const activeTab = resolveActiveTab(path)
+      emit(BridgeTopics.routeChanged, {
+        path,
+        activeTab,
+        isRootOfTab: activeTab != null && tabRoots[activeTab] === path,
+      })
+    }
+
+    // 네이티브 → 웹
+    const offInsets = on(BridgeTopics.safeAreaInsets, (payload) => {
+      const insets = (payload as { insets?: { top: number; bottom: number; left: number; right: number } })?.insets
+      if (insets) {
+        setSafeInsets(insets)
+      }
+    })
+    const offNavigate = on(BridgeTopics.navigate, (payload) => {
+      const p = payload as { tab?: string; path?: string }
+      const path = typeof p?.path === 'string' ? p.path : '/'
+      // 로그인 분기는 웹 소유(useAppBar 동일): 'my' 탭 + 비로그인 → /login
+      const target = p?.tab === 'my' && !authStore.getSession().isSignIn ? '/login' : path
+      if (target === window.location.pathname) {
+        window.scrollTo(0, 0) // 재탭/동일 경로 → 스크롤 top(§2.9.2)
+      } else {
+        router.navigate(target).catch(() => undefined)
+      }
+    })
+    const offScrollTop = on(BridgeTopics.scrollTop, () => window.scrollTo(0, 0))
+    const offKeyboard = on(BridgeTopics.keyboard, (payload) => {
+      const height = (payload as { height?: number })?.height ?? 0
+      // 변수만 노출(W6). 레이아웃 소비는 Android adjustResize 이중보정 회피 위해 보류(G3/T2).
+      document.documentElement.style.setProperty('--keyboard-height', `${height}px`)
+    })
+
+    // 웹 → 네이티브: 모든 네비게이션에서 ROUTE_CHANGED (NAVIGATE 재발신 금지 → 무한루프 방지)
+    sendRouteChanged() // 초기 1회
+    const unsubscribeRouter = router.subscribe(() => sendRouteChanged())
+
+    return () => {
+      offInsets()
+      offNavigate()
+      offScrollTop()
+      offKeyboard()
+      unsubscribeRouter()
     }
   }, [])
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/_favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="naver-site-verification" content="988646065ee9168e6971dcc97fe2c5919f8d38b2" />
     <meta name="google-site-verification" content="iVnwCGBjXyv5Gu7iP9uOyTn_YbMutG4VtlocKgt8iVQ" />
     <meta name="description" content="검증된 다양한 국내외 라멘 맛집 정보를 만나보세요." />
@@ -76,6 +76,26 @@
           document.documentElement.dataset.theme = defaultTheme
           document.documentElement.style.colorScheme = defaultTheme
         }
+      })()
+    </script>
+    <script>
+      // 앱 셸 선마킹 (W1, FOUC 방지): __RAISING_APP__/UA로 is-app·is-ios class + --safe-*·--app-bar-space 1차 세팅.
+      ;(() => {
+        try {
+          const el = document.documentElement
+          const app = window.__RAISING_APP__
+          const uaMatch = /RaisingApp\/[\d.]+\s*\((ios|android)\)/i.exec(navigator.userAgent || '')
+          const isApp = !!app || !!uaMatch
+          const platform = app ? app.platform : uaMatch ? uaMatch[1].toLowerCase() : 'web'
+          el.classList.toggle('is-app', isApp)
+          el.classList.toggle('is-web', !isApp)
+          el.classList.toggle('is-ios', platform === 'ios')
+          el.classList.toggle('is-android', platform === 'android')
+          const tabH = app && app.tabBar && app.tabBar.height ? app.tabBar.height : 56
+          el.style.setProperty('--native-tab-bar-height', isApp ? tabH + 'px' : '0px')
+          el.style.setProperty('--safe-top', '0px')
+          el.style.setProperty('--safe-bottom', '0px')
+        } catch (e) {}
       })()
     </script>
     <div id="root"></div>

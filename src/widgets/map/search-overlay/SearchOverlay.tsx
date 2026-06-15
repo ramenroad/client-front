@@ -136,5 +136,5 @@ const SubmitButton = render.button(
 )
 
 const FullScreenSearchOverlay = render.main(
-  'absolute w-full h-[100dvh] inset-0 bg-white z-[150] flex flex-col gap-32 box-border px-16 py-20 pt-84',
+  'absolute w-full h-[100dvh] inset-0 bg-white z-[150] flex flex-col gap-32 box-border px-16 py-20 pt-[calc(var(--safe-top)_+_84px)]',
 )

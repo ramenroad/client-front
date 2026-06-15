@@ -46,7 +46,10 @@ const renderLazyRoute = (Component: LazyRouteComponent) => (
   </Suspense>
 )
 
-const router = createBrowserRouter([
+// W4: 단일 라우터 인스턴스를 export해 router.subscribe()/navigate()로 브리지 동기화
+// (레이아웃 비의존 → 단독 라우트(login/community/notice…) 누락 원천 해소, R-D).
+// eslint-disable-next-line react-refresh/only-export-components
+export const router = createBrowserRouter([
   {
     path: '/',
     element: renderLazyRoute(AppBarLayout),

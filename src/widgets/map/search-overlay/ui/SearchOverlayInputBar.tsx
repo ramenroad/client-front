@@ -55,7 +55,7 @@ export const SearchOverlayInputBar = ({
 }
 
 const SearchOverlayContainer = render.figure(
-  'absolute top-16 left-0 right-0 z-[200] m-0 px-20 h-48 box-border flex gap-12 items-center transition-[transform,opacity] duration-300 ease-out data-[hidden=true]:pointer-events-none data-[hidden=true]:-translate-y-[200%] data-[hidden=true]:opacity-0',
+  'absolute top-[calc(var(--safe-top)_+_16px)] left-0 right-0 z-[200] m-0 px-20 h-48 box-border flex gap-12 items-center transition-[transform,opacity] duration-300 ease-out data-[hidden=true]:pointer-events-none data-[hidden=true]:-translate-y-[200%] data-[hidden=true]:opacity-0',
 )
 
 const SearchBox = render.div(
