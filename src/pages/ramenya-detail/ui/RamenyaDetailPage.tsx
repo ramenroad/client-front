@@ -11,6 +11,7 @@ import { checkBusinessStatus, checkBusinessStatusSpecial, DAY_MAP, OpenStatus } 
 import { RamenyaOpenStatus } from '@/entities/ramenya/ui'
 import type { Review } from '@/entities/review/model'
 import type { MyInfo } from '@/entities/viewer/model'
+import { RamenCalendarAddEntry } from '@/features/ramen-calendar-add-entry'
 import type { NaverMapMarker } from '@/widgets/map/naver-map'
 import { NaverMap } from '@/widgets/map/naver-map'
 import { ReviewCard } from '@/widgets/review'
@@ -25,6 +26,7 @@ import {
   IconLocate,
   IconMap,
   IconMenuBoard,
+  IconRamenCalendarOutline,
   IconShare,
   IconStar,
   IconTag,
@@ -51,9 +53,14 @@ const RamenyaDetailPage = () => {
     id,
     detail,
     detailQuery,
+    todayVisitDate,
     isSignIn,
     isBookmarked,
+    isCalendarAddOpen,
     handleBookmarkClick,
+    handleOpenCalendarAdd,
+    handleCloseCalendarAdd,
+    handleNavigateCalendarPage,
     isShareOpen,
     openShare,
     closeShare,
@@ -105,6 +112,7 @@ const RamenyaDetailPage = () => {
           detail={detail}
           isBookmarked={isBookmarked}
           onBookmarkClick={handleBookmarkClick}
+          onCalendarAddClick={handleOpenCalendarAdd}
           isTimeExpanded={isTimeExpanded}
           setIsTimeExpanded={setIsTimeExpanded}
           sortedBusinessHours={sortedBusinessHours}
@@ -156,6 +164,19 @@ const RamenyaDetailPage = () => {
           onOpenRaisingMap={handleNavigateRaisingMap}
         />
       </PageContainer>
+
+      {isCalendarAddOpen && (
+        <RamenCalendarAddEntry
+          visitDate={todayVisitDate}
+          initialRamenya={{ _id: id, name: detail.name }}
+          createSuccessToastAction={(visitDate) => (
+            <ToastShortcutButton type="button" onClick={() => handleNavigateCalendarPage(visitDate)}>
+              캘린더 확인
+            </ToastShortcutButton>
+          )}
+          onClose={handleCloseCalendarAdd}
+        />
+      )}
 
       <Modal isOpen={selectedImageIndex !== null && selectedImages.length > 0} onClose={handleCloseImagePopup}>
         {selectedImageIndex !== null && selectedImages.length > 0 && (
@@ -239,6 +260,7 @@ const InformationSection = ({
   detail,
   isBookmarked,
   onBookmarkClick,
+  onCalendarAddClick,
   isTimeExpanded,
   setIsTimeExpanded,
   sortedBusinessHours,
@@ -247,6 +269,7 @@ const InformationSection = ({
   detail: RamenyaDetail
   isBookmarked: boolean
   onBookmarkClick: () => void
+  onCalendarAddClick: () => void
   isTimeExpanded: boolean
   setIsTimeExpanded: (expanded: boolean) => void
   sortedBusinessHours: BusinessHour[]
@@ -262,14 +285,23 @@ const InformationSection = ({
     <InformationWrapper>
       <MarketDetailTitleRow>
         <MarketDetailTitle>{detail.name}</MarketDetailTitle>
-        <BookmarkButton
-          type="button"
-          aria-pressed={isBookmarked}
-          aria-label={isBookmarked ? `${detail.name} 저장 해제` : `${detail.name} 저장`}
-          onClick={onBookmarkClick}
-        >
-          <IconBookmark active={isBookmarked} size={28} />
-        </BookmarkButton>
+        <HeaderActionGroup>
+          <CalendarAddButton type="button" aria-label={`${detail.name} 라멘 캘린더에 추가`} onClick={onCalendarAddClick}>
+            <IconRamenCalendarOutline width={26} height={26} />
+            <CalendarAddBadge aria-hidden="true">
+              <CalendarAddPlusHorizontal />
+              <CalendarAddPlusVertical />
+            </CalendarAddBadge>
+          </CalendarAddButton>
+          <BookmarkButton
+            type="button"
+            aria-pressed={isBookmarked}
+            aria-label={isBookmarked ? `${detail.name} 저장 해제` : `${detail.name} 저장`}
+            onClick={onBookmarkClick}
+          >
+            <IconBookmark active={isBookmarked} size={28} />
+          </BookmarkButton>
+        </HeaderActionGroup>
       </MarketDetailTitleRow>
       <MarketDetailBoxContainer>
         <MarketDetailBox>
@@ -762,6 +794,24 @@ const MarketDetailTitleRow = render.div('flex items-start justify-between gap-12
 
 const MarketDetailTitle = render.h1('m-0 min-w-0 flex-1 font-22-sb text-black')
 
+const HeaderActionGroup = render.div('flex shrink-0 items-center gap-10')
+
+const CalendarAddButton = render.button(
+  'relative flex h-28 w-28 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none',
+)
+
+const CalendarAddBadge = render.span(
+  'absolute -right-2 -bottom-2 flex h-13 w-13 items-center justify-center rounded-full border-2 border-solid border-white bg-gray-700',
+)
+
+const CalendarAddPlusHorizontal = render.span(
+  'absolute left-1/2 top-1/2 h-[1.5px] w-7 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white',
+)
+
+const CalendarAddPlusVertical = render.span(
+  'absolute left-1/2 top-1/2 h-7 w-[1.5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white',
+)
+
 const BookmarkButton = render.button(
   'flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none',
 )
@@ -907,6 +957,10 @@ const ModalButtonBox = render.div('flex h-60 w-full')
 const ModalCancelButton = render.button('w-full cursor-pointer border-none bg-transparent font-16-r text-black disabled:text-gray-200')
 
 const ModalConfirmButton = render.button('w-full cursor-pointer border-none bg-transparent font-16-r text-orange disabled:text-gray-200')
+
+const ToastShortcutButton = render.button(
+  'cursor-pointer whitespace-nowrap border-none bg-transparent p-0 font-14-sb text-orange shadow-none outline-none',
+)
 
 const ReviewDivider = render.div('h-1 w-full bg-divider')
 

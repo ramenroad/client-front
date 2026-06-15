@@ -25,6 +25,21 @@ type MapButton = {
 const RAISING_MAP_ZOOM = 16
 const RAISING_MAP_RADIUS = 3_000
 
+const pad2 = (value: number) => String(value).padStart(2, '0')
+
+const createDateKey = (date: Date) => {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
+}
+
+const createCalendarUrl = (visitDate: string) => {
+  const searchParams = new URLSearchParams({
+    month: visitDate.slice(0, 7),
+    date: visitDate,
+  })
+
+  return `/my-calendar?${searchParams.toString()}`
+}
+
 const getMapButtonUrl = (url?: string, deepLink?: string) => {
   if (isMobileDevice() && deepLink) {
     return deepLink
@@ -79,9 +94,11 @@ export const useRamenyaDetailPage = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const [selectedImages, setSelectedImages] = useState<string[]>([])
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  const [isCalendarAddOpen, setIsCalendarAddOpen] = useState(false)
   const { bookmarkedIds, toggleBookmark } = useRamenyaBookmarks()
 
   const detail = detailQuery.data
+  const todayVisitDate = useMemo(() => createDateKey(new Date()), [])
   const isSignIn = authSession.isSignIn && myInfoQuery.error?.status !== 401
   const isBookmarked = bookmarkedIds.has(id)
   const share = useShare({
@@ -206,13 +223,31 @@ export const useRamenyaDetailPage = () => {
     toggleBookmark(id)
   }
 
+  const handleOpenCalendarAdd = () => {
+    if (!isSignIn) {
+      setIsLoginModalOpen(true)
+      return
+    }
+
+    setIsCalendarAddOpen(true)
+  }
+
+  const handleNavigateCalendarPage = (visitDate: string) => {
+    navigate(createCalendarUrl(visitDate))
+  }
+
   return {
     id,
     detail,
     detailQuery,
+    todayVisitDate,
     isSignIn,
     isBookmarked,
+    isCalendarAddOpen,
     handleBookmarkClick,
+    handleOpenCalendarAdd,
+    handleCloseCalendarAdd: () => setIsCalendarAddOpen(false),
+    handleNavigateCalendarPage,
     isShareOpen: share.isShareOpen,
     openShare: share.openShare,
     closeShare: share.closeShare,

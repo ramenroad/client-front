@@ -1,3 +1,4 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useApiQuery, type ApiQueryOptions } from '@/shared/api'
 import type { AutocompleteResponse, RecentSearchKeywordsResponse, SearchParams, SearchResult } from '../model'
 import { searchQueryKeys } from './query-keys'
@@ -23,6 +24,8 @@ export function useSearchAutocompleteQuery(query: string, options?: ApiQueryOpti
     queryKey: searchQueryKeys.autocomplete(query),
     queryFn: () => searchApi.getAutocomplete(query),
     enabled: query.trim().length > 0,
+    // 키워드가 바뀌는 동안 직전 결과를 유지해 입력 중 결과가 깜빡이지 않게 한다.
+    placeholderData: keepPreviousData,
     ...options,
   })
 }

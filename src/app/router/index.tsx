@@ -21,6 +21,7 @@ const MapSearchPage = lazy(() => import('@/pages/map-search'))
 const MenuBoardImagesPage = lazy(() => import('@/pages/menu-board-images'))
 const MenuBoardSubmitPage = lazy(() => import('@/pages/menu-board-submit'))
 const MyActivityPage = lazy(() => import('@/pages/my-activity'))
+const MyCalendarPage = lazy(() => import('@/pages/my-calendar'))
 const MyInformationPage = lazy(() => import('@/pages/my-information'))
 const MyProfilePage = lazy(() => import('@/pages/my-profile'))
 const MySearchPage = lazy(() => import('@/pages/my-search'))
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
       {
         path: 'mypage',
         element: renderLazyRoute(MyProfilePage),
+      },
+      {
+        path: 'my-calendar',
+        element: renderLazyRoute(MyCalendarPage),
       },
       {
         path: 'my-activity',

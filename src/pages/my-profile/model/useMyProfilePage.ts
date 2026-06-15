@@ -19,6 +19,7 @@ export const useMyProfilePage = () => {
     isError: isSignedIn && myInfoQuery.isError && !isAuthError,
     handleProfileClick: () => navigate('/information'),
     handleLoginClick: () => navigate('/login'),
+    handleCalendarClick: () => navigate('/my-calendar'),
     handleActivityClick: (tab: 'review' | 'post' | 'comment') => navigate(`/my-activity?tab=${tab}`),
     handleSavedStoreClick: () => navigate('/my-search?tab=saved'),
     handleSearchClick: () => navigate('/my-search?tab=recent'),
