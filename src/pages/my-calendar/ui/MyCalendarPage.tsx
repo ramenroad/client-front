@@ -19,6 +19,7 @@ const MyCalendarPage = () => {
     isSignIn,
     selectedEntries,
     monthlyBowlCount,
+    shouldShowMonthlyTotalPrice,
     monthlyTotalPriceLabel,
     editingEntry,
     selectedVisitDate,
@@ -58,7 +59,7 @@ const MyCalendarPage = () => {
         <CalendarBoard>
           <WeekdayRow>
             {weekdayLabels.map((weekday, index) => (
-              <WeekdayLabel key={weekday} data-sunday={index === weekdayLabels.length - 1}>
+              <WeekdayLabel key={weekday} data-sunday={index === 0} data-saturday={index === weekdayLabels.length - 1}>
                 {weekday}
               </WeekdayLabel>
             ))}
@@ -71,6 +72,7 @@ const MyCalendarPage = () => {
                 data-current-month={day.isCurrentMonth}
                 data-selected={day.isSelected}
                 data-sunday={day.isSunday}
+                data-saturday={day.isSaturday}
                 onClick={() => onDateClick(day.date)}
                 aria-label={`${day.label}일 선택`}
               >
@@ -134,11 +136,15 @@ const MyCalendarPage = () => {
                 <StatLabel>이번 달 먹은 라멘</StatLabel>
                 <StatValue>{monthlyBowlCount}그릇</StatValue>
               </StatItem>
-              <StatDivider />
-              <StatItem>
-                <StatLabel>이번 달 쓴 금액</StatLabel>
-                <StatValue>{monthlyTotalPriceLabel}원</StatValue>
-              </StatItem>
+              {shouldShowMonthlyTotalPrice && (
+                <>
+                  <StatDivider />
+                  <StatItem>
+                    <StatLabel>이번 달 쓴 금액</StatLabel>
+                    <StatValue>{monthlyTotalPriceLabel}원</StatValue>
+                  </StatItem>
+                </>
+              )}
             </>
           )}
         </MonthlyStats>
@@ -243,12 +249,14 @@ const CalendarBoard = render.section('mt-12 flex w-full flex-col')
 
 const WeekdayRow = render.div('grid grid-cols-[repeat(7,44px)] justify-between')
 
-const WeekdayLabel = render.span('flex h-34 items-center justify-center font-14-r text-gray-700 data-[sunday=true]:text-red')
+const WeekdayLabel = render.span(
+  'flex h-34 items-center justify-center font-14-r text-gray-700 data-[saturday=true]:text-blue data-[sunday=true]:text-red',
+)
 
 const DayGrid = render.div('grid grid-cols-[repeat(7,44px)] justify-between')
 
 const DayButton = render.button(
-  'relative flex h-56 w-44 cursor-pointer flex-col items-center justify-center border-none bg-transparent p-0 text-gray-300 shadow-none outline-none data-[current-month=true]:text-gray-900 data-[sunday=true]:data-[current-month=true]:text-red',
+  'relative flex h-56 w-44 cursor-pointer flex-col items-center justify-center border-none bg-transparent p-0 text-gray-300 shadow-none outline-none data-[current-month=true]:text-gray-900 data-[saturday=true]:data-[current-month=true]:text-blue data-[sunday=true]:data-[current-month=true]:text-red',
 )
 
 const DateNumber = render.span(
