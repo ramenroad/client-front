@@ -18,18 +18,15 @@ export type MyCalendarDay = {
   isToday: boolean
   isSelected: boolean
   isSunday: boolean
+  isSaturday: boolean
   hasRecord: boolean
 }
 
-const WEEKDAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'] as const
+const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const
 const SELECTED_DATE_QUERY_KEY = 'date'
 const VIEW_MONTH_QUERY_KEY = 'month'
 const DATE_KEY_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 const MONTH_KEY_PATTERN = /^\d{4}-\d{2}$/
-
-const getMondayStartOffset = (day: number) => {
-  return day === 0 ? 6 : day - 1
-}
 
 const pad2 = (value: number) => String(value).padStart(2, '0')
 
@@ -95,7 +92,7 @@ const createCalendarDays = (
   const month = viewMonth.getMonth()
   const firstDate = new Date(year, month, 1)
   const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const leadingEmptyCount = getMondayStartOffset(firstDate.getDay())
+  const leadingEmptyCount = firstDate.getDay()
   const cellCount = Math.ceil((leadingEmptyCount + daysInMonth) / 7) * 7
 
   return Array.from({ length: cellCount }, (_, index) => {
@@ -110,6 +107,7 @@ const createCalendarDays = (
       isToday: isSameDate(date, today),
       isSelected: isSameDate(date, selectedDate),
       isSunday: date.getDay() === 0,
+      isSaturday: date.getDay() === 6,
       hasRecord: recordedDates.has(toDateKey(date)),
     }
   })
@@ -175,6 +173,7 @@ export const useMyCalendarPage = () => {
     () => entries.reduce((sum, entry) => sum + (entry.price ?? 0), 0),
     [entries],
   )
+  const shouldShowMonthlyTotalPrice = monthlyTotalPrice > 0
   const monthlyTotalPriceLabel = useMemo(() => monthlyTotalPrice.toLocaleString('ko-KR'), [monthlyTotalPrice])
   const editingEntry = useMemo(
     () => entries.find((entry) => entry._id === editingEntryId) ?? null,
@@ -267,6 +266,7 @@ export const useMyCalendarPage = () => {
     selectedEntries,
     monthlyBowlCount,
     monthlyTotalPrice,
+    shouldShowMonthlyTotalPrice,
     monthlyTotalPriceLabel,
     editingEntry,
     selectedVisitDate,
