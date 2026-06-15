@@ -51,7 +51,8 @@ let authAdapter: HttpAuthAdapter | null = null
 let refreshPromise: Promise<AuthTokens> | null = null
 
 const http: AxiosInstance = axios.create({
-  baseURL: getApiBaseUrl(),
+  // dev: Vite 프록시(/api)로 동일 출처화해 CORS 회피. prod: 기존 절대 URL.
+  baseURL: import.meta.env.DEV ? '/api' : getApiBaseUrl(),
   withCredentials: true,
 })
 
