@@ -1,3 +1,4 @@
+import { RamenCalendarAddEntry } from '@/features/ramen-calendar-add-entry'
 import { IconBookmark, IconGPS } from '@/shared/ui/icon'
 import { Modal } from '@/shared/ui/modal'
 import render from '@/shared/ui/render'
@@ -41,7 +42,12 @@ const MapSearchPage = () => {
     bookmarkedIds,
     isSavedMode,
     isLoginModalOpen,
+    calendarAddTarget,
+    todayVisitDate,
     handleBookmarkToggle,
+    handleCalendarAddOpen,
+    handleCalendarAddClose,
+    handleNavigateCalendarPage,
     handleToggleSavedMode,
     handleCloseLoginModal,
     handleNavigateLoginPage,
@@ -134,7 +140,21 @@ const MapSearchPage = () => {
         onOpenDetail={handleOpenDetailSheet}
         onCloseDetail={handleCloseDetailSheet}
         onBookmarkToggle={handleBookmarkToggle}
+        onCalendarAddOpen={handleCalendarAddOpen}
       />
+
+      {calendarAddTarget && (
+        <RamenCalendarAddEntry
+          visitDate={todayVisitDate}
+          initialRamenya={calendarAddTarget}
+          createSuccessToastAction={(visitDate) => (
+            <ToastShortcutButton type="button" onClick={() => handleNavigateCalendarPage(visitDate)}>
+              캘린더 확인
+            </ToastShortcutButton>
+          )}
+          onClose={handleCalendarAddClose}
+        />
+      )}
 
       <Modal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal}>
         <ModalContent>
@@ -169,6 +189,10 @@ const ModalButtonBox = render.div('flex h-60 w-full')
 const ModalCancelButton = render.button('w-full cursor-pointer border-none bg-transparent font-16-r text-black')
 
 const ModalConfirmButton = render.button('w-full cursor-pointer border-none bg-transparent font-16-r text-orange')
+
+const ToastShortcutButton = render.button(
+  'cursor-pointer whitespace-nowrap border-none bg-transparent p-0 font-14-sb text-orange shadow-none outline-none',
+)
 
 const GPSButton = render.button(
   'absolute left-16 z-40 flex h-38 w-38 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none transition-[bottom] duration-300 ease-out',

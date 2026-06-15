@@ -9,6 +9,7 @@ export type RamenCalendarEntry = {
   ramenyaName: string
   ramenyaId?: Id | null
   menus: string[]
+  price?: number | null
   createdAt?: ISODateString
   updatedAt?: ISODateString
 }
@@ -18,7 +19,10 @@ export type CreateRamenCalendarEntryRequest = {
   ramenyaName: string
   ramenyaId?: Id | null
   menus: string[]
+  price?: number | null
 }
+
+export type UpdateRamenCalendarEntryRequest = Partial<CreateRamenCalendarEntryRequest>
 
 // month는 1~12 (서버 컨벤션), JS Date의 0~11이 아님.
 export type RamenCalendarListParams = {

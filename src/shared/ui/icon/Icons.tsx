@@ -1117,6 +1117,24 @@ export const IconRamenCalendar = (props: IconProps) => (
   </svg>
 );
 
+export const IconRamenCalendarOutline = ({ color, ...rest }: IconProps) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...rest}>
+    <rect
+      x="4.6"
+      y="6.6"
+      width="14.8"
+      height="12.8"
+      rx="1.4"
+      fill="white"
+      stroke={color ?? "#292929"}
+      strokeWidth="1.2"
+    />
+    <path d="M5 10H19" stroke={color ?? "#292929"} strokeWidth="1.2" strokeLinecap="round" />
+    <path d="M8 4.5V7.5" stroke={color ?? "#292929"} strokeWidth="1.2" strokeLinecap="round" />
+    <path d="M16 4.5V7.5" stroke={color ?? "#292929"} strokeWidth="1.2" strokeLinecap="round" />
+  </svg>
+);
+
 export const IconMyReview = (props: IconProps) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <rect x="5" y="4" width="14" height="17" rx="2" fill="#FF5E00" />

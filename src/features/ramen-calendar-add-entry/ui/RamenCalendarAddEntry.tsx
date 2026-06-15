@@ -1,42 +1,70 @@
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, ReactNode } from 'react'
+import type { RamenCalendarEntry } from '@/entities/ramen-calendar/model'
 import { Button } from '@/shared/ui/button'
 import { IconClose } from '@/shared/ui/icon'
 import { BottomPopupLayout, Popup } from '@/shared/ui/popup'
 import render from '@/shared/ui/render'
-import { useRamenCalendarAddEntry } from '../model/useRamenCalendarAddEntry'
+import { Toggle } from '@/shared/ui/toggle'
+import { useRamenCalendarAddEntry, type RamenCalendarAddEntryInitialRamenya } from '../model/useRamenCalendarAddEntry'
 
 type RamenCalendarAddEntryProps = {
   visitDate: string
+  entry?: RamenCalendarEntry | null
+  initialRamenya?: RamenCalendarAddEntryInitialRamenya
+  createSuccessToastAction?: (visitDate: string) => ReactNode
   onClose: () => void
 }
 
-export const RamenCalendarAddEntry = ({ visitDate, onClose }: RamenCalendarAddEntryProps) => {
+export const RamenCalendarAddEntry = ({
+  visitDate,
+  entry,
+  initialRamenya,
+  createSuccessToastAction,
+  onClose,
+}: RamenCalendarAddEntryProps) => {
   const {
+    title,
+    submitText,
+    entryVisitDate,
     ramenyaName,
     menuInput,
+    isPriceInputEnabled,
+    priceInput,
     suggestions,
     showSuggestions,
     errors,
     isSubmitting,
+    handleVisitDateChange,
     handleNameChange,
     handleSelectResult,
     handleMenuChange,
+    handlePriceInputEnabledChange,
+    handlePriceChange,
     handleSubmit,
-  } = useRamenCalendarAddEntry({ visitDate, onClose })
+  } = useRamenCalendarAddEntry({ visitDate, entry, initialRamenya, createSuccessToastAction, onClose })
 
   return (
     <Popup isOpen direction="bottom" onClose={onClose}>
       <BottomPopupLayout>
         <Header>
-          <Title>라멘 기록 추가</Title>
+          <Title>{title}</Title>
           <CloseButton type="button" onClick={onClose} aria-label="닫기">
             <IconClose />
           </CloseButton>
         </Header>
 
-        <DateText>{visitDate}</DateText>
-
         <Form onSubmit={handleSubmit}>
+          <Field>
+            <FieldLabel>방문 날짜</FieldLabel>
+            <TextInput
+              type="date"
+              value={entryVisitDate}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => handleVisitDateChange(event.target.value)}
+              data-error={errors.visitDate}
+            />
+            {errors.visitDate && <FieldError>날짜는 YYYY-MM-DD 형식으로 입력해주세요</FieldError>}
+          </Field>
+
           <Field>
             <FieldLabel>가게</FieldLabel>
             <ShopInputWrapper>
@@ -68,8 +96,25 @@ export const RamenCalendarAddEntry = ({ visitDate, onClose }: RamenCalendarAddEn
             />
           </Field>
 
+          <Field>
+            <PriceHeader>
+              <FieldLabel>가격 입력하기</FieldLabel>
+              <Toggle checked={isPriceInputEnabled} onChange={handlePriceInputEnabledChange} />
+            </PriceHeader>
+            <FieldCaption>켜면 입력한 금액이 이번 달 지출 통계에 반영돼요.</FieldCaption>
+            {isPriceInputEnabled && (
+              <TextInput
+                type="text"
+                inputMode="numeric"
+                value={priceInput}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => handlePriceChange(event.target.value)}
+                placeholder="가격을 입력하세요 (선택, 원)"
+              />
+            )}
+          </Field>
+
           <Button type="submit" disabled={isSubmitting}>
-            추가하기
+            {submitText}
           </Button>
         </Form>
       </BottomPopupLayout>
@@ -85,13 +130,15 @@ const CloseButton = render.button(
   'flex h-24 w-24 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none',
 )
 
-const DateText = render.span('mt-4 font-14-r text-gray-500')
-
 const Form = render.form('mt-20 flex flex-col gap-16')
 
 const Field = render.div('flex flex-col gap-8')
 
 const FieldLabel = render.span('font-14-m text-gray-900')
+
+const PriceHeader = render.div('flex items-center justify-between')
+
+const FieldCaption = render.span('font-12-r text-gray-500')
 
 const ShopInputWrapper = render.div('relative flex flex-col')
 

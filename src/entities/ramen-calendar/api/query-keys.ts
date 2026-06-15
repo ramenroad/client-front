@@ -7,5 +7,6 @@ export const ramenCalendarQueryKeys = {
 
 export const ramenCalendarMutationKeys = {
   create: () => [...ramenCalendarQueryKeys.all, 'create'] as const,
+  update: () => [...ramenCalendarQueryKeys.all, 'update'] as const,
   delete: () => [...ramenCalendarQueryKeys.all, 'delete'] as const,
 }
