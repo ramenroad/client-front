@@ -27,6 +27,7 @@ import {
   IconInstagram,
   IconLocate,
   IconShare,
+  IconRamenCalendarOutline,
   IconStar,
   IconTag,
   IconTime,
@@ -89,6 +90,7 @@ interface ResultListOverlayProps<T> {
   onOpenDetail: (item: T) => void
   onCloseDetail: () => void
   onBookmarkToggle?: (ramenyaId: string) => void
+  onCalendarAddOpen?: (ramenya: CalendarAddRamenya) => void
 }
 
 type DetailContent = {
@@ -103,6 +105,11 @@ type DetailContent = {
   contactNumber?: string
   instagramProfile?: string
   recommendedMenu?: RamenyaDetail['recommendedMenu']
+}
+
+type CalendarAddRamenya = {
+  _id: string
+  name: string
 }
 
 const MAP_RESULT_SCROLL_STORAGE_KEY = 'mapResultListScrollTop'
@@ -150,6 +157,7 @@ export const ResultListOverlay = <T,>({
   onOpenDetail,
   onCloseDetail,
   onBookmarkToggle,
+  onCalendarAddOpen,
 }: ResultListOverlayProps<T>) => {
   const navigate = useNavigate()
   const overlayRef = useRef<HTMLElement | null>(null)
@@ -269,6 +277,7 @@ export const ResultListOverlay = <T,>({
           onBack={onCloseDetail}
           onDetailPageOpen={handleDetailPageOpen}
           onBookmarkToggle={onBookmarkToggle}
+          onCalendarAddOpen={onCalendarAddOpen}
         />
       ) : (
         <>
@@ -376,6 +385,7 @@ const MapDetailSheetContent = <T,>({
   onBack,
   onDetailPageOpen,
   onBookmarkToggle,
+  onCalendarAddOpen,
 }: {
   ReviewCard: ReviewCardComponent
   id: string
@@ -390,6 +400,7 @@ const MapDetailSheetContent = <T,>({
   onBack: () => void
   onDetailPageOpen: (id: string) => void
   onBookmarkToggle?: (ramenyaId: string) => void
+  onCalendarAddOpen?: (ramenya: CalendarAddRamenya) => void
 }) => {
   const [isTimeExpanded, setIsTimeExpanded] = useState(false)
   const content = useMemo(() => createDetailContent({ id, selectedItem, detail }), [detail, id, selectedItem])
@@ -447,16 +458,31 @@ const MapDetailSheetContent = <T,>({
         <InformationWrapper>
           <MarketDetailTitleRow>
             <MarketDetailTitle>{content.name}</MarketDetailTitle>
-            {onBookmarkToggle && (
-              <BookmarkButton
-                type="button"
-                aria-pressed={Boolean(bookmarkedIds?.has(content.id))}
-                aria-label={bookmarkedIds?.has(content.id) ? `${content.name} 저장 해제` : `${content.name} 저장`}
-                onClick={() => onBookmarkToggle(content.id)}
-              >
-                <IconBookmark active={Boolean(bookmarkedIds?.has(content.id))} size={28} />
-              </BookmarkButton>
-            )}
+            <HeaderActionGroup>
+              {onCalendarAddOpen && (
+                <CalendarAddButton
+                  type="button"
+                  aria-label={`${content.name} 라멘 캘린더에 추가`}
+                  onClick={() => onCalendarAddOpen({ _id: content.id, name: content.name })}
+                >
+                  <IconRamenCalendarOutline width={26} height={26} />
+                  <CalendarAddBadge aria-hidden="true">
+                    <CalendarAddPlusHorizontal />
+                    <CalendarAddPlusVertical />
+                  </CalendarAddBadge>
+                </CalendarAddButton>
+              )}
+              {onBookmarkToggle && (
+                <BookmarkButton
+                  type="button"
+                  aria-pressed={Boolean(bookmarkedIds?.has(content.id))}
+                  aria-label={bookmarkedIds?.has(content.id) ? `${content.name} 저장 해제` : `${content.name} 저장`}
+                  onClick={() => onBookmarkToggle(content.id)}
+                >
+                  <IconBookmark active={Boolean(bookmarkedIds?.has(content.id))} size={28} />
+                </BookmarkButton>
+              )}
+            </HeaderActionGroup>
           </MarketDetailTitleRow>
           <MarketDetailBoxContainer>
             <MarketDetailBox>
@@ -695,6 +721,24 @@ const InformationWrapper = render.section('flex flex-col gap-16 px-20 pt-20 pb-3
 const MarketDetailTitleRow = render.div('flex items-start justify-between gap-12')
 
 const MarketDetailTitle = render.h1('m-0 min-w-0 flex-1 font-22-sb text-black')
+
+const HeaderActionGroup = render.div('flex shrink-0 items-center gap-10')
+
+const CalendarAddButton = render.button(
+  'relative flex h-28 w-28 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none',
+)
+
+const CalendarAddBadge = render.span(
+  'absolute -right-2 -bottom-2 flex h-13 w-13 items-center justify-center rounded-full border-2 border-solid border-white bg-gray-700',
+)
+
+const CalendarAddPlusHorizontal = render.span(
+  'absolute left-1/2 top-1/2 h-[1.5px] w-7 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white',
+)
+
+const CalendarAddPlusVertical = render.span(
+  'absolute left-1/2 top-1/2 h-7 w-[1.5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white',
+)
 
 const BookmarkButton = render.button(
   'flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-0 shadow-none outline-none',

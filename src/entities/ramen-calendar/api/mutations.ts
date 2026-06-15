@@ -2,6 +2,7 @@ import { useApiMutation, type ApiMutationOptions } from '@/shared/api'
 import type { CreateRamenCalendarEntryRequest, RamenCalendarEntry } from '../model'
 import { ramenCalendarMutationKeys } from './query-keys'
 import { ramenCalendarApi } from './requests'
+import type { UpdateRamenCalendarEntryVariables } from './types'
 
 export function useCreateRamenCalendarEntryMutation(
   options?: ApiMutationOptions<RamenCalendarEntry, CreateRamenCalendarEntryRequest>,
@@ -17,4 +18,16 @@ export function useDeleteRamenCalendarEntryMutation(options?: ApiMutationOptions
     mutationKey: ramenCalendarMutationKeys.delete(),
     ...options,
   })
+}
+
+export function useUpdateRamenCalendarEntryMutation(
+  options?: ApiMutationOptions<RamenCalendarEntry, UpdateRamenCalendarEntryVariables>,
+) {
+  return useApiMutation<RamenCalendarEntry, UpdateRamenCalendarEntryVariables>(
+    ({ id, data }) => ramenCalendarApi.update(id, data),
+    {
+      mutationKey: ramenCalendarMutationKeys.update(),
+      ...options,
+    },
+  )
 }
