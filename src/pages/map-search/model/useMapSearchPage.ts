@@ -39,6 +39,11 @@ type SyncSearchAreaOptions = {
   enableMapScopedSearch?: boolean
 }
 
+type CalendarAddTarget = {
+  _id: string
+  name: string
+}
+
 const DEFAULT_CENTER: Coordinate = {
   latitude: RAMENYA_LOCATION_LIST[0].location.latitude,
   longitude: RAMENYA_LOCATION_LIST[0].location.longitude,
@@ -58,6 +63,21 @@ const MAP_CURRENT_LOCATION_BUTTON_HIDE_DVH = 70
 // 매장 포커스 시 하단시트에 가려지지 않도록 시트 높이의 절반만큼 화면 위로 올린다(보이는 지도 영역의 중앙 정렬).
 const MAP_FOCUS_LIFT_SHEET_FRACTION = 0.5
 const sortValues = Object.values(SortType)
+
+const pad2 = (value: number) => String(value).padStart(2, '0')
+
+const createDateKey = (date: Date) => {
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
+}
+
+const createCalendarUrl = (visitDate: string) => {
+  const searchParams = new URLSearchParams({
+    month: visitDate.slice(0, 7),
+    date: visitDate,
+  })
+
+  return `/my-calendar?${searchParams.toString()}`
+}
 
 const isFilterOptions = (value: unknown): value is FilterOptions => {
   if (!value || typeof value !== 'object') {
@@ -307,12 +327,14 @@ export const useMapSearchPage = () => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(getInitialFilterOptions)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isSavedMode, setIsSavedMode] = useState(false)
+  const [calendarAddTarget, setCalendarAddTarget] = useState<CalendarAddTarget | null>(null)
   const isFirstIdleRef = useRef(true)
   const suppressNextIdleRef = useRef(false)
   // handleMapIdle(빈 deps 콜백)에서 최신 저장모드 값을 읽기 위한 ref
   const isSavedModeRef = useRef(false)
   const { openToast } = useToast()
   const { isSignIn, bookmarkedIds, bookmarkedRamenyas, toggleBookmark } = useRamenyaBookmarks()
+  const todayVisitDate = useMemo(() => createDateKey(new Date()), [])
 
   useEffect(() => {
     isSavedModeRef.current = isSavedMode
@@ -786,6 +808,29 @@ export const useMapSearchPage = () => {
     [isSignIn, toggleBookmark],
   )
 
+  const handleCalendarAddOpen = useCallback(
+    (ramenya: CalendarAddTarget) => {
+      if (!isSignIn) {
+        setIsLoginModalOpen(true)
+        return
+      }
+
+      setCalendarAddTarget(ramenya)
+    },
+    [isSignIn],
+  )
+
+  const handleCalendarAddClose = useCallback(() => {
+    setCalendarAddTarget(null)
+  }, [])
+
+  const handleNavigateCalendarPage = useCallback(
+    (visitDate: string) => {
+      navigate(createCalendarUrl(visitDate))
+    },
+    [navigate],
+  )
+
   const handleToggleSavedMode = useCallback(() => {
     if (!isSignIn) {
       setIsLoginModalOpen(true)
@@ -868,7 +913,12 @@ export const useMapSearchPage = () => {
     bookmarkedIds,
     isSavedMode,
     isLoginModalOpen,
+    calendarAddTarget,
+    todayVisitDate,
     handleBookmarkToggle,
+    handleCalendarAddOpen,
+    handleCalendarAddClose,
+    handleNavigateCalendarPage,
     handleToggleSavedMode,
     handleCloseLoginModal,
     handleNavigateLoginPage,

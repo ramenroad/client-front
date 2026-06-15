@@ -8,6 +8,7 @@ import {
   type KeyboardEvent,
 } from 'react'
 import { useSearchAutocompleteQuery } from '@/entities/search/api'
+import { useDebouncedValue } from '@/shared/lib/useDebouncedValue'
 
 type LocalRamenyaHistoryItem = {
   _id: string
@@ -58,7 +59,9 @@ export const useSearchOverlay = ({
     readStorage<LocalRamenyaHistoryItem[]>(RAMENYA_HISTORY_STORAGE_KEY, []),
   )
 
-  const autocompleteQuery = useSearchAutocompleteQuery(keyword, {
+  // 입력은 즉시 반영하되 자동완성 요청은 타이핑이 멈춘 뒤에만 보낸다.
+  const debouncedKeyword = useDebouncedValue(keyword, 250)
+  const autocompleteQuery = useSearchAutocompleteQuery(debouncedKeyword, {
     staleTime: 30_000,
   })
 
@@ -75,6 +78,8 @@ export const useSearchOverlay = ({
   const ramenyaResults = autocompleteQuery.data?.ramenyaSearchResults ?? []
   const isTyping = keyword.length > 0
   const hasAutoCompleteResults = keywordResults.length > 0 || ramenyaResults.length > 0
+  // 디바운스 대기 중이거나 요청 중이면 아직 '결과 없음'으로 단정하지 않는다.
+  const isAutocompleteLoading = isTyping && (keyword !== debouncedKeyword || autocompleteQuery.isFetching)
   const isOverlayVisible = isFocused || (isExternal && isSearchOverlayOpen)
   const shouldRenderSearchBox = !isExternal || isSearchOverlayOpen
 
@@ -218,6 +223,7 @@ export const useSearchOverlay = ({
     isOverlayVisible,
     shouldRenderSearchBox,
     hasAutoCompleteResults,
+    isAutocompleteLoading,
     keywordHistory,
     ramenyaHistory,
     keywordResults,

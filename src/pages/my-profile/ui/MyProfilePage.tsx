@@ -7,6 +7,7 @@ import {
   IconMyPost,
   IconMyReview,
   IconPolicy,
+  IconRamenCalendar,
   IconRecentStore,
   IconSavedPost,
   IconUnSignInUser,
@@ -27,6 +28,7 @@ const MyProfilePage = () => {
     isError,
     handleProfileClick,
     handleLoginClick,
+    handleCalendarClick,
     handleActivityClick,
     handleSavedStoreClick,
     handleSearchClick,
@@ -36,6 +38,7 @@ const MyProfilePage = () => {
   } = useMyProfilePage()
 
   const activityItems = [
+    { label: '라멘 캘린더', icon: <IconRamenCalendar />, onClick: handleCalendarClick },
     { label: '작성한 리뷰', icon: <IconMyReview />, onClick: () => handleActivityClick('review') },
     { label: '작성한 게시글', icon: <IconMyPost />, onClick: () => handleActivityClick('post') },
     { label: '작성한 댓글', icon: <IconMyComment />, onClick: () => handleActivityClick('comment') },
