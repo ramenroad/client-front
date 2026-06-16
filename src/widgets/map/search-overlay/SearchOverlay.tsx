@@ -136,5 +136,6 @@ const SubmitButton = render.button(
 )
 
 const FullScreenSearchOverlay = render.main(
-  'absolute w-full h-[100dvh] inset-0 bg-white z-[150] flex flex-col gap-32 box-border px-16 py-20 pt-[calc(var(--safe-top)_+_84px)]',
+  // 검색바(--map-search-top, 높이 48) 아래로 콘텐츠가 오도록 패딩이 검색바 위치를 따라간다(웹: 16+68=84로 기존과 동일).
+  'absolute w-full h-[100dvh] inset-0 bg-white z-[150] flex flex-col gap-32 box-border px-16 py-20 pt-[calc(var(--map-search-top)_+_68px)]',
 )

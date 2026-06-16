@@ -2,6 +2,7 @@ import { useMemo, useState, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { viewerQueryKeys } from '@/entities/viewer/api'
+import { consumePostLoginRedirect } from '@/entities/session/model'
 import { useUpdateNicknameMutation } from '@/features/profile'
 import type { ApiError } from '@/shared/api'
 import { useToast } from '@/shared/ui/toast'
@@ -26,7 +27,8 @@ export const useRegisterNicknamePage = () => {
     onSuccess: () => {
       openToast(currentNickname ? '닉네임 변경 완료' : '닉네임 설정 완료')
       queryClient.invalidateQueries({ queryKey: viewerQueryKeys.myInfo() })
-      navigate('/mypage')
+      // 회원가입 흐름으로 들어왔다면 로그인 직전 페이지로 복귀(없으면 마이). 닉네임 '변경'은 보통 복귀값 없음 → /mypage.
+      navigate(consumePostLoginRedirect() ?? '/mypage')
     },
     onError: (error) => {
       if (getErrorStatusCode(error) === 409) {
@@ -34,7 +36,7 @@ export const useRegisterNicknamePage = () => {
         return
       }
 
-      openToast(error.message || '닉네임 설정에 실패했어요.')
+      openToast(error.message || '닉네임 설정에 실패했어요.', undefined, 'error')
     },
   })
 

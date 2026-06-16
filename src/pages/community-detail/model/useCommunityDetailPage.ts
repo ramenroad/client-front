@@ -15,7 +15,7 @@ import {
   useUpdateCommunityCommentMutation,
 } from '@/entities/community/api'
 import type { CommunityCommentNode } from '@/entities/community/model'
-import { useAuthSession } from '@/entities/session/model'
+import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useMyInfoQuery } from '@/entities/viewer/api'
 import { useShare } from '@/shared/lib/useShare'
 import { useToast } from '@/shared/ui/toast'
@@ -23,6 +23,7 @@ import { useToast } from '@/shared/ui/toast'
 export const useCommunityDetailPage = () => {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
   const { isSignIn } = useAuthSession()
   const { openToast } = useToast()
@@ -77,7 +78,7 @@ export const useCommunityDetailPage = () => {
       title: '로그인이 필요해요',
       message: '로그인 하시겠습니까?',
       confirmText: '확인',
-      onConfirm: () => navigate('/login'),
+      onConfirm: () => goToLogin(),
     })
     return false
   }
@@ -105,7 +106,7 @@ export const useCommunityDetailPage = () => {
             openToast('게시글을 삭제했어요.')
             navigate(-1)
           },
-          onError: () => openToast('게시글 삭제에 실패했어요.'),
+          onError: () => openToast('게시글 삭제에 실패했어요.', undefined, 'error'),
         })
       },
     })
@@ -137,7 +138,7 @@ export const useCommunityDetailPage = () => {
           invalidateComments()
           invalidateBoard()
         },
-        onError: () => openToast('댓글 등록에 실패했어요.'),
+        onError: () => openToast('댓글 등록에 실패했어요.', undefined, 'error'),
       },
     )
   }
@@ -180,7 +181,7 @@ export const useCommunityDetailPage = () => {
           handleCancelEdit()
           invalidateComments()
         },
-        onError: () => openToast('댓글 수정에 실패했어요.'),
+        onError: () => openToast('댓글 수정에 실패했어요.', undefined, 'error'),
       },
     )
   }
@@ -198,7 +199,7 @@ export const useCommunityDetailPage = () => {
               invalidateComments()
               invalidateBoard()
             },
-            onError: () => openToast('댓글 삭제에 실패했어요.'),
+            onError: () => openToast('댓글 삭제에 실패했어요.', undefined, 'error'),
           },
         )
       },

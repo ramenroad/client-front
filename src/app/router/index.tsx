@@ -6,6 +6,7 @@ type LazyRouteComponent = LazyExoticComponent<() => ReactNode>
 
 const AppBarLayout = lazy(() => import('@/widgets/layouts/app-bar-layout'))
 const MapLayout = lazy(() => import('@/widgets/layouts/map-layout'))
+const OverlayLayout = lazy(() => import('@/widgets/layouts/overlay-layout'))
 const WithoutAppBarLayout = lazy(() => import('@/widgets/layouts/without-app-bar-layout'))
 
 const BannerPage = lazy(() => import('@/pages/banner'))
@@ -83,10 +84,6 @@ export const router = createBrowserRouter([
         element: renderLazyRoute(MyProfilePage),
       },
       {
-        path: 'my-calendar',
-        element: renderLazyRoute(MyCalendarPage),
-      },
-      {
         path: 'my-activity',
         element: renderLazyRoute(MyActivityPage),
       },
@@ -137,6 +134,17 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    // 라멘 캘린더는 마이의 하위 페이지가 아니라 앱 위에 덮이는 오버레이(OverlayLayout) — 단독 라우트.
+    path: 'my-calendar',
+    element: renderLazyRoute(OverlayLayout),
+    children: [
+      {
+        path: '',
+        element: renderLazyRoute(MyCalendarPage),
+      },
+    ],
+  },
+  {
     path: 'login',
     element: renderLazyRoute(LoginPage),
   },
@@ -149,16 +157,23 @@ export const router = createBrowserRouter([
     element: renderLazyRoute(CommunityNotificationsPage),
   },
   {
-    path: 'community/write',
-    element: renderLazyRoute(CommunityWritePage),
-  },
-  {
-    path: 'community/write/:id',
-    element: renderLazyRoute(CommunityWritePage),
-  },
-  {
-    path: 'community/:id',
-    element: renderLazyRoute(CommunityDetailPage),
+    // 커뮤니티 작성/상세는 캘린더와 동일하게 OverlayLayout으로 띄운다
+    // (useImmersive로 네이티브 탭바를 덮어 화면을 가득 채우는 독립 오버레이).
+    element: renderLazyRoute(OverlayLayout),
+    children: [
+      {
+        path: 'community/write',
+        element: renderLazyRoute(CommunityWritePage),
+      },
+      {
+        path: 'community/write/:id',
+        element: renderLazyRoute(CommunityWritePage),
+      },
+      {
+        path: 'community/:id',
+        element: renderLazyRoute(CommunityDetailPage),
+      },
+    ],
   },
   {
     path: 'oauth/:id',

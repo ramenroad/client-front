@@ -7,7 +7,7 @@ import {
   useRamenCalendarEntriesQuery,
 } from '@/entities/ramen-calendar/api'
 import type { RamenCalendarEntry } from '@/entities/ramen-calendar/model'
-import { useAuthSession } from '@/entities/session/model'
+import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useToast } from '@/shared/ui/toast'
 
 export type MyCalendarDay = {
@@ -134,6 +134,7 @@ const createInitialCalendarState = (today: Date, searchParams: URLSearchParams) 
 
 export const useMyCalendarPage = () => {
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const [searchParams, setSearchParams] = useSearchParams()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
@@ -219,7 +220,7 @@ export const useMyCalendarPage = () => {
         queryClient.invalidateQueries({ queryKey: ramenCalendarQueryKeys.all })
         openToast('기록을 삭제했어요')
       } catch {
-        openToast('삭제에 실패했어요')
+        openToast('삭제에 실패했어요', undefined, 'error')
       }
     },
     [deleteMutation, deleteTargetEntryId, openToast, queryClient],
@@ -280,7 +281,7 @@ export const useMyCalendarPage = () => {
     onDateClick: handleDateClick,
     onEntryClick: handleEntryClick,
     onBack: () => navigate(-1),
-    onLoginClick: () => navigate('/login'),
+    onLoginClick: () => goToLogin(),
     onEditEntry: (id: string) => setEditingEntryId(id),
     onCloseEdit: () => setEditingEntryId(null),
     onDeleteEntry: openDeleteConfirm,

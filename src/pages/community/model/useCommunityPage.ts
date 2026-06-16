@@ -7,7 +7,7 @@ import {
   COMMUNITY_NOTIFICATION_READ_STORAGE_KEY,
   type CommunityBoardListTabKey,
 } from '@/entities/community/model'
-import { useAuthSession } from '@/entities/session/model'
+import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useIntersectionObserver } from '@/shared/lib/useIntersectionObserver'
 import { useToast } from '@/shared/ui/toast'
 
@@ -26,6 +26,7 @@ const hasUnreadCommunityNotifications = () => {
 
 export const useCommunityPage = () => {
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const { isSignIn } = useAuthSession()
   const { openToast } = useToast()
   const [selectedTabKey, setSelectedTabKey] = useState<CommunityBoardListTabKey>('all')
@@ -55,7 +56,7 @@ export const useCommunityPage = () => {
   const handleWriteClick = () => {
     if (!isSignIn) {
       openToast('로그인 후 게시글을 작성할 수 있어요.')
-      navigate('/login')
+      goToLogin()
       return
     }
 

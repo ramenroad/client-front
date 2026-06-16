@@ -469,7 +469,7 @@ const MenuBoardSection = ({
       setIsRemoveMenuBoardModalOpen(false)
     },
     onError: () => {
-      openToast('메뉴판 삭제에 실패했습니다.')
+      openToast('메뉴판 삭제에 실패했습니다.', undefined, 'error')
     },
   })
 

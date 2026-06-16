@@ -10,14 +10,14 @@ export const useLoginPage = () => {
   const handleLogin = useCallback(
     async (provider: OAuthProvider) => {
       if (!isOAuthProviderConfigured(provider)) {
-        openToast('로그인 설정이 비어있어요. OAuth 설정을 확인해주세요.')
+        openToast('로그인 설정이 비어있어요. OAuth 설정을 확인해주세요.', undefined, 'error')
         return
       }
 
       const started = await startOAuthLogin(provider)
 
       if (!started) {
-        openToast('로그인 페이지로 이동하지 못했어요.')
+        openToast('로그인 페이지로 이동하지 못했어요.', undefined, 'error')
       }
     },
     [openToast],

@@ -77,7 +77,7 @@ export const useRamenyaBookmarks = () => {
     },
     onError: (_error, _ramenyaId, previousBookmarks) => {
       rollbackBookmarks(previousBookmarks)
-      openToast('매장 저장에 실패했습니다.')
+      openToast('매장 저장에 실패했습니다.', undefined, 'error')
     },
     onSettled: (_data, _error, ramenyaId) => settleBookmark(ramenyaId),
   })
@@ -89,7 +89,7 @@ export const useRamenyaBookmarks = () => {
     },
     onError: (_error, _ramenyaId, previousBookmarks) => {
       rollbackBookmarks(previousBookmarks)
-      openToast('매장 저장 해제에 실패했습니다.')
+      openToast('매장 저장 해제에 실패했습니다.', undefined, 'error')
     },
     onSettled: (_data, _error, ramenyaId) => settleBookmark(ramenyaId),
   })

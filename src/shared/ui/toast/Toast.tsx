@@ -1,16 +1,18 @@
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import styled from "@emotion/styled";
-import { IconCheckCircle } from "@/shared/ui/icon";
+import { IconCheckCircle, IconClose } from "@/shared/ui/icon";
 import render from "@/shared/ui/render";
+import type { ToastVariant } from "./context";
 
 interface ToastProps {
   message: string;
   action?: ReactNode;
   isVisible: boolean;
+  variant?: ToastVariant;
 }
 
-export const Toast = ({ message, action, isVisible }: ToastProps) => {
+export const Toast = ({ message, action, isVisible, variant = "success" }: ToastProps) => {
   if (!message) {
     return null;
   }
@@ -20,7 +22,11 @@ export const Toast = ({ message, action, isVisible }: ToastProps) => {
       <ToastWrapper isVisible={isVisible}>
         <ToastContent>
           <ToastLeft>
-            <IconCheckCircle className="shrink-0" />
+            {variant === "error" ? (
+              <IconClose className="shrink-0" color="#ff5454" width={20} height={20} />
+            ) : (
+              <IconCheckCircle className="shrink-0" />
+            )}
             <ToastMessage>{message}</ToastMessage>
           </ToastLeft>
           {action ? <ToastActionSlot>{action}</ToastActionSlot> : null}

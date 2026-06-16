@@ -18,6 +18,7 @@ import { PageLayout } from '@/shared/ui/page-layout'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
 import TopBar from '@/shared/ui/top-bar'
+import { useAppEnv } from '@/shared/app-env'
 import { useMyProfilePage } from '../model/useMyProfilePage'
 
 const MyProfilePage = () => {
@@ -36,6 +37,9 @@ const MyProfilePage = () => {
     handlePolicyClick,
     handleNotReady,
   } = useMyProfilePage()
+
+  // 앱에선 마이페이지가 탭 루트라 뒤로가기 불필요 → 숨김. 웹은 기존대로(홈으로).
+  const { isApp } = useAppEnv()
 
   const activityItems = [
     { label: '라멘 캘린더', icon: <IconRamenCalendar />, onClick: handleCalendarClick },
@@ -58,7 +62,7 @@ const MyProfilePage = () => {
 
   return (
     <Layout variant="appBar">
-      <TopBar title="마이페이지" navigate="/" />
+      <TopBar title="마이페이지" navigate="/" hideBack={isApp} />
 
       {isLoading && (
         <StateWrapper>

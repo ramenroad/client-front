@@ -132,7 +132,7 @@ export const ReviewCard = ({ review, editable, mypage = false }: ReviewCardProps
       setIsDeleteModalOpen(false)
     },
     onError: () => {
-      openToast('리뷰 삭제에 실패했습니다.')
+      openToast('리뷰 삭제에 실패했습니다.', undefined, 'error')
     },
   })
   const isReviewLong = review.review.length > MAX_REVIEW_LENGTH

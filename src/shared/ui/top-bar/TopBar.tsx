@@ -10,9 +10,10 @@ interface TopBarProps {
   tooltip?: ReactNode;
   icon?: ReactNode;
   onIconClick?: () => void;
+  hideBack?: boolean;
 }
 
-const TopBar = ({ title, navigate: navigatePath, onBackClick, tooltip, icon, onIconClick }: TopBarProps) => {
+const TopBar = ({ title, navigate: navigatePath, onBackClick, tooltip, icon, onIconClick, hideBack }: TopBarProps) => {
   const navigate = useNavigate();
 
   const handleBackClick = () => {
@@ -31,9 +32,11 @@ const TopBar = ({ title, navigate: navigatePath, onBackClick, tooltip, icon, onI
 
   return (
     <TopBarWrapper>
-      <IconWrapper>
-        <StyledIconBack onClick={handleBackClick} />
-      </IconWrapper>
+      {!hideBack && (
+        <IconWrapper>
+          <StyledIconBack onClick={handleBackClick} />
+        </IconWrapper>
+      )}
       <HeaderTitle>{title}</HeaderTitle>
       {tooltip && tooltip}
       {icon && <AdditionalIconWrapper onClick={onIconClick}>{icon}</AdditionalIconWrapper>}

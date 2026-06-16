@@ -23,7 +23,7 @@ export const useInquiryPage = () => {
     },
     onError: (error) => {
       setIsSubmitConfirmOpen(false)
-      openToast(error.message || '의견 등록에 실패했어요.')
+      openToast(error.message || '의견 등록에 실패했어요.', undefined, 'error')
     },
   })
 

@@ -2,6 +2,9 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
+    <!-- 네이버/카카오 지도 JS는 요청 Referer로 도메인 인증한다. 일부 WebView는 기본 정책에서 cross-origin Referer를 누락하므로
+         origin을 항상 보내도록 명시해, 등록된 origin이 인증에 확실히 전달되게 한다. -->
+    <meta name="referrer" content="origin" />
     <link rel="icon" type="image/svg+xml" href="/_favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="naver-site-verification" content="988646065ee9168e6971dcc97fe2c5919f8d38b2" />

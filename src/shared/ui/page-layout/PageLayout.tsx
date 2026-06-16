@@ -19,4 +19,7 @@ export const PageLayout = ({ variant, className, ...props }: PageLayoutProps) =>
   return <PageLayoutBase {...props} className={twMerge(PAGE_LAYOUT_MIN_HEIGHT_CLASS_NAMES[variant], className)} />
 }
 
-const PageLayoutBase = render.section('box-border flex w-full flex-col bg-background text-primary transition-color')
+// 하단 예약은 Footer + Space(--app-bottom-space)와 min-height(--page-offset-*)로 처리(웹과 동일 구조).
+const PageLayoutBase = render.section(
+  'box-border flex w-full flex-col bg-background text-primary transition-color',
+)

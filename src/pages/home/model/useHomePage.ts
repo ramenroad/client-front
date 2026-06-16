@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, type MouseEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useRamenyaGroupQuery } from '@/entities/curation/api'
+import { useCrossTabNavigate } from '@/shared/app-env'
 import { useToast } from '@/shared/ui/toast'
 
 type LocationCoordinate = {
@@ -44,7 +44,8 @@ const getCurrentPosition = () => {
 }
 
 export const useHomePage = () => {
-  const navigate = useNavigate()
+  // 탭 인지 네비게이션 — 홈에서 /map(지도 탭 소유)으로 갈 땐 in-place 이동이 아니라 지도 탭 전환으로 위임.
+  const navigate = useCrossTabNavigate()
   const locationContainerRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
@@ -96,7 +97,7 @@ export const useHomePage = () => {
     async (location: LocationCoordinate | null) => {
       if (!location) {
         if (!navigator.geolocation) {
-          openToast('이 브라우저에서는 위치 정보를 지원하지 않습니다.')
+          openToast('이 브라우저에서는 위치 정보를 지원하지 않습니다.', undefined, 'error')
           return
         }
 
@@ -110,7 +111,7 @@ export const useHomePage = () => {
           )
           return
         } catch {
-          openToast('현재 위치를 확인하지 못했습니다. 위치 권한을 확인해주세요.')
+          openToast('현재 위치를 확인하지 못했습니다. 위치 권한을 확인해주세요.', undefined, 'error')
           return
         }
       }

@@ -7,7 +7,7 @@ import {
 } from '@/entities/ramenya/model'
 import { useRamenyaReviewImagesQuery, useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useMyInfoQuery } from '@/entities/viewer/api'
-import { useAuthSession } from '@/entities/session/model'
+import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useRamenyaBookmarks } from '@/features/bookmark'
 import { openUrl } from '@/shared/lib/browser'
 import { getReviewCreatedTime } from '@/shared/lib/date'
@@ -76,6 +76,7 @@ const createRaisingMapUrl = ({
 export const useRamenyaDetailPage = () => {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const authSession = useAuthSession()
   const detailQuery = useRamenyaDetailQuery(id)
   const myInfoQuery = useMyInfoQuery({ enabled: authSession.isSignIn })
@@ -180,7 +181,7 @@ export const useRamenyaDetailPage = () => {
 
   const handleNavigateLoginPage = () => {
     setIsLoginModalOpen(false)
-    navigate('/login')
+    goToLogin()
   }
 
   const handleNavigateMenuBoardSubmitPage = () => {

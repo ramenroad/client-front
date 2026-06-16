@@ -25,7 +25,7 @@ export const useWithdrawPage = () => {
       navigate('/')
     },
     onError: (error) => {
-      openToast(error.message || '회원탈퇴에 실패했어요.')
+      openToast(error.message || '회원탈퇴에 실패했어요.', undefined, 'error')
     },
   })
 

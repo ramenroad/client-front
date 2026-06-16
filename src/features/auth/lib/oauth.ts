@@ -1,9 +1,21 @@
+import { isInApp } from '@/shared/bridge'
 import { getApiBaseUrl, resolveEnv } from '@/shared/config'
 import { ensureKakaoInitialized, isKakaoSdkConfigured } from '@/shared/lib/kakao-sdk'
 
 export type OAuthProvider = 'kakao' | 'naver' | 'google' | 'apple'
 
 const NAVER_OAUTH_STATE = 'ramenroad'
+
+// 네이티브 앱 복귀용 커스텀 스킴(Info.plist/AndroidManifest에 등록). 카톡 앱 경유 로그인이
+// 카톡 인앱 브라우저로 떨어졌을 때, 콜백 페이지가 이 스킴으로 코드를 네이티브에 넘겨 우리 WebView로 복귀시킨다.
+export const APP_RETURN_SCHEME = 'raisingapp'
+// OAuth state 표식 — "앱에서 시작한 로그인"임을 라운드트립 후에도 식별(카톡 인앱 브라우저엔 __RAISING_APP__ 미주입).
+export const OAUTH_APP_STATE = 'app'
+
+export const buildAppReturnUrl = (
+  provider: Exclude<OAuthProvider, 'apple'>,
+  params: Record<string, string>,
+) => `${APP_RETURN_SCHEME}://oauth/${provider}?${new URLSearchParams(params).toString()}`
 
 // Kakao login is started through the JavaScript SDK so that mobile users get the
 // KakaoTalk app simple-login flow (throughTalk). The redirect still lands on
@@ -99,6 +111,8 @@ export const loginWithKakaoSdk = async (): Promise<boolean> => {
   kakao.Auth.authorize({
     redirectUri: getOAuthCallbackUrl('kakao'),
     throughTalk: KAKAO_LOGIN_THROUGH_TALK,
+    // 앱에서 시작한 로그인이면 표식을 심어, 카톡 인앱 브라우저로 떨어진 콜백이 네이티브로 바운스하도록 한다.
+    ...(isInApp() ? { state: OAUTH_APP_STATE } : {}),
   })
 
   return true

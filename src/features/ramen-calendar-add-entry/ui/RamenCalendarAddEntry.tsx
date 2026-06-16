@@ -61,6 +61,9 @@ export const RamenCalendarAddEntry = ({
               value={entryVisitDate}
               onChange={(event: ChangeEvent<HTMLInputElement>) => handleVisitDateChange(event.target.value)}
               data-error={errors.visitDate}
+              // iOS/WebKit의 date 입력은 네이티브 크롬 때문에 h-44를 무시하고 세로로 커지고, intrinsic 너비로 다른 입력보다 넓어진다.
+              // appearance-none으로 네이티브 크롬 제거, min-w-0으로 너비 넘침 방지, value 박스 기본 마진 제거로 높이 정상화.
+              className="appearance-none min-w-0 [&::-webkit-date-and-time-value]:m-0 [&::-webkit-date-and-time-value]:text-left"
             />
             {errors.visitDate && <FieldError>날짜는 YYYY-MM-DD 형식으로 입력해주세요</FieldError>}
           </Field>

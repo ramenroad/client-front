@@ -2,9 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { viewerQueryKeys } from '@/entities/viewer/api'
-import { authStore } from '@/entities/session/model'
+import { authStore, consumePostLoginRedirect } from '@/entities/session/model'
 import {
+  buildAppReturnUrl,
   getNaverOAuthState,
+  OAUTH_APP_STATE,
   startOAuthLogin,
   type OAuthProvider,
   type SignInResponse,
@@ -14,6 +16,7 @@ import {
   useSignInWithNaverMutation,
 } from '@/features/auth'
 import type { ApiError } from '@/shared/api'
+import { isInApp } from '@/shared/bridge'
 import { useToast } from '@/shared/ui/toast'
 
 type OAuthCallbackStatus = 'loading' | 'email_conflict' | 'withdrawn' | 'error'
@@ -78,7 +81,9 @@ export const useOAuthCallbackPage = () => {
       authStore.setTokens(data)
       queryClient.invalidateQueries({ queryKey: viewerQueryKeys.myInfo() })
       openToast('로그인 성공')
-      navigate(normalizeSignInType(data.type) === 'signup' ? '/register' : '/')
+      // 로그인 직전 페이지로 복귀(없으면 홈). 회원가입은 /register로 보내되 복귀 경로는 보존 → 가입 완료 시 사용.
+      const isSignup = normalizeSignInType(data.type) === 'signup'
+      navigate(isSignup ? '/register' : (consumePostLoginRedirect() ?? '/'))
     },
     [navigate, openToast, queryClient],
   )
@@ -99,7 +104,7 @@ export const useOAuthCallbackPage = () => {
       }
 
       setStatus('error')
-      openToast(error.message || '로그인 실패')
+      openToast(error.message || '로그인 실패', undefined, 'error')
     },
     [openToast],
   )
@@ -142,6 +147,14 @@ export const useOAuthCallbackPage = () => {
     }
 
     const { code, state, accessToken } = getOAuthCallbackCode()
+
+    // 카카오 앱 경유 로그인이 카톡 인앱 브라우저로 떨어진 경우: 커스텀 스킴으로 네이티브에 코드를 넘겨
+    // 우리 WebView로 복귀시킨다(토큰 교환은 복귀 후 isInApp 컨텍스트에서 실행). 순수 웹/인앱에선 바운스 안 함.
+    if (provider === 'kakao' && code && state === OAUTH_APP_STATE && !isInApp()) {
+      window.location.replace(buildAppReturnUrl('kakao', { code, state }))
+      return
+    }
+
     const callbackValue = provider === 'google' ? accessToken : code
     const callbackKey = `${provider}:${callbackValue ?? ''}:${state ?? ''}`
 

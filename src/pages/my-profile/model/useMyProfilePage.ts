@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { useMyInfoQuery } from '@/entities/viewer/api'
-import { useAuthSession } from '@/entities/session/model'
+import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useToast } from '@/shared/ui/toast'
 
 export const useMyProfilePage = () => {
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const authSession = useAuthSession()
   const { openToast } = useToast()
   const myInfoQuery = useMyInfoQuery({ enabled: authSession.isSignIn })
@@ -18,7 +19,7 @@ export const useMyProfilePage = () => {
     isLoading: isSignedIn && myInfoQuery.isLoading,
     isError: isSignedIn && myInfoQuery.isError && !isAuthError,
     handleProfileClick: () => navigate('/information'),
-    handleLoginClick: () => navigate('/login'),
+    handleLoginClick: () => goToLogin(),
     handleCalendarClick: () => navigate('/my-calendar'),
     handleActivityClick: (tab: 'review' | 'post' | 'comment') => navigate(`/my-activity?tab=${tab}`),
     handleSavedStoreClick: () => navigate('/my-search?tab=saved'),

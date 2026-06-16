@@ -8,7 +8,7 @@ import {
   useReviewDetailQuery,
   useUpdateReviewMutation,
 } from '@/entities/review/api'
-import { useAuthSession } from '@/entities/session/model'
+import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useImageUpload } from '@/shared/lib/useImageUpload'
 import { useToast } from '@/shared/ui/toast'
 import { MAX_REVIEW_IMAGES, MIN_REVIEW_LENGTH, REVIEW_FORM_COPY } from './constants'
@@ -45,6 +45,7 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
   const { id: routeId = '' } = useParams()
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
   const authSession = useAuthSession()
   const { openToast } = useToast()
@@ -129,7 +130,7 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
       maxImages: MAX_REVIEW_IMAGES,
       onImagesChange: handleReviewImagesChange,
       onLimitExceeded: (maxImages) => openToast(`이미지는 최대 ${maxImages}개까지 업로드 가능합니다.`),
-      onUploadError: () => openToast('이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.'),
+      onUploadError: () => openToast('이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.', undefined, 'error'),
     })
 
   const invalidateReviewQueries = useCallback(
@@ -224,8 +225,8 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
 
   const handleLoginConfirm = useCallback(() => {
     setIsLoginModalOpen(false)
-    navigate('/login')
-  }, [navigate])
+    goToLogin()
+  }, [goToLogin])
 
   const handleSubmitReview = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -233,7 +234,7 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
       setHasSubmitted(true)
 
       if (!isFormValid) {
-        openToast('입력하지 않은 항목이 있어요')
+        openToast('입력하지 않은 항목이 있어요', undefined, 'error')
         return
       }
 
@@ -270,7 +271,7 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
         navigate(-1)
       } catch (error) {
         console.error(isEditMode ? '리뷰 수정 중 에러 발생:' : '리뷰 등록 중 에러 발생:', error)
-        openToast(pageCopy.errorToast)
+        openToast(pageCopy.errorToast, undefined, 'error')
       }
     },
     [
@@ -298,7 +299,7 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
   useEffect(() => {
     if (isEditMode) {
       if (reviewDetailQuery.isError) {
-        openToast('리뷰 정보를 불러오는데 실패했습니다.')
+        openToast('리뷰 정보를 불러오는데 실패했습니다.', undefined, 'error')
         navigate(-1)
       }
 
@@ -306,7 +307,7 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
     }
 
     if (ramenyaDetailQuery.isError) {
-      openToast('라멘집 정보를 불러오는데 실패했습니다.')
+      openToast('라멘집 정보를 불러오는데 실패했습니다.', undefined, 'error')
     }
   }, [isEditMode, navigate, openToast, ramenyaDetailQuery.isError, reviewDetailQuery.isError])
 

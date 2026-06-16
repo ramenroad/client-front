@@ -337,22 +337,27 @@
     -moz-osx-font-smoothing: grayscale;
 
     /* 앱/웹 공용 레이아웃 변수 (W3). 기본=웹 기존값. is-app에서 오버라이드. */
-    --app-bar-space: 62px; /* 웹 하단 AppBar 높이. 앱은 네이티브 탭바가 WebView 밖이라 0 */
-    --page-offset-appbar: 267px; /* PageLayout: AppBar+Footer 예약(웹 기존값 유지, 7px 정정은 G11 보류) */
-    --page-offset-footer: 212px; /* PageLayout: Footer만 */
+    --app-bar-space: 62px; /* 웹 하단 AppBar 높이(지도 높이 계산용). 앱은 네이티브 탭바라 0 → 지도 풀블리드 */
+    --app-bottom-space: 55px; /* 하단 Space 높이: 웹 55(앱바 스페이서) / 앱 네이티브 탭바 높이 */
+    --native-bar-reserve: 0px; /* 앱에서만 네이티브 탭바만큼 추가 예약(footer-only 등) */
+    --page-offset-appbar: calc(212px + var(--app-bottom-space)); /* footer(212) + 하단 space. 웹 267 */
+    --page-offset-footer: calc(212px + var(--native-bar-reserve)); /* footer(212) (+앱: 네이티브 탭바). 웹 212 */
     --native-tab-bar-height: 0px;
     --safe-top: 0px; /* 잔여 인셋(§2.7.1) — SAFE_AREA_INSETS로 갱신. 앱 기본형 0 */
-    --safe-bottom: 0px;
+    --safe-bottom: 0px; /* 네이티브 탭바 높이(앱). useBottomTabBarHeight로 주입 */
     --safe-left: 0px;
     --safe-right: 0px;
     --keyboard-height: 0px; /* KEYBOARD 이벤트로 갱신(W6). 레이아웃 소비는 G3/T2 후(이중보정 회피) */
+    --map-search-top: calc(var(--safe-top) + 16px); /* 지도 검색바 top. 앱에선 풀블리드 지도에서 상태바와 떨어지게 더 낮춘다. */
   }
 
   :root.is-app {
-    /* 앱: 웹 AppBar/Footer 미렌더(W2) → 예약 높이 0. 하단은 네이티브 탭바가 처리. */
+    /* 앱: 웹 하단 AppBar만 미렌더(네이티브 탭바 대체). Footer는 유지.
+       지도 풀블리드용 --app-bar-space만 0, 하단 예약은 네이티브 탭바 높이(--safe-bottom)로. */
     --app-bar-space: 0px;
-    --page-offset-appbar: 0px;
-    --page-offset-footer: 0px;
+    --app-bottom-space: var(--safe-bottom);
+    --native-bar-reserve: var(--safe-bottom);
+    --map-search-top: calc(var(--safe-top) + 32px); /* 앱: 검색바를 16px 더 내려 풀블리드 지도 상단에서 시원하게 띄운다. */
   }
 
   :root,

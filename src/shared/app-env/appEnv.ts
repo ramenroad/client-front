@@ -49,8 +49,10 @@ export function readAppEnv(): AppEnv {
       appVersion: g.appVersion ?? null,
       tabBarNative: Boolean(g.tabBar?.native),
       tabBarHeight: g.tabBar?.height ?? 0,
-      // raw 인셋은 직접 적용 금지(§2.7.1). 잔여값은 SAFE_AREA_INSETS 이벤트로 갱신되므로 0 기준이 안전.
-      safeTop: 0,
+      // 상단 인셋은 이제 항상 웹이 --safe-top 패딩으로 처리하므로 raw 상단 인셋과 같다.
+      // 부트 시 주입된 raw 값으로 시드해, 비동기 SAFE_AREA_INSETS 이벤트가 늦거나(리스너 등록 전 emit) 유실돼도
+      // 첫 렌더부터 여백이 적용되게 한다. 하단/좌우는 탭바 표시 여부 등 잔여 계산이 필요해 0 기준 + 이벤트 갱신 유지(§2.7.1).
+      safeTop: g.insets?.top ?? 0,
       safeBottom: 0,
       safeLeft: 0,
       safeRight: 0,
@@ -91,6 +93,10 @@ export function applyAppEnvToDom(env: AppEnv = state) {
   el.classList.toggle('is-android', env.platform === 'android')
   applyCssVars(env)
 }
+
+// 모듈 로드 시점(=첫 페인트 전)에 class/CSS 변수를 적용해, 마운트 effect를 기다리며 한 프레임 깜빡이는 것을 막는다.
+// __RAISING_APP__는 콘텐츠 로드 전 주입되므로 여기서 동기로 읽을 수 있다. (applyCssVars 정의 이후에 호출 — TDZ 회피)
+applyAppEnvToDom(state)
 
 /** SAFE_AREA_INSETS(잔여) 수신 시 호출 — store + CSS 변수 갱신. */
 export function setSafeInsets(insets: { top: number; bottom: number; left: number; right: number }) {

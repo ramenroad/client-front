@@ -12,12 +12,13 @@ import {
   MAX_COMMUNITY_IMAGE_COUNT,
   type CommunityBoardCategory,
 } from '@/entities/community/model'
-import { useAuthSession } from '@/entities/session/model'
+import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useImageUpload, type UploadImageValue } from '@/shared/lib/useImageUpload'
 import { useToast } from '@/shared/ui/toast'
 
 export const useCommunityWritePage = () => {
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
   const { id } = useParams<{ id: string }>()
   const isEditMode = Boolean(id)
@@ -55,7 +56,7 @@ export const useCommunityWritePage = () => {
       navigate('/community')
     },
     onError: () => {
-      openToast('게시글 등록에 실패했어요.')
+      openToast('게시글 등록에 실패했어요.', undefined, 'error')
     },
   })
 
@@ -66,7 +67,7 @@ export const useCommunityWritePage = () => {
       navigate(`/community/${id}`, { replace: true })
     },
     onError: () => {
-      openToast('게시글 수정에 실패했어요.')
+      openToast('게시글 수정에 실패했어요.', undefined, 'error')
     },
   })
 
@@ -75,7 +76,7 @@ export const useCommunityWritePage = () => {
     maxImages: MAX_COMMUNITY_IMAGE_COUNT,
     onImagesChange: setImages,
     onLimitExceeded: () => setIsImageLimitOpen(true),
-    onUploadError: () => openToast('이미지를 처리하지 못했어요. 다시 시도해주세요.'),
+    onUploadError: () => openToast('이미지를 처리하지 못했어요. 다시 시도해주세요.', undefined, 'error'),
   })
 
   const isSubmitting = createBoardMutation.isPending || updateBoardMutation.isPending
@@ -86,12 +87,12 @@ export const useCommunityWritePage = () => {
   const handleSubmit = () => {
     if (!isSignIn) {
       openToast('로그인 후 게시글을 작성할 수 있어요.')
-      navigate('/login')
+      goToLogin()
       return
     }
 
     if (isSubmitDisabled || !category) {
-      openToast('주제, 제목, 내용을 모두 입력해주세요.')
+      openToast('주제, 제목, 내용을 모두 입력해주세요.', undefined, 'error')
       return
     }
 

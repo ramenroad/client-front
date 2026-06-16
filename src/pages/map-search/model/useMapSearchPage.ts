@@ -13,6 +13,7 @@ import {
 import { useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useSearchResultsQuery } from '@/entities/search/api'
 import type { SearchResult } from '@/entities/search/model'
+import { useGoToLogin } from '@/entities/session/model'
 import { useRamenyaBookmarks, type BookmarkedRamenya } from '@/features/bookmark'
 import { getReviewCreatedTime } from '@/shared/lib/date'
 import type { Coordinate, MapViewportSnapshot } from '@/shared/lib/naver-map'
@@ -312,6 +313,7 @@ const getCurrentPosition = () => {
 
 export const useMapSearchPage = () => {
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const { safeTop } = useAppEnv() // 지도 풀블리드 시 상단 잔여 인셋(W8) — 검색바 하단 겹침 기준 보정
   const [searchParams, setSearchParams] = useSearchParams()
   const initialCenter = useMemo(() => getInitialCenter(searchParams), [searchParams])
@@ -767,7 +769,7 @@ export const useMapSearchPage = () => {
 
   const handleCurrentLocationClick = useCallback(async () => {
     if (!navigator.geolocation) {
-      openToast('이 브라우저에서는 위치 정보를 지원하지 않습니다.')
+      openToast('이 브라우저에서는 위치 정보를 지원하지 않습니다.', undefined, 'error')
       return
     }
 
@@ -790,7 +792,7 @@ export const useMapSearchPage = () => {
       })
       syncSearchAreaToUrl(nextArea, viewport?.zoom ?? initialZoom)
     } catch {
-      openToast('현재 위치를 확인하지 못했습니다. 위치 권한을 확인해주세요.')
+      openToast('현재 위치를 확인하지 못했습니다. 위치 권한을 확인해주세요.', undefined, 'error')
     }
   }, [initialZoom, openToast, searchArea, syncSearchAreaToUrl, viewport])
 
@@ -878,8 +880,8 @@ export const useMapSearchPage = () => {
 
   const handleNavigateLoginPage = useCallback(() => {
     setIsLoginModalOpen(false)
-    navigate('/login')
-  }, [navigate])
+    goToLogin()
+  }, [goToLogin])
 
   return {
     initialCenter,

@@ -31,6 +31,43 @@ type MarkerInstanceEntry<T> = {
   marker: NaverMapMarker<T>
 }
 
+// 언마운트/HMR 시 맵·리스너가 이미 파기됐는데 cleanup이 돌면 네이버 내부에서 throw(`x.isArray` null) 한다.
+// 리스너 해제는 best-effort라 실패를 삼켜 React commit 단계가 깨지지 않게 한다.
+const safeRemoveListener = (maps: NaverMaps | null, listener: NaverMapEventListener) => {
+  if (!maps) {
+    return
+  }
+  try {
+    maps.Event.removeListener(listener)
+  } catch {
+    // 이미 해제/파기됨 — 무시.
+  }
+}
+
+// 마커 해제도 동일하게 best-effort — 파기된 맵의 마커에 setMap(null)을 호출하면 네이버 내부에서
+// throw(`x.capitalize` null 등) 한다. cleanup이 React commit 단계를 깨지 않게 삼킨다.
+const safeSetMapNull = (instance: NaverMarkerInstance | null | undefined) => {
+  if (!instance) {
+    return
+  }
+  try {
+    instance.setMap(null)
+  } catch {
+    // 이미 파기됨 — 무시.
+  }
+}
+
+const safeDestroyMap = (map: NaverMapInstance | null) => {
+  if (!map) {
+    return
+  }
+  try {
+    map.destroy?.()
+  } catch {
+    // 이미 파기됨 — 무시.
+  }
+}
+
 interface NaverMapProps<T> {
   initialCenter: Coordinate
   initialZoom?: number
@@ -108,21 +145,32 @@ export const NaverMap = <T,>({
       return
     }
 
+    // rAF/맵 이벤트로 지연 실행되는 사이 맵이 파기되면(상세→뒤로/공유 토스트 리렌더 등) SDK 전역이 사라져
+    // setIcon 내부에서 throw(`x.LatLng` null) 하고 React commit이 깨진다. 전역 SDK를 한 번 더 확인한다.
+    if (!window.naver?.maps) {
+      return
+    }
+
     const zoom = map.getZoom()
 
     markerInstancesRef.current.forEach(({ instance, marker }) => {
       const isSelected = marker.id === selectedMarkerId
 
-      instance.setIcon(
-        createRamenyaMarkerIcon({
-          maps,
-          inactive: marker.inactive,
-          isSelected,
-          title: marker.title,
-          zoom,
-        }),
-      )
-      instance.setZIndex(getRamenyaMarkerZIndex(marker.id, selectedMarkerId))
+      // 개별 마커가 이미 맵에서 떨어졌으면(setMap(null)) setIcon이 네이버 내부에서 throw 한다 — best-effort로 삼킨다.
+      try {
+        instance.setIcon(
+          createRamenyaMarkerIcon({
+            maps,
+            inactive: marker.inactive,
+            isSelected,
+            title: marker.title,
+            zoom,
+          }),
+        )
+        instance.setZIndex(getRamenyaMarkerZIndex(marker.id, selectedMarkerId))
+      } catch {
+        // 파기/경합 중인 마커 — 무시.
+      }
     })
   }, [selectedMarkerId])
 
@@ -191,7 +239,7 @@ export const NaverMap = <T,>({
     })
 
     return () => {
-      maps.Event.removeListener(idleListener)
+      safeRemoveListener(maps, idleListener)
     }
   }, [onMapIdle, scheduleRamenyaMarkerIconUpdate, status])
 
@@ -203,37 +251,48 @@ export const NaverMap = <T,>({
       return
     }
 
-    markerListenersRef.current.forEach((listener) => maps.Event.removeListener(listener))
+    // 토스트/리렌더로 markers 참조가 바뀌어 이 effect가 재실행되는 사이 맵이 파기되면
+    // new maps.Marker가 네이버 내부에서 throw(`x.LatLng` null) 한다 — 전역 SDK를 한 번 더 확인한다.
+    if (!window.naver?.maps) {
+      return
+    }
+
+    markerListenersRef.current.forEach((listener) => safeRemoveListener(maps, listener))
     markerListenersRef.current = []
-    markerInstancesRef.current.forEach(({ instance }) => instance.setMap(null))
+    markerInstancesRef.current.forEach(({ instance }) => safeSetMapNull(instance))
     markerInstancesRef.current = []
 
     const zoom = map.getZoom()
 
     markers.forEach((marker) => {
-      const markerInstance = new maps.Marker({
-        map,
-        position: new maps.LatLng(marker.position.latitude, marker.position.longitude),
-        icon: createRamenyaMarkerIcon({
-          maps,
-          inactive: marker.inactive,
-          isSelected: false,
-          title: marker.title,
-          zoom,
-        }),
-        clickable: true,
-        zIndex: DEFAULT_RAMENYA_MARKER_Z_INDEX,
-      })
+      // 파기/경합 중인 맵에 마커를 붙이면 throw 하므로 마커 단위로 best-effort 처리한다.
+      try {
+        const markerInstance = new maps.Marker({
+          map,
+          position: new maps.LatLng(marker.position.latitude, marker.position.longitude),
+          icon: createRamenyaMarkerIcon({
+            maps,
+            inactive: marker.inactive,
+            isSelected: false,
+            title: marker.title,
+            zoom,
+          }),
+          clickable: true,
+          zIndex: DEFAULT_RAMENYA_MARKER_Z_INDEX,
+        })
 
-      const clickListener = maps.Event.addListener(markerInstance, 'click', () => {
-        onMarkerClick?.(marker.data)
-      })
+        const clickListener = maps.Event.addListener(markerInstance, 'click', () => {
+          onMarkerClick?.(marker.data)
+        })
 
-      markerInstancesRef.current.push({
-        instance: markerInstance,
-        marker,
-      })
-      markerListenersRef.current.push(clickListener)
+        markerInstancesRef.current.push({
+          instance: markerInstance,
+          marker,
+        })
+        markerListenersRef.current.push(clickListener)
+      } catch {
+        // 파기/경합 중인 맵 — 무시.
+      }
     })
   }, [markerSnapshotKey, markers, onMarkerClick, status])
 
@@ -258,7 +317,7 @@ export const NaverMap = <T,>({
     })
 
     return () => {
-      maps.Event.removeListener(zoomListener)
+      safeRemoveListener(maps, zoomListener)
     }
   }, [scheduleRamenyaMarkerIconUpdate, status])
 
@@ -267,7 +326,7 @@ export const NaverMap = <T,>({
     const maps = mapsRef.current
 
     if (!map || !maps || !currentLocation) {
-      currentLocationMarkerRef.current?.setMap(null)
+      safeSetMapNull(currentLocationMarkerRef.current)
       currentLocationMarkerRef.current = null
       return
     }
@@ -321,13 +380,18 @@ export const NaverMap = <T,>({
         window.cancelAnimationFrame(markerIconFrameRef.current)
       }
 
-      if (maps) {
-        markerListenersRef.current.forEach((listener) => maps.Event.removeListener(listener))
-      }
+      markerListenersRef.current.forEach((listener) => safeRemoveListener(maps, listener))
 
-      markerInstancesRef.current.forEach(({ instance }) => instance.setMap(null))
-      currentLocationMarkerRef.current?.setMap(null)
-      mapRef.current?.destroy?.()
+      markerInstancesRef.current.forEach(({ instance }) => safeSetMapNull(instance))
+      safeSetMapNull(currentLocationMarkerRef.current)
+      safeDestroyMap(mapRef.current)
+
+      // 죽은 인스턴스가 ref에 남으면 재진입(상세→뒤로) 시 init이 생성을 건너뛰어 깨진 맵이 된다 → 비워준다.
+      markerInstancesRef.current = []
+      markerListenersRef.current = []
+      currentLocationMarkerRef.current = null
+      mapRef.current = null
+      mapsRef.current = null
     }
   }, [])
 

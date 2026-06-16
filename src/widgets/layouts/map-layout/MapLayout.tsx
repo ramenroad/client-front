@@ -17,8 +17,9 @@ const MapLayout = () => {
   )
 }
 
+// 맵은 풀블리드 — 앱의 #root 상단 안전영역 패딩을 음수 마진으로 상쇄해 상태바 아래까지 채운다(상단 인셋은 맵 내부 오버레이가 --safe-top으로 처리).
 const MapScreen = render.main(
-  'relative h-[calc(100dvh-var(--app-bar-space))] w-full overflow-hidden box-border',
+  'relative mt-[calc(-1*var(--safe-top))] h-[calc(100dvh-var(--app-bar-space))] w-full overflow-hidden box-border',
 )
 
 export default MapLayout

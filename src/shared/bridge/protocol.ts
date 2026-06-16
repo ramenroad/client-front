@@ -73,6 +73,7 @@ export const BridgeMethods = {
   hapticNotification: 'haptic.notification',
   hapticSelection: 'haptic.selection',
   shareOpen: 'share.open',
+  kakaoShare: 'kakao.share',
   openURL: 'openURL',
   clipboardWrite: 'clipboard.write',
   clipboardRead: 'clipboard.read',
@@ -96,6 +97,8 @@ export const BridgeTopics = {
   navigate: 'NAVIGATE', // N→W: 탭 터치
   routeChanged: 'ROUTE_CHANGED', // W→N: 라우트 변경(하이라이트만)
   setSafeAreaMode: 'SET_SAFE_AREA_MODE', // W→N: 지도 진입/이탈(멱등)
+  setTabBar: 'SET_TAB_BAR', // W→N: 풀스크린 커버 — 탭바 강제 숨김/복원(라우트 무관, 멱등)
+  switchTab: 'SWITCH_TAB', // W→N: 다른 탭 소유 라우트로 이동 — 탭 전환 + 해당 탭 WebView 로드(크로스탭 네비)
   safeAreaInsets: 'SAFE_AREA_INSETS', // N→W: 잔여 인셋
   setStatusBar: 'SET_STATUS_BAR', // W→N: 상태바 스타일
   keyboard: 'KEYBOARD', // N→W: {height,duration}
@@ -132,6 +135,8 @@ export interface RaisingAppGlobal {
   tabBar: { native: boolean; height: number };
   capabilities: string[];
   openURLSchemes?: string[];
+  /** 이 WebView가 속한 탭(소유 탭). 웹이 크로스탭 네비(다른 탭 소유 라우트로 이동)를 판별하는 데 쓴다. */
+  tab?: ActiveTab;
 }
 
 /** envelope 판별 헬퍼. */

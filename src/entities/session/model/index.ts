@@ -1,4 +1,6 @@
 export * from './auth-store'
 export * from './session'
 export * from './types'
+export * from './postLoginRedirect'
+export * from './useGoToLogin'
 export * from './useRequireSignInRedirect'

@@ -23,7 +23,7 @@ export const useMenuBoardSubmitPage = () => {
       navigate(-1)
     },
     onError: () => {
-      openToast('메뉴판 등록에 실패했습니다.')
+      openToast('메뉴판 등록에 실패했습니다.', undefined, 'error')
     },
   })
   const { fileInputRef, isUploading: isImageUploading, handleImageClick, handleImageUpload, handleRemoveImage } =
@@ -32,7 +32,7 @@ export const useMenuBoardSubmitPage = () => {
       maxImages: MAX_MENU_BOARD_IMAGES,
       onImagesChange: setSelectedImages,
       onLimitExceeded: (maxImages) => openToast(`이미지는 최대 ${maxImages}개까지 업로드 가능합니다.`),
-      onUploadError: () => openToast('이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.'),
+      onUploadError: () => openToast('이미지 변환에 실패했습니다. 다른 이미지를 선택해주세요.', undefined, 'error'),
     })
 
   const handleDescriptionChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -45,7 +45,7 @@ export const useMenuBoardSubmitPage = () => {
     event.preventDefault()
 
     if (!id) {
-      openToast('메뉴판 등록에 실패했습니다.')
+      openToast('메뉴판 등록에 실패했습니다.', undefined, 'error')
       return
     }
 

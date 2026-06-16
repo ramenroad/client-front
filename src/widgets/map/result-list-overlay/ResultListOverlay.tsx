@@ -696,7 +696,8 @@ const DragHandle = render.div(
 
 const Handle = render.div('h-4 w-36 rounded-full bg-divider')
 
-const ListContentArea = render.div('hide-scrollbar flex-1 overflow-y-auto')
+// 앱: 마지막 카드가 네이티브 탭바에 가리지 않게 하단에 탭바 높이(--safe-bottom)만큼 여백. 웹은 0.
+const ListContentArea = render.div('hide-scrollbar flex-1 overflow-y-auto pb-[var(--safe-bottom)]')
 
 const ListItem = render.div('')
 
@@ -714,7 +715,8 @@ const MarketThumbnail = render.img('h-190 w-full object-cover object-center')
 
 const Divider = render.div('h-8 w-full bg-divider')
 
-const DetailContentArea = render.div('hide-scrollbar flex-1 overflow-y-auto')
+// 앱: 미니 상세뷰 하단(상세 페이지 이동 버튼 등)이 네이티브 탭바에 가리지 않게 탭바 높이(--safe-bottom)만큼 여백. 웹은 0.
+const DetailContentArea = render.div('hide-scrollbar flex-1 overflow-y-auto pb-[var(--safe-bottom)]')
 
 const InformationWrapper = render.section('flex flex-col gap-16 px-20 pt-20 pb-32')
 

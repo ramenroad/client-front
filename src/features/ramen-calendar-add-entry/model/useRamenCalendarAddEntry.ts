@@ -134,12 +134,12 @@ export const useRamenCalendarAddEntry = ({
     setHasSubmitted(true)
 
     if (!isVisitDateValid) {
-      openToast('방문 날짜를 확인해주세요')
+      openToast('방문 날짜를 확인해주세요', undefined, 'error')
       return
     }
 
     if (!isNameValid) {
-      openToast('가게를 입력해주세요')
+      openToast('가게를 입력해주세요', undefined, 'error')
       return
     }
 
@@ -164,7 +164,7 @@ export const useRamenCalendarAddEntry = ({
       openToast(isEditMode ? '기록을 수정했어요' : '기록을 추가했어요', createSuccessToastAction?.(formData.visitDate))
       onClose()
     } catch {
-      openToast(isEditMode ? '기록 수정에 실패했어요' : '기록 추가에 실패했어요')
+      openToast(isEditMode ? '기록 수정에 실패했어요' : '기록 추가에 실패했어요', undefined, 'error')
     }
   }
 

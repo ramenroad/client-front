@@ -1,4 +1,5 @@
 import { CommunityBoardCard } from '@/entities/community/ui'
+import { useAppEnv } from '@/shared/app-env'
 import { IconNotification, IconWriteButton } from '@/shared/ui/icon'
 import render from '@/shared/ui/render'
 import AppBar from '@/widgets/navigation/app-bar'
@@ -17,6 +18,9 @@ const CommunityPage = () => {
     handleWriteClick,
     handleNotificationClick,
   } = useCommunityPage()
+
+  // 앱: 웹 하단 AppBar는 미렌더(네이티브 탭바가 대체) — 중복 방지. 하단 예약은 --app-bottom-space로 유지.
+  const { isApp } = useAppEnv()
 
   return (
     <>
@@ -74,14 +78,16 @@ const CommunityPage = () => {
 
         <BottomSpace />
       </Page>
-      <AppBar />
+      {!isApp && <AppBar />}
     </>
   )
 }
 
-const Page = render.section('relative min-h-[100dvh] w-full bg-white')
+// 앱: #root 상단 안전영역 패딩을 음수 마진으로 상쇄해 페이지가 화면 최상단에서 시작 → sticky 헤더가 상태바 영역까지 덮는다.
+const Page = render.section('relative mt-[calc(-1*var(--safe-top))] min-h-[100dvh] w-full bg-white')
 
-const StickyHeader = render.div('sticky top-0 z-20 bg-white')
+// 제목 + 탭(전체/이벤트/신장개업/질문)을 함께 상단 고정. top-0으로 상태바까지 덮고, pt-[--safe-top]으로 내용은 상태바 아래에 둔다.
+const StickyHeader = render.div('sticky top-0 z-20 bg-white pt-[var(--safe-top)]')
 
 const Header = render.div('flex items-center justify-between px-20 pb-16 pt-20')
 
@@ -118,6 +124,7 @@ const FloatingWriteButton = render.button(
 
 const ObserverTarget = render.div('h-1')
 
-const BottomSpace = render.div('h-55 min-h-55')
+// 웹 55(AppBar 스페이서) / 앱 네이티브 탭바 높이(--app-bottom-space=--safe-bottom). AppBarLayout Space와 동일.
+const BottomSpace = render.div('h-[var(--app-bottom-space)] min-h-[var(--app-bottom-space)]')
 
 export default CommunityPage

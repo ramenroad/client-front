@@ -1,10 +1,11 @@
 import { useCallback, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuthSession } from '@/entities/session/model'
+import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { resolveActiveTab } from '@/shared/app-env'
 
 export const useAppBar = () => {
   const navigate = useNavigate()
+  const goToLogin = useGoToLogin()
   const location = useLocation()
   const { isSignIn } = useAuthSession()
 
@@ -34,8 +35,12 @@ export const useAppBar = () => {
   }, [navigate])
 
   const handleMyClick = useCallback(() => {
-    navigate(isSignIn ? '/mypage' : '/login')
-  }, [isSignIn, navigate])
+    if (isSignIn) {
+      navigate('/mypage')
+    } else {
+      goToLogin('/mypage')
+    }
+  }, [isSignIn, navigate, goToLogin])
 
   return {
     selected,
