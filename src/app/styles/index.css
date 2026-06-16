@@ -348,7 +348,7 @@
     --safe-left: 0px;
     --safe-right: 0px;
     --keyboard-height: 0px; /* KEYBOARD 이벤트로 갱신(W6). 레이아웃 소비는 G3/T2 후(이중보정 회피) */
-    --map-search-top: calc(var(--safe-top) + 16px); /* 지도 검색바 top. 앱에선 풀블리드 지도에서 상태바와 떨어지게 더 낮춘다. */
+    --map-search-top: calc(var(--safe-top) + 16px); /* 지도 검색바 top(웹/앱 공통). 앱은 --safe-top만큼 상태바 아래로 밀린다. */
   }
 
   :root.is-app {
@@ -357,7 +357,6 @@
     --app-bar-space: 0px;
     --app-bottom-space: var(--safe-bottom);
     --native-bar-reserve: var(--safe-bottom);
-    --map-search-top: calc(var(--safe-top) + 32px); /* 앱: 검색바를 16px 더 내려 풀블리드 지도 상단에서 시원하게 띄운다. */
   }
 
   :root,

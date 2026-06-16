@@ -49,11 +49,13 @@ export function readAppEnv(): AppEnv {
       appVersion: g.appVersion ?? null,
       tabBarNative: Boolean(g.tabBar?.native),
       tabBarHeight: g.tabBar?.height ?? 0,
-      // 상단 인셋은 이제 항상 웹이 --safe-top 패딩으로 처리하므로 raw 상단 인셋과 같다.
       // 부트 시 주입된 raw 값으로 시드해, 비동기 SAFE_AREA_INSETS 이벤트가 늦거나(리스너 등록 전 emit) 유실돼도
-      // 첫 렌더부터 여백이 적용되게 한다. 하단/좌우는 탭바 표시 여부 등 잔여 계산이 필요해 0 기준 + 이벤트 갱신 유지(§2.7.1).
+      // 첫 렌더부터 여백이 적용되게 한다(이후 이벤트가 정확값으로 갱신). §2.7.1
+      // - 상단: edge-to-edge라 잔여 상단 = raw 상단 인셋.
+      // - 하단: 각 탭 WebView의 초기 라우트는 항상 탭 라우트(탭바 표시)라 잔여 하단 ≈ 탭바 높이 + 홈인디케이터.
+      //   (이벤트 유실 시 하단 시트 최하단 여백이 0으로 남던 문제 방지. 비-탭 라우트로 가면 이벤트가 insets.bottom으로 정정.)
       safeTop: g.insets?.top ?? 0,
-      safeBottom: 0,
+      safeBottom: (g.tabBar?.height ?? 0) + (g.insets?.bottom ?? 0),
       safeLeft: 0,
       safeRight: 0,
     }
