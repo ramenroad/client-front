@@ -9,6 +9,7 @@ import { useRamenyaReviewImagesQuery, useRamenyaReviewsInfiniteQuery } from '@/e
 import { useMyInfoQuery } from '@/entities/viewer/api'
 import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useRamenyaBookmarks } from '@/features/bookmark'
+import { useCrossTabNavigate } from '@/shared/app-env'
 import { openUrl } from '@/shared/lib/browser'
 import { getReviewCreatedTime } from '@/shared/lib/date'
 import { isMobileDevice } from '@/shared/lib/image'
@@ -76,6 +77,9 @@ const createRaisingMapUrl = ({
 export const useRamenyaDetailPage = () => {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  // 라이징 지도(/map)는 지도 탭 소유 라우트 → 탭 인지 네비. 홈 탭에서 호출 시 현재 WebView를 /map으로
+  // 오염시키지 않고(지도 이중 표시 방지) SWITCH_TAB으로 지도 탭만 전환·로드한다. 같은 탭이면 일반 navigate로 폴백.
+  const crossTabNavigate = useCrossTabNavigate()
   const goToLogin = useGoToLogin()
   const authSession = useAuthSession()
   const detailQuery = useRamenyaDetailQuery(id)
@@ -206,7 +210,7 @@ export const useRamenyaDetailPage = () => {
   }
 
   const handleNavigateRaisingMap = () => {
-    navigate(
+    crossTabNavigate(
       createRaisingMapUrl({
         id,
         latitude: detail?.latitude,
