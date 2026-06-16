@@ -357,6 +357,7 @@
     --app-bar-space: 0px;
     --app-bottom-space: var(--safe-bottom);
     --native-bar-reserve: var(--safe-bottom);
+    --map-search-top: var(--safe-top); /* 앱: 검색 UI를 웹(+16px)보다 16px 위로 — 상태바 바로 아래에 붙인다. */
   }
 
   :root,
