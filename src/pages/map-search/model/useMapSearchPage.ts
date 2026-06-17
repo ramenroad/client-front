@@ -179,6 +179,18 @@ const getInitialArea = (searchParams: URLSearchParams): SearchArea | null => {
   return { latitude, longitude, radius }
 }
 
+// 위치 파라미터(lat/lng[/radius])를 비교용 키로 직렬화. '외부 네비게이션'과 '지도 자체 URL 동기화'를 구분하는 데 쓴다.
+const areaKeyFromParams = (searchParams: URLSearchParams): string | null => {
+  const latitude = parseNumberParam(searchParams.get('latitude'))
+  const longitude = parseNumberParam(searchParams.get('longitude'))
+
+  if (latitude === undefined || longitude === undefined) {
+    return null
+  }
+
+  return `${latitude}:${longitude}:${parseNumberParam(searchParams.get('radius')) ?? ''}`
+}
+
 const getInitialCenter = (searchParams: URLSearchParams): Coordinate => {
   const latitude = parseNumberParam(searchParams.get('latitude'))
   const longitude = parseNumberParam(searchParams.get('longitude'))
@@ -336,6 +348,9 @@ export const useMapSearchPage = () => {
   const suppressNextIdleRef = useRef(false)
   // handleMapIdle(빈 deps 콜백)에서 최신 저장모드 값을 읽기 위한 ref
   const isSavedModeRef = useRef(false)
+  // #3: 지도가 URL에 마지막으로 쓴 위치 키. 외부 네비게이션(홈 지역 뱃지 등)과 지도 자체 동기화를 구분해
+  // warm 지도 재중심 시 루프/지터를 막는다. 초기값=초기 파라미터 키(콜드 마운트 중복 재중심 방지).
+  const lastSyncedAreaKeyRef = useRef<string | null>(areaKeyFromParams(searchParams))
   const { openToast } = useToast()
   const { isSignIn, bookmarkedIds, bookmarkedRamenyas, toggleBookmark } = useRamenyaBookmarks()
   const todayVisitDate = useMemo(() => createDateKey(new Date()), [])
@@ -628,6 +643,8 @@ export const useMapSearchPage = () => {
 
   const syncSearchAreaToUrl = useCallback(
     (area: SearchArea, zoom?: number, options?: SyncSearchAreaOptions) => {
+      // 이 URL 변경은 지도 자체 동기화임을 표시 → 아래 외부-네비게이션 재중심 effect가 무시(루프 방지).
+      lastSyncedAreaKeyRef.current = `${area.latitude}:${area.longitude}:${area.radius}`
       setSearchParams(
         (prev) =>
           updateMapSearchParams(prev, (nextParams) => {
@@ -651,6 +668,34 @@ export const useMapSearchPage = () => {
     },
     [setSearchParams, trimmedKeyword],
   )
+
+  // #3: warm 지도 외부 네비게이션 재중심 — 홈 지역 뱃지 등으로 URL 위치 파라미터가 바뀌면(우리가 쓴 게 아니면)
+  // 이미 떠 있는 지도를 panTo(focusRequest)하고 검색영역을 갱신한다. 콜드 마운트·지도 자체 동기화는 무시.
+  useEffect(() => {
+    const latitude = parseNumberParam(searchParams.get('latitude'))
+    const longitude = parseNumberParam(searchParams.get('longitude'))
+
+    if (latitude === undefined || longitude === undefined) {
+      return
+    }
+
+    const radius = parseNumberParam(searchParams.get('radius'))
+    const key = `${latitude}:${longitude}:${radius ?? ''}`
+
+    if (key === lastSyncedAreaKeyRef.current) {
+      return
+    }
+
+    lastSyncedAreaKeyRef.current = key
+    setFocusRequest({ id: `nav-${key}`, position: { latitude, longitude } })
+
+    // 영역(반경)까지 온 '지역 이동'이면 검색영역을 갱신해 그 지역 주변 결과를 보여준다.
+    // URL(외부 시스템) 변화에 React 상태를 동기화하는 경우 — set-state-in-effect의 정당한 예외(규칙 메시지 명시).
+    if (radius !== undefined) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSearchArea({ latitude, longitude, radius })
+    }
+  }, [searchParams])
 
   const handleMapReady = useCallback((nextViewport: MapViewportSnapshot) => {
     setViewport(nextViewport)
