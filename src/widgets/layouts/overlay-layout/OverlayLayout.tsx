@@ -12,7 +12,7 @@ const OverlayLayout = () => {
   useImmersive() // 마운트 동안 네이티브 탭바를 덮어 숨김. 순수 웹/구버전 앱에선 no-op.
   const [entered, setEntered] = useState(false)
 
-  // 다음 프레임에 enter 상태로 전환 → 슬라이드업 등장(새 창이 올라오는 느낌).
+  // 다음 프레임에 enter 상태로 전환 → 오른쪽에서 왼쪽으로 밀려 들어오는 push 전환(계층 네비 기본 느낌).
   useEffect(() => {
     const raf = requestAnimationFrame(() => setEntered(true))
     return () => cancelAnimationFrame(raf)
@@ -28,7 +28,7 @@ const OverlayLayout = () => {
 // Popup(zIndex 200)/Toast(z-150)는 body 포털로 위에 뜨므로 그 아래(z-55)에 둔다 — 페이지/웹 AppBar(z-40) 위.
 // fixed라 #root의 상단 안전영역 패딩을 못 받으므로 자체적으로 pt-[--safe-top]을 준다(앱에서만 실값).
 const Panel = render.div(
-  'fixed inset-0 z-[55] flex translate-y-full flex-col overflow-y-auto bg-background pt-[var(--safe-top)] transition-transform duration-300 ease-out data-[entered=true]:translate-y-0',
+  'fixed inset-0 z-[55] flex translate-x-full flex-col overflow-y-auto bg-background pt-[var(--safe-top)] transition-transform duration-300 ease-out data-[entered=true]:translate-x-0',
 )
 
 export default OverlayLayout
