@@ -8,7 +8,7 @@ import { MenuBoardDetail } from '@/entities/menu-board/ui'
 import { ramenyaQueryKeys } from '@/entities/ramenya/api'
 import type { BusinessHour, RamenyaDetail, RamenyaMenuBoard } from '@/entities/ramenya/model'
 import { checkBusinessStatus, checkBusinessStatusSpecial, DAY_MAP, OpenStatus } from '@/entities/ramenya/model'
-import { RamenyaOpenStatus } from '@/entities/ramenya/ui'
+import { RamenyaAddress, RamenyaOpenStatus } from '@/entities/ramenya/ui'
 import type { Review } from '@/entities/review/model'
 import type { MyInfo } from '@/entities/viewer/model'
 import { RamenCalendarAddEntry } from '@/features/ramen-calendar-add-entry'
@@ -326,7 +326,7 @@ const InformationSection = ({
 
         <MarketDetailBox>
           <DetailIconTag icon={<IconLocate />} text="주소" />
-          <MarketDetailBoxText>{detail.address}</MarketDetailBoxText>
+          <RamenyaAddress address={detail.address} />
         </MarketDetailBox>
 
         <MarketDetailBox>

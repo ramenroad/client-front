@@ -1,10 +1,10 @@
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { useMyInfoQuery } from '@/entities/viewer/api'
 import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useToast } from '@/shared/ui/toast'
 
 export const useMyProfilePage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const authSession = useAuthSession()
   const { openToast } = useToast()

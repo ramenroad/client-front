@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams } from '@/shared/navigation'
 import { useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import {
   getTodayBusinessHour,
@@ -75,8 +75,8 @@ const createRaisingMapUrl = ({
 }
 
 export const useRamenyaDetailPage = () => {
-  const { id = '' } = useParams()
-  const navigate = useNavigate()
+  const { id = '' } = useAppParams()
+  const navigate = useAppNavigate()
   // 라이징 지도(/map)는 지도 탭 소유 라우트 → 탭 인지 네비. 홈 탭에서 호출 시 현재 WebView를 /map으로
   // 오염시키지 않고(지도 이중 표시 방지) SWITCH_TAB으로 지도 탭만 전환·로드한다. 같은 탭이면 일반 navigate로 폴백.
   const crossTabNavigate = useCrossTabNavigate()
@@ -240,6 +240,7 @@ export const useRamenyaDetailPage = () => {
   const handleNavigateCalendarPage = (visitDate: string) => {
     navigate(createCalendarUrl(visitDate))
   }
+
 
   return {
     id,

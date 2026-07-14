@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams } from '@/shared/navigation'
 import {
   communityQueryKeys,
   useAddCommunityBoardLikeMutation,
@@ -21,8 +21,8 @@ import { useShare } from '@/shared/lib/useShare'
 import { useToast } from '@/shared/ui/toast'
 
 export const useCommunityDetailPage = () => {
-  const { id = '' } = useParams()
-  const navigate = useNavigate()
+  const { id = '' } = useAppParams()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
   const { isSignIn } = useAuthSession()

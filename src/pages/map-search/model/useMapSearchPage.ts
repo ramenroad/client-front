@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAppNavigate, useAppSearchParams } from '@/shared/navigation'
 import { useNearbyRamenyasQuery, useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import {
   checkBusinessStatus,
@@ -324,10 +324,10 @@ const getCurrentPosition = () => {
 }
 
 export const useMapSearchPage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const { safeTop } = useAppEnv() // 지도 풀블리드 시 상단 잔여 인셋(W8) — 검색바 하단 겹침 기준 보정
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useAppSearchParams()
   const initialCenter = useMemo(() => getInitialCenter(searchParams), [searchParams])
   const initialZoom = useMemo(() => parseNumberParam(searchParams.get('level')) ?? DEFAULT_ZOOM, [searchParams])
   const initialKeyword = searchParams.get('keyword') ?? ''

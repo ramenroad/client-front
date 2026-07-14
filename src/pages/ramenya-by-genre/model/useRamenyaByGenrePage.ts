@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams, useScreenScroll } from '@/shared/navigation'
 import { useRamenyaListQuery } from '@/entities/ramenya/api'
 import {
   filterRamenyas,
@@ -52,8 +52,9 @@ const writeStoredFilterOptions = (filterOptions: FilterOptions) => {
 }
 
 export const useRamenyaByGenrePage = () => {
-  const navigate = useNavigate()
-  const { genre = '' } = useParams()
+  const scrollScreen = useScreenScroll()
+  const navigate = useAppNavigate()
+  const { genre = '' } = useAppParams()
   const [filterOptions, setFilterOptions] = useState(readStoredFilterOptions)
   const [currentLocation, setCurrentLocation] = useState<Coordinate | null>(null)
   const ramenyaListQuery = useRamenyaListQuery({ genre }, { enabled: Boolean(genre) })
@@ -77,8 +78,8 @@ export const useRamenyaByGenrePage = () => {
   }, [filterOptions])
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [genre])
+    scrollScreen()
+  }, [genre, scrollScreen])
 
   const ramenyas = useMemo(
     () => filterRamenyas(ramenyaListQuery.data ?? [], filterOptions, currentLocation),

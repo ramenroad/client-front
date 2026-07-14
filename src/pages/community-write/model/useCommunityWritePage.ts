@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams } from '@/shared/navigation'
 import {
   communityQueryKeys,
   useCommunityBoardDetailQuery,
@@ -17,10 +17,10 @@ import { useImageUpload, type UploadImageValue } from '@/shared/lib/useImageUplo
 import { useToast } from '@/shared/ui/toast'
 
 export const useCommunityWritePage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
-  const { id } = useParams<{ id: string }>()
+  const { id } = useAppParams<{ id: string }>()
   const isEditMode = Boolean(id)
   const { isSignIn } = useAuthSession()
   const { openToast } = useToast()

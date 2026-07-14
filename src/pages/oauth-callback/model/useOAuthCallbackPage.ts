@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams } from '@/shared/navigation'
 import { viewerQueryKeys } from '@/entities/viewer/api'
 import { authStore, consumePostLoginRedirect } from '@/entities/session/model'
 import {
@@ -64,9 +64,9 @@ const getErrorEmail = (error: ApiError) => {
 }
 
 export const useOAuthCallbackPage = () => {
-  const { id } = useParams()
+  const { id } = useAppParams()
   const provider = id as SupportedCallbackProvider | undefined
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
   const [status, setStatus] = useState<OAuthCallbackStatus>('loading')
@@ -83,7 +83,11 @@ export const useOAuthCallbackPage = () => {
       openToast('로그인 성공')
       // 로그인 직전 페이지로 복귀(없으면 홈). 회원가입은 /register로 보내되 복귀 경로는 보존 → 가입 완료 시 사용.
       const isSignup = normalizeSignInType(data.type) === 'signup'
-      navigate(isSignup ? '/register' : (consumePostLoginRedirect() ?? '/'))
+      const destination = isSignup ? '/register' : (consumePostLoginRedirect() ?? '/')
+
+      // 콜백 화면은 목적지로 치환한다 — OAuth는 풀페이지 왕복이라 이 액티비티가 스택의 바닥이고,
+      // push로 얹으면 뒤로가기가 콜백 화면으로 되돌아와 인가 코드를 다시 처리하려 든다.
+      navigate(destination, { replace: true })
     },
     [navigate, openToast, queryClient],
   )

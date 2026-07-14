@@ -91,6 +91,9 @@ const SELECTED_RAMENYA_MARKER_Z_INDEX = 1_000
 // 하단시트가 쓰는 기준과 동일하게 동적 뷰포트 높이를 사용한다.
 const getViewportHeight = () => window.visualViewport?.height || window.innerHeight
 
+// 시트 높이 변화가 이보다 작으면 팬하지 않는다 — 눈에 띄지도 않는 이동으로 지도가 들썩이는 것을 막는다.
+const MIN_SHEET_PAN_PX = 2
+
 // 화면 수직 픽셀 거리를 위도 차이로 환산한다(웹 메르카토르 근사, 줌이 클수록 1px당 위도 차가 작다).
 const EQUATOR_METERS_PER_PIXEL_AT_ZOOM_0 = 156543.03392
 const METERS_PER_LATITUDE_DEGREE = 111_320
@@ -123,7 +126,9 @@ export const NaverMap = <T,>({
   const markerListenersRef = useRef<NaverMapEventListener[]>([])
   const markerIconFrameRef = useRef<number | null>(null)
   const currentLocationMarkerRef = useRef<NaverMarkerInstance | null>(null)
-  const focusOffsetRatioRef = useRef(focusOffsetRatio)
+  // 지금 지도 중심이 이미 반영하고 있는 하단시트 오프셋 비율 / 이미 처리한 포커스 요청.
+  const appliedOffsetRatioRef = useRef(focusOffsetRatio)
+  const appliedFocusRequestRef = useRef(focusRequest)
   const [status, setStatus] = useState<'error' | 'loading' | 'ready'>('loading')
 
   const markerSnapshotKey = useMemo(
@@ -348,29 +353,59 @@ export const NaverMap = <T,>({
     currentLocationMarkerRef.current.setZIndex(CURRENT_LOCATION_MARKER_Z_INDEX)
   }, [currentLocation, status])
 
-  // 최신 오프셋 비율만 클로저로 읽어, 시트 드래그로 비율이 바뀔 때마다 포커스가 재실행돼
-  // 지도가 튀는 것을 막는다(포커스 effect 의존성에는 focusOffsetRatio를 넣지 않는다).
-  useEffect(() => {
-    focusOffsetRatioRef.current = focusOffsetRatio
-  }, [focusOffsetRatio])
-
+  /**
+   * 지도 중심을 "하단시트에 가려지지 않은 영역의 중심"에 맞춘다.
+   *
+   * 시트가 화면 하단 S px를 덮으면 보이는 영역의 중심은 지도 컨테이너 중심보다 S/2 만큼 위에 있다
+   * (focusOffsetRatio가 그 S/2를 뷰포트 높이 대비 비율로 들고 온다). 그래서 두 경우 모두 여기서 처리한다.
+   *
+   * ① 매장 포커스 — 대상 좌표를 그 중심에 오도록 절대 위치로 팬한다.
+   * ② 시트 높이 변경 — 보이는 영역의 중심이 움직인 만큼 지도를 반대로 옮겨, 보던 지점이 계속 그 중심에
+   *    남게 한다(시트가 커지면 남쪽으로). 시트 드래그 중에는 resultSheetHeight가 바뀌지 않고 놓는 순간에만
+   *    바뀌므로, 프레임마다 팬이 터지지 않고 정착 시점에 한 번 부드럽게 움직인다.
+   *
+   * 매장 클릭은 시트를 펼치면서 포커스도 함께 요청하므로(openDetailSheet), ①에서 최신 비율로 절대 위치를
+   * 계산하고 곧장 반환해 ②와 이중으로 팬하지 않는다.
+   */
   useEffect(() => {
     const map = mapRef.current
     const maps = mapsRef.current
 
-    if (!map || !maps || !focusRequest) {
+    if (!map || !maps) {
+      return // 아직 준비 전 — status가 바뀌며 다시 실행된다(그 사이 요청은 ref에 남아 유실되지 않는다).
+    }
+
+    const isNewFocusRequest = focusRequest !== appliedFocusRequestRef.current
+    appliedFocusRequestRef.current = focusRequest
+
+    // ① 포커스 이동. 위경도를 직접 옮기므로 단일 panTo로 부드럽고, 북쪽 기준(회전 없음) 지도라 방향이 보장된다.
+    if (isNewFocusRequest && focusRequest) {
+      onFocusMove?.()
+
+      const { latitude, longitude } = focusRequest.position
+      const offsetPx = getViewportHeight() * focusOffsetRatio
+      const latitudeShift = offsetPx > 0 ? pixelsToLatitudeDelta(latitude, offsetPx, map.getZoom()) : 0
+
+      map.panTo(new maps.LatLng(latitude - latitudeShift, longitude))
+      appliedOffsetRatioRef.current = focusOffsetRatio
       return
     }
 
-    onFocusMove?.()
+    // ② 시트 높이만 바뀐 경우.
+    const deltaPx = getViewportHeight() * (appliedOffsetRatioRef.current - focusOffsetRatio)
 
-    const { latitude, longitude } = focusRequest.position
-    // 하단시트에 가려지지 않도록 중심을 대상보다 남쪽으로 옮겨, 대상이 화면 중앙보다 위에 오게 한다.
-    // 위경도를 직접 옮기므로 단일 panTo로 부드럽게 이동하고, 북쪽 기준(회전 없음) 지도라 방향이 보장된다.
-    const offsetPx = getViewportHeight() * focusOffsetRatioRef.current
-    const latitudeShift = offsetPx > 0 ? pixelsToLatitudeDelta(latitude, offsetPx, map.getZoom()) : 0
-    map.panTo(new maps.LatLng(latitude - latitudeShift, longitude))
-  }, [focusRequest, onFocusMove, status])
+    if (Math.abs(deltaPx) < MIN_SHEET_PAN_PX) {
+      return // 미세 변화는 무시. 기준값을 갱신하지 않아 다음 변화에 누적된다(조금씩 어긋나는 것 방지).
+    }
+
+    onFocusMove?.() // 사용자의 지도 조작이 아니다 → '현 지도에서 검색' 안내를 띄우지 않는다.
+
+    const center = map.getCenter()
+    const latitudeShift = pixelsToLatitudeDelta(center.lat(), deltaPx, map.getZoom())
+
+    map.panTo(new maps.LatLng(center.lat() + latitudeShift, center.lng()))
+    appliedOffsetRatioRef.current = focusOffsetRatio
+  }, [focusRequest, focusOffsetRatio, onFocusMove, status])
 
   useEffect(() => {
     return () => {

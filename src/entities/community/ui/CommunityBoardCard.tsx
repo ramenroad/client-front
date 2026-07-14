@@ -1,7 +1,8 @@
 import { type MouseEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import type { CommunityBoardSummary } from '@/entities/community/model'
 import { getRelativeTimeLabel } from '@/entities/community/lib'
+import { formatCompactNumber } from '@/shared/lib/number'
 import { IconUnSignInUserProfile } from '@/shared/ui/icon'
 import render from '@/shared/ui/render'
 import { CommunityCommentIcon, CommunityEyeIcon, CommunityHeartIcon } from './CommunityIcons'
@@ -23,7 +24,7 @@ export const CommunityBoardCard = ({ board }: CommunityBoardCardProps) => {
   const authorName = board.userId?.nickname ?? '알 수 없는 사용자'
   const authorProfileImageUrl = board.userId?.profileImageUrl
   const authorId = board.userId?._id
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   const handleAuthorClick = (event: MouseEvent<HTMLDivElement>) => {
     if (!authorId) {
@@ -66,15 +67,15 @@ export const CommunityBoardCard = ({ board }: CommunityBoardCardProps) => {
         <Metrics>
           <MetricItem>
             <CommunityEyeIcon width={16} height={16} />
-            <MetricValue>{board.viewCount}</MetricValue>
+            <MetricValue>{formatCompactNumber(board.viewCount)}</MetricValue>
           </MetricItem>
           <MetricItem>
             <CommunityHeartIcon width={16} height={16} />
-            <MetricValue>{board.likeCount}</MetricValue>
+            <MetricValue>{formatCompactNumber(board.likeCount)}</MetricValue>
           </MetricItem>
           <MetricItem>
             <CommunityCommentIcon width={16} height={16} />
-            <MetricValue>{board.commentCount}</MetricValue>
+            <MetricValue>{formatCompactNumber(board.commentCount)}</MetricValue>
           </MetricItem>
         </Metrics>
       </BottomRow>

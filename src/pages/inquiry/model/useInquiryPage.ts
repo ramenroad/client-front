@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { useRequireSignInRedirect } from '@/entities/session/model'
 import { useCreateInquiryMutation } from '@/features/inquiry'
 import { useToast } from '@/shared/ui/toast'
 
 export const useInquiryPage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { openToast } = useToast()
 
   // 의견 남기기는 로그인이 필요하다. 비로그인 상태로 진입하면 로그인 화면으로 보낸다.

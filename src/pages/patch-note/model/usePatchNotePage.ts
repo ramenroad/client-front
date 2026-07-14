@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { useNoticeList } from '@/entities/support/model'
 
 export const usePatchNotePage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const list = useNoticeList('패치노트')
 
   return {

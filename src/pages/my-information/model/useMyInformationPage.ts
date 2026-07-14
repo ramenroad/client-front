@@ -1,6 +1,6 @@
 import { useRef, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { useMyInfoQuery, viewerQueryKeys } from '@/entities/viewer/api'
 import { authStore, useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useSignOutMutation } from '@/features/auth'
@@ -9,7 +9,7 @@ import { useTheme } from '@/shared/model'
 import { useToast } from '@/shared/ui/toast'
 
 export const useMyInformationPage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
   const { openToast } = useToast()

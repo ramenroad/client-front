@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { ramenyaQueryKeys } from '@/entities/ramenya/api'
 import { reviewQueryKeys, useDeleteReviewMutation } from '@/entities/review/api'
 import type { MyReview, Review, ReviewRamenyaInfo, UserReview } from '@/entities/review/model'
@@ -47,7 +47,7 @@ const ReviewHeader = ({ review, mypage, editable, onEdit, onDelete }: {
   onEdit: () => void
   onDelete: () => void
 }) => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   if (mypage) {
     return (
@@ -118,7 +118,7 @@ const ReviewActions = ({ onEdit, onDelete }: { onEdit: () => void; onDelete: () 
 }
 
 export const ReviewCard = ({ review, editable, mypage = false }: ReviewCardProps) => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
   const [isReviewExpanded, setIsReviewExpanded] = useState(false)

@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useAppLocation, useAppNavigate } from '@/shared/navigation'
 import { setPostLoginRedirect } from './postLoginRedirect'
 
 /**
@@ -11,8 +11,8 @@ import { setPostLoginRedirect } from './postLoginRedirect'
  *   goToLogin('/mypage')   // 의도한 목적지가 현재 페이지와 다를 때(예: '마이' 탭)
  */
 export const useGoToLogin = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useAppNavigate()
+  const location = useAppLocation()
 
   return useCallback(
     (from?: string) => {

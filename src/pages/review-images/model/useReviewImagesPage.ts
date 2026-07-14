@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useAppParams, useScreenScroll } from '@/shared/navigation'
 import { useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import { useRamenyaReviewImagesQuery } from '@/entities/review/api'
 
 export const useReviewImagesPage = () => {
-  const { id = '' } = useParams()
+  const scrollScreen = useScreenScroll()
+  const { id = '' } = useAppParams()
   const detailQuery = useRamenyaDetailQuery(id)
   const imagesQuery = useRamenyaReviewImagesQuery(id)
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null)
   const images = imagesQuery.data?.ramenyaReviewImagesUrls ?? []
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    scrollScreen()
+  }, [scrollScreen])
 
   return {
     title: detailQuery.data?.name ?? '이미지',

@@ -1,12 +1,12 @@
 import { useCallback, useMemo } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useAppLocation, useAppNavigate } from '@/shared/navigation'
 import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { resolveActiveTab } from '@/shared/app-env'
 
 export const useAppBar = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
-  const location = useLocation()
+  const location = useAppLocation()
   const { isSignIn } = useAuthSession()
 
   // 활성 탭은 resolveActiveTab 단일 소스로 산출(§2.9.3) — ROUTE_CHANGED 발신부와 매핑 일치.

@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { useBannerQuery } from '@/entities/curation/api'
 import { useBannerNavigation } from '@/entities/curation/model'
 import { Banner as BannerCarousel } from '@/entities/curation/ui'
 
 export const HomeBanner = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { bannerQuery } = useBannerQuery()
   const handleBannerClick = useBannerNavigation()
   const [currentIndex, setCurrentIndex] = useState(0)

@@ -1,6 +1,6 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAppNavigate, useAppSearchParams } from '@/shared/navigation'
 import { viewerQueryKeys } from '@/entities/viewer/api'
 import { consumePostLoginRedirect } from '@/entities/session/model'
 import { useUpdateNicknameMutation } from '@/features/profile'
@@ -16,10 +16,10 @@ const getErrorStatusCode = (error: ApiError) => {
 }
 
 export const useRegisterNicknamePage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
-  const [searchParams] = useSearchParams()
+  const [searchParams] = useAppSearchParams()
   const currentNickname = searchParams.get('nickname') ?? ''
   const [nickname, setNickname] = useState('')
   const [isNicknameAlreadyExists, setIsNicknameAlreadyExists] = useState(false)

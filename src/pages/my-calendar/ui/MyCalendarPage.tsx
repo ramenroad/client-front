@@ -28,9 +28,11 @@ const MyCalendarPage = () => {
     isDeleting,
     isDeleteConfirmOpen,
     isAddOpen,
+    canGoToday,
     onPrevMonth,
     onNextMonth,
     onDateClick,
+    onGoToday,
     onEntryClick,
     onBack,
     onLoginClick,
@@ -45,7 +47,18 @@ const MyCalendarPage = () => {
 
   return (
     <Layout variant="appBar">
-      <TopBar title="라멘 캘린더" onBackClick={onBack} />
+      <TopBar
+        title="라멘 캘린더"
+        onBackClick={onBack}
+        icon={
+          canGoToday ? (
+            <TodayChip type="button" aria-label="오늘로 이동">
+              오늘
+            </TodayChip>
+          ) : undefined
+        }
+        onIconClick={onGoToday}
+      />
       <Content>
         <MonthHeader>
           <MonthButton type="button" onClick={onPrevMonth} aria-label="이전 달">
@@ -74,9 +87,15 @@ const MyCalendarPage = () => {
                 data-sunday={day.isSunday}
                 data-saturday={day.isSaturday}
                 onClick={() => onDateClick(day.date)}
+                aria-current={day.isToday ? 'date' : undefined}
                 aria-label={`${day.label}일 선택`}
               >
-                <DateNumber data-selected={day.isSelected}>{day.label}</DateNumber>
+                <DateNumber
+                  data-selected={day.isSelected}
+                  data-today={day.isToday && day.isCurrentMonth && !day.isSelected}
+                >
+                  {day.label}
+                </DateNumber>
                 <RecordDot data-visible={day.hasRecord} />
               </DayButton>
             ))}
@@ -231,6 +250,11 @@ const CalendarEntryCard = ({ entry, isDeleting, onClick, onEdit, onDelete }: Cal
 
 const Layout = render.extend(PageLayout, 'pb-40')
 
+// TopBar의 우측 슬롯(div + onClick)에 얹히는 칩. button으로 두어 키보드 포커스와 aria-label을 살린다.
+const TodayChip = render.button(
+  'flex h-24 cursor-pointer items-center justify-center whitespace-nowrap rounded-full border border-solid border-orange bg-transparent px-8 font-12-m text-orange shadow-none outline-none active:bg-light-orange',
+)
+
 const Content = render.section('flex w-full flex-col px-20')
 
 const MonthHeader = render.section('mt-12 grid h-44 grid-cols-[44px_1fr_44px] items-center')
@@ -259,8 +283,10 @@ const DayButton = render.button(
   'relative flex h-56 w-44 cursor-pointer flex-col items-center justify-center border-none bg-transparent p-0 text-gray-300 shadow-none outline-none data-[current-month=true]:text-gray-900 data-[saturday=true]:data-[current-month=true]:text-blue data-[sunday=true]:data-[current-month=true]:text-red',
 )
 
+// 오늘은 오렌지 테두리, 선택은 검은 원. 선택된 오늘은 검은 원이 이기므로 data-today가 꺼진 채로 내려온다.
+// 투명 테두리를 기본으로 깔아 마커가 켜져도 숫자 위치가 흔들리지 않게 한다.
 const DateNumber = render.span(
-  'flex h-32 w-32 shrink-0 items-center justify-center rounded-full font-16-m data-[selected=true]:bg-black data-[selected=true]:text-white',
+  'flex h-32 w-32 shrink-0 items-center justify-center rounded-full border border-solid border-transparent font-16-m data-[selected=true]:bg-black data-[selected=true]:text-white data-[today=true]:border-orange data-[today=true]:text-orange',
 )
 
 const RecordDot = render.span('mt-3 h-6 w-6 rounded-full bg-orange opacity-0 data-[visible=true]:opacity-100')

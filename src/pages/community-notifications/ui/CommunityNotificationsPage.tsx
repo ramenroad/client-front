@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { COMMUNITY_NOTIFICATION_MOCKS, COMMUNITY_NOTIFICATION_READ_STORAGE_KEY } from '@/entities/community/model'
 import { IconBack } from '@/shared/ui/icon'
 import render from '@/shared/ui/render'
 
 const CommunityNotificationsPage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   useEffect(() => {
     localStorage.setItem(COMMUNITY_NOTIFICATION_READ_STORAGE_KEY, 'read')

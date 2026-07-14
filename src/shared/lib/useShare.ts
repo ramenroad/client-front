@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { BridgeMethods, has, invoke } from '@/shared/bridge'
 import { createSiteUrl, DEFAULT_SHARE_IMAGE_URL } from '@/shared/config'
 import { useToast } from '@/shared/ui/toast'
+import { copyToClipboard } from './clipboard'
 import { ensureKakaoInitialized } from './kakao-sdk'
 
 export type ShareType = 'kakao' | 'url' | 'more'
@@ -33,14 +34,8 @@ export const useShare = (content: ShareContent) => {
   const getUrl = () => createSiteUrl(content.url ?? getCurrentPath())
 
   const handleCopyLink = async () => {
-    const url = getUrl()
     try {
-      // 앱: 네이티브 clipboard.write(§2.8.3). WebView는 비보안 컨텍스트라 navigator.clipboard가 거부되므로 브리지 우선.
-      if (has(BridgeMethods.clipboardWrite)) {
-        await invoke(BridgeMethods.clipboardWrite, { text: url })
-      } else {
-        await navigator.clipboard.writeText(url)
-      }
+      await copyToClipboard(getUrl())
       openToast('주소가 복사되었습니다')
     } catch {
       openToast('주소 복사에 실패했습니다.', undefined, 'error')

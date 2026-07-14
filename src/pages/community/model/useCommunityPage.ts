@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { useCommunityBoardsInfiniteQuery } from '@/entities/community/api'
 import {
   COMMUNITY_BOARD_LIST_TABS,
@@ -25,7 +25,7 @@ const hasUnreadCommunityNotifications = () => {
 }
 
 export const useCommunityPage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const { isSignIn } = useAuthSession()
   const { openToast } = useToast()
