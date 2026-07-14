@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useAppNavigate, useAppParams, useAppSearchParams } from '@/shared/navigation'
+import {
+  getInitialHashParams,
+  getInitialSearchParams,
+  useAppNavigate,
+  useAppParams,
+  useAppSearchParams,
+} from '@/shared/navigation'
 import { viewerQueryKeys } from '@/entities/viewer/api'
 import { authStore, consumePostLoginRedirect } from '@/entities/session/model'
 import {
@@ -23,10 +29,11 @@ import { useToast } from '@/shared/ui/toast'
 type OAuthCallbackStatus = 'loading' | 'email_conflict' | 'withdrawn' | 'error'
 type SupportedCallbackProvider = Extract<OAuthProvider, 'kakao' | 'naver' | 'google' | 'apple'>
 
-const getOAuthSearchParams = () => new URLSearchParams(window.location.search)
-
+// 부팅 시점의 URL을 읽는다. window.location을 직접 보면 안 된다 — 스택(history-sync)이 마운트 직후
+// URL을 다시 쓰면서 **해시를 지워버려서**, 구글 implicit flow의 access_token(#access_token=...)이
+// 이 훅이 실행될 때쯤엔 이미 사라져 있다.
 const getAppleCallbackParams = () => {
-  const searchParams = getOAuthSearchParams()
+  const searchParams = getInitialSearchParams()
 
   return {
     accessToken: searchParams.get('accessToken'),
@@ -36,8 +43,8 @@ const getAppleCallbackParams = () => {
 }
 
 const getOAuthCallbackCode = () => {
-  const searchParams = getOAuthSearchParams()
-  const hashParams = new URLSearchParams(window.location.hash.substring(1))
+  const searchParams = getInitialSearchParams()
+  const hashParams = getInitialHashParams()
 
   return {
     code: searchParams.get('code'),
