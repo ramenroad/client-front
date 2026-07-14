@@ -13,9 +13,7 @@ import { useCrossTabNavigate } from '@/shared/app-env'
 import { openUrl } from '@/shared/lib/browser'
 import { getReviewCreatedTime } from '@/shared/lib/date'
 import { isMobileDevice } from '@/shared/lib/image'
-import { copyToClipboard } from '@/shared/lib/clipboard'
 import { useShare } from '@/shared/lib/useShare'
-import { useToast } from '@/shared/ui/toast'
 
 type MapButtonType = 'google' | 'kakao' | 'naver'
 
@@ -83,7 +81,6 @@ export const useRamenyaDetailPage = () => {
   // 오염시키지 않고(지도 이중 표시 방지) SWITCH_TAB으로 지도 탭만 전환·로드한다. 같은 탭이면 일반 navigate로 폴백.
   const crossTabNavigate = useCrossTabNavigate()
   const goToLogin = useGoToLogin()
-  const { openToast } = useToast()
   const authSession = useAuthSession()
   const detailQuery = useRamenyaDetailQuery(id)
   const myInfoQuery = useMyInfoQuery({ enabled: authSession.isSignIn })
@@ -244,21 +241,6 @@ export const useRamenyaDetailPage = () => {
     navigate(createCalendarUrl(visitDate))
   }
 
-  // 주소를 눌러 복사 — 지도 앱이나 메신저에 그대로 붙여넣을 수 있게 한다.
-  const handleCopyAddress = async () => {
-    const address = detail?.address
-
-    if (!address) {
-      return
-    }
-
-    try {
-      await copyToClipboard(address)
-      openToast('주소를 복사했어요.')
-    } catch {
-      openToast('주소를 복사하지 못했어요.', undefined, 'error')
-    }
-  }
 
   return {
     id,
@@ -268,7 +250,6 @@ export const useRamenyaDetailPage = () => {
     isSignIn,
     isBookmarked,
     isCalendarAddOpen,
-    handleCopyAddress,
     handleBookmarkClick,
     handleOpenCalendarAdd,
     handleCloseCalendarAdd: () => setIsCalendarAddOpen(false),

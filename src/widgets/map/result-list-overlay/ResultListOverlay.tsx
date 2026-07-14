@@ -12,7 +12,7 @@ import {
   type FilterOptions,
   type RamenyaDetail,
 } from '@/entities/ramenya/model'
-import { RamenyaCard, RamenyaOpenStatus } from '@/entities/ramenya/ui'
+import { RamenyaAddress, RamenyaCard, RamenyaOpenStatus } from '@/entities/ramenya/ui'
 import type { Review } from '@/entities/review/model'
 import { createSiteUrl } from '@/shared/config'
 import type { Coordinate } from '@/shared/lib/naver-map'
@@ -508,7 +508,7 @@ const MapDetailSheetContent = <T,>({
 
             <MarketDetailBox>
               <DetailIconTag icon={<IconLocate />} text="주소" />
-              <MarketDetailBoxText>{content.address}</MarketDetailBoxText>
+              <RamenyaAddress address={content.address} />
             </MarketDetailBox>
 
             <MarketDetailBox>

@@ -8,7 +8,7 @@ import { MenuBoardDetail } from '@/entities/menu-board/ui'
 import { ramenyaQueryKeys } from '@/entities/ramenya/api'
 import type { BusinessHour, RamenyaDetail, RamenyaMenuBoard } from '@/entities/ramenya/model'
 import { checkBusinessStatus, checkBusinessStatusSpecial, DAY_MAP, OpenStatus } from '@/entities/ramenya/model'
-import { RamenyaOpenStatus } from '@/entities/ramenya/ui'
+import { RamenyaAddress, RamenyaOpenStatus } from '@/entities/ramenya/ui'
 import type { Review } from '@/entities/review/model'
 import type { MyInfo } from '@/entities/viewer/model'
 import { RamenCalendarAddEntry } from '@/features/ramen-calendar-add-entry'
@@ -57,7 +57,6 @@ const RamenyaDetailPage = () => {
     isSignIn,
     isBookmarked,
     isCalendarAddOpen,
-    handleCopyAddress,
     handleBookmarkClick,
     handleOpenCalendarAdd,
     handleCloseCalendarAdd,
@@ -114,7 +113,6 @@ const RamenyaDetailPage = () => {
           isBookmarked={isBookmarked}
           onBookmarkClick={handleBookmarkClick}
           onCalendarAddClick={handleOpenCalendarAdd}
-          onCopyAddress={handleCopyAddress}
           isTimeExpanded={isTimeExpanded}
           setIsTimeExpanded={setIsTimeExpanded}
           sortedBusinessHours={sortedBusinessHours}
@@ -263,7 +261,6 @@ const InformationSection = ({
   isBookmarked,
   onBookmarkClick,
   onCalendarAddClick,
-  onCopyAddress,
   isTimeExpanded,
   setIsTimeExpanded,
   sortedBusinessHours,
@@ -273,7 +270,6 @@ const InformationSection = ({
   isBookmarked: boolean
   onBookmarkClick: () => void
   onCalendarAddClick: () => void
-  onCopyAddress: () => void
   isTimeExpanded: boolean
   setIsTimeExpanded: (expanded: boolean) => void
   sortedBusinessHours: BusinessHour[]
@@ -330,9 +326,7 @@ const InformationSection = ({
 
         <MarketDetailBox>
           <DetailIconTag icon={<IconLocate />} text="주소" />
-          <AddressCopyButton type="button" onClick={onCopyAddress} aria-label={`주소 복사: ${detail.address}`}>
-            {detail.address}
-          </AddressCopyButton>
+          <RamenyaAddress address={detail.address} />
         </MarketDetailBox>
 
         <MarketDetailBox>
@@ -843,11 +837,6 @@ const MarketDetailGenre = render.div('flex items-center gap-8 font-14-r')
 const MarketDetailGenreText = render.span('text-inherit')
 
 const MarketDetailBoxText = render.div('font-14-r text-black')
-
-// 눌러서 복사하는 주소. 옆 항목들과 글자 스타일은 그대로 두고(MarketDetailBoxText 동일) 버튼 기본 스타일만 걷어낸다.
-const AddressCopyButton = render.button(
-  'cursor-pointer break-words border-none bg-transparent p-0 text-left font-14-r text-black active:opacity-60',
-)
 
 const MarketDetailBoxContent = render.div('max-w-254 break-words font-14-r')
 

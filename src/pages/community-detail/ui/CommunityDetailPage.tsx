@@ -11,6 +11,7 @@ import {
   CommunityEyeIcon,
   CommunityHeartIcon,
 } from "@/entities/community/ui";
+import { formatCompactNumber } from "@/shared/lib/number";
 import {
   IconEdit,
   IconHeart,
@@ -249,22 +250,22 @@ const CommunityDetailPage = () => {
               <LikePill type="button" onClick={onToggleBoardLike}>
                 <IconHeart filled={isBoardLiked} />
                 <LikeLabel>좋아요</LikeLabel>
-                <LikeCount>{board.likeCount}</LikeCount>
+                <LikeCount>{formatCompactNumber(board.likeCount)}</LikeCount>
               </LikePill>
             </LikeBar>
 
             <MetricsRow>
               <Metric>
                 <CommunityEyeIcon />
-                <MetricValue>{board.viewCount}</MetricValue>
+                <MetricValue>{formatCompactNumber(board.viewCount)}</MetricValue>
               </Metric>
               <Metric>
                 <CommunityHeartIcon />
-                <MetricValue>{board.likeCount}</MetricValue>
+                <MetricValue>{formatCompactNumber(board.likeCount)}</MetricValue>
               </Metric>
               <Metric>
                 <CommunityCommentIcon />
-                <MetricValue>{board.commentCount}</MetricValue>
+                <MetricValue>{formatCompactNumber(board.commentCount)}</MetricValue>
               </Metric>
             </MetricsRow>
           </Content>
@@ -483,7 +484,7 @@ const CommentItem = ({
               onClick={() => actions.onToggleLike(comment)}
             >
               <IconHeart filled={isLiked} />
-              <MetricValue>{comment.likeCount}</MetricValue>
+              <MetricValue>{formatCompactNumber(comment.likeCount)}</MetricValue>
             </LikeMetaButton>
           </CommentActionsRow>
         )}
