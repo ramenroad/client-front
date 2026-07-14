@@ -17,10 +17,17 @@ export const buildAppReturnUrl = (
   params: Record<string, string>,
 ) => `${APP_RETURN_SCHEME}://oauth/${provider}?${new URLSearchParams(params).toString()}`
 
-// Kakao login is started through the JavaScript SDK so that mobile users get the
-// KakaoTalk app simple-login flow (throughTalk). The redirect still lands on
-// /oauth/kakao with ?code=, so the callback exchange is unchanged.
-const KAKAO_LOGIN_THROUGH_TALK = true
+/**
+ * 카카오톡 앱 간편로그인(throughTalk)은 **앱에서만** 켠다.
+ *
+ * throughTalk는 로그인 페이지를 `kakaotalk://inappbrowser`로 넘겨 **카카오톡 인앱 브라우저**에서 열어버린다.
+ * 그래서 로그인이 카카오톡 안에서 끝나고 원래 브라우저는 그대로 남는다 — 사용자 눈엔 "눌러도 아무 일도 안 일어남".
+ *
+ * 앱에는 돌아올 길이 있다: state에 표식을 심어(OAUTH_APP_STATE) 콜백이 커스텀 스킴으로 네이티브에 코드를
+ * 넘기고 우리 WebView로 복귀한다(useOAuthCallbackPage). 하지만 **순수 웹(사파리 등)은 돌아올 길이 없다.**
+ * → 복귀 수단이 있는 앱에서만 켜고, 웹은 평범한 리다이렉트로 브라우저 안에서 로그인을 끝낸다.
+ */
+const shouldUseKakaoTalkSimpleLogin = () => isInApp()
 
 export const getOAuthCallbackUrl = (provider: Exclude<OAuthProvider, 'apple'>) => {
   return `${window.location.origin}/oauth/${provider}`
@@ -99,7 +106,7 @@ export const redirectToOAuthProvider = (provider: OAuthProvider) => {
   return true
 }
 
-// Starts Kakao login via the JavaScript SDK (KakaoTalk app simple login).
+// Starts Kakao login via the JavaScript SDK.
 // Returns false when the SDK key is missing or the script failed to load.
 export const loginWithKakaoSdk = async (): Promise<boolean> => {
   const kakao = await ensureKakaoInitialized()
@@ -110,7 +117,7 @@ export const loginWithKakaoSdk = async (): Promise<boolean> => {
 
   kakao.Auth.authorize({
     redirectUri: getOAuthCallbackUrl('kakao'),
-    throughTalk: KAKAO_LOGIN_THROUGH_TALK,
+    throughTalk: shouldUseKakaoTalkSimpleLogin(),
     // 앱에서 시작한 로그인이면 표식을 심어, 카톡 인앱 브라우저로 떨어진 콜백이 네이티브로 바운스하도록 한다.
     ...(isInApp() ? { state: OAUTH_APP_STATE } : {}),
   })
