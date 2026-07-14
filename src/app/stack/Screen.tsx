@@ -47,8 +47,12 @@ const ScreenBody = ({ chrome, children }: ScreenBodyProps) => {
   const activity = useActivity()
   const { scroll } = useAppScreen()
 
-  // 구 OverlayLayout: 마운트된 동안 네이티브 탭바를 덮는다. 순수 웹/구버전 앱에선 no-op.
-  useImmersive(Boolean(chrome.immersive))
+  // 구 OverlayLayout: 네이티브 탭바를 덮는다. 순수 웹/구버전 앱에선 no-op.
+  //
+  // 반드시 "지금 보이는 화면"일 때만 덮어야 한다. 스택은 화면을 살려두므로(라우터처럼 언마운트되지 않는다)
+  // 마운트 기준으로 걸면, 커뮤니티 상세(immersive) → 작성자 프로필처럼 탭바가 보여야 하는 화면으로 나가도
+  // 상세가 스택에 살아 있어 cleanup이 돌지 않고 탭바가 숨겨진 채로 남는다.
+  useImmersive(Boolean(chrome.immersive) && activity.isActive)
 
   // 브리지 scroll.top(재탭)은 스택 밖에서 오므로, 활성 화면이 자기 스크롤 함수를 등록해 둔다.
   useEffect(() => {
