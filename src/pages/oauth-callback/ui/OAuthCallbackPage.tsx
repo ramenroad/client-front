@@ -57,8 +57,7 @@ const OAuthCallbackPage = () => {
         )}
 
         <LoginButtonWrapper>
-          {/* 방금 실패한 제공자는 빼야 한다 — 다시 누르면 같은 406이라 화면이 그대로다. */}
-          <OAuthRecoveryActions onLogin={handleLogin} onBack={handleBack} excludeProvider={attemptedProvider} />
+          <OAuthRecoveryActions onLogin={handleLogin} onBack={handleBack} />
         </LoginButtonWrapper>
       </Wrapper>
     )

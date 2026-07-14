@@ -8,47 +8,36 @@ import { RaisingText } from '@/shared/ui/text'
 interface OAuthRecoveryActionsProps {
   onBack: () => void
   onLogin: (provider: OAuthProvider) => void
-  /**
-   * 방금 실패한 제공자 — 이메일 충돌(406)에서만 넘긴다.
-   *
-   * 406은 "이 이메일은 **다른** 제공자로 가입돼 있다"는 뜻이므로 같은 제공자를 다시 누르면 또 406이다.
-   * 제공자엔 이미 세션·동의가 있어 동의 화면도 없이 즉시 되돌아오니, 사용자 눈엔 "눌러도 같은 화면"만 반복된다.
-   * 탈퇴(403)·일시 오류에선 같은 제공자 재시도가 정상이므로 넘기지 않는다.
-   */
-  excludeProvider?: OAuthProvider
 }
 
-export const OAuthRecoveryActions = ({ onBack, onLogin, excludeProvider }: OAuthRecoveryActionsProps) => {
-  const isVisible = (provider: OAuthProvider) => provider !== excludeProvider
-
+/**
+ * 로그인 실패·이메일 충돌·탈퇴 화면의 복구 수단.
+ *
+ * 어느 상태에서든 **로그인 페이지와 똑같이 4개 제공자를 모두** 보여준다. 한때 카카오·네이버만 있었는데,
+ * 그러면 Apple·Google로 가입한 계정은 이 화면에서 빠져나갈 길이 아예 없었다.
+ * "방금 실패한 제공자"는 버튼에서 빼지 않고 안내 문구로 알린다 — 화면마다 버튼 구성이 달라지면
+ * 사용자가 "왜 내 로그인 방식이 안 보이지?"로 더 헤맨다.
+ */
+export const OAuthRecoveryActions = ({ onBack, onLogin }: OAuthRecoveryActionsProps) => {
   return (
     <ActionsWrapper>
-      {isVisible('kakao') && (
-        <SocialLoginButton provider="kakao" type="button" onClick={() => onLogin('kakao')} icon={<IconKakao />}>
-          카카오 계정으로 로그인
-        </SocialLoginButton>
-      )}
-      {isVisible('naver') && (
-        <SocialLoginButton provider="naver" type="button" onClick={() => onLogin('naver')} icon={<IconNaver />}>
-          네이버 계정으로 로그인
-        </SocialLoginButton>
-      )}
-      {/* 로그인 페이지에는 Apple·Google이 있는데 이 화면엔 없어서, 그 둘로 가입한 계정은 빠져나갈 길이 없었다. */}
-      {isVisible('apple') && (
-        <AppleLoginButtonImage type="button" onClick={() => onLogin('apple')} aria-label="Apple 계정으로 로그인">
-          <AppleLoginImage src={AppleLoginButton} alt="" />
-        </AppleLoginButtonImage>
-      )}
-      {isVisible('google') && (
-        <SocialLoginButton
-          provider="google"
-          type="button"
-          onClick={() => onLogin('google')}
-          icon={<IconGoogleImage src={IconGoogleImageSource} alt="" />}
-        >
-          Google 계정으로 로그인
-        </SocialLoginButton>
-      )}
+      <SocialLoginButton provider="kakao" type="button" onClick={() => onLogin('kakao')} icon={<IconKakao />}>
+        카카오 계정으로 로그인
+      </SocialLoginButton>
+      <SocialLoginButton provider="naver" type="button" onClick={() => onLogin('naver')} icon={<IconNaver />}>
+        네이버 계정으로 로그인
+      </SocialLoginButton>
+      <AppleLoginButtonImage type="button" onClick={() => onLogin('apple')} aria-label="Apple 계정으로 로그인">
+        <AppleLoginImage src={AppleLoginButton} alt="" />
+      </AppleLoginButtonImage>
+      <SocialLoginButton
+        provider="google"
+        type="button"
+        onClick={() => onLogin('google')}
+        icon={<IconGoogleImage src={IconGoogleImageSource} alt="" />}
+      >
+        Google 계정으로 로그인
+      </SocialLoginButton>
       <BackButton type="button" onClick={onBack}>
         <RaisingText size={14} weight="m">
           이전 화면으로 돌아가기
