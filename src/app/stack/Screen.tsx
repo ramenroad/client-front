@@ -82,7 +82,12 @@ const ScreenBody = ({ chrome, children }: ScreenBodyProps) => {
 const Content = render.div('flex min-h-full w-full flex-col')
 
 // 구 MapLayout의 MapScreen. 앱은 --app-bar-space가 0이라 100dvh(풀블리드), 웹은 하단 AppBar만큼 뺀다.
-const FullBleed = render.main('relative h-[calc(100dvh-var(--app-bar-space))] w-full overflow-hidden box-border')
+//
+// select-none: 이 화면은 드래그가 곧 조작(지도 패닝, 하단시트 높이 조절)이라 텍스트가 블록으로 잡히면 안 된다.
+// user-select는 상속되므로 입력 요소에서만 되살린다 — WebKit은 조상의 none이 input 안의 캐럿/선택까지 막는다.
+const FullBleed = render.main(
+  'relative h-[calc(100dvh-var(--app-bar-space))] w-full select-none overflow-hidden box-border [&_input]:select-text [&_textarea]:select-text',
+)
 
 // 구 AppBarLayout의 Space — Footer가 웹 AppBar/네이티브 탭바에 가리지 않게 하는 하단 여백.
 const Space = render.div('h-[var(--app-bottom-space)] min-h-[var(--app-bottom-space)]')
