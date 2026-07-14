@@ -6,8 +6,16 @@ import { RaisingText } from '@/shared/ui/text'
 import { OAuthRecoveryActions } from './OAuthRecoveryActions'
 import { useOAuthCallbackPage } from '../model/useOAuthCallbackPage'
 
+const PROVIDER_LABEL: Record<string, string> = {
+  kakao: '카카오',
+  naver: '네이버',
+  google: 'Google',
+  apple: 'Apple',
+}
+
 const OAuthCallbackPage = () => {
-  const { status, loginEmail, handleLogin, handleBack } = useOAuthCallbackPage()
+  const { status, loginEmail, attemptedProvider, handleLogin, handleBack } = useOAuthCallbackPage()
+  const attemptedLabel = attemptedProvider ? PROVIDER_LABEL[attemptedProvider] : undefined
 
   if (status === 'loading') {
     return (
@@ -29,8 +37,14 @@ const OAuthCallbackPage = () => {
           <RaisingText size={20} weight="m">
             이미 가입된 이메일 주소입니다.
           </RaisingText>
+          {/* 어느 계정으로 가입했는지 알려주지 않으면 사용자는 버튼을 찍어야 한다. 최소한 "이건 아니다"는 알려준다. */}
           <SubText size={14} weight="r">
-            네이버 혹은 카카오 계정을 확인해 주세요
+            {attemptedLabel
+              ? `${attemptedLabel}로 가입된 계정이 아니에요`
+              : '다른 소셜 계정으로 가입되어 있어요'}
+          </SubText>
+          <SubText size={14} weight="r">
+            가입에 사용한 계정으로 로그인해 주세요
           </SubText>
         </AlertContainer>
 
@@ -43,7 +57,8 @@ const OAuthCallbackPage = () => {
         )}
 
         <LoginButtonWrapper>
-          <OAuthRecoveryActions onLogin={handleLogin} onBack={handleBack} />
+          {/* 방금 실패한 제공자는 빼야 한다 — 다시 누르면 같은 406이라 화면이 그대로다. */}
+          <OAuthRecoveryActions onLogin={handleLogin} onBack={handleBack} excludeProvider={attemptedProvider} />
         </LoginButtonWrapper>
       </Wrapper>
     )
