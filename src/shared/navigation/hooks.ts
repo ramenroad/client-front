@@ -19,6 +19,15 @@ export const useAppNavigate = () => navigate
 export const useAppParams = <T extends ActivityBaseParams = ActivityBaseParams>(): Readonly<Partial<T>> =>
   useActivityParams<ActivityName>() as Readonly<Partial<T>>
 
+/**
+ * 이 화면이 지금 "보이는 화면"인가.
+ *
+ * 스택은 화면을 살려두므로(라우터처럼 언마운트되지 않는다) 화면 단위 부수효과 — 네이티브 탭바 덮기,
+ * 세이프에어리어 모드 전환처럼 **전역 상태를 건드리는 것** — 을 마운트/언마운트에 걸면 안 된다.
+ * 위에 다른 화면이 얹혀도 cleanup이 돌지 않아 그 상태가 그대로 남는다. 이 훅으로 "보이는 동안"에 건다.
+ */
+export const useIsActiveScreen = (): boolean => useActivity().isActive
+
 /** react-router의 useLocation 대체(pathname/search만). 정규 경로 기준이라 후행 슬래시가 없다. */
 export const useAppLocation = () => {
   const { path } = useNavigationSnapshot()

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppNavigate, useAppSearchParams } from '@/shared/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -8,6 +8,7 @@ import {
 } from '@/entities/ramen-calendar/api'
 import type { RamenCalendarEntry } from '@/entities/ramen-calendar/model'
 import { useAuthSession, useGoToLogin } from '@/entities/session/model'
+import { hapticSelection } from '@/shared/lib/haptic'
 import { useToast } from '@/shared/ui/toast'
 
 export type MyCalendarDay = {
@@ -140,7 +141,7 @@ export const useMyCalendarPage = () => {
   const { openToast } = useToast()
   const { isSignIn } = useAuthSession()
 
-  const today = useMemo(() => new Date(), [])
+  const [today, setToday] = useState(() => new Date())
   const initialCalendarState = useMemo(() => createInitialCalendarState(today, searchParams), [searchParams, today])
   const [viewMonth, setViewMonth] = useState(initialCalendarState.viewMonth)
   const [selectedDate, setSelectedDate] = useState(initialCalendarState.selectedDate)
@@ -148,8 +149,28 @@ export const useMyCalendarPage = () => {
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null)
   const [deleteTargetEntryId, setDeleteTargetEntryId] = useState<string | null>(null)
 
+  // 화면이 스택에 살아있는 채로 자정을 넘기면 today가 어제로 굳어 오늘 마커와 '오늘' 버튼이 같이 어긋난다.
+  // 화면이 다시 보일 때만 확인하고, 날짜가 그대로면 같은 참조를 돌려줘 불필요한 리렌더를 막는다.
+  useEffect(() => {
+    const syncToday = () => {
+      const now = new Date()
+      setToday((current) => (toDateKey(current) === toDateKey(now) ? current : now))
+    }
+
+    document.addEventListener('visibilitychange', syncToday)
+    window.addEventListener('focus', syncToday)
+
+    return () => {
+      document.removeEventListener('visibilitychange', syncToday)
+      window.removeEventListener('focus', syncToday)
+    }
+  }, [])
+
   const year = viewMonth.getFullYear()
   const month = viewMonth.getMonth() + 1 // JS 0~11 → API 1~12
+
+  // '오늘 달을 보는 중 + 오늘이 선택됨'이면 버튼이 갈 곳이 없다 → 노출하지 않는다.
+  const canGoToday = !(toMonthKey(viewMonth) === toMonthKey(today) && isSameDate(selectedDate, today))
 
   const entriesQuery = useRamenCalendarEntriesQuery(year, month, { enabled: isSignIn })
   const entries = useMemo(() => entriesQuery.data ?? [], [entriesQuery.data])
@@ -247,6 +268,16 @@ export const useMyCalendarPage = () => {
     [syncCalendarSearchParams],
   )
 
+  // 이동은 날짜 선택과 동일한 경로(달 이동 + 날짜 선택 + 쿼리 동기화)를 탄다.
+  // 클릭 시점의 날짜를 다시 읽어, 화면을 켜 둔 채 자정을 넘긴 경우에도 실제 오늘로 간다.
+  const handleGoToday = useCallback(() => {
+    const now = new Date()
+
+    setToday((current) => (toDateKey(current) === toDateKey(now) ? current : now))
+    handleDateClick(now)
+    hapticSelection()
+  }, [handleDateClick])
+
   const handleEntryClick = useCallback(
     (entry: RamenCalendarEntry) => {
       if (!entry.ramenyaId) {
@@ -276,9 +307,11 @@ export const useMyCalendarPage = () => {
     isDeleting: deleteMutation.isPending,
     isDeleteConfirmOpen: Boolean(deleteTargetEntryId),
     isAddOpen,
+    canGoToday,
     onPrevMonth: () => handleMonthChange(-1),
     onNextMonth: () => handleMonthChange(1),
     onDateClick: handleDateClick,
+    onGoToday: handleGoToday,
     onEntryClick: handleEntryClick,
     onBack: () => navigate(-1),
     onLoginClick: () => goToLogin(),

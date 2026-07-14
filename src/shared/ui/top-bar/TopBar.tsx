@@ -52,6 +52,9 @@ const StyledIconBack = render.extend(IconBack, "cursor-pointer");
 
 const HeaderTitle = render.span("font-16-sb text-primary");
 
-const AdditionalIconWrapper = render.div("absolute right-20 w-24 h-24 cursor-pointer");
+// 아이콘(24x24)뿐 아니라 텍스트 칩도 담을 수 있게 폭은 내용에 맡긴다(min-w-24로 기존 아이콘 타겟 크기는 보존).
+const AdditionalIconWrapper = render.div(
+  "absolute right-20 flex h-24 w-auto min-w-24 cursor-pointer items-center justify-end",
+);
 
 export default TopBar;

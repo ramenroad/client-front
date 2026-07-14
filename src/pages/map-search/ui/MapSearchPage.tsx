@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { BridgeTopics, emit } from '@/shared/bridge'
+import { useIsActiveScreen } from '@/shared/navigation'
 import { RamenCalendarAddEntry } from '@/features/ramen-calendar-add-entry'
 import { IconBookmark, IconGPS } from '@/shared/ui/icon'
 import { Modal } from '@/shared/ui/modal'
@@ -69,13 +70,22 @@ const MapSearchPage = () => {
 
   // 지도 진입: 상단 풀블리드(네이티브 상단 스페이서 접기) + 지도용 상태바. 이탈 시 inset 원복(멱등, W5/§2.7.1).
   // emit은 앱에서만 동작(순수 웹 no-op)이라 웹 회귀 없음.
+  //
+  // 마운트가 아니라 **보이는 동안**에 건다 — 스택은 지도를 살려두므로(지도 위로 매장 상세를 얹어도 언마운트되지
+  // 않는다) 마운트 기준으로 걸면 원복 cleanup이 돌지 않아, 지도 탭의 다른 화면까지 edge-to-edge로 남는다.
+  const isActiveScreen = useIsActiveScreen()
+
   useEffect(() => {
+    if (!isActiveScreen) {
+      return
+    }
+
     emit(BridgeTopics.setSafeAreaMode, { mode: 'edge-to-edge', edges: ['top'] })
     emit(BridgeTopics.setStatusBar, { style: 'dark-content' })
     return () => {
       emit(BridgeTopics.setSafeAreaMode, { mode: 'inset' })
     }
-  }, [])
+  }, [isActiveScreen])
 
   return (
     <>
