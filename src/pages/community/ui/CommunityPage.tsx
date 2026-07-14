@@ -1,8 +1,6 @@
 import { CommunityBoardCard } from '@/entities/community/ui'
-import { useAppEnv } from '@/shared/app-env'
 import { IconNotification, IconWriteButton } from '@/shared/ui/icon'
 import render from '@/shared/ui/render'
-import AppBar from '@/widgets/navigation/app-bar'
 import { useCommunityPage } from '../model/useCommunityPage'
 
 const CommunityPage = () => {
@@ -19,9 +17,7 @@ const CommunityPage = () => {
     handleNotificationClick,
   } = useCommunityPage()
 
-  // 앱: 웹 하단 AppBar는 미렌더(네이티브 탭바가 대체) — 중복 방지. 하단 예약은 --app-bottom-space로 유지.
-  const { isApp } = useAppEnv()
-
+  // 웹 하단 AppBar는 스택 밖(MobileFrame)에서 한 번만 그린다. 여기선 하단 예약(BottomSpace)만 유지.
   return (
     <>
       <Page>
@@ -78,13 +74,13 @@ const CommunityPage = () => {
 
         <BottomSpace />
       </Page>
-      {!isApp && <AppBar />}
     </>
   )
 }
 
-// 앱: #root 상단 안전영역 패딩을 음수 마진으로 상쇄해 페이지가 화면 최상단에서 시작 → sticky 헤더가 상태바 영역까지 덮는다.
-const Page = render.section('relative mt-[calc(-1*var(--safe-top))] min-h-[100dvh] w-full bg-white')
+// sticky 헤더가 상태바 영역까지 덮어야 하므로 화면 상단 패딩 없이 최상단에서 시작한다
+// (스크린 래퍼가 safeTop:false로 패딩을 주지 않는다 — 헤더가 pt-[--safe-top]으로 직접 처리).
+const Page = render.section('relative min-h-[100dvh] w-full bg-white')
 
 // 제목 + 탭(전체/이벤트/신장개업/질문)을 함께 상단 고정. top-0으로 상태바까지 덮고, pt-[--safe-top]으로 내용은 상태바 아래에 둔다.
 const StickyHeader = render.div('sticky top-0 z-20 bg-white pt-[var(--safe-top)]')

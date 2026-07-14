@@ -1,12 +1,12 @@
 import { useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useAppLocation, useAppNavigate } from '@/shared/navigation'
 import { useAuthSession } from './session'
 import { setPostLoginRedirect } from './postLoginRedirect'
 
 /** 비로그인 상태로 페이지에 진입하면 지정 경로(기본 /login)로 보낸다(마운트 가드). 로그인 후 원래 페이지로 복귀. */
 export const useRequireSignInRedirect = (to = '/login') => {
-  const navigate = useNavigate()
-  const location = useLocation()
+  const navigate = useAppNavigate()
+  const location = useAppLocation()
   const { isSignIn } = useAuthSession()
 
   useEffect(() => {

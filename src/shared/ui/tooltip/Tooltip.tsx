@@ -36,11 +36,13 @@ const Tooltip = ({ children, content, title }: TooltipProps) => {
     const handleScroll = () => updatePosition();
 
     window.addEventListener("resize", handleResize);
-    window.addEventListener("scroll", handleScroll);
+    // 스크롤은 window가 아니라 화면(AppScreen) 내부 컨테이너에서 일어난다. scroll 이벤트는 버블링되지 않으므로
+    // 캡처 단계로 받아 어느 스크롤 컨테이너에서 나든 툴팁 위치를 다시 잡는다.
+    window.addEventListener("scroll", handleScroll, true);
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", handleScroll, true);
     };
   }, [isVisible]);
 

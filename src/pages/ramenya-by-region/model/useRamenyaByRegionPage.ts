@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams, useScreenScroll } from '@/shared/navigation'
 import { useRamenyaListQuery } from '@/entities/ramenya/api'
 import { filterRamenyas, initialFilterOptions, SortType, type FilterOptions } from '@/entities/ramenya/model'
 import { getBrowserCurrentLocation } from '@/shared/lib/geolocation'
@@ -45,8 +45,9 @@ const writeStoredFilterOptions = (filterOptions: FilterOptions) => {
 }
 
 export const useRamenyaByRegionPage = () => {
-  const navigate = useNavigate()
-  const { location = '' } = useParams()
+  const scrollScreen = useScreenScroll()
+  const navigate = useAppNavigate()
+  const { location = '' } = useAppParams()
   const [filterOptions, setFilterOptions] = useState(readStoredFilterOptions)
   const [currentLocation, setCurrentLocation] = useState<Coordinate | null>(null)
   const ramenyaListQuery = useRamenyaListQuery({ region: location }, { enabled: Boolean(location) })
@@ -70,8 +71,8 @@ export const useRamenyaByRegionPage = () => {
   }, [filterOptions])
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [location])
+    scrollScreen()
+  }, [location, scrollScreen])
 
   const ramenyas = useMemo(
     () => filterRamenyas(ramenyaListQuery.data ?? [], filterOptions, currentLocation),

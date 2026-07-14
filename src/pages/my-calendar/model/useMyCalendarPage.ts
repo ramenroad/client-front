@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAppNavigate, useAppSearchParams } from '@/shared/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   ramenCalendarQueryKeys,
@@ -133,9 +133,9 @@ const createInitialCalendarState = (today: Date, searchParams: URLSearchParams) 
 }
 
 export const useMyCalendarPage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useAppSearchParams()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
   const { isSignIn } = useAuthSession()

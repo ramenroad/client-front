@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
-import { authStore, consumePendingLoginRewind } from '@/entities/session/model'
+import { authStore } from '@/entities/session/model'
 import { authApi } from '@/features/auth'
 import { initializeHttpAuth } from '@/shared/api'
 import { ThemeProvider } from '@/shared/model'
@@ -7,11 +7,9 @@ import { PopupProvider } from '@/shared/ui/popup'
 import { ToastProvider } from '@/shared/ui/toast'
 import { queryClient } from './query-client'
 import { AppQueryProvider } from './query-provider'
-import { BridgeTopics, emit, installBridge, isInApp, on } from '@/shared/bridge'
-import { applyAppEnvToDom, readAppEnv, resolveActiveTab, setSafeInsets } from '@/shared/app-env'
-import { overlayStackStore } from '@/shared/overlay-stack'
-import { OverlayStackHost } from '@/app/overlay-stack'
-import { router } from '@/app/router'
+import { BridgeTopics, installBridge, isInApp, on } from '@/shared/bridge'
+import { applyAppEnvToDom, readAppEnv, setSafeInsets } from '@/shared/app-env'
+import { goBack, navigateToPath, navigationStore, scrollActiveScreenTo } from '@/shared/navigation'
 
 export const AppProviders = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
@@ -51,18 +49,8 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
     }
   }, [])
 
-  // #4: 새 화면(PUSH)은 스크롤 최상단에서 시작. 뒤로가기(POP)/치환(REPLACE)은 위치 유지.
-  // 페이지는 window 스크롤을 쓰므로 window 기준(풀블리드 지도는 window 스크롤이 없어 무해). 웹/앱 공통.
-  useEffect(() => {
-    const unsubscribe = router.subscribe((state) => {
-      if (state.historyAction === 'PUSH') {
-        window.scrollTo(0, 0)
-      }
-    })
-    return unsubscribe
-  }, [])
-
-  // 네이티브 브리지 동기화 (W1/W4). 순수 웹에선 applyAppEnvToDom만 하고 즉시 종료.
+  // 네이티브 브리지 동기화 (W1/W4). 웹 → 네이티브 발신(ROUTE_CHANGED/BACK_STATE)은 스택 플러그인이 맡고,
+  // 여기서는 네이티브 → 웹 수신만 처리한다. 순수 웹에선 applyAppEnvToDom만 하고 즉시 종료.
   useEffect(() => {
     installBridge()
     applyAppEnvToDom(readAppEnv())
@@ -70,102 +58,44 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
       return
     }
 
-    const tabRoots: Record<string, string> = {
-      home: '/',
-      map: '/map',
-      community: '/community',
-      my: '/mypage',
-    }
-
-    const isAtTabRoot = () => {
-      const path = router.state.location.pathname
-      const activeTab = resolveActiveTab(path)
-      return activeTab != null && tabRoots[activeTab] === path
-    }
-
-    const sendRouteChanged = () => {
-      // G6: 오버레이 레이어가 떠 있으면 그 경로가 "현재 화면" — 라우터 위치 대신 레이어 기준으로 발신.
-      const overlayPath = overlayStackStore.getEffectivePath()
-      const path = overlayPath?.split('?')[0] ?? router.state.location.pathname
-      const activeTab = resolveActiveTab(path)
-      const isRootOfTab = activeTab != null && tabRoots[activeTab] === path
-      emit(BridgeTopics.routeChanged, { path, activeTab, isRootOfTab })
-      // G5: 탭 루트가 아니면 웹이 뒤로가기(history pop) 처리 가능 → 네이티브가 백버튼/스와이프를 웹에 위임.
-      // G6: 레이어가 떠 있으면 닫기를 웹이 처리하므로 항상 canHandle.
-      emit(BridgeTopics.backState, { canHandle: overlayStackStore.hasOpenLayer() || !isRootOfTab })
-    }
-
-    // 네이티브 → 웹
     const offInsets = on(BridgeTopics.safeAreaInsets, (payload) => {
       const insets = (payload as { insets?: { top: number; bottom: number; left: number; right: number } })?.insets
       if (insets) {
         setSafeInsets(insets)
       }
     })
+
+    // 탭 터치. 탭 루트는 singleton이라 스택 아래에 살아 있으면 navigateToPath가 새로 쌓지 않고 되감는다
+    // — 지도/홈이 두 장 뜨지 않는다.
     const offNavigate = on(BridgeTopics.navigate, (payload) => {
       const p = payload as { tab?: string; path?: string }
       const path = typeof p?.path === 'string' ? p.path : '/'
       // 로그인 분기는 웹 소유(useAppBar 동일): 'my' 탭 + 비로그인 → /login
       const target = p?.tab === 'my' && !authStore.getSession().isSignIn ? '/login' : path
-      // G6: 레이어 열림 동안 window.location은 replaceState로 레이어 경로를 가리키므로 라우터 위치로 비교.
-      if (target === router.state.location.pathname) {
-        if (overlayStackStore.hasOpenLayer()) {
-          overlayStackStore.clear() // 재탭/동일 경로 = 레이어부터 정리(베이스 노출)
-          return
-        }
-        window.scrollTo(0, 0) // 재탭/동일 경로 → 스크롤 top(§2.9.2)
-      } else {
-        router.navigate(target).catch(() => undefined)
-      }
-    })
-    // G5: 네이티브 안드로이드 백버튼 위임 → 탭 루트가 아니면 웹 history pop(루트면 네이티브가 무력화).
-    // G6: 오버레이 레이어가 떠 있으면 레이어 닫기가 우선(레이어는 히스토리에 없어 pop으로는 안 닫힌다).
-    const offAndroidBack = on(BridgeTopics.androidBackPress, () => {
-      if (overlayStackStore.requestPop()) {
+
+      if (target === navigationStore.getSnapshot().path) {
+        scrollActiveScreenTo(0) // 재탭/동일 경로 → 스크롤 top(§2.9.2)
         return
       }
-      if (!isAtTabRoot()) {
-        router.navigate(-1).catch(() => undefined)
+
+      navigateToPath(target)
+    })
+
+    // G5: 네이티브 백버튼 위임 — 웹이 처리 가능할 때만(스택이 쌓였거나 step이 있을 때) 되감는다.
+    // 탭 루트에선 canGoBack이 false라 네이티브가 그대로 소유한다.
+    const offAndroidBack = on(BridgeTopics.androidBackPress, () => {
+      if (navigationStore.getSnapshot().canGoBack) {
+        goBack()
       }
     })
-    const offScrollTop = on(BridgeTopics.scrollTop, () => window.scrollTo(0, 0))
+
+    // 화면마다 자기 스크롤 컨테이너를 가지므로 window가 아니라 활성 화면을 스크롤한다.
+    const offScrollTop = on(BridgeTopics.scrollTop, () => scrollActiveScreenTo(0))
+
     const offKeyboard = on(BridgeTopics.keyboard, (payload) => {
       const height = (payload as { height?: number })?.height ?? 0
       // 변수만 노출(W6). 레이아웃 소비는 Android adjustResize 이중보정 회피 위해 보류(G3/T2).
       document.documentElement.style.setProperty('--keyboard-height', `${height}px`)
-    })
-
-    // G6: 오버레이 스택 변화 → URL replaceState 동기화 + 상태 재발신. 스토어는 데이터만 갖고 부수효과는
-    // 여기 한 곳에서 수행한다. replaceState는 히스토리를 늘리지 않아 iOS 스와이프 백이 계속 무장해제 상태.
-    // 라우터가 history.state에 보관하는 복원 정보(idx 등)를 보존해야 하므로 state는 그대로 넘긴다.
-    const syncOverlayUrl = () => {
-      const base = router.state.location
-      const target = overlayStackStore.getEffectivePath() ?? `${base.pathname}${base.search}`
-      if (`${window.location.pathname}${window.location.search}` !== target) {
-        window.history.replaceState(window.history.state, '', target)
-      }
-    }
-    const unsubscribeOverlay = overlayStackStore.subscribe(() => {
-      syncOverlayUrl()
-      sendRouteChanged()
-    })
-
-    // 웹 → 네이티브: 모든 네비게이션에서 ROUTE_CHANGED (NAVIGATE 재발신 금지 → 무한루프 방지)
-    sendRouteChanged() // 초기 1회
-    const unsubscribeRouter = router.subscribe((state) => {
-      // G6(앱): 로그인 되감기 — OAuth 콜백이 history.go로 첫 항목까지 되감은 POP이 정착하면 목적지를
-      // replace로 얹어 back-forward 목록을 [목적지] 하나로 복원한다(스와이프 백 재무장 방지).
-      if (state.historyAction === 'POP') {
-        const rewindDestination = consumePendingLoginRewind()
-        if (rewindDestination) {
-          router.navigate(rewindDestination, { replace: true }).catch(() => undefined)
-          return
-        }
-      }
-      // G6: 레이어가 뜬 채 실제 라우터가 움직이면(이스케이프/네이티브 스와이프 pop 등) 레이어를 정리해
-      // "베이스만 이동하고 레이어가 남는" 상태 어긋남을 막는다. 이스케이프 경로에선 선행 clear로 무해(멱등).
-      overlayStackStore.clear()
-      sendRouteChanged()
     })
 
     return () => {
@@ -174,8 +104,6 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
       offAndroidBack()
       offScrollTop()
       offKeyboard()
-      unsubscribeOverlay()
-      unsubscribeRouter()
     }
   }, [])
 
@@ -183,12 +111,7 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
     <ThemeProvider>
       <PopupProvider>
         <ToastProvider>
-          <AppQueryProvider>
-            {children}
-            {/* G6: 앱 전용 오버레이 레이어 호스트 — 자체 MemoryRouter를 가지므로 RouterProvider 밖,
-                레이어 페이지들이 쓰는 Query/Toast/Popup 컨텍스트 안에 마운트한다. 웹에선 항상 빈 렌더. */}
-            <OverlayStackHost />
-          </AppQueryProvider>
+          <AppQueryProvider>{children}</AppQueryProvider>
         </ToastProvider>
       </PopupProvider>
     </ThemeProvider>

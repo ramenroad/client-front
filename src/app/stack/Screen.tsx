@@ -1,0 +1,84 @@
+import { Suspense, useEffect, type ReactNode } from 'react'
+import { AppScreen, useAppScreen } from '@stackflow/plugin-basic-ui'
+import { useActivity } from '@stackflow/react'
+import { useImmersive } from '@/shared/app-env'
+import {
+  ACTIVITY_ROUTES,
+  registerActiveScreenScroll,
+  type ActivityName,
+  type ActivityRoute,
+} from '@/shared/navigation'
+import render from '@/shared/ui/render'
+import { Footer } from '@/widgets/footer'
+import { StackLoader } from './StackLoader'
+
+/**
+ * 스크린 래퍼 — 구 레이아웃 4종(AppBarLayout / WithoutAppBarLayout / MapLayout / OverlayLayout)의 대체.
+ *
+ * Stackflow에는 라우트 중첩이 없으므로 레이아웃을 액티비티 플래그(ACTIVITY_ROUTES)로 표현하고 여기서 해석한다.
+ * AppScreen이 화면 컨테이너(절대 위치) + push/pop 전환 + 엣지 스와이프 백을 전부 제공하므로,
+ * 자체 구현했던 Panel 전환·useEdgeSwipeBack은 필요 없다.
+ *
+ * 웹 하단 AppBar는 여기서 그리지 않는다 — 화면마다 그리면 전환 때 탭바가 화면과 함께 밀려온다.
+ * 스택 밖(MobileFrame)에서 한 번만 그리고, 노출 여부는 navigationStore가 알려준다.
+ */
+interface ScreenProps {
+  name: ActivityName
+  children: ReactNode
+}
+
+export const Screen = ({ name, children }: ScreenProps) => {
+  const chrome = ACTIVITY_ROUTES[name]
+
+  return (
+    // 지도는 가로 드래그가 지도 패닝이라 엣지 스와이프 백과 충돌한다(탭 루트라 되돌아갈 화면도 없다).
+    <AppScreen preventSwipeBack={chrome.fullBleed} backgroundColor="var(--color-surface)">
+      <ScreenBody chrome={chrome}>{children}</ScreenBody>
+    </AppScreen>
+  )
+}
+
+interface ScreenBodyProps {
+  chrome: ActivityRoute
+  children: ReactNode
+}
+
+const ScreenBody = ({ chrome, children }: ScreenBodyProps) => {
+  const activity = useActivity()
+  const { scroll } = useAppScreen()
+
+  // 구 OverlayLayout: 마운트된 동안 네이티브 탭바를 덮는다. 순수 웹/구버전 앱에선 no-op.
+  useImmersive(Boolean(chrome.immersive))
+
+  // 브리지 scroll.top(재탭)은 스택 밖에서 오므로, 활성 화면이 자기 스크롤 함수를 등록해 둔다.
+  useEffect(() => {
+    if (!activity.isActive) {
+      return
+    }
+
+    return registerActiveScreenScroll((top) => scroll({ top }))
+  }, [activity.isActive, scroll])
+
+  const content = <Suspense fallback={<StackLoader />}>{children}</Suspense>
+
+  // 구 MapLayout: 풀블리드 — 상단 안전영역까지 채우고 화면 자체는 스크롤하지 않는다.
+  if (chrome.fullBleed) {
+    return <FullBleed>{content}</FullBleed>
+  }
+
+  return (
+    <Content className={chrome.safeTop === false ? undefined : 'pt-[var(--safe-top)]'}>
+      {content}
+      {chrome.footer && <Footer />}
+      {chrome.space && <Space />}
+    </Content>
+  )
+}
+
+const Content = render.div('flex min-h-full w-full flex-col')
+
+// 구 MapLayout의 MapScreen. 앱은 --app-bar-space가 0이라 100dvh(풀블리드), 웹은 하단 AppBar만큼 뺀다.
+const FullBleed = render.main('relative h-[calc(100dvh-var(--app-bar-space))] w-full overflow-hidden box-border')
+
+// 구 AppBarLayout의 Space — Footer가 웹 AppBar/네이티브 탭바에 가리지 않게 하는 하단 여백.
+const Space = render.div('h-[var(--app-bottom-space)] min-h-[var(--app-bottom-space)]')

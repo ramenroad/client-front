@@ -1,6 +1,6 @@
 import storeImage from '@/assets/images/store.png'
 import { Fragment, useCallback, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import {
   checkBusinessStatus,
   checkBusinessStatusSpecial,
@@ -159,7 +159,7 @@ export const ResultListOverlay = <T,>({
   onBookmarkToggle,
   onCalendarAddOpen,
 }: ResultListOverlayProps<T>) => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const overlayRef = useRef<HTMLElement | null>(null)
   const listContentRef = useRef<HTMLElement | null>(null)
   const lastOverlapRef = useRef<boolean | null>(null)

@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { authStore, useRequireSignInRedirect } from '@/entities/session/model'
 import { useWithdrawMutation } from '@/features/auth'
 import { useToast } from '@/shared/ui/toast'
@@ -8,7 +8,7 @@ import { useToast } from '@/shared/ui/toast'
 const WITHDRAW_CONFIRM_TEXT = '확인했습니다'
 
 export const useWithdrawPage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
   useRequireSignInRedirect()

@@ -1,14 +1,15 @@
 import { useEffect, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useAppParams, useScreenScroll } from '@/shared/navigation'
 import { useRamenyaGroupQuery } from '@/entities/curation/api'
 
 export const useGroupPage = () => {
-  const { id = '' } = useParams()
+  const scrollScreen = useScreenScroll()
+  const { id = '' } = useAppParams()
   const { ramenyaGroupQuery } = useRamenyaGroupQuery()
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [id])
+    scrollScreen()
+  }, [id, scrollScreen])
 
   const ramenyaGroup = useMemo(
     () => ramenyaGroupQuery.data?.find((group) => group._id === id),

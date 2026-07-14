@@ -1,8 +1,7 @@
 import { type MouseEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import type { CommunityBoardSummary } from '@/entities/community/model'
 import { getRelativeTimeLabel } from '@/entities/community/lib'
-import { useOverlayNavigate } from '@/shared/overlay-stack'
 import { IconUnSignInUserProfile } from '@/shared/ui/icon'
 import render from '@/shared/ui/render'
 import { CommunityCommentIcon, CommunityEyeIcon, CommunityHeartIcon } from './CommunityIcons'
@@ -24,8 +23,7 @@ export const CommunityBoardCard = ({ board }: CommunityBoardCardProps) => {
   const authorName = board.userId?.nickname ?? '알 수 없는 사용자'
   const authorProfileImageUrl = board.userId?.profileImageUrl
   const authorId = board.userId?._id
-  const navigate = useNavigate()
-  const overlayNavigate = useOverlayNavigate() // G6: 게시글 상세는 앱에서 레이어로 뜬다(히스토리 비증가)
+  const navigate = useAppNavigate()
 
   const handleAuthorClick = (event: MouseEvent<HTMLDivElement>) => {
     if (!authorId) {
@@ -36,7 +34,7 @@ export const CommunityBoardCard = ({ board }: CommunityBoardCardProps) => {
   }
 
   return (
-    <Card onClick={() => overlayNavigate(`/community/${board._id}`)}>
+    <Card onClick={() => navigate(`/community/${board._id}`)}>
       <Category>{board.category}</Category>
 
       <ContentRow>

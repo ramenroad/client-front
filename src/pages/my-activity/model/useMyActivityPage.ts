@@ -1,8 +1,7 @@
 import { useMemo } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAppNavigate, useAppSearchParams } from '@/shared/navigation'
 import { useMyCommentsQuery, useMyPostsQuery } from '@/entities/activity/api'
 import { useMyReviewsInfiniteQuery } from '@/entities/review/api'
-import { useOverlayNavigate } from '@/shared/overlay-stack'
 
 export type MyActivityTab = 'review' | 'post' | 'comment'
 
@@ -13,9 +12,8 @@ const PARAM_TO_TAB: Record<string, MyActivityTab> = {
 }
 
 export const useMyActivityPage = () => {
-  const navigate = useNavigate()
-  const overlayNavigate = useOverlayNavigate() // G6: 게시글 상세는 앱에서 레이어로 뜬다(히스토리 비증가)
-  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useAppNavigate()
+  const [searchParams, setSearchParams] = useAppSearchParams()
   // 탭을 URL(?tab=)로 관리해, 다른 화면 갔다가 뒤로가기해도 선택 탭이 유지되도록 한다.
   const activeTab = PARAM_TO_TAB[searchParams.get('tab') ?? ''] ?? 'review'
   const setActiveTab = (tab: MyActivityTab) => setSearchParams({ tab }, { replace: true })
@@ -38,7 +36,7 @@ export const useMyActivityPage = () => {
     isPostsLoading: postsQuery.isLoading,
     comments: commentsQuery.data ?? [],
     isCommentsLoading: commentsQuery.isLoading,
-    onBoardClick: (boardId: string) => overlayNavigate(`/community/${boardId}`),
+    onBoardClick: (boardId: string) => navigate(`/community/${boardId}`),
     onBack: () => navigate(-1),
   }
 }

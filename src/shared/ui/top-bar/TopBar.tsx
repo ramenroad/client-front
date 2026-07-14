@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAppNavigate } from "@/shared/navigation";
 import { IconBack } from "@/shared/ui/icon";
 import render from "@/shared/ui/render";
 
@@ -14,7 +14,7 @@ interface TopBarProps {
 }
 
 const TopBar = ({ title, navigate: navigatePath, onBackClick, tooltip, icon, onIconClick, hideBack }: TopBarProps) => {
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   const handleBackClick = () => {
     if (onBackClick) {

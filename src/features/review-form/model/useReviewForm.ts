@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent, type KeyboardEvent } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams, useAppSearchParams, useScreenScroll } from '@/shared/navigation'
 import { useRamenyaDetailQuery, ramenyaQueryKeys } from '@/entities/ramenya/api'
 import {
   reviewQueryKeys,
@@ -41,10 +41,11 @@ const isReviewFormValid = ({ rating, menus, review }: Pick<ReviewFormValues, 'ra
 }
 
 export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
+  const scrollScreen = useScreenScroll()
   const isEditMode = mode === 'edit'
-  const { id: routeId = '' } = useParams()
-  const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
+  const { id: routeId = '' } = useAppParams()
+  const [searchParams] = useAppSearchParams()
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
   const authSession = useAuthSession()
@@ -312,8 +313,8 @@ export const useReviewForm = ({ mode }: UseReviewFormOptions) => {
   }, [isEditMode, navigate, openToast, ramenyaDetailQuery.isError, reviewDetailQuery.isError])
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    scrollScreen()
+  }, [scrollScreen])
 
   const isSubmitting = createReviewMutation.isPending || updateReviewMutation.isPending
   const isLoading = isEditMode ? reviewDetailQuery.isLoading : ramenyaDetailQuery.isLoading

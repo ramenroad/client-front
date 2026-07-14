@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAppNavigate, useAppSearchParams } from '@/shared/navigation'
 import { useRecentViewedRamenyaQuery } from '@/entities/activity/api'
 import type { RecentViewedRamenyaInfo } from '@/entities/activity/model'
 import { useMyBookmarksQuery } from '@/features/bookmark'
@@ -25,8 +25,8 @@ const isPopulatedRamenya = (value: unknown): value is RecentViewedRamenyaInfo =>
   typeof value === 'object' && value !== null && 'name' in value
 
 export const useMySearchPage = () => {
-  const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const navigate = useAppNavigate()
+  const [searchParams, setSearchParams] = useAppSearchParams()
   // 탭을 URL(?tab=)로 관리해, 다른 화면 갔다가 뒤로가기해도 선택 탭이 유지되도록 한다.
   const activeTab = PARAM_TO_TAB[searchParams.get('tab') ?? ''] ?? 'saved'
   const setActiveTab = (tab: MySearchTab) => setSearchParams({ tab }, { replace: true })

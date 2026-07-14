@@ -1,12 +1,10 @@
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { useMyInfoQuery } from '@/entities/viewer/api'
 import { useAuthSession, useGoToLogin } from '@/entities/session/model'
-import { useOverlayNavigate } from '@/shared/overlay-stack'
 import { useToast } from '@/shared/ui/toast'
 
 export const useMyProfilePage = () => {
-  const navigate = useNavigate()
-  const overlayNavigate = useOverlayNavigate() // G6: 캘린더는 앱에서 레이어로 뜬다(히스토리 비증가)
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const authSession = useAuthSession()
   const { openToast } = useToast()
@@ -22,7 +20,7 @@ export const useMyProfilePage = () => {
     isError: isSignedIn && myInfoQuery.isError && !isAuthError,
     handleProfileClick: () => navigate('/information'),
     handleLoginClick: () => goToLogin(),
-    handleCalendarClick: () => overlayNavigate('/my-calendar'),
+    handleCalendarClick: () => navigate('/my-calendar'),
     handleActivityClick: (tab: 'review' | 'post' | 'comment') => navigate(`/my-activity?tab=${tab}`),
     handleSavedStoreClick: () => navigate('/my-search?tab=saved'),
     handleSearchClick: () => navigate('/my-search?tab=recent'),

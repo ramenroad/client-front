@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams } from '@/shared/navigation'
 import { useUploadMenuBoardMutation } from '@/entities/menu-board/api'
 import { ramenyaQueryKeys } from '@/entities/ramenya/api'
 import { useImageUpload } from '@/shared/lib/useImageUpload'
@@ -10,8 +10,8 @@ const MAX_MENU_BOARD_IMAGES = 5
 const MAX_DESCRIPTION_LENGTH = 50
 
 export const useMenuBoardSubmitPage = () => {
-  const { id = '' } = useParams()
-  const navigate = useNavigate()
+  const { id = '' } = useAppParams()
+  const navigate = useAppNavigate()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
   const [selectedImages, setSelectedImages] = useState<(File | string)[]>([])

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useAppNavigate } from '@/shared/navigation'
 import { useCommunityBoardsInfiniteQuery } from '@/entities/community/api'
 import {
   COMMUNITY_BOARD_LIST_TABS,
@@ -8,7 +9,6 @@ import {
 } from '@/entities/community/model'
 import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useIntersectionObserver } from '@/shared/lib/useIntersectionObserver'
-import { useOverlayNavigate } from '@/shared/overlay-stack'
 import { useToast } from '@/shared/ui/toast'
 
 const COMMUNITY_LIST_LIMIT = 20
@@ -25,7 +25,7 @@ const hasUnreadCommunityNotifications = () => {
 }
 
 export const useCommunityPage = () => {
-  const overlayNavigate = useOverlayNavigate() // G6: 글쓰기는 앱에서 레이어로 뜬다(히스토리 비증가)
+  const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
   const { isSignIn } = useAuthSession()
   const { openToast } = useToast()
@@ -60,7 +60,7 @@ export const useCommunityPage = () => {
       return
     }
 
-    overlayNavigate('/community/write')
+    navigate('/community/write')
   }
 
   return {

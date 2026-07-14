@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'react-router-dom'
+import { useAppParams, useScreenScroll } from '@/shared/navigation'
 import { useDeleteMenuBoardMutation } from '@/entities/menu-board/api'
 import { ramenyaQueryKeys, useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import { useMyInfoQuery } from '@/entities/viewer/api'
@@ -8,7 +8,8 @@ import { useAuthSession } from '@/entities/session/model'
 import { useToast } from '@/shared/ui/toast'
 
 export const useMenuBoardImagesPage = () => {
-  const { id = '' } = useParams()
+  const scrollScreen = useScreenScroll()
+  const { id = '' } = useAppParams()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
   const authSession = useAuthSession()
@@ -38,8 +39,8 @@ export const useMenuBoardImagesPage = () => {
   })
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    scrollScreen()
+  }, [scrollScreen])
 
   const handleRemoveMenuBoard = () => {
     if (!selectedMenuBoard || !id) {

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useAppNavigate, useAppParams } from '@/shared/navigation'
 import { viewerQueryKeys } from '@/entities/viewer/api'
-import { authStore, consumePostLoginRedirect, setPendingLoginRewind } from '@/entities/session/model'
+import { authStore, consumePostLoginRedirect } from '@/entities/session/model'
 import {
   buildAppReturnUrl,
   getNaverOAuthState,
@@ -64,9 +64,9 @@ const getErrorEmail = (error: ApiError) => {
 }
 
 export const useOAuthCallbackPage = () => {
-  const { id } = useParams()
+  const { id } = useAppParams()
   const provider = id as SupportedCallbackProvider | undefined
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const queryClient = useQueryClient()
   const { openToast } = useToast()
   const [status, setStatus] = useState<OAuthCallbackStatus>('loading')
@@ -85,16 +85,9 @@ export const useOAuthCallbackPage = () => {
       const isSignup = normalizeSignInType(data.type) === 'signup'
       const destination = isSignup ? '/register' : (consumePostLoginRedirect() ?? '/')
 
-      // G6(앱): OAuth 왕복(location.href → 제공자 → 콜백)으로 쌓인 back-forward 항목을 첫 항목까지 되감는다.
-      // back 항목이 남으면 iOS 스와이프 백 제스처가 재무장돼 스냅샷 흰 화면이 재발한다. 되감기 POP으로 이
-      // 컴포넌트가 언마운트되면 navigate가 무시되므로, 목적지는 마커로 남겨 app-provider가 replace로 마무리.
-      // 순수 웹은 기존 push 네비 유지(브라우저 뒤로가기 기대 동작 보존).
-      const backSteps = window.history.length - 1
-      if (isInApp() && backSteps > 0 && setPendingLoginRewind(destination)) {
-        window.history.go(-backSteps)
-        return
-      }
-      navigate(destination)
+      // 콜백 화면은 목적지로 치환한다 — OAuth는 풀페이지 왕복이라 이 액티비티가 스택의 바닥이고,
+      // push로 얹으면 뒤로가기가 콜백 화면으로 되돌아와 인가 코드를 다시 처리하려 든다.
+      navigate(destination, { replace: true })
     },
     [navigate, openToast, queryClient],
   )

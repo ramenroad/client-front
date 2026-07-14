@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useAppNavigate, useAppParams } from "@/shared/navigation";
 import {
   reviewQueryKeys,
   useMyReviewsInfiniteQuery,
@@ -17,8 +17,8 @@ import { useShare } from "@/shared/lib/useShare";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const useUserReviewsPage = () => {
-  const { id: userId = "" } = useParams();
-  const navigate = useNavigate();
+  const { id: userId = "" } = useAppParams();
+  const navigate = useAppNavigate();
   const queryClient = useQueryClient();
   const authSession = useAuthSession();
   const myInfoQuery = useMyInfoQuery({ enabled: authSession.isSignIn });

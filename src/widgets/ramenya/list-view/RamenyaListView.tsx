@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { RamenyaCard, type RamenyaCardItem } from '@/entities/ramenya/ui'
 import type { Coordinate } from '@/shared/lib/naver-map'
 import render from '@/shared/ui/render'
@@ -23,7 +23,7 @@ export const RamenyaListView = ({
   currentLocation,
   onItemClick,
 }: RamenyaListViewProps) => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
 
   if (!ramenyas) {
     return null

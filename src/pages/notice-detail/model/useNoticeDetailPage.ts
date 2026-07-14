@@ -1,9 +1,9 @@
-import { useLocation, useParams } from 'react-router-dom'
+import { useAppLocation, useAppParams } from '@/shared/navigation'
 import { useNoticeQuery } from '@/entities/support/api'
 
 export const useNoticeDetailPage = () => {
-  const { id } = useParams<{ id: string }>()
-  const { pathname } = useLocation()
+  const { id } = useAppParams<{ id: string }>()
+  const { pathname } = useAppLocation()
   const { data, isLoading, isError } = useNoticeQuery(id ?? '')
 
   return {

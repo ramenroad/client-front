@@ -1,10 +1,10 @@
 import { useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useAppNavigate } from '@/shared/navigation'
 import { isOAuthProviderConfigured, startOAuthLogin, type OAuthProvider } from '@/features/auth'
 import { useToast } from '@/shared/ui/toast'
 
 export const useLoginPage = () => {
-  const navigate = useNavigate()
+  const navigate = useAppNavigate()
   const { openToast } = useToast()
 
   const handleLogin = useCallback(

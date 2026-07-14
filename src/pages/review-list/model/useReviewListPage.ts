@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useAppParams } from '@/shared/navigation'
 import { useRamenyaReviewsInfiniteQuery } from '@/entities/review/api'
 import { useMyInfoQuery } from '@/entities/viewer/api'
 import { useAuthSession } from '@/entities/session/model'
 import { useIntersectionObserver } from '@/shared/lib/useIntersectionObserver'
 
 export const useReviewListPage = () => {
-  const { id = '' } = useParams()
+  const { id = '' } = useAppParams()
   const authSession = useAuthSession()
   const myInfoQuery = useMyInfoQuery({ enabled: authSession.isSignIn })
   const reviewsQuery = useRamenyaReviewsInfiniteQuery(
