@@ -18,11 +18,15 @@ import type { CommunityCommentNode } from '@/entities/community/model'
 import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useMyInfoQuery } from '@/entities/viewer/api'
 import { useShare } from '@/shared/lib/useShare'
+import { useOverlayNavigate } from '@/shared/overlay-stack'
 import { useToast } from '@/shared/ui/toast'
 
 export const useCommunityDetailPage = () => {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  // G6: 글수정은 앱에서 이 레이어 "위"의 새 레이어로 — 레이어 내부 히스토리에 쌓으면 스와이프/백버튼이
+  // 상세까지 통째로 닫아버린다. 웹에선 일반 라우트 push로 폴백.
+  const overlayNavigate = useOverlayNavigate()
   const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
   const { isSignIn } = useAuthSession()
@@ -230,7 +234,7 @@ export const useCommunityDetailPage = () => {
     onCloseConfirmDialog: closeConfirmDialog,
     onConfirmDialog: runConfirmDialog,
     onToggleBoardLike: handleToggleBoardLike,
-    onEditBoard: () => navigate(`/community/write/${id}`),
+    onEditBoard: () => overlayNavigate(`/community/write/${id}`),
     onDeleteBoard: handleDeleteBoard,
     onSaveBoard: handleSaveBoard,
     onReportBoard: handleReportBoard,

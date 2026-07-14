@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useNearbyRamenyasQuery, useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import {
   checkBusinessStatus,
@@ -15,6 +15,7 @@ import { useSearchResultsQuery } from '@/entities/search/api'
 import type { SearchResult } from '@/entities/search/model'
 import { useGoToLogin } from '@/entities/session/model'
 import { useRamenyaBookmarks, type BookmarkedRamenya } from '@/features/bookmark'
+import { useOverlayNavigate } from '@/shared/overlay-stack'
 import { getReviewCreatedTime } from '@/shared/lib/date'
 import type { Coordinate, MapViewportSnapshot } from '@/shared/lib/naver-map'
 import { calculateDistanceValue } from '@/shared/lib/number'
@@ -324,7 +325,7 @@ const getCurrentPosition = () => {
 }
 
 export const useMapSearchPage = () => {
-  const navigate = useNavigate()
+  const overlayNavigate = useOverlayNavigate() // G6: 캘린더는 앱에서 레이어로 뜬다(히스토리 비증가)
   const goToLogin = useGoToLogin()
   const { safeTop } = useAppEnv() // 지도 풀블리드 시 상단 잔여 인셋(W8) — 검색바 하단 겹침 기준 보정
   const [searchParams, setSearchParams] = useSearchParams()
@@ -875,9 +876,9 @@ export const useMapSearchPage = () => {
 
   const handleNavigateCalendarPage = useCallback(
     (visitDate: string) => {
-      navigate(createCalendarUrl(visitDate))
+      overlayNavigate(createCalendarUrl(visitDate))
     },
-    [navigate],
+    [overlayNavigate],
   )
 
   const handleToggleSavedMode = useCallback(() => {

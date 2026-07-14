@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { viewerQueryKeys } from '@/entities/viewer/api'
-import { authStore, consumePostLoginRedirect } from '@/entities/session/model'
+import { authStore, consumePostLoginRedirect, setPendingLoginRewind } from '@/entities/session/model'
 import {
   buildAppReturnUrl,
   getNaverOAuthState,
@@ -83,7 +83,18 @@ export const useOAuthCallbackPage = () => {
       openToast('로그인 성공')
       // 로그인 직전 페이지로 복귀(없으면 홈). 회원가입은 /register로 보내되 복귀 경로는 보존 → 가입 완료 시 사용.
       const isSignup = normalizeSignInType(data.type) === 'signup'
-      navigate(isSignup ? '/register' : (consumePostLoginRedirect() ?? '/'))
+      const destination = isSignup ? '/register' : (consumePostLoginRedirect() ?? '/')
+
+      // G6(앱): OAuth 왕복(location.href → 제공자 → 콜백)으로 쌓인 back-forward 항목을 첫 항목까지 되감는다.
+      // back 항목이 남으면 iOS 스와이프 백 제스처가 재무장돼 스냅샷 흰 화면이 재발한다. 되감기 POP으로 이
+      // 컴포넌트가 언마운트되면 navigate가 무시되므로, 목적지는 마커로 남겨 app-provider가 replace로 마무리.
+      // 순수 웹은 기존 push 네비 유지(브라우저 뒤로가기 기대 동작 보존).
+      const backSteps = window.history.length - 1
+      if (isInApp() && backSteps > 0 && setPendingLoginRewind(destination)) {
+        window.history.go(-backSteps)
+        return
+      }
+      navigate(destination)
     },
     [navigate, openToast, queryClient],
   )

@@ -14,10 +14,14 @@ import {
 } from '@/entities/community/model'
 import { useAuthSession, useGoToLogin } from '@/entities/session/model'
 import { useImageUpload, type UploadImageValue } from '@/shared/lib/useImageUpload'
+import { useOverlayNavigate } from '@/shared/overlay-stack'
 import { useToast } from '@/shared/ui/toast'
 
 export const useCommunityWritePage = () => {
   const navigate = useNavigate()
+  // G6: 수정 완료 → 상세는 앱에서 "이 레이어를 상세 레이어로 교체" — 레이어 내부 히스토리에 두면
+  // 닫기 대상이 어긋난다(작성 폼이 스택에 남음). 웹에선 기존 replace 라우팅으로 폴백.
+  const overlayNavigate = useOverlayNavigate()
   const goToLogin = useGoToLogin()
   const queryClient = useQueryClient()
   const { id } = useParams<{ id: string }>()
@@ -64,7 +68,7 @@ export const useCommunityWritePage = () => {
     onSuccess: () => {
       openToast('게시글을 수정했어요.')
       queryClient.invalidateQueries({ queryKey: communityQueryKeys.all })
-      navigate(`/community/${id}`, { replace: true })
+      overlayNavigate(`/community/${id}`, { replace: true })
     },
     onError: () => {
       openToast('게시글 수정에 실패했어요.', undefined, 'error')

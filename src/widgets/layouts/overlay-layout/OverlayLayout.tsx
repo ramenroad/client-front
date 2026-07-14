@@ -7,6 +7,10 @@ import render from '@/shared/ui/render'
  * 오버레이 레이아웃 — 라멘 캘린더처럼 "특정 탭의 하위 페이지"가 아니라 앱 위에 새 창처럼 떠야 하는 화면용.
  * AppBarLayout 자식이 아니라 단독 라우트로 두어 의미상 독립 화면이 되고,
  * useImmersive로 네이티브 하단 탭바까지 덮어 화면을 가득 채운다. 닫기는 페이지 자체 TopBar(뒤로가기).
+ *
+ * G6: 앱(브리지 연결)에선 같은 화면들이 라우트 대신 OverlayStackHost(app/overlay-stack) 레이어로 뜬다
+ * (히스토리 비증가 — iOS 스와이프 백 스냅샷 백지 회피). 이 라우트 모드는 순수 웹·구버전 앱·딥링크
+ * 콜드스타트 전용이며, 패널 시각 사양은 호스트의 Panel과 동일하게 유지해야 한다.
  */
 const OverlayLayout = () => {
   useImmersive() // 마운트 동안 네이티브 탭바를 덮어 숨김. 순수 웹/구버전 앱에선 no-op.

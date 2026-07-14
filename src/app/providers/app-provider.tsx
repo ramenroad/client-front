@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
-import { authStore } from '@/entities/session/model'
+import { authStore, consumePendingLoginRewind } from '@/entities/session/model'
 import { authApi } from '@/features/auth'
 import { initializeHttpAuth } from '@/shared/api'
 import { ThemeProvider } from '@/shared/model'
@@ -9,6 +9,8 @@ import { queryClient } from './query-client'
 import { AppQueryProvider } from './query-provider'
 import { BridgeTopics, emit, installBridge, isInApp, on } from '@/shared/bridge'
 import { applyAppEnvToDom, readAppEnv, resolveActiveTab, setSafeInsets } from '@/shared/app-env'
+import { overlayStackStore } from '@/shared/overlay-stack'
+import { OverlayStackHost } from '@/app/overlay-stack'
 import { router } from '@/app/router'
 
 export const AppProviders = ({ children }: { children: ReactNode }) => {
@@ -82,12 +84,15 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
     }
 
     const sendRouteChanged = () => {
-      const path = router.state.location.pathname
+      // G6: 오버레이 레이어가 떠 있으면 그 경로가 "현재 화면" — 라우터 위치 대신 레이어 기준으로 발신.
+      const overlayPath = overlayStackStore.getEffectivePath()
+      const path = overlayPath?.split('?')[0] ?? router.state.location.pathname
       const activeTab = resolveActiveTab(path)
       const isRootOfTab = activeTab != null && tabRoots[activeTab] === path
       emit(BridgeTopics.routeChanged, { path, activeTab, isRootOfTab })
       // G5: 탭 루트가 아니면 웹이 뒤로가기(history pop) 처리 가능 → 네이티브가 백버튼/스와이프를 웹에 위임.
-      emit(BridgeTopics.backState, { canHandle: !isRootOfTab })
+      // G6: 레이어가 떠 있으면 닫기를 웹이 처리하므로 항상 canHandle.
+      emit(BridgeTopics.backState, { canHandle: overlayStackStore.hasOpenLayer() || !isRootOfTab })
     }
 
     // 네이티브 → 웹
@@ -102,14 +107,23 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
       const path = typeof p?.path === 'string' ? p.path : '/'
       // 로그인 분기는 웹 소유(useAppBar 동일): 'my' 탭 + 비로그인 → /login
       const target = p?.tab === 'my' && !authStore.getSession().isSignIn ? '/login' : path
-      if (target === window.location.pathname) {
+      // G6: 레이어 열림 동안 window.location은 replaceState로 레이어 경로를 가리키므로 라우터 위치로 비교.
+      if (target === router.state.location.pathname) {
+        if (overlayStackStore.hasOpenLayer()) {
+          overlayStackStore.clear() // 재탭/동일 경로 = 레이어부터 정리(베이스 노출)
+          return
+        }
         window.scrollTo(0, 0) // 재탭/동일 경로 → 스크롤 top(§2.9.2)
       } else {
         router.navigate(target).catch(() => undefined)
       }
     })
     // G5: 네이티브 안드로이드 백버튼 위임 → 탭 루트가 아니면 웹 history pop(루트면 네이티브가 무력화).
+    // G6: 오버레이 레이어가 떠 있으면 레이어 닫기가 우선(레이어는 히스토리에 없어 pop으로는 안 닫힌다).
     const offAndroidBack = on(BridgeTopics.androidBackPress, () => {
+      if (overlayStackStore.requestPop()) {
+        return
+      }
       if (!isAtTabRoot()) {
         router.navigate(-1).catch(() => undefined)
       }
@@ -121,9 +135,38 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
       document.documentElement.style.setProperty('--keyboard-height', `${height}px`)
     })
 
+    // G6: 오버레이 스택 변화 → URL replaceState 동기화 + 상태 재발신. 스토어는 데이터만 갖고 부수효과는
+    // 여기 한 곳에서 수행한다. replaceState는 히스토리를 늘리지 않아 iOS 스와이프 백이 계속 무장해제 상태.
+    // 라우터가 history.state에 보관하는 복원 정보(idx 등)를 보존해야 하므로 state는 그대로 넘긴다.
+    const syncOverlayUrl = () => {
+      const base = router.state.location
+      const target = overlayStackStore.getEffectivePath() ?? `${base.pathname}${base.search}`
+      if (`${window.location.pathname}${window.location.search}` !== target) {
+        window.history.replaceState(window.history.state, '', target)
+      }
+    }
+    const unsubscribeOverlay = overlayStackStore.subscribe(() => {
+      syncOverlayUrl()
+      sendRouteChanged()
+    })
+
     // 웹 → 네이티브: 모든 네비게이션에서 ROUTE_CHANGED (NAVIGATE 재발신 금지 → 무한루프 방지)
     sendRouteChanged() // 초기 1회
-    const unsubscribeRouter = router.subscribe(() => sendRouteChanged())
+    const unsubscribeRouter = router.subscribe((state) => {
+      // G6(앱): 로그인 되감기 — OAuth 콜백이 history.go로 첫 항목까지 되감은 POP이 정착하면 목적지를
+      // replace로 얹어 back-forward 목록을 [목적지] 하나로 복원한다(스와이프 백 재무장 방지).
+      if (state.historyAction === 'POP') {
+        const rewindDestination = consumePendingLoginRewind()
+        if (rewindDestination) {
+          router.navigate(rewindDestination, { replace: true }).catch(() => undefined)
+          return
+        }
+      }
+      // G6: 레이어가 뜬 채 실제 라우터가 움직이면(이스케이프/네이티브 스와이프 pop 등) 레이어를 정리해
+      // "베이스만 이동하고 레이어가 남는" 상태 어긋남을 막는다. 이스케이프 경로에선 선행 clear로 무해(멱등).
+      overlayStackStore.clear()
+      sendRouteChanged()
+    })
 
     return () => {
       offInsets()
@@ -131,6 +174,7 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
       offAndroidBack()
       offScrollTop()
       offKeyboard()
+      unsubscribeOverlay()
       unsubscribeRouter()
     }
   }, [])
@@ -139,7 +183,12 @@ export const AppProviders = ({ children }: { children: ReactNode }) => {
     <ThemeProvider>
       <PopupProvider>
         <ToastProvider>
-          <AppQueryProvider>{children}</AppQueryProvider>
+          <AppQueryProvider>
+            {children}
+            {/* G6: 앱 전용 오버레이 레이어 호스트 — 자체 MemoryRouter를 가지므로 RouterProvider 밖,
+                레이어 페이지들이 쓰는 Query/Toast/Popup 컨텍스트 안에 마운트한다. 웹에선 항상 빈 렌더. */}
+            <OverlayStackHost />
+          </AppQueryProvider>
         </ToastProvider>
       </PopupProvider>
     </ThemeProvider>
