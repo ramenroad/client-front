@@ -14,6 +14,7 @@ export const MAP_RESULT_SHEET_HEIGHT_VALUES = [
 
 // 자유 드래그 경계(dvh). 최소/최대는 기존 COLLAPSED/EXPANDED와 동일하게 유지한다.
 export const MAP_RESULT_SHEET_MIN_DVH = 8
+// 상한: 시트 최상단이 상단 고정 검색바 아래에 머물도록 잡는다 — 시트가 검색바(좌측 뒤로가기 포함)를 덮지 않게 하는 한계선.
 export const MAP_RESULT_SHEET_MAX_DVH = 80
 
 // 시트를 최하단(최소 높이)까지 내렸을 때만 내부 콘텐츠를 숨기고 상단 핸들바만 노출한다.

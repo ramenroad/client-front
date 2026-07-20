@@ -16,6 +16,8 @@ interface SearchOverlayProps extends ComponentProps<'input'> {
   isHidden?: boolean
   isSearchOverlayOpen?: boolean
   setIsSearchOverlayOpen?: (value: boolean) => void
+  /** 지도 보기(비포커스) 상태에서 좌측 뒤로가기를 눌렀을 때. 미제공(예: 홈)이면 뒤로가기는 검색 오버레이 닫기만 한다. */
+  onIdleBack?: () => void
 }
 
 export const SearchOverlay = ({
@@ -27,6 +29,7 @@ export const SearchOverlay = ({
   isHidden = false,
   isSearchOverlayOpen = false,
   setIsSearchOverlayOpen,
+  onIdleBack,
   ...rest
 }: SearchOverlayProps) => {
   const {
@@ -64,6 +67,16 @@ export const SearchOverlay = ({
     onSelectKeyword,
   })
 
+  // 좌측 뒤로가기: 검색 모드(포커스)나 외부(홈) 진입에선 오버레이 닫기(기존 동작),
+  // 지도 보기(비포커스·onIdleBack 제공)에선 네비게이션 뒤로가기.
+  const handleBackIconClick = () => {
+    if (isFocused || isExternal) {
+      handleCloseOverlay()
+      return
+    }
+    onIdleBack?.()
+  }
+
   return (
     <>
       {shouldRenderSearchBox && (
@@ -72,9 +85,9 @@ export const SearchOverlay = ({
           inputRef={inputRef}
           keyword={keyword}
           isHidden={isHidden && !isFocused}
-          showBackIcon={isFocused || isExternal}
+          showBackIcon={isFocused || isExternal || Boolean(onIdleBack)}
           showSearchIcon={!isFocused}
-          onClose={handleCloseOverlay}
+          onClose={handleBackIconClick}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onKeyDown={handleInputKeyDown}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useAppNavigate, useAppSearchParams } from '@/shared/navigation'
+import { goBack, navigationStore, useAppNavigate, useAppSearchParams } from '@/shared/navigation'
 import { useNearbyRamenyasQuery, useRamenyaDetailQuery } from '@/entities/ramenya/api'
 import {
   checkBusinessStatus,
@@ -19,7 +19,7 @@ import { getReviewCreatedTime } from '@/shared/lib/date'
 import type { Coordinate, MapViewportSnapshot } from '@/shared/lib/naver-map'
 import { calculateDistanceValue } from '@/shared/lib/number'
 import { useToast } from '@/shared/ui/toast'
-import { useAppEnv } from '@/shared/app-env'
+import { useCrossTabNavigate } from '@/shared/app-env'
 import type { NaverMapFocusRequest, NaverMapMarker } from '@/widgets/map/naver-map'
 import {
   MAP_RESULT_SHEET_HEIGHTS,
@@ -58,8 +58,6 @@ const MAP_SHEET_HEIGHT_STORAGE_KEY = 'mapPageSheetHeight'
 // 시트는 앱바 바로 위(bottom-0)에 붙으므로 추가 하단 오프셋 없음.
 const MAP_SHEET_BOTTOM_OFFSET = 0
 const MAP_FLOATING_BUTTON_GAP = 16
-// 검색창(top-16 h-48 => 하단 64px) + 여유 12px. 시트 상단이 이 지점보다 위로 올라오면 검색창을 숨긴다.
-const MAP_SEARCH_BAR_BOTTOM_PX = 76
 // 이 높이(dvh) 이상에서는 현재 위치 버튼을 숨긴다(시트가 화면 상단까지 올라온 상태).
 const MAP_CURRENT_LOCATION_BUTTON_HIDE_DVH = 70
 // 매장 포커스 시 하단시트에 가려지지 않도록 시트 높이의 절반만큼 화면 위로 올린다(보이는 지도 영역의 중앙 정렬).
@@ -326,7 +324,7 @@ const getCurrentPosition = () => {
 export const useMapSearchPage = () => {
   const navigate = useAppNavigate()
   const goToLogin = useGoToLogin()
-  const { safeTop } = useAppEnv() // 지도 풀블리드 시 상단 잔여 인셋(W8) — 검색바 하단 겹침 기준 보정
+  const crossTabNavigate = useCrossTabNavigate()
   const [searchParams, setSearchParams] = useAppSearchParams()
   const initialCenter = useMemo(() => getInitialCenter(searchParams), [searchParams])
   const initialZoom = useMemo(() => parseNumberParam(searchParams.get('level')) ?? DEFAULT_ZOOM, [searchParams])
@@ -339,7 +337,6 @@ export const useMapSearchPage = () => {
   const [currentLocation, setCurrentLocation] = useState<Coordinate | null>(null)
   const [focusRequest, setFocusRequest] = useState<NaverMapFocusRequest | null>(null)
   const [resultSheetHeight, setResultSheetHeight] = useState<string>(getInitialSheetHeight)
-  const [isSearchBarHidden, setIsSearchBarHidden] = useState(false)
   const [filterOptions, setFilterOptions] = useState<FilterOptions>(getInitialFilterOptions)
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [isSavedMode, setIsSavedMode] = useState(false)
@@ -572,9 +569,14 @@ export const useMapSearchPage = () => {
   // 포커스 좌표를 화면 중앙에서 위로 올릴 비율(뷰포트 높이 대비). NaverMap이 px로 환산해 적용한다.
   const focusOffsetRatio = (parseSheetDvh(resultSheetHeight) / 100) * MAP_FOCUS_LIFT_SHEET_FRACTION
 
-  const handleSearchBarOverlapChange = useCallback((overlapping: boolean) => {
-    setIsSearchBarHidden(overlapping)
-  }, [])
+  // 검색바 좌측 뒤로가기(지도 보기 상태). 되돌릴 웹 히스토리가 있으면 pop, 없으면(지도 탭 루트) 홈 탭으로.
+  const handleSearchBack = useCallback(() => {
+    if (navigationStore.getSnapshot().canGoBack) {
+      goBack()
+      return
+    }
+    crossTabNavigate('/')
+  }, [crossTabNavigate])
 
   const setSelectedRamenya = useCallback(
     (ramenya: MapRamenya) => {
@@ -957,8 +959,6 @@ export const useMapSearchPage = () => {
     shouldShowCurrentLocationButton,
     currentLocationButtonBottom,
     focusOffsetRatio,
-    isSearchBarHidden,
-    searchBarBottomPx: MAP_SEARCH_BAR_BOTTOM_PX + safeTop,
     bookmarkedIds,
     isSavedMode,
     isLoginModalOpen,
@@ -971,7 +971,7 @@ export const useMapSearchPage = () => {
     handleToggleSavedMode,
     handleCloseLoginModal,
     handleNavigateLoginPage,
-    handleSearchBarOverlapChange,
+    handleSearchBack,
     handleMapReady,
     handleMapIdle,
     handleMapFocusMove,

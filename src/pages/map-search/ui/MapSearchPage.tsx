@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BridgeTopics, emit } from '@/shared/bridge'
 import { useIsActiveScreen } from '@/shared/navigation'
+import { useImmersive } from '@/shared/app-env'
 import { RamenCalendarAddEntry } from '@/features/ramen-calendar-add-entry'
 import { IconBookmark, IconGPS } from '@/shared/ui/icon'
 import { Modal } from '@/shared/ui/modal'
@@ -40,8 +41,6 @@ const MapSearchPage = () => {
     shouldShowCurrentLocationButton,
     currentLocationButtonBottom,
     focusOffsetRatio,
-    isSearchBarHidden,
-    searchBarBottomPx,
     bookmarkedIds,
     isSavedMode,
     isLoginModalOpen,
@@ -54,7 +53,7 @@ const MapSearchPage = () => {
     handleToggleSavedMode,
     handleCloseLoginModal,
     handleNavigateLoginPage,
-    handleSearchBarOverlapChange,
+    handleSearchBack,
     handleMapReady,
     handleMapIdle,
     handleMapFocusMove,
@@ -75,6 +74,10 @@ const MapSearchPage = () => {
   // 않는다) 마운트 기준으로 걸면 원복 cleanup이 돌지 않아, 지도 탭의 다른 화면까지 edge-to-edge로 남는다.
   const isActiveScreen = useIsActiveScreen()
 
+  // 지도 화면인 동안 네이티브 하단 탭바를 덮어 숨긴다(몰입) — 하단 인셋도 홈인디케이터만 예약되게 줄어든다.
+  // 이탈(다른 화면이 얹힘) 시 자동 복원. 탭 탈출은 검색바 좌측 뒤로가기(onIdleBack)가 담당한다.
+  useImmersive(isActiveScreen)
+
   useEffect(() => {
     if (!isActiveScreen) {
       return
@@ -92,9 +95,9 @@ const MapSearchPage = () => {
       <SearchOverlay
         keyword={keyword}
         setKeyword={setKeyword}
-        isHidden={isSearchBarHidden}
         onSelectKeyword={handleKeywordSelect}
         onClearKeyword={handleKeywordClear}
+        onIdleBack={handleSearchBack}
       />
 
       <NaverMap
@@ -153,10 +156,8 @@ const MapSearchPage = () => {
         isDetailError={isDetailError}
         isDetailReviewsLoading={isDetailReviewsLoading}
         isDetailReviewsError={isDetailReviewsError}
-        searchBarBottomPx={searchBarBottomPx}
         bookmarkedIds={bookmarkedIds}
         onHeightChange={setResultSheetHeight}
-        onSearchBarOverlapChange={handleSearchBarOverlapChange}
         onFilterChange={setFilterOptions}
         onSelect={handleResultClick}
         onOpenDetail={handleOpenDetailSheet}

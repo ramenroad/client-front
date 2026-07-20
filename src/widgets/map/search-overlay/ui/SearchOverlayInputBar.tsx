@@ -30,13 +30,8 @@ export const SearchOverlayInputBar = ({
 }: SearchOverlayInputBarProps) => {
   return (
     <SearchOverlayContainer data-hidden={isHidden}>
-      {showBackIcon && <FocusResetIcon onClick={onClose} />}
       <SearchBox>
-        {showSearchIcon && (
-          <IconWrapper>
-            <IconSearch />
-          </IconWrapper>
-        )}
+        {showBackIcon && <FocusResetIcon onClick={onClose} />}
         <SearchInput
           ref={inputRef}
           {...rest}
@@ -46,9 +41,18 @@ export const SearchOverlayInputBar = ({
           onFocus={onFocus}
           onKeyDown={onKeyDown}
         />
-        <SearchDeleteIconWrapper onClick={onClear}>
-          {keyword.trim() !== '' && <IconDeleteSearchValue />}
-        </SearchDeleteIconWrapper>
+        {/* 우측 슬롯: 입력값 있으면 X(clear) / 없고 지도 보기(비포커스)면 돋보기 / 검색 모드(포커스)엔 아무것도 안 보인다. */}
+        {keyword.trim() !== '' ? (
+          <SearchDeleteIconWrapper onClick={onClear}>
+            <IconDeleteSearchValue />
+          </SearchDeleteIconWrapper>
+        ) : (
+          showSearchIcon && (
+            <IconWrapper>
+              <IconSearch />
+            </IconWrapper>
+          )
+        )}
       </SearchBox>
     </SearchOverlayContainer>
   )
@@ -64,7 +68,8 @@ const SearchBox = render.div(
 
 const IconWrapper = render.div('w-24 h-24')
 
-const FocusResetIcon = render.extend(IconBack, 'cursor-pointer')
+// 옆 아이콘(돋보기·X)이 20×20이라 기본 24×24인 IconBack만 커 보인다 — 20으로 맞춘다.
+const FocusResetIcon = render.extend(IconBack, 'h-20 w-20 shrink-0 cursor-pointer')
 
 const SearchInput = render.input(
   'w-full h-24 bg-white border-none font-16-r text-black leading-24 placeholder:text-gray-200 focus:outline-none align-middle',

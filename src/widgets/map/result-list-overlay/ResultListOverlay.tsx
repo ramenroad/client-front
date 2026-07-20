@@ -1,5 +1,5 @@
 import storeImage from '@/assets/images/store.png'
-import { Fragment, useCallback, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react'
+import { Fragment, useCallback, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react'
 import { useAppNavigate } from '@/shared/navigation'
 import {
   checkBusinessStatus,
@@ -81,10 +81,8 @@ interface ResultListOverlayProps<T> {
   isDetailError?: boolean
   isDetailReviewsLoading?: boolean
   isDetailReviewsError?: boolean
-  searchBarBottomPx?: number
   bookmarkedIds?: ReadonlySet<string>
   onHeightChange: (height: string) => void
-  onSearchBarOverlapChange?: (overlapping: boolean) => void
   onFilterChange: (filterOptions: FilterOptions) => void
   onSelect: (item: T) => void
   onOpenDetail: (item: T) => void
@@ -148,10 +146,8 @@ export const ResultListOverlay = <T,>({
   isDetailError = false,
   isDetailReviewsLoading = false,
   isDetailReviewsError = false,
-  searchBarBottomPx = 0,
   bookmarkedIds,
   onHeightChange,
-  onSearchBarOverlapChange,
   onFilterChange,
   onSelect,
   onOpenDetail,
@@ -162,7 +158,6 @@ export const ResultListOverlay = <T,>({
   const navigate = useAppNavigate()
   const overlayRef = useRef<HTMLElement | null>(null)
   const listContentRef = useRef<HTMLElement | null>(null)
-  const lastOverlapRef = useRef<boolean | null>(null)
   const initialScrollTop = useMemo(() => getStoredScrollTop(), [])
   const listScrollTopRef = useRef(initialScrollTop)
   const itemIds = useMemo(() => items.map((item) => item.id), [items])
@@ -170,54 +165,12 @@ export const ResultListOverlay = <T,>({
     () => items.find((item) => item.id === (detailId ?? selectedId)) ?? null,
     [detailId, items, selectedId],
   )
-  const { containerStyle, activeHeightDvh, isContentCollapsed, dragHandleProps, registerItemRef } = useResultListOverlay({
+  const { containerStyle, isContentCollapsed, dragHandleProps, registerItemRef } = useResultListOverlay({
     currentHeight: height,
     itemIds,
     selectedId,
     onHeightChange,
   })
-
-  // 시트가 검색창 영역을 침범하면 검색창을 숨기도록 상위에 알린다.
-  // 주의: CSS height transition 도중 시트 자신의 getBoundingClientRect()는 시작 시점에 '이전 높이'를
-  // 반환해 stale 하다. 그래서 transition 대상이 아닌 offsetParent(MapScreen)의 안정적 하단 +
-  // 목표 높이(activeHeightDvh)로 시트 상단을 수학적으로 계산해, 드래그/프로그램 변경 모두에서 정확히 판정한다.
-  useLayoutEffect(() => {
-    if (!onSearchBarOverlapChange) {
-      return
-    }
-
-    const evaluateOverlap = () => {
-      const node = overlayRef.current
-      const container = node?.offsetParent as HTMLElement | null
-
-      if (!container) {
-        return
-      }
-
-      const viewportHeight = window.innerHeight
-      const overlayHeightPx = (activeHeightDvh / 100) * viewportHeight
-      const overlayTop = container.getBoundingClientRect().bottom - overlayHeightPx
-      const overlapping = overlayTop < searchBarBottomPx
-
-      if (lastOverlapRef.current !== overlapping) {
-        lastOverlapRef.current = overlapping
-        onSearchBarOverlapChange(overlapping)
-      }
-    }
-
-    evaluateOverlap()
-
-    const visualViewport = window.visualViewport
-    window.addEventListener('resize', evaluateOverlap)
-    window.addEventListener('orientationchange', evaluateOverlap)
-    visualViewport?.addEventListener('resize', evaluateOverlap)
-
-    return () => {
-      window.removeEventListener('resize', evaluateOverlap)
-      window.removeEventListener('orientationchange', evaluateOverlap)
-      visualViewport?.removeEventListener('resize', evaluateOverlap)
-    }
-  }, [activeHeightDvh, searchBarBottomPx, onSearchBarOverlapChange])
 
   const rememberListScrollTop = useCallback(() => {
     if (!listContentRef.current) {
