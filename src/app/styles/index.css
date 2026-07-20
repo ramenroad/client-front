@@ -406,6 +406,14 @@
   #root {
     min-height: 100dvh;
   }
+
+  /* stackflow(basic-ui) 엣지 스와이프 백 스트립. 터치 리스너가 passive라 preventDefault가
+     불가능해서, 여기서 시작한 터치의 세로 성분이 네이티브 팬(웹뷰/사파리 러버밴드)으로도
+     인식돼 스와이프 중 뷰 전체가 위아래로 딸려 움직인다. 시작점 기준으로 네이티브 팬 자체를
+     차단한다 — JS 터치 이벤트는 계속 발화하므로 스와이프 백 동작에는 영향 없다. */
+  [data-part="edge"] {
+    touch-action: none;
+  }
 }
 
 @layer utilities {
