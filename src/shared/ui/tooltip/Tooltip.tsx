@@ -10,41 +10,7 @@ interface TooltipProps {
 
 const Tooltip = ({ children, content, title }: TooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-
-  const updatePosition = () => {
-    if (triggerRef.current && tooltipRef.current) {
-      const triggerRect = triggerRef.current.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      const left = triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
-      const top = triggerRect.bottom + 8;
-
-      setPosition({ top, left });
-    }
-  };
-
-  useEffect(() => {
-    if (!isVisible) {
-      return;
-    }
-
-    updatePosition();
-
-    const handleResize = () => updatePosition();
-    const handleScroll = () => updatePosition();
-
-    window.addEventListener("resize", handleResize);
-    // 스크롤은 window가 아니라 화면(AppScreen) 내부 컨테이너에서 일어난다. scroll 이벤트는 버블링되지 않으므로
-    // 캡처 단계로 받아 어느 스크롤 컨테이너에서 나든 툴팁 위치를 다시 잡는다.
-    window.addEventListener("scroll", handleScroll, true);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", handleScroll, true);
-    };
-  }, [isVisible]);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isVisible) {
@@ -52,12 +18,7 @@ const Tooltip = ({ children, content, title }: TooltipProps) => {
     }
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        tooltipRef.current &&
-        !tooltipRef.current.contains(event.target as Node) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(event.target as Node)
-      ) {
+      if (rootRef.current && !rootRef.current.contains(event.target as Node)) {
         setIsVisible(false);
       }
     };
@@ -70,38 +31,38 @@ const Tooltip = ({ children, content, title }: TooltipProps) => {
   }, [isVisible]);
 
   return (
-    <>
-      <TriggerWrapper ref={triggerRef} onClick={() => setIsVisible((prev) => !prev)}>
-        {children}
-      </TriggerWrapper>
+    <TooltipRoot ref={rootRef}>
+      <TriggerWrapper onClick={() => setIsVisible((prev) => !prev)}>{children}</TriggerWrapper>
 
       {isVisible && (
-        <TooltipContainer
-          ref={tooltipRef}
-          style={{
-            position: "fixed",
-            top: `${position.top}px`,
-            left: `${position.left}px`,
-            zIndex: 1000,
-          }}
-        >
-          <TooltipContent>
+        <PanelAnchor>
+          <TooltipPanel>
             {title && <TooltipTitle>{title}</TooltipTitle>}
             <TooltipText>{content}</TooltipText>
-          </TooltipContent>
-          <TooltipArrow />
-        </TooltipContainer>
+            <TooltipArrow />
+          </TooltipPanel>
+        </PanelAnchor>
       )}
-    </>
+    </TooltipRoot>
   );
 };
 
-const TriggerWrapper = render.div("cursor-pointer h-24");
+const TooltipRoot = render.div("relative flex h-24 shrink-0");
 
-const TooltipContainer = styled.div`
-  animation: fadeIn 0.2s ease-in-out;
+const TriggerWrapper = render.div("flex h-24 cursor-pointer items-center");
 
-  @keyframes fadeIn {
+// 트리거 바로 아래에 건다. 뷰포트 좌표(getBoundingClientRect + position:fixed)로는 배치할 수 없다 —
+// Stackflow AppScreen이 전환 후에도 transform을 유지하므로 fixed의 기준이 뷰포트가 아니라 화면 컨테이너가 되고,
+// 웹에서 390 프레임이 가운데 정렬된 만큼 툴팁이 프레임 밖으로 밀려난다.
+//
+// 가로 중앙 정렬은 폭 0 + justify-center로 만든다(패널이 좌우로 같은 만큼 넘쳐 트리거 중심에 맞는다).
+// translate를 쓰지 않는 이유는 등장 애니메이션이 이미 transform을 쓰기 때문이다.
+const PanelAnchor = render.div("absolute left-1/2 top-full z-10 flex w-0 justify-center pt-8");
+
+const FadeIn = styled.div`
+  animation: tooltipFadeIn 0.2s ease-in-out;
+
+  @keyframes tooltipFadeIn {
     from {
       opacity: 0;
       transform: translateY(-4px);
@@ -113,8 +74,9 @@ const TooltipContainer = styled.div`
   }
 `;
 
-const TooltipContent = render.div(
-  "rounded-lg shadow-lg border border-gray-200 py-8 px-12 max-w-xs relative bg-[#414141]",
+const TooltipPanel = render.extend(
+  FadeIn,
+  "relative max-w-xs shrink-0 rounded-lg border border-gray-200 bg-[#414141] px-12 py-8 shadow-lg",
 );
 
 const TooltipTitle = render.div("font-semibold text-white text-lg mb-2");
