@@ -23,7 +23,6 @@ import { useCrossTabNavigate } from '@/shared/app-env'
 import type { NaverMapFocusRequest, NaverMapMarker } from '@/widgets/map/naver-map'
 import {
   MAP_RESULT_SHEET_HEIGHTS,
-  MAP_RESULT_SHEET_COLLAPSE_DVH,
   MAP_RESULT_SHEET_MAX_DVH,
   MAP_RESULT_SHEET_MIN_DVH,
   parseSheetDvh,
@@ -582,8 +581,9 @@ export const useMapSearchPage = () => {
     (ramenya: MapRamenya) => {
       const ramenyaId = getRamenyaId(ramenya)
       suppressNextIdleRef.current = true
+      // 필터 헤더만 보이는 최소 상태(HALF 미만)면 리스트가 보이도록 반쯤 올린다.
       setResultSheetHeight((prev) =>
-        parseSheetDvh(prev) <= MAP_RESULT_SHEET_COLLAPSE_DVH ? MAP_RESULT_SHEET_HEIGHTS.HALF : prev,
+        parseSheetDvh(prev) < parseSheetDvh(MAP_RESULT_SHEET_HEIGHTS.HALF) ? MAP_RESULT_SHEET_HEIGHTS.HALF : prev,
       )
       // 좌표가 있는 매장만 지도 포커스를 이동한다(저장 모드의 좌표 미제공 매장 보호).
       if (hasValidCoords(ramenya)) {
@@ -899,7 +899,7 @@ export const useMapSearchPage = () => {
       setKeyword('')
       setSearchKeyword('')
       setResultSheetHeight((current) =>
-        parseSheetDvh(current) <= MAP_RESULT_SHEET_COLLAPSE_DVH ? MAP_RESULT_SHEET_HEIGHTS.HALF : current,
+        parseSheetDvh(current) < parseSheetDvh(MAP_RESULT_SHEET_HEIGHTS.HALF) ? MAP_RESULT_SHEET_HEIGHTS.HALF : current,
       )
       setSearchParams(
         (prevParams) =>

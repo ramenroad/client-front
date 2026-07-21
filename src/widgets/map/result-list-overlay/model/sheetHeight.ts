@@ -17,10 +17,6 @@ export const MAP_RESULT_SHEET_MIN_DVH = 8
 // 상한: 시트 최상단이 상단 고정 검색바 아래에 머물도록 잡는다 — 시트가 검색바(좌측 뒤로가기 포함)를 덮지 않게 하는 한계선.
 export const MAP_RESULT_SHEET_MAX_DVH = 80
 
-// 시트를 최하단(최소 높이)까지 내렸을 때만 내부 콘텐츠를 숨기고 상단 핸들바만 노출한다.
-// 클램프가 정확히 MIN 값을 만들지만 부동소수 여유를 위해 1dvh 톨러런스를 둔다.
-export const MAP_RESULT_SHEET_COLLAPSE_DVH = MAP_RESULT_SHEET_MIN_DVH + 1
-
 export const parseSheetDvh = (height: string) => {
   const parsed = parseFloat(height)
   return Number.isFinite(parsed) ? parsed : MAP_RESULT_SHEET_MIN_DVH
@@ -38,6 +34,10 @@ export const SHEET_FLICK_PROJECTION_MS = 160
 export const SHEET_SEARCH_BAR_HEIGHT_PX = 48
 // 펼침 시 검색바 하단과 시트 top 사이에 두는 최소 여유(px).
 export const SHEET_TOP_GAP_PX = 16
+// 최소 높이일 때 손잡이(h-32=32) + 필터 줄(py-11 + h-30 = 52) + 컨테이너 상·하 보더(2)가 딱 들어오는 높이(px).
+// 이 높이에선 "필터 헤더까지만" 보이고 리스트는 렌더링하지 않는다(빈틈·스크롤 없이 정확히).
+export const SHEET_HEADER_MIN_PX = 86
+export const SHEET_MIN_HEIGHT_CSS = `${SHEET_HEADER_MIN_PX}px`
 
 // 시트가 검색바를 침범하지 않는 최대 높이(CSS 식).
 // 시트 컨테이너(MapScreen)는 100dvh - --app-bar-space(웹 하단 탭바) 높이이고, 검색바 하단은
@@ -47,14 +47,14 @@ export const SHEET_MAX_HEIGHT_CSS = `calc(100dvh - var(--app-bar-space) - var(--
   SHEET_SEARCH_BAR_HEIGHT_PX + SHEET_TOP_GAP_PX
 }px)`
 
-// [MIN, maxDvh] 범위로 클램프한다(동적 상한 대응).
-export const clampSheetDvhTo = (value: number, maxDvh: number): number =>
-  Math.min(maxDvh, Math.max(MAP_RESULT_SHEET_MIN_DVH, value))
+// [minDvh, maxDvh] 범위로 클램프한다.
+export const clampSheetDvhTo = (value: number, minDvh: number, maxDvh: number): number =>
+  Math.min(maxDvh, Math.max(minDvh, value))
 
-// 동적 상한을 반영한 detent 목록(오름차순). 최하단·중간은 유지하고 최상단만 maxDvh로 대체한다.
-export const getSheetDetentsDvh = (maxDvh: number): number[] => {
-  const halfDvh = Math.min(parseSheetDvh(MAP_RESULT_SHEET_HEIGHTS.HALF), maxDvh)
-  return [MAP_RESULT_SHEET_MIN_DVH, halfDvh, maxDvh]
+// 동적 하한/상한을 반영한 detent 목록(오름차순). 중간(HALF)은 [min, max] 범위로 클램프한다.
+export const getSheetDetentsDvh = (minDvh: number, maxDvh: number): number[] => {
+  const halfDvh = Math.min(Math.max(parseSheetDvh(MAP_RESULT_SHEET_HEIGHTS.HALF), minDvh), maxDvh)
+  return [minDvh, halfDvh, maxDvh]
 }
 
 // 주어진 높이(dvh)에서 detent 목록 중 가장 가까운 값을 고른다.
@@ -68,7 +68,8 @@ export const projectSheetDetentDvh = (
   velocityDvhPerMs: number,
   detents: readonly number[],
 ): number => {
+  const minDvh = detents[0]
   const maxDvh = detents[detents.length - 1]
-  const projectedDvh = clampSheetDvhTo(heightDvh + velocityDvhPerMs * SHEET_FLICK_PROJECTION_MS, maxDvh)
+  const projectedDvh = clampSheetDvhTo(heightDvh + velocityDvhPerMs * SHEET_FLICK_PROJECTION_MS, minDvh, maxDvh)
   return nearestSheetDetentDvh(projectedDvh, detents)
 }

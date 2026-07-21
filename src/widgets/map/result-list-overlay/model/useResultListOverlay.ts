@@ -11,14 +11,13 @@ import {
 import {
   clampSheetDvhTo,
   getSheetDetentsDvh,
-  MAP_RESULT_SHEET_COLLAPSE_DVH,
-  MAP_RESULT_SHEET_MIN_DVH,
   parseSheetDvh,
   projectSheetDetentDvh,
   SHEET_MAX_HEIGHT_CSS,
+  SHEET_MIN_HEIGHT_CSS,
   toSheetDvh,
 } from './sheetHeight'
-import { useSheetMaxDvh } from './useSheetMaxDvh'
+import { useSheetBounds } from './useSheetBounds'
 
 interface UseResultListOverlayParams {
   currentHeight: string
@@ -72,20 +71,21 @@ export const useResultListOverlay = ({
   const [isDragging, setIsDragging] = useState(false)
   const [dragHeightDvh, setDragHeightDvh] = useState(() => parseSheetDvh(currentHeight))
 
-  // 검색바를 침범하지 않는 안전 최대 높이(dvh)와 그에 맞춘 detent. 낮은 화면에선 80dvh보다 작아진다.
-  // 상한은 리사이즈 때만 바뀌므로, 드래그 콜백은 이 값을 의존성으로 받아도 드래그 도중엔 안정적으로 유지된다.
-  const maxSheetDvh = useSheetMaxDvh()
-  const detents = useMemo(() => getSheetDetentsDvh(maxSheetDvh), [maxSheetDvh])
+  // 시트 높이의 하한(손잡이+필터 헤더)·상한(검색바 아래)을 측정. 화면 크기에 따라 달라진다.
+  // 리사이즈 때만 바뀌므로, 드래그 콜백이 이 값을 의존성으로 받아도 드래그 도중엔 안정적으로 유지된다.
+  const { minDvh, maxDvh } = useSheetBounds()
+  const detents = useMemo(() => getSheetDetentsDvh(minDvh, maxDvh), [minDvh, maxDvh])
 
   const itemIdsKey = useMemo(() => itemIds.join('|'), [itemIds])
-  // 드래그 중이 아니어도(프로그램 EXPANDED=80dvh 등) 상한을 넘지 않도록 렌더 높이를 클램프한다.
-  const activeHeightDvh = Math.min(isDragging ? dragHeightDvh : parseSheetDvh(currentHeight), maxSheetDvh)
-  const isContentCollapsed = activeHeightDvh <= MAP_RESULT_SHEET_COLLAPSE_DVH
+  // 드래그 중이 아니어도(프로그램 값 등) 하한/상한을 벗어나지 않도록 렌더 높이를 클램프한다.
+  const activeHeightDvh = clampSheetDvhTo(isDragging ? dragHeightDvh : parseSheetDvh(currentHeight), minDvh, maxDvh)
+  // 최소 높이(하한 근처)에선 필터 헤더까지만 보이고 리스트는 렌더링하지 않는다.
+  const isListCollapsed = activeHeightDvh <= minDvh + 1
 
   const containerStyle = useMemo<CSSProperties>(
     () => ({
-      // 렌더 높이도 CSS 상한으로 한 번 더 감싼다 — 측정 지연·반올림·초기 프레임에도 검색바를 절대 침범하지 않게.
-      height: `min(${activeHeightDvh}dvh, ${SHEET_MAX_HEIGHT_CSS})`,
+      // 렌더 높이도 CSS 하한/상한으로 감싼다 — 측정 지연·반올림·초기 프레임에도 필터 헤더는 보이고 검색바는 안 넘게.
+      height: `clamp(${SHEET_MIN_HEIGHT_CSS}, ${activeHeightDvh}dvh, ${SHEET_MAX_HEIGHT_CSS})`,
       transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     }),
     [activeHeightDvh, isDragging],
@@ -105,8 +105,8 @@ export const useResultListOverlay = ({
   // 드래그 시작: 앵커(startY/시작 높이)와 속도 추정 표본을 초기화한다.
   const beginDrag = useCallback(
     (startY: number, pointerId: number, startTime: number) => {
-      // 앵커를 '보이는' 높이(상한 클램프 반영)로 잡아, 상한에서 아래로 끌 때 데드존이 생기지 않게 한다.
-      const startHeightDvh = Math.min(parseSheetDvh(currentHeight), maxSheetDvh)
+      // 앵커를 '보이는' 높이(하한/상한 클램프 반영)로 잡아, 경계에서 끌 때 데드존이 생기지 않게 한다.
+      const startHeightDvh = clampSheetDvhTo(parseSheetDvh(currentHeight), minDvh, maxDvh)
 
       dragStartRef.current = {
         pointerId,
@@ -120,7 +120,7 @@ export const useResultListOverlay = ({
       setIsDragging(true)
       setDragHeightDvh(startHeightDvh)
     },
-    [currentHeight, maxSheetDvh],
+    [currentHeight, minDvh, maxDvh],
   )
 
   // 드래그 종료: 놓은 높이에 릴리스 속도를 반영해 가장 가까운 detent로 스냅한다.
@@ -165,8 +165,8 @@ export const useResultListOverlay = ({
     }
 
     const nextHeightPx = dragStart.startHeightPx + dragStart.startY - event.clientY
-    setDragHeightDvh(clampSheetDvhTo(pxToDvh(nextHeightPx), maxSheetDvh))
-  }, [maxSheetDvh])
+    setDragHeightDvh(clampSheetDvhTo(pxToDvh(nextHeightPx), minDvh, maxDvh))
+  }, [minDvh, maxDvh])
 
   const handlePointerUp = useCallback(
     (event: PointerEvent<HTMLElement>) => {
@@ -281,15 +281,15 @@ export const useResultListOverlay = ({
     (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'ArrowUp') {
         event.preventDefault()
-        onHeightChange(toSheetDvh(clampSheetDvhTo(parseSheetDvh(currentHeight) + KEYBOARD_STEP_DVH, maxSheetDvh)))
+        onHeightChange(toSheetDvh(clampSheetDvhTo(parseSheetDvh(currentHeight) + KEYBOARD_STEP_DVH, minDvh, maxDvh)))
       }
 
       if (event.key === 'ArrowDown') {
         event.preventDefault()
-        onHeightChange(toSheetDvh(clampSheetDvhTo(parseSheetDvh(currentHeight) - KEYBOARD_STEP_DVH, maxSheetDvh)))
+        onHeightChange(toSheetDvh(clampSheetDvhTo(parseSheetDvh(currentHeight) - KEYBOARD_STEP_DVH, minDvh, maxDvh)))
       }
     },
-    [currentHeight, maxSheetDvh, onHeightChange],
+    [currentHeight, minDvh, maxDvh, onHeightChange],
   )
 
   useEffect(() => {
@@ -321,14 +321,14 @@ export const useResultListOverlay = ({
   return {
     containerStyle,
     activeHeightDvh,
-    isContentCollapsed,
+    isListCollapsed,
     dragHandleProps: {
       role: 'slider',
       tabIndex: 0,
       'aria-label': '검색 결과 시트 높이 조절',
       'aria-orientation': 'vertical' as const,
-      'aria-valuemin': MAP_RESULT_SHEET_MIN_DVH,
-      'aria-valuemax': Math.round(maxSheetDvh),
+      'aria-valuemin': Math.round(minDvh),
+      'aria-valuemax': Math.round(maxDvh),
       'aria-valuenow': Math.round(activeHeightDvh),
       onKeyDown: handleKeyDown,
       onPointerCancel: handlePointerCancel,

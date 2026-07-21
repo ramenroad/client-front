@@ -165,7 +165,7 @@ export const ResultListOverlay = <T,>({
     () => items.find((item) => item.id === (detailId ?? selectedId)) ?? null,
     [detailId, items, selectedId],
   )
-  const { containerStyle, isContentCollapsed, dragHandleProps, contentDragProps, registerItemRef } = useResultListOverlay({
+  const { containerStyle, isListCollapsed, dragHandleProps, contentDragProps, registerItemRef } = useResultListOverlay({
     currentHeight: height,
     itemIds,
     selectedId,
@@ -214,7 +214,7 @@ export const ResultListOverlay = <T,>({
         <Handle aria-hidden="true" />
       </DragHandle>
 
-      {isContentCollapsed ? null : isDetailOpen ? (
+      {isDetailOpen ? (
         <MapDetailSheetContent
           key={detailId ?? selectedItem?.id ?? 'detail'}
           ReviewCard={ReviewCard}
@@ -236,47 +236,50 @@ export const ResultListOverlay = <T,>({
         <>
           <FilterSection filterOptions={filterOptions} onFilterChange={onFilterChange} />
 
-          <ListContentArea ref={handleListContentRef} onScroll={rememberListScrollTop} {...contentDragProps}>
-            {items.map((item) => (
-              <ListItem key={item.id} ref={registerItemRef(item.id)}>
-                <RamenyaCard
-                  _id={item.id}
-                  name={item.name}
-                  address={item.address}
-                  latitude={item.latitude}
-                  longitude={item.longitude}
-                  genre={item.genre}
-                  thumbnailUrl={item.thumbnailUrl}
-                  rating={item.rating}
-                  reviewCount={item.reviewCount}
-                  businessHours={item.businessHours}
-                  isSelected={selectedId === item.id}
-                  currentLocation={currentLocation}
-                  actionSlot={
-                    onBookmarkToggle && (
-                      <BookmarkToggleButton
-                        type="button"
-                        aria-pressed={Boolean(bookmarkedIds?.has(item.id))}
-                        aria-label={bookmarkedIds?.has(item.id) ? `${item.name} 저장 해제` : `${item.name} 저장`}
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          onBookmarkToggle(item.id)
-                        }}
-                      >
-                        <IconBookmark active={Boolean(bookmarkedIds?.has(item.id))} />
-                      </BookmarkToggleButton>
-                    )
-                  }
-                  onClick={() => handleItemClick(item)}
-                />
-                <LineWrapper>
-                  <Line />
-                </LineWrapper>
-              </ListItem>
-            ))}
+          {/* 최소 높이(필터 헤더까지만)에선 리스트를 아예 렌더링하지 않는다 — 빈틈에서 스크롤되는 문제 방지. */}
+          {isListCollapsed ? null : (
+            <ListContentArea ref={handleListContentRef} onScroll={rememberListScrollTop} {...contentDragProps}>
+              {items.map((item) => (
+                <ListItem key={item.id} ref={registerItemRef(item.id)}>
+                  <RamenyaCard
+                    _id={item.id}
+                    name={item.name}
+                    address={item.address}
+                    latitude={item.latitude}
+                    longitude={item.longitude}
+                    genre={item.genre}
+                    thumbnailUrl={item.thumbnailUrl}
+                    rating={item.rating}
+                    reviewCount={item.reviewCount}
+                    businessHours={item.businessHours}
+                    isSelected={selectedId === item.id}
+                    currentLocation={currentLocation}
+                    actionSlot={
+                      onBookmarkToggle && (
+                        <BookmarkToggleButton
+                          type="button"
+                          aria-pressed={Boolean(bookmarkedIds?.has(item.id))}
+                          aria-label={bookmarkedIds?.has(item.id) ? `${item.name} 저장 해제` : `${item.name} 저장`}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            onBookmarkToggle(item.id)
+                          }}
+                        >
+                          <IconBookmark active={Boolean(bookmarkedIds?.has(item.id))} />
+                        </BookmarkToggleButton>
+                      )
+                    }
+                    onClick={() => handleItemClick(item)}
+                  />
+                  <LineWrapper>
+                    <Line />
+                  </LineWrapper>
+                </ListItem>
+              ))}
 
-            {items.length === 0 && <NoStoreBox type="map" />}
-          </ListContentArea>
+              {items.length === 0 && <NoStoreBox type="map" />}
+            </ListContentArea>
+          )}
         </>
       )}
     </OverlayContainer>
