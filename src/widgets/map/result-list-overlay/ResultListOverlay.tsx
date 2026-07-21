@@ -165,7 +165,7 @@ export const ResultListOverlay = <T,>({
     () => items.find((item) => item.id === (detailId ?? selectedId)) ?? null,
     [detailId, items, selectedId],
   )
-  const { containerStyle, isContentCollapsed, dragHandleProps, registerItemRef } = useResultListOverlay({
+  const { containerStyle, isContentCollapsed, dragHandleProps, contentDragProps, registerItemRef } = useResultListOverlay({
     currentHeight: height,
     itemIds,
     selectedId,
@@ -236,7 +236,7 @@ export const ResultListOverlay = <T,>({
         <>
           <FilterSection filterOptions={filterOptions} onFilterChange={onFilterChange} />
 
-          <ListContentArea ref={handleListContentRef} onScroll={rememberListScrollTop}>
+          <ListContentArea ref={handleListContentRef} onScroll={rememberListScrollTop} {...contentDragProps}>
             {items.map((item) => (
               <ListItem key={item.id} ref={registerItemRef(item.id)}>
                 <RamenyaCard
@@ -644,13 +644,13 @@ const OverlayContainer = render.section(
 )
 
 const DragHandle = render.div(
-  'flex h-20 w-full cursor-grab touch-none select-none items-center justify-center outline-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-orange/40',
+  'flex h-32 w-full cursor-grab touch-none select-none items-center justify-center outline-none active:cursor-grabbing focus-visible:ring-2 focus-visible:ring-orange/40',
 )
 
-const Handle = render.div('h-4 w-36 rounded-full bg-divider')
+const Handle = render.div('h-5 w-40 rounded-full bg-divider')
 
 // 앱: 마지막 카드가 네이티브 탭바에 가리지 않게 하단에 탭바 높이(--safe-bottom)만큼 여백. 웹은 0.
-const ListContentArea = render.div('hide-scrollbar flex-1 overflow-y-auto pb-[var(--safe-bottom)]')
+const ListContentArea = render.div('hide-scrollbar flex-1 touch-pan-y overflow-y-auto overscroll-contain pb-[var(--safe-bottom)]')
 
 const ListItem = render.div('')
 

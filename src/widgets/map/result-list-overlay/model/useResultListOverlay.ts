@@ -9,13 +9,16 @@ import {
   type PointerEvent,
 } from 'react'
 import {
-  clampSheetDvh,
+  clampSheetDvhTo,
+  getSheetDetentsDvh,
   MAP_RESULT_SHEET_COLLAPSE_DVH,
-  MAP_RESULT_SHEET_MAX_DVH,
   MAP_RESULT_SHEET_MIN_DVH,
   parseSheetDvh,
+  projectSheetDetentDvh,
+  SHEET_MAX_HEIGHT_CSS,
   toSheetDvh,
 } from './sheetHeight'
+import { useSheetMaxDvh } from './useSheetMaxDvh'
 
 interface UseResultListOverlayParams {
   currentHeight: string
@@ -28,10 +31,28 @@ type DragStart = {
   pointerId: number
   startY: number
   startHeightPx: number
+  // 속도(플릭) 추정용 최근 표본과 누적 속도(dvh/ms, +면 확장 방향)
+  lastY: number
+  lastTime: number
+  velocityDvhPerMs: number
+}
+
+// 리스트 최상단에서 시작한 제스처를 시트 드래그로 승격시키기 위한 후보 정보
+type ContentDragCandidate = {
+  pointerId: number
+  startY: number
+  startTime: number
+  engaged: boolean
 }
 
 // 키보드 화살표 1회당 높이 변화량(dvh)
 const KEYBOARD_STEP_DVH = 10
+// 시트 높이 속도 평활(EMA) 계수(0~1). 클수록 순간적으로 튀는 속도에 둔감하다.
+const SHEET_VELOCITY_SMOOTHING = 0.6
+// 이 시간(ms)보다 오래 손이 멈춘 뒤 놓으면 플릭이 아니라 '정지 후 놓기'로 보고 속도를 0으로 처리한다.
+const SHEET_VELOCITY_STILL_MS = 100
+// 리스트 최상단에서 아래로 이만큼(px) 끌면 네이티브 스크롤 대신 시트 접기로 전환한다.
+const SHEET_CONTENT_DRAG_THRESHOLD_PX = 8
 
 const getViewportHeight = () => window.visualViewport?.height || window.innerHeight
 
@@ -47,16 +68,24 @@ export const useResultListOverlay = ({
 }: UseResultListOverlayParams) => {
   const itemRefs = useRef<Map<string, HTMLElement>>(new Map())
   const dragStartRef = useRef<DragStart | null>(null)
+  const contentDragRef = useRef<ContentDragCandidate | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragHeightDvh, setDragHeightDvh] = useState(() => parseSheetDvh(currentHeight))
 
+  // 검색바를 침범하지 않는 안전 최대 높이(dvh)와 그에 맞춘 detent. 낮은 화면에선 80dvh보다 작아진다.
+  // 상한은 리사이즈 때만 바뀌므로, 드래그 콜백은 이 값을 의존성으로 받아도 드래그 도중엔 안정적으로 유지된다.
+  const maxSheetDvh = useSheetMaxDvh()
+  const detents = useMemo(() => getSheetDetentsDvh(maxSheetDvh), [maxSheetDvh])
+
   const itemIdsKey = useMemo(() => itemIds.join('|'), [itemIds])
-  const activeHeightDvh = isDragging ? dragHeightDvh : parseSheetDvh(currentHeight)
+  // 드래그 중이 아니어도(프로그램 EXPANDED=80dvh 등) 상한을 넘지 않도록 렌더 높이를 클램프한다.
+  const activeHeightDvh = Math.min(isDragging ? dragHeightDvh : parseSheetDvh(currentHeight), maxSheetDvh)
   const isContentCollapsed = activeHeightDvh <= MAP_RESULT_SHEET_COLLAPSE_DVH
 
   const containerStyle = useMemo<CSSProperties>(
     () => ({
-      height: `${activeHeightDvh}dvh`,
+      // 렌더 높이도 CSS 상한으로 한 번 더 감싼다 — 측정 지연·반올림·초기 프레임에도 검색바를 절대 침범하지 않게.
+      height: `min(${activeHeightDvh}dvh, ${SHEET_MAX_HEIGHT_CSS})`,
       transition: isDragging ? 'none' : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     }),
     [activeHeightDvh, isDragging],
@@ -73,33 +102,47 @@ export const useResultListOverlay = ({
     }
   }, [])
 
+  // 드래그 시작: 앵커(startY/시작 높이)와 속도 추정 표본을 초기화한다.
+  const beginDrag = useCallback(
+    (startY: number, pointerId: number, startTime: number) => {
+      // 앵커를 '보이는' 높이(상한 클램프 반영)로 잡아, 상한에서 아래로 끌 때 데드존이 생기지 않게 한다.
+      const startHeightDvh = Math.min(parseSheetDvh(currentHeight), maxSheetDvh)
+
+      dragStartRef.current = {
+        pointerId,
+        startY,
+        startHeightPx: dvhToPx(startHeightDvh),
+        lastY: startY,
+        lastTime: startTime,
+        velocityDvhPerMs: 0,
+      }
+
+      setIsDragging(true)
+      setDragHeightDvh(startHeightDvh)
+    },
+    [currentHeight, maxSheetDvh],
+  )
+
+  // 드래그 종료: 놓은 높이에 릴리스 속도를 반영해 가장 가까운 detent로 스냅한다.
   const finishDrag = useCallback(
-    (heightDvh: number) => {
-      const clampedDvh = clampSheetDvh(heightDvh)
+    (heightDvh: number, velocityDvhPerMs: number) => {
+      const snappedDvh = projectSheetDetentDvh(heightDvh, velocityDvhPerMs, detents)
 
       setIsDragging(false)
-      setDragHeightDvh(clampedDvh)
-      onHeightChange(toSheetDvh(clampedDvh))
+      setDragHeightDvh(snappedDvh)
+      onHeightChange(toSheetDvh(snappedDvh))
       dragStartRef.current = null
     },
-    [onHeightChange],
+    [detents, onHeightChange],
   )
 
   const handlePointerDown = useCallback(
     (event: PointerEvent<HTMLElement>) => {
       event.preventDefault()
       event.currentTarget.setPointerCapture(event.pointerId)
-
-      dragStartRef.current = {
-        pointerId: event.pointerId,
-        startY: event.clientY,
-        startHeightPx: dvhToPx(parseSheetDvh(currentHeight)),
-      }
-
-      setIsDragging(true)
-      setDragHeightDvh(parseSheetDvh(currentHeight))
+      beginDrag(event.clientY, event.pointerId, event.timeStamp)
     },
-    [currentHeight],
+    [beginDrag],
   )
 
   const handlePointerMove = useCallback((event: PointerEvent<HTMLElement>) => {
@@ -109,9 +152,21 @@ export const useResultListOverlay = ({
       return
     }
 
+    // 최근 표본과의 차이로 순간 속도를 구해 EMA로 누적한다(위로 끌면 +).
+    const elapsed = event.timeStamp - dragStart.lastTime
+
+    if (elapsed > 0) {
+      const instantaneousVelocity = pxToDvh(dragStart.lastY - event.clientY) / elapsed
+      dragStart.velocityDvhPerMs =
+        dragStart.velocityDvhPerMs * SHEET_VELOCITY_SMOOTHING +
+        instantaneousVelocity * (1 - SHEET_VELOCITY_SMOOTHING)
+      dragStart.lastY = event.clientY
+      dragStart.lastTime = event.timeStamp
+    }
+
     const nextHeightPx = dragStart.startHeightPx + dragStart.startY - event.clientY
-    setDragHeightDvh(clampSheetDvh(pxToDvh(nextHeightPx)))
-  }, [])
+    setDragHeightDvh(clampSheetDvhTo(pxToDvh(nextHeightPx), maxSheetDvh))
+  }, [maxSheetDvh])
 
   const handlePointerUp = useCallback(
     (event: PointerEvent<HTMLElement>) => {
@@ -125,8 +180,10 @@ export const useResultListOverlay = ({
         event.currentTarget.releasePointerCapture(event.pointerId)
       }
 
+      // 손이 멈춘 채로 놓았으면(표본이 오래됨) 플릭이 아니라 정지로 보고 속도를 버린다.
+      const isStale = event.timeStamp - dragStart.lastTime > SHEET_VELOCITY_STILL_MS
       const nextHeightPx = dragStart.startHeightPx + dragStart.startY - event.clientY
-      finishDrag(pxToDvh(nextHeightPx))
+      finishDrag(pxToDvh(nextHeightPx), isStale ? 0 : dragStart.velocityDvhPerMs)
     },
     [finishDrag],
   )
@@ -143,24 +200,96 @@ export const useResultListOverlay = ({
         event.currentTarget.releasePointerCapture(event.pointerId)
       }
 
-      finishDrag(pxToDvh(dragStart.startHeightPx))
+      finishDrag(pxToDvh(dragStart.startHeightPx), 0)
     },
     [finishDrag],
+  )
+
+  // 리스트 콘텐츠 제스처: 기본은 네이티브 스크롤에 맡기고,
+  // 최상단에서 아래로 끌 때만 시트 드래그(접기)로 승격시킨다.
+  const handleContentPointerDown = useCallback((event: PointerEvent<HTMLElement>) => {
+    contentDragRef.current = {
+      pointerId: event.pointerId,
+      startY: event.clientY,
+      startTime: event.timeStamp,
+      engaged: false,
+    }
+  }, [])
+
+  const handleContentPointerMove = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      const candidate = contentDragRef.current
+
+      if (!candidate || candidate.pointerId !== event.pointerId) {
+        return
+      }
+
+      if (candidate.engaged) {
+        handlePointerMove(event)
+        return
+      }
+
+      const movedDown = event.clientY - candidate.startY
+      const isAtTop = event.currentTarget.scrollTop <= 0
+
+      // 최상단 + 아래로 임계값 이상 끌었을 때만 시트 드래그로 승격(그 외엔 네이티브 스크롤 유지).
+      if (isAtTop && movedDown > SHEET_CONTENT_DRAG_THRESHOLD_PX) {
+        candidate.engaged = true
+        event.currentTarget.setPointerCapture(event.pointerId)
+        beginDrag(candidate.startY, event.pointerId, candidate.startTime)
+        handlePointerMove(event)
+      }
+    },
+    [beginDrag, handlePointerMove],
+  )
+
+  const handleContentPointerUp = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      const candidate = contentDragRef.current
+
+      if (!candidate || candidate.pointerId !== event.pointerId) {
+        return
+      }
+
+      contentDragRef.current = null
+
+      if (candidate.engaged) {
+        handlePointerUp(event)
+      }
+    },
+    [handlePointerUp],
+  )
+
+  const handleContentPointerCancel = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      const candidate = contentDragRef.current
+
+      if (!candidate || candidate.pointerId !== event.pointerId) {
+        return
+      }
+
+      contentDragRef.current = null
+
+      if (candidate.engaged) {
+        handlePointerCancel(event)
+      }
+    },
+    [handlePointerCancel],
   )
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>) => {
       if (event.key === 'ArrowUp') {
         event.preventDefault()
-        onHeightChange(toSheetDvh(clampSheetDvh(parseSheetDvh(currentHeight) + KEYBOARD_STEP_DVH)))
+        onHeightChange(toSheetDvh(clampSheetDvhTo(parseSheetDvh(currentHeight) + KEYBOARD_STEP_DVH, maxSheetDvh)))
       }
 
       if (event.key === 'ArrowDown') {
         event.preventDefault()
-        onHeightChange(toSheetDvh(clampSheetDvh(parseSheetDvh(currentHeight) - KEYBOARD_STEP_DVH)))
+        onHeightChange(toSheetDvh(clampSheetDvhTo(parseSheetDvh(currentHeight) - KEYBOARD_STEP_DVH, maxSheetDvh)))
       }
     },
-    [currentHeight, onHeightChange],
+    [currentHeight, maxSheetDvh, onHeightChange],
   )
 
   useEffect(() => {
@@ -199,13 +328,19 @@ export const useResultListOverlay = ({
       'aria-label': '검색 결과 시트 높이 조절',
       'aria-orientation': 'vertical' as const,
       'aria-valuemin': MAP_RESULT_SHEET_MIN_DVH,
-      'aria-valuemax': MAP_RESULT_SHEET_MAX_DVH,
+      'aria-valuemax': Math.round(maxSheetDvh),
       'aria-valuenow': Math.round(activeHeightDvh),
       onKeyDown: handleKeyDown,
       onPointerCancel: handlePointerCancel,
       onPointerDown: handlePointerDown,
       onPointerMove: handlePointerMove,
       onPointerUp: handlePointerUp,
+    },
+    contentDragProps: {
+      onPointerCancel: handleContentPointerCancel,
+      onPointerDown: handleContentPointerDown,
+      onPointerMove: handleContentPointerMove,
+      onPointerUp: handleContentPointerUp,
     },
     registerItemRef,
   }
