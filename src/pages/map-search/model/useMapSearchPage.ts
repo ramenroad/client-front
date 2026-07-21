@@ -249,19 +249,27 @@ const sortByDistance = (ramenyas: MapRamenya[], currentLocation?: Coordinate | n
   )
 }
 
+// exemptId: 밖에서 콕 집어 지정된 매장(상세 → 지도 바로가기의 selectedId)은 필터에서 면제한다.
+// 필터는 sessionStorage에 저장돼 다음 진입까지 살아있고, 특히 '영업 중'은 현재 시각으로 매번 판정되므로
+// 면제하지 않으면 같은 딥링크가 시간대에 따라 리스트·마커·상세 시트에서 통째로 사라진다.
 const filterMapRamenyas = (
   ramenyas: MapRamenya[],
   filterOptions: FilterOptions,
   currentLocation?: Coordinate | null,
+  exemptId?: string | null,
 ) => {
+  const isExempt = (ramenya: MapRamenya) => Boolean(exemptId) && getRamenyaId(ramenya) === exemptId
+
   let filteredRamenyas = ramenyas
 
   if (filterOptions.isOpen) {
-    filteredRamenyas = filteredRamenyas.filter(matchesOpenFilter)
+    filteredRamenyas = filteredRamenyas.filter((ramenya) => isExempt(ramenya) || matchesOpenFilter(ramenya))
   }
 
   if (filterOptions.genre.length > 0) {
-    filteredRamenyas = filteredRamenyas.filter((ramenya) => matchesGenreFilter(ramenya, filterOptions.genre))
+    filteredRamenyas = filteredRamenyas.filter(
+      (ramenya) => isExempt(ramenya) || matchesGenreFilter(ramenya, filterOptions.genre),
+    )
   }
 
   if (filterOptions.sort === SortType.DISTANCE) {
@@ -347,6 +355,9 @@ export const useMapSearchPage = () => {
   // #3: 지도가 URL에 마지막으로 쓴 위치 키. 외부 네비게이션(홈 지역 뱃지 등)과 지도 자체 동기화를 구분해
   // warm 지도 재중심 시 루프/지터를 막는다. 초기값=초기 파라미터 키(콜드 마운트 중복 재중심 방지).
   const lastSyncedAreaKeyRef = useRef<string | null>(areaKeyFromParams(searchParams))
+  // 지도가 URL에 마지막으로 쓴 검색어. 위치 키와 같은 역할 — 홈 검색처럼 밖에서 들어온 검색어와
+  // 지도 자체 검색을 구분한다. 초기값=초기 파라미터(콜드 마운트에서 중복 동기화 방지).
+  const lastSyncedKeywordRef = useRef(initialKeyword)
   const { openToast } = useToast()
   const { isSignIn, bookmarkedIds, bookmarkedRamenyas, toggleBookmark } = useRamenyaBookmarks()
   const todayVisitDate = useMemo(() => createDateKey(new Date()), [])
@@ -478,9 +489,10 @@ export const useMapSearchPage = () => {
     searchQuery.data,
     trimmedKeyword,
   ])
+  // 면제 대상은 URL의 selectedId만 쓴다. effectiveSelectedId는 이 리스트에서 유도되므로(autoFocus) 순환한다.
   const ramenyaList = useMemo(
-    () => filterMapRamenyas(rawRamenyaList, filterOptions, currentLocation),
-    [currentLocation, filterOptions, rawRamenyaList],
+    () => filterMapRamenyas(rawRamenyaList, filterOptions, currentLocation, selectedId),
+    [currentLocation, filterOptions, rawRamenyaList, selectedId],
   )
 
   const autoFocusRamenya = useMemo(() => {
@@ -671,32 +683,53 @@ export const useMapSearchPage = () => {
     [setSearchParams, trimmedKeyword],
   )
 
-  // #3: warm 지도 외부 네비게이션 재중심 — 홈 지역 뱃지 등으로 URL 위치 파라미터가 바뀌면(우리가 쓴 게 아니면)
-  // 이미 떠 있는 지도를 panTo(focusRequest)하고 검색영역을 갱신한다. 콜드 마운트·지도 자체 동기화는 무시.
+  // #3: warm 지도 외부 네비게이션 동기화 — 홈 지역 뱃지·홈 검색·상세의 '라이징 지도 바로가기'처럼 밖에서
+  // URL이 바뀌면(우리가 쓴 게 아니면) 이미 떠 있는 지도를 그 URL에 맞춘다. 콜드 마운트·자체 동기화는 무시.
+  //
+  // 위치뿐 아니라 검색어까지 보는 이유: 지도는 singleton이라 재진입해도 리마운트되지 않는다(navigator가
+  // replaceStep으로 파라미터만 갈아끼운다). useState 초기값으로 한 번 읽은 keyword가 그대로 남으므로,
+  // URL만 갈리고 상태가 옛것이면 "홈에서 검색했는데 결과가 그대로" / "상세에서 지도로 왔는데 옛 검색
+  // 결과만 뜨고 그 매장은 리스트에 없다"가 된다.
   useEffect(() => {
+    const urlKeyword = searchParams.get('keyword') ?? ''
+    const isExternalKeyword = urlKeyword !== lastSyncedKeywordRef.current
+    const areaKey = areaKeyFromParams(searchParams)
+    const isExternalArea = areaKey !== null && areaKey !== lastSyncedAreaKeyRef.current
+
+    if (!isExternalKeyword && !isExternalArea) {
+      return
+    }
+
     const latitude = parseNumberParam(searchParams.get('latitude'))
     const longitude = parseNumberParam(searchParams.get('longitude'))
-
-    if (latitude === undefined || longitude === undefined) {
-      return
-    }
-
     const radius = parseNumberParam(searchParams.get('radius'))
-    const key = `${latitude}:${longitude}:${radius ?? ''}`
 
-    if (key === lastSyncedAreaKeyRef.current) {
-      return
-    }
-
-    lastSyncedAreaKeyRef.current = key
-    setFocusRequest({ id: `nav-${key}`, position: { latitude, longitude } })
-
-    // 영역(반경)까지 온 '지역 이동'이면 검색영역을 갱신해 그 지역 주변 결과를 보여준다.
     // URL(외부 시스템) 변화에 React 상태를 동기화하는 경우 — set-state-in-effect의 정당한 예외(규칙 메시지 명시).
-    if (radius !== undefined) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSearchArea({ latitude, longitude, radius })
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (isExternalKeyword) {
+      lastSyncedKeywordRef.current = urlKeyword
+      setKeyword(urlKeyword)
+      setSearchKeyword(urlKeyword)
     }
+
+    // 저장 모드는 URL에 없는 화면 상태라 재진입해도 살아남는다. 밖에서 검색어·위치를 지정해 들어왔는데
+    // 저장 모드가 켜져 있으면 리스트가 북마크 목록으로 고정돼 정작 그 대상이 보이지 않는다 → 해제한다.
+    setIsSavedMode(false)
+    setNeedsRefresh(false)
+
+    if (isExternalArea && latitude !== undefined && longitude !== undefined) {
+      lastSyncedAreaKeyRef.current = areaKey
+      setFocusRequest({ id: `nav-${areaKey}`, position: { latitude, longitude } })
+
+      // 영역(반경)까지 온 '지역 이동'이면 검색영역을 갱신해 그 지역 주변 결과를 보여준다.
+      if (radius !== undefined) {
+        setSearchArea({ latitude, longitude, radius })
+      }
+    } else {
+      // 검색어만 온 경우(홈 검색) — 검색 결과의 자동 포커스(autoFocusRequest)가 지도를 잡도록 비워둔다.
+      setFocusRequest(null)
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [searchParams])
 
   const handleMapReady = useCallback((nextViewport: MapViewportSnapshot) => {
@@ -744,6 +777,8 @@ export const useMapSearchPage = () => {
     (nextKeyword: string, isNearBy?: boolean) => {
       const normalizedKeyword = nextKeyword.trim()
 
+      // 이 검색어 변경은 지도 자체 동기화임을 표시 → 위 외부-네비게이션 effect가 무시(중복 동기화 방지).
+      lastSyncedKeywordRef.current = normalizedKeyword
       setIsSavedMode(false)
       setKeyword(normalizedKeyword)
       setSearchKeyword(normalizedKeyword)
@@ -780,6 +815,13 @@ export const useMapSearchPage = () => {
 
   const handleKeywordClear = useCallback(() => {
     const nextArea = viewport ? createSearchAreaFromViewport(viewport) : searchArea
+
+    // 검색어와 위치를 모두 지도 자체 동기화로 표시한다. 위치 키를 빼먹으면 아래에서 쓴 URL을 외부 진입으로
+    // 오인해 같은 자리로 한 번 더 팬한다(지도가 까닭 없이 들썩인다).
+    lastSyncedKeywordRef.current = ''
+    if (nextArea) {
+      lastSyncedAreaKeyRef.current = `${nextArea.latitude}:${nextArea.longitude}:${nextArea.radius}`
+    }
 
     setKeyword('')
     setSearchKeyword('')
@@ -895,7 +937,10 @@ export const useMapSearchPage = () => {
 
     if (nextSavedMode) {
       // 저장 모드 진입: 위치/검색 상태를 정리하고 시트를 반쯤 올려 리스트를 보여준다.
+      // 검색어를 URL에서 지우는 것도 지도 자체 변경이다 — 표시하지 않으면 외부-네비게이션 effect가
+      // 이를 외부 진입으로 보고 방금 켠 저장 모드를 즉시 꺼버린다.
       suppressNextIdleRef.current = true
+      lastSyncedKeywordRef.current = ''
       setKeyword('')
       setSearchKeyword('')
       setResultSheetHeight((current) =>
