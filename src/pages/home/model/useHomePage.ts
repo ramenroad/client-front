@@ -128,14 +128,13 @@ export const useHomePage = () => {
     [navigate, openToast],
   )
 
+  // 홈 검색은 항상 전역 검색이다. SearchOverlay는 엔터를 '이 근처에서 찾기'(isNearBy)로 넘기지만,
+  // 홈에는 기준이 될 지도 뷰포트가 없다 — 그대로 nearBy를 붙이면 지도가 기본 중심(연남동) 반경으로
+  // 검색을 좁혀, 다른 지역 매장은 결과에서 통째로 빠진다(전역 폴백은 결과가 0건일 때만 돈다).
+  // 위치로 좁히는 건 실제 뷰포트가 있는 지도 화면에서만 의미가 있다.
   const handleSearchKeywordSelect = useCallback(
-    (keyword: string, isNearBy?: boolean) => {
-      navigate(
-        buildMapPath({
-          keyword,
-          nearBy: isNearBy,
-        }),
-      )
+    (keyword: string) => {
+      navigate(buildMapPath({ keyword }))
     },
     [navigate],
   )
