@@ -43,23 +43,23 @@ const APP_BAR_LAYOUT = { footer: true, space: true, appBar: true } as const
  * history-sync가 특이도(정적 세그먼트 우선)로 자동 정렬하므로 선언 순서는 매칭에 영향을 주지 않는다.
  */
 const ACTIVITY_ROUTE_TABLE = {
-  // 홈 탭
+  // 홈 탭 — 지역/장르/그룹은 sticky 헤더가 상태바를 덮어야 해서 상단 패딩을 스스로 처리한다(커뮤니티 목록과 동일).
   Home: { route: '/', ...APP_BAR_LAYOUT, singleton: true },
-  RamenyaByRegion: { route: '/location/:location', ...APP_BAR_LAYOUT },
+  RamenyaByRegion: { route: '/location/:location', ...APP_BAR_LAYOUT, safeTop: false },
   RamenyaDetail: { route: '/detail/:id', ...APP_BAR_LAYOUT },
-  RamenyaByGenre: { route: '/genre/:genre', ...APP_BAR_LAYOUT },
+  RamenyaByGenre: { route: '/genre/:genre', ...APP_BAR_LAYOUT, safeTop: false },
   Banner: { route: '/banner', ...APP_BAR_LAYOUT },
-  Group: { route: '/group/:id', ...APP_BAR_LAYOUT },
+  Group: { route: '/group/:id', ...APP_BAR_LAYOUT, safeTop: false },
 
   // 지도 탭 — 풀블리드라 상단 패딩을 주지 않는다(지도 오버레이가 --map-search-top으로 자체 처리).
   MapSearch: { route: '/map', appBar: true, fullBleed: true, safeTop: false, singleton: true },
 
-  // 커뮤니티 탭 — 목록은 sticky 헤더가 상태바를 덮어야 해서 상단 패딩을 스스로 처리한다.
+  // 커뮤니티 탭 — 목록·작성/수정은 sticky 헤더가 상태바를 덮어야 해서 상단 패딩을 스스로 처리한다.
   Community: { route: '/community', appBar: true, safeTop: false, singleton: true },
   CommunityNotifications: { route: '/community/notifications' },
   CommunityDetail: { route: '/community/:id', immersive: true },
-  CommunityWrite: { route: '/community/write', immersive: true },
-  CommunityEdit: { route: '/community/write/:id', immersive: true },
+  CommunityWrite: { route: '/community/write', immersive: true, safeTop: false },
+  CommunityEdit: { route: '/community/write/:id', immersive: true, safeTop: false },
 
   // 마이 탭
   MyProfile: { route: '/mypage', ...APP_BAR_LAYOUT, singleton: true },

@@ -166,7 +166,8 @@ const CommunityImagePreview = memo(({ image, index, onRemove }: CommunityImagePr
 
 const Page = render.section('min-h-[100dvh] w-full bg-white pb-138')
 
-const Header = render.div('sticky top-0 z-10 flex items-center justify-between bg-white px-20 py-10')
+// top-0으로 상태바까지 덮고, 기존 py-10의 상단분에 --safe-top을 더해 내용은 상태바 아래에 둔다(라우트 safeTop:false와 한 쌍).
+const Header = render.div('sticky top-0 z-10 flex items-center justify-between bg-white px-20 pb-10 pt-[calc(var(--safe-top)+10px)]')
 
 const BackButton = render.button('flex h-24 w-24 cursor-pointer items-center justify-center border-none bg-transparent p-0')
 

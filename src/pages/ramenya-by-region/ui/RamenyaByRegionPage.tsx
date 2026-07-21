@@ -46,7 +46,8 @@ const RamenyaByRegionPage = () => {
 
 const Layout = render.extend(PageLayout)
 
-const HeaderContainer = render.section('sticky top-0 z-20 flex w-full flex-col bg-white font-16-sb')
+// top-0으로 상태바까지 덮고, pt-[--safe-top]으로 내용은 상태바 아래에 둔다(라우트 safeTop:false와 한 쌍 — 커뮤니티 목록과 동일).
+const HeaderContainer = render.section('sticky top-0 z-20 flex w-full flex-col bg-white pt-[var(--safe-top)] font-16-sb')
 
 const InformationWrapper = render.section('box-border flex min-h-0 w-full flex-1 flex-col')
 

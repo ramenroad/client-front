@@ -56,7 +56,8 @@ const GroupPage = () => {
 
 const Layout = render.extend(PageLayout)
 
-const HeaderSection = render.section('sticky top-0 z-20 w-full bg-white')
+// top-0으로 상태바까지 덮고, pt-[--safe-top]으로 내용은 상태바 아래에 둔다(라우트 safeTop:false와 한 쌍 — 커뮤니티 목록과 동일).
+const HeaderSection = render.section('sticky top-0 z-20 w-full bg-white pt-[var(--safe-top)]')
 
 const HeaderImageSection = render.section('w-full shrink-0')
 
