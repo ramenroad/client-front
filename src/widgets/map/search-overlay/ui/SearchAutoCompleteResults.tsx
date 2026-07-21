@@ -1,4 +1,4 @@
-import { getTextMatch } from '@/shared/lib/text'
+import { getTextMatchParts } from '@/shared/lib/text'
 import { IconLocate } from '@/shared/ui/icon'
 import render from '@/shared/ui/render'
 import { RaisingText } from '@/shared/ui/text'
@@ -28,31 +28,42 @@ export const SearchAutoCompleteResults = ({
       {keywordResults.map((keywordResult) => (
         <KeywordWrapper key={keywordResult._id} onClick={() => onKeywordSelect(keywordResult.name)}>
           <IconLocate />
-          <KeywordTextGroup>
-            <HighlightedText size={16} weight="sb">
-              {getTextMatch({ query: keyword, target: keywordResult.name }).matchedText}
-            </HighlightedText>
-            <PlainText size={16} weight="sb">
-              {getTextMatch({ query: keyword, target: keywordResult.name }).unMatchedText}
-            </PlainText>
-          </KeywordTextGroup>
+          <AutoCompleteMatchText keyword={keyword} target={keywordResult.name} />
         </KeywordWrapper>
       ))}
 
       {ramenyaResults.map((ramenyaResult) => (
         <KeywordWrapper key={ramenyaResult._id} onClick={() => onRamenyaSelect(ramenyaResult)}>
           <IconLocate color="#A0A0A0" />
-          <KeywordTextGroup>
-            <HighlightedText size={16} weight="sb">
-              {getTextMatch({ query: keyword, target: ramenyaResult.name }).matchedText}
-            </HighlightedText>
-            <PlainText size={16} weight="sb">
-              {getTextMatch({ query: keyword, target: ramenyaResult.name }).unMatchedText}
-            </PlainText>
-          </KeywordTextGroup>
+          <AutoCompleteMatchText keyword={keyword} target={ramenyaResult.name} />
         </KeywordWrapper>
       ))}
     </AutoCompleteContainer>
+  )
+}
+
+// 일치 구간만 주황색으로, 나머지는 원문 순서를 유지한 채(제자리 3분할) 렌더링한다.
+const AutoCompleteMatchText = ({ keyword, target }: { keyword: string; target: string }) => {
+  const { before, match, after } = getTextMatchParts({ query: keyword, target })
+
+  return (
+    <KeywordTextGroup>
+      {before && (
+        <PlainText size={16} weight="sb">
+          {before}
+        </PlainText>
+      )}
+      {match && (
+        <HighlightedText size={16} weight="sb">
+          {match}
+        </HighlightedText>
+      )}
+      {after && (
+        <PlainText size={16} weight="sb">
+          {after}
+        </PlainText>
+      )}
+    </KeywordTextGroup>
   )
 }
 
